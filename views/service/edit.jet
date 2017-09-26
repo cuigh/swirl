@@ -1,0 +1,658 @@
+{{ extends "../_layouts/default" }}
+{{ import "../_modules/form" }}
+
+{{ block script() }}
+<script>$(() => new Swirl.Service.EditPage())</script>
+{{ end }}
+
+{{ block pair(field, index=0, name="", value="")}}
+<tr>
+  <td>
+    <input name="{{field}}s[{{index}}].name" class="input is-small" type="text" value="{{name}}">
+  </td>
+  <td>
+    <input name="{{field}}s[{{index}}].value" class="input is-small" type="text" value="{{value}}">
+  </td>
+  <td>
+    <a class="button is-small is-danger" data-action="delete-{{field}}">Delete</a>
+  </td>
+</tr>
+{{ end }}
+
+{{ block dialog(name, items) }}
+<div id="dlg-add-{{ name }}" class="modal">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Add {{ name }}</p>
+      <button class="delete"></button>
+    </header>
+    <section class="modal-card-body" style="max-height: 400px; overflow-y: auto">
+      <nav class="panel">
+        <div class="panel-block">
+          <p class="control has-icons-left">
+            <input class="input is-small" type="text" placeholder="Searching is not implemented...">
+            <span class="icon is-small is-left">
+              <i class="fa fa-search"></i>
+            </span>
+          </p>
+        </div>
+        {{ range items }}
+        <label class="panel-block">
+          <input type="checkbox" value="{{ .ID }}" data-name="{{ .Spec.Name }}">
+          {{ .Spec.Name }}
+        </label>
+        {{end}}
+      </nav>
+    </section>
+    <footer class="modal-card-foot">
+      <button id="btn-add-{{ name }}" type="button" class="button is-primary">Confirm</button>
+      <button type="button" class="button dismiss">Cancel</button>
+    </footer>
+  </div>
+</div>
+{{ end }}
+
+{{ block body() }}
+<section class="hero is-info">
+  <div class="hero-body">
+    <div class="container has-text-centered">
+      <h1 class="title is-2">
+        SERVICE
+      </h1>
+      <h2 class="subtitle is-5">
+        Services are the definitions of tasks to run on a swarm.
+      </h2>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <nav class="breadcrumb has-succeeds-separator is-small is-marginless" aria-label="breadcrumbs">
+    <ul>
+      <li><a href="/">Dashboard</a></li>
+      <li><a href="/service/">Services</a></li>
+      <li class="is-active"><a>Edit</a></li>
+    </ul>
+  </nav>
+</div>
+<section class="hero is-small is-light">
+  <div class="hero-body">
+    <div class="container">
+      <h2 class="title is-2">
+        {{ .Service.Name }}
+      </h2>
+    </div>
+  </div>
+</section>
+
+<nav class="navbar has-shadow">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item is-tab" href="/service/{{.Service.Name}}/detail">Detail</a>
+      <a class="navbar-item is-tab" href="/service/{{.Service.Name}}/raw">Raw</a>
+      <a class="navbar-item is-tab is-active" href="/service/{{.Service.Name}}/edit">Edit</a>
+    </div>
+  </div>
+</nav>
+
+<section class="section">
+  <div class="container">
+    <form id="form-service" method="post" action="update" data-form="ajax-json" data-url="/service/">
+      <div class="columns">
+        <div class="column">
+          <div class="field">
+            <label class="label">Image</label>
+            <div class="control is-expanded">
+              <input name="image" value="{{ .Service.Image }}" class="input" placeholder="" data-v-rule="native" required>
+            </div>
+          </div>
+          <div class="field">
+            <label class="label">Mode</label>
+            <div class="field has-addons is-marginless">
+              <div class="control">
+                <span class="select">
+                  <select id="cb-mode" name="mode">
+                    <option value="replicated"{{if .Service.Mode == "replicated"}} selected{{end}}>Replicated</option>
+                    <option value="global"{{if .Service.Mode == "global"}} selected{{end}}>Global</option>
+                  </select>
+                </span>
+              </div>
+              <div class="control is-expanded">
+                <input id="txt-replicas" name="replicas" class="input" placeholder="" data-type="integer" data-v-rule="service-mode" {{if .Service.Mode == "global"}}style="display: none"{{else}}value="{{.Service.Replicas}}"{{end}}>
+              </div>
+            </div>
+          </div>
+          <div class="field">
+            <label class="label">Network</label>
+            <div class="control">
+              {{ set := .CheckedNetworks }}
+              {{range .Networks}}
+              {{ yield checkbox(name="networks", value=.Name, label=.Name, checked=set.Contains(.ID)) }}
+              {{end}}
+            </div>
+          </div>
+        </div>
+        <div class="is-divider-vertical" data-content=""></div>
+        <div class="column">
+          <div class="field">
+            <label class="label">Command</label>
+            <div class="control">
+              <input name="command" value="{{ .Service.Command }}" class="input" type="text" placeholder="">
+            </div>
+          </div>
+          <div class="field">
+            <label class="label">Args</label>
+            <div class="control">
+              <input name="args" value="{{ .Service.Args }}" class="input" type="text" placeholder="">
+            </div>
+          </div>
+          <div class="field">
+            <label class="label">Work directory</label>
+            <div class="control">
+              <input name="dir" value="{{ .Service.Dir }}" class="input" type="text" placeholder="">
+            </div>
+          </div>
+          <div class="field">
+            <label class="label">User</label>
+            <div class="control">
+              <input name="user" value="{{ .Service.User }}" class="input" type="text" placeholder="">
+            </div>
+          </div>
+        </div>
+      </div>
+      <fieldset>
+        <legend class="lead is-5">Environments</legend>
+        {{ yield options_table(name="env", items=.Service.Environments) }}
+      </fieldset>
+      <fieldset>
+        <legend class="lead is-5">Service Labels</legend>
+        {{ yield options_table(name="slabel", items=.Service.ServiceLabels) }}
+      </fieldset>
+      <fieldset>
+        <legend class="lead is-5">Container Labels</legend>
+        {{ yield options_table(name="clabel", items=.Service.ContainerLabels) }}
+      </fieldset>
+      <hr>
+      <div class="tabs is-toggle is-fullwidth is-marginless" data-target="tab-content">
+        <ul>
+          <li class="is-active">
+            <a>
+              <span>Ports</span>
+            </a>
+          </li>
+          <li>
+            <a>
+              <span>Volumes</span>
+            </a>
+          </li>
+          <li>
+            <a>
+              <span>Configurations</span>
+            </a>
+          </li>
+          <li>
+            <a>
+              <span>Resources</span>
+            </a>
+          </li>
+          <li>
+            <a>
+              <span>Placement</span>
+            </a>
+          </li>
+          <li>
+            <a>
+              <span>Schedule policy</span>
+            </a>
+          </li>
+          <li>
+            <a>
+              <span>Log driver</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div id="tab-content" class="tabs-content has-no-top-border">
+        <div>
+          <div class="field">
+            <label class="label">Resolution mode</label>
+            <div class="control">
+              {{ yield radios(name="endpoint.mode", values=slice("vip", "dnsrr"), labels=slice("VIP", "DNS-RR"), checked=.Service.Endpoint.Mode) }}
+            </div>
+          </div>
+          <div class="field">
+            <label class="label">Port config</label>
+            <table id="table-endpoint-ports" class="table is-bordered is-narrow is-fullwidth is-marginless" data-name="endpoint.port">
+              <thead>
+                <tr>
+                  <th>Host</th>
+                  <th>Container</th>
+                  <th>Protocol</th>
+                  <th>Mode</th>
+                  <th width="50">
+                    <a class="button is-small is-outlined is-success" data-action="add-endpoint-port">
+                      <span class="icon is-small">
+                        <i class="fa fa-plus"></i>
+                      </span>
+                    </a>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {{range i, p := .Service.Endpoint.Ports}}
+                <tr>
+                  <td><input name="endpoint.ports[{{i}}].published_port" value="{{p.PublishedPort}}" class="input is-small" placeholder="port in host" data-type="integer"></td>
+                  <td>
+                    <input name="endpoint.ports[{{i}}].target_port" value="{{p.TargetPort}}" class="input is-small" placeholder="port in container" data-type="integer">
+                  </td>
+                  <td>
+                    <div class="select is-small">
+                      <select name="endpoint.ports[{{i}}].protocol">
+                        {{ yield option(value="tcp", label="TCP", selected=p.Protocol) }}
+                        {{ yield option(value="udp", label="UDP", selected=p.Protocol) }}
+                      </select>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="select is-small">
+                      <select name="endpoint.ports[{{i}}].publish_mode">
+                        {{ yield option(value="ingress", selected=p.PublishMode) }}
+                        {{ yield option(value="host", selected=p.PublishMode) }}
+                      </select>
+                    </div>
+                  </td>
+                  <td>
+                    <a class="button is-small is-outlined is-danger" data-action="delete-endpoint-port">
+                      <span class="icon is-small">
+                        <i class="fa fa-trash"></i>
+                      </span>
+                    </a>
+                  </td>
+                </tr>
+                {{end}}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div style="display: none">
+          <table id="table-mounts" class="table is-bordered is-narrow is-fullwidth is-marginless" data-name="mount">
+            <thead>
+              <tr>
+                <th width="80">Type</th>
+                <th>Source</th>
+                <th>Target</th>
+                <th width="30">ReadOnly</th>
+                <th>Propagation</th>
+                <th width="50">
+                  <a class="button is-small is-outlined is-success" data-action="add-mount">
+                    <span class="icon is-small">
+                      <i class="fa fa-plus"></i>
+                    </span>
+                  </a>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {{range i, m := .Service.Mounts}}
+              <tr>
+                <td>
+                  <div class="select is-small">
+                    {{ yield select(name="mounts["+i+"].type", values=slice("bind", "volume", "tmpfs"), labels=slice("Bind", "Volume", "TempFS"), selected=m.Type) }}
+                  </div>
+                </td>
+                <td>
+                  <input name="mounts[{{i}}].src" value="{{m.Source}}" class="input is-small" placeholder="path in host">
+                </td>
+                <td><input name="mounts[{{i}}].dst" value="{{m.Target}}" class="input is-small" placeholder="path in container"></td>
+                <td>
+                  <div class="select is-small">
+                    {{ yield select(name="mounts["+i+"].read_only", values=slice("false", "true"), labels=slice("No", "Yes"), selected=m.Type, dt="bool") }}
+                  </div>
+                </td>
+                <td>
+                  <div class="select is-small">
+                    <select name="mounts[{{i}}].propagation">
+                      <option value="">--Select--</option>
+                      {{ yield option(value="rprivate", selected=m.Propagation) }}
+                      {{ yield option(value="private", selected=m.Propagation) }}
+                      {{ yield option(value="rshared", selected=m.Propagation) }}
+                      {{ yield option(value="shared", selected=m.Propagation) }}
+                      {{ yield option(value="rslave", selected=m.Propagation) }}
+                      {{ yield option(value="slave", selected=m.Propagation) }}
+                    </select>
+                  </div>
+                </td>
+                <td>
+                  <a class="button is-small is-outlined is-danger" data-action="delete-mount">
+                    <span class="icon is-small">
+                      <i class="fa fa-trash"></i>
+                    </span>
+                  </a>
+                </td>
+              </tr>
+              {{end}}
+            </tbody>
+          </table>
+        </div>
+        <div style="display: none">
+          <div class="field">
+            <label class="label">Secrets</label>
+            <table id="table-secrets" class="table is-bordered is-narrow is-fullwidth is-marginless" data-name="secret">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>File name</th>
+                  <th>UID</th>
+                  <th>GID</th>
+                  <th>Mode</th>
+                  <th width="50">
+                    <a class="button is-small is-outlined is-success" data-action="add-secret">
+                      <span class="icon is-small">
+                        <i class="fa fa-plus"></i>
+                      </span>
+                    </a>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {{range i, c := .Service.Secrets}}
+                <tr>
+                  <td>{{ c.Name }}<input name="secrets[{{ i }}].id" value="{{ c.ID }}" type="hidden"><input name="secrets[{{ i }}].name" value="{{ c.Name }}" type="hidden"></td>
+                  <td><input name="secrets[{{ i }}].file_name" value="{{ c.FileName }}" class="input is-small"></td>
+                  <td><input name="secrets[{{ i }}].uid" value="{{ c.UID }}" class="input is-small"></td>
+                  <td><input name="secrets[{{ i }}].gid" value="{{ c.GID }}" class="input is-small"></td>
+                  <td><input name="secrets[{{ i }}].mode" value="{{ c.Mode }}" class="input is-small" data-type="integer"></td>
+                  <td>
+                    <a class="button is-small is-outlined is-danger" data-action="delete-secret">
+                      <span class="icon is-small">
+                        <i class="fa fa-remove"></i>
+                      </span>
+                    </a>
+                  </td>
+                </tr>
+                {{end}}
+              </tbody>
+            </table>
+            <p class="help">Secrets will be mounted as /run/secrets/$FILE_NAME in containers by default, You can specify a custom location in Docker 17.06 and higher.</p>
+          </div>
+          <div class="field">
+            <label class="label">Configs</label>
+            <table id="table-configs" class="table is-bordered is-narrow is-fullwidth is-marginless" data-name="config">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>File name</th>
+                  <th>UID</th>
+                  <th>GID</th>
+                  <th>Mode</th>
+                  <th width="50">
+                    <a class="button is-small is-outlined is-success" data-action="add-config">
+                      <span class="icon is-small">
+                        <i class="fa fa-plus"></i>
+                      </span>
+                    </a>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {{range i, c := .Service.Configs}}
+                <tr>
+                  <td>{{ c.Name }}<input name="configs[{{ i }}].id" value="{{ c.ID }}" type="hidden"><input name="configs[{{ i }}].name" value="{{ c.Name }}" type="hidden"></td>
+                  <td><input name="configs[{{ i }}].file_name" value="{{ c.FileName }}" class="input is-small"></td>
+                  <td><input name="configs[{{ i }}].uid" value="{{ c.UID }}" class="input is-small"></td>
+                  <td><input name="configs[{{ i }}].gid" value="{{ c.GID }}" class="input is-small"></td>
+                  <td><input name="configs[{{ i }}].mode" value="{{ c.Mode }}" class="input is-small" data-type="integer"></td>
+                  <td>
+                    <a class="button is-small is-outlined is-danger" data-action="delete-config">
+                      <span class="icon is-small">
+                        <i class="fa fa-remove"></i>
+                      </span>
+                    </a>
+                  </td>
+                </tr>
+                {{end}}
+              </tbody>
+            </table>
+            <p class="help">Configs will be mounted as /$FILE_NAME in containers by default, You can specify a custom location.</p>
+          </div>
+        </div>
+        <div style="display: none">
+          <div class="columns">
+            <div class="column">
+              <fieldset>
+                <legend class="lead is-5">Limits</legend>
+                <div class="field">
+                  <label class="label">CPU</label>
+                  <div class="control">
+                    <input name="resource.limit.cpu" value="{{ .Service.Resource.Limit.CPU ? .Service.Resource.Limit.CPU : "" }}" class="input" placeholder="e.g. 1" data-type="float">
+                  </div>
+                </div>
+                <div class="field">
+                  <label class="label">Memory</label>
+                  <div class="control">
+                    <input name="resource.limit.memory" value="{{ .Service.Resource.Limit.Memory }}" class="input" placeholder="e.g. 1G">
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+            <div class="is-divider-vertical" data-content=""></div>
+            <div class="column">
+              <fieldset>
+                <legend class="lead is-5">Reservations</legend>
+                <div class="field">
+                  <label class="label">CPU</label>
+                  <div class="control">
+                    <input name="resource.reserve.cpu" value="{{ .Service.Resource.Reserve.CPU ? .Service.Resource.Reserve.CPU : "" }}" class="input" placeholder="e.g. 0.1" data-type="float">
+                  </div>
+                </div>
+                <div class="field">
+                  <label class="label">Memory</label>
+                  <div class="control">
+                    <input name="resource.reserve.memory" value="{{ .Service.Resource.Reserve.Memory }}" class="input" placeholder="e.g. 10M">
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+          </div>
+        </div>
+        <div style="display: none">
+          <div class="field">
+            <label class="label">Constraints</label>
+            <table id="table-constraints" class="table is-bordered is-narrow is-fullwidth is-marginless" data-name="constraint">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th width="30">Operator</th>
+                  <th>Value</th>
+                  <th width="50">
+                    <a class="button is-small is-outlined is-success" data-action="add-constraint">
+                      <span class="icon is-small">
+                        <i class="fa fa-plus"></i>
+                      </span>
+                    </a>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {{ range i, c := .Service.Placement.Constraints }}
+                <tr>
+                  <td>
+                    <input name="placement.constraints[{{i}}].name" value="{{c.Name}}" class="input is-small" placeholder="e.g. node.role/node.hostname/node.id/node.labels.*/engine.labels.*/...">
+                  </td>
+                  <td>
+                    <div class="select is-small">
+                      {{ yield select(name="placement.constraints["+i+"].op", values=slice("==", "!="), selected=c.Operator) }}
+                    </div>
+                  </td>
+                  <td>
+                    <input name="placement.constraints[{{i}}].value" value="{{c.Value}}" class="input is-small" placeholder="e.g. manager">
+                  </td>
+                  <td>
+                    <a class="button is-small is-outlined is-danger" data-action="delete-constraint">
+                      <span class="icon is-small">
+                        <i class="fa fa-trash"></i>
+                      </span>
+                    </a>
+                  </td>
+                </tr>
+                {{ end }}
+              </tbody>
+            </table>
+          </div>
+          <div class="field">
+            <label class="label">Preferences</label>
+            <table id="table-preferences" class="table is-bordered is-narrow is-fullwidth is-marginless" data-name="preference">
+              <thead>
+                <tr>
+                  <th>Spread</th>
+                  <th width="50">
+                    <a class="button is-small is-outlined is-success" data-action="add-preference">
+                      <span class="icon is-small">
+                        <i class="fa fa-plus"></i>
+                      </span>
+                    </a>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {{ range i, p := .Service.Placement.Preferences }}
+                <tr>
+                  <td>
+                    <input name="placement.preferences[{{i}}].spread" value="{{p.Spread}}" class="input is-small" placeholder="e.g. engine.labels.az">
+                  </td>
+                  <td>
+                    <a class="button is-small is-outlined is-danger" data-action="delete-preference">
+                      <span class="icon is-small">
+                        <i class="fa fa-trash"></i>
+                      </span>
+                    </a>
+                  </td>
+                </tr>
+                {{ end }}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div style="display: none">
+          <div class="columns">
+            <div class="column">
+              <fieldset>
+                <legend class="lead is-5">Update</legend>
+                <div class="field">
+                  <label class="label">Parallelism</label>
+                  <div class="control">
+                    <input name="update_policy.parallelism" value="{{ trimZero(.Service.UpdatePolicy.Parallelism) }}" class="input" placeholder="" data-type="integer">
+                  </div>
+                </div>
+                <div class="field">
+                  <label class="label">Delay</label>
+                  <div class="control">
+                    <input name="update_policy.delay" value="{{ .Service.UpdatePolicy.Delay }}" class="input" placeholder="ns|us|ms|s|m|h">
+                  </div>
+                </div>
+                <div class="field">
+                  <label class="label">Failure action</label>
+                  <div class="control">
+                    {{ yield radios(name="update_policy.failure_action", values=slice("pause", "continue", "rollback"), checked=.Service.UpdatePolicy.FailureAction) }}
+                  </div>
+                </div>
+                <div class="field">
+                  <label class="label">Order</label>
+                  <div class="control">
+                    {{ yield radios(name="update_policy.order", values=slice("start-first", "stop-first"), checked=.Service.UpdatePolicy.Order) }}
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+            <div class="is-divider-vertical" data-content=""></div>
+            <div class="column">
+              <fieldset>
+                <legend class="lead is-5">Rollback</legend>
+                <div class="field">
+                  <label class="label">Parallelism</label>
+                  <div class="control">
+                    <input name="rollback_policy.parallelism" value="{{ trimZero(.Service.RollbackPolicy.Parallelism) }}" class="input" placeholder="" data-type="integer">
+                  </div>
+                </div>
+                <div class="field">
+                  <label class="label">Delay</label>
+                  <div class="control">
+                    <input name="rollback_policy.delay" value="{{ .Service.RollbackPolicy.Delay }}" class="input" placeholder="ns|us|ms|s|m|h">
+                  </div>
+                </div>
+                <div class="field">
+                  <label class="label">Failure action</label>
+                  <div class="control">
+                    {{ yield radios(name="rollback_policy.failure_action", values=slice("pause", "continue"), checked=.Service.RollbackPolicy.FailureAction) }}
+                  </div>
+                </div>
+                <div class="field">
+                  <label class="label">Order</label>
+                  <div class="control">
+                    {{ yield radios(name="rollback_policy.order", values=slice("start-first", "stop-first"), checked=.Service.RollbackPolicy.Order) }}
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+            <div class="is-divider-vertical" data-content=""></div>
+            <div class="column">
+              <fieldset>
+                <legend class="lead is-5">Restart</legend>
+                <div class="field">
+                  <label class="label">Condition</label>
+                  <div class="control">
+                    {{ yield radios(name="restart_policy.condition", values=slice("any", "on-failure", "none"), checked=.Service.RestartPolicy.Condition) }}
+                  </div>
+                </div>
+                <div class="field">
+                  <label class="label">Max attempts</label>
+                  <div class="control">
+                    <input name="restart_policy.max_attempts" value="{{ trimZero(.Service.RestartPolicy.MaxAttempts) }}" class="input" placeholder="" data-type="integer">
+                  </div>
+                </div>
+                <div class="field">
+                  <label class="label">Delay</label>
+                  <div class="control">
+                    <input name="restart_policy.delay" value="{{ .Service.RestartPolicy.Delay }}" class="input" placeholder="ns|us|ms|s|m|h">
+                  </div>
+                </div>
+                <div class="field">
+                  <label class="label">Window</label>
+                  <div class="control">
+                    <input name="restart_policy.window" value="{{ .Service.RestartPolicy.Delay }}" class="input" placeholder="ns|us|ms|s|m|h">
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+          </div>
+        </div>
+        <div style="display: none">
+          <div class="field">
+            <label class="label">Name</label>
+            <div class="control">
+              {{ yield radios(name="log_driver.name", values=slice("json-file", "syslog", "journald", "gelf", "fluentd", "awslogs", "splunk", "etwlogs", "gcplogs", "none"), checked=.Service.LogDriver.Name) }}
+            </div>
+          </div>
+          <div class="field">
+            <label class="label">Options</label>
+            {{ yield options_table(name="log_driver.option", items=.Service.LogDriver.Options) }}
+          </div>
+        </div>
+      </div>
+      <hr>
+      <div class="field is-grouped">
+        <div class="control">
+          <button type="submit" class="button is-primary">Submit</button>
+        </div>
+        <div class="control">
+          <a href="/service/" class="button is-link">Cancel</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+
+{{ yield dialog(name="secret", items=.Secrets) }}
+{{ yield dialog(name="config", items=.Configs) }}
+{{ end }}

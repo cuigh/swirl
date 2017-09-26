@@ -1,0 +1,19 @@
+{{ block pager(info) }}
+  <nav class="pagination is-centered">
+    <a class="pagination-previous" {{ if info.Page > 1 }}href="{{ info.URL(info.Page-1) }}"{{ else }}disabled{{ end }}>Previous</a>
+    <a class="pagination-next" {{ if info.Page < info.MaxPage }}href="{{ info.URL(info.Page+1) }}"{{ else }}disabled{{ end }}>Next</a>
+    <ul class="pagination-list">
+      {{ range info.Pages }}
+      <li>
+        {{ if . == 0 }}
+        <span class="pagination-ellipsis">&hellip;</span>
+        {{ else if . == info.Page }}
+        <a class="pagination-link is-current">{{ . }}</a>
+        {{ else }}
+        <a href="{{info.URL(.)}}" class="pagination-link">{{ . }}</a>
+        {{ end }}
+      </li>
+      {{ end }}      
+    </ul>
+  </nav>  
+{{ end }}

@@ -1,0 +1,70 @@
+{{ extends "../_layouts/default" }}
+{{ import "../_modules/detail" }}
+
+{{ block body() }}
+<section class="hero is-info">
+  <div class="hero-body">
+    <div class="container has-text-centered">
+      <h1 class="title is-2">
+        VOLUMES
+      </h1>
+      <h2 class="subtitle is-5">
+        Create and manage persistent storage that can be attached to containers.
+      </h2>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <nav class="breadcrumb has-succeeds-separator is-small is-marginless" aria-label="breadcrumbs">
+    <ul>
+      <li><a href="/">Dashboard</a></li>
+      <li><a href="/volume/">Volumes</a></li>
+      <li class="is-active"><a>Detail</a></li>
+    </ul>
+  </nav>
+</div>
+<section class="hero is-small is-light">
+  <div class="hero-body">
+    <div class="container">
+      <h2 class="title is-2">
+        {{ .Volume.Name }}
+      </h2>      
+    </div>
+  </div>
+</section>
+<nav class="navbar has-shadow">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item is-tab is-active" href="/volume/{{.Volume.Name}}/detail">
+        Detail
+      </a>
+      <a class="navbar-item is-tab " href="/volume/{{.Volume.Name}}/raw">
+        Raw
+      </a>
+    </div>
+  </div>
+</nav>
+<section class="section">
+  <div class="container">
+    <div class="message is-primary">
+      <div class="message-body">
+        <dl class="is-horizontal is-marginless">
+          <dt class="has-text-left">Driver</dt>
+          <dd>{{ .Volume.Driver }}</dd>
+          <dt class="has-text-left">Scope</dt>
+          <dd>{{ .Volume.Scope}}</dd>
+          <dt class="has-text-left">Mount point</dt>
+          <dd>{{ .Volume.Mountpoint }}</dd>
+        </dl>
+      </div>
+    </div>
+    {{ yield tags(title="Options", tags=.Volume.Options) }}
+    {{ yield tags(title="Labels", tags=.Volume.Labels) }}
+    <a href="/volume/" class="button is-primary">
+      <span class="icon"><i class="fa fa-reply"></i></span>
+      <span>Return</span>
+    </a>
+  </div>
+</section>
+{{ end }}

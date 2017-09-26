@@ -1,0 +1,122 @@
+{{ extends "../../_layouts/default" }}
+{{ import "../../_modules/pager" }}
+
+{{ block option(value, selected) }}
+<option value="{{ value }}"{{ if selected == value }} selected{{end}}>{{ value }}</option>
+{{ end }}
+
+{{ block body() }}
+<section class="hero is-dark">
+  <div class="hero-body">
+    <div class="container has-text-centered">
+      <h1 class="title is-2">EVENTS</h1>
+      <h2 class="subtitle is-5">
+        Manage all user events.
+      </h2>      
+    </div>
+  </div>
+  <div class="hero-foot">
+    <div class="container">
+      <nav class="tabs is-boxed">
+        <ul>
+          <li>
+            <a href="/system/role/">Roles</a>
+          </li>
+          <li>
+            <a href="/system/user/">Users</a>
+          </li>
+          <li>
+            <a href="/system/setting/">Settings</a>
+          </li>
+          <li class="is-active">
+            <a href="/system/event/">Events</a>
+          </li>          
+        </ul>
+      </nav>
+    </div>
+  </div>  
+</section>
+
+<section class="section">
+  <nav class="level">
+    <!-- Left side -->
+    <div class="level-left">
+      <div class="level-item">
+        <form>
+          <div class="field has-addons">
+            <p class="control">
+              <span class="select">
+                <select name="type">
+                  <option value="">All</option>
+                  <optgroup label="System">
+                    {{ yield option(value="Authentication", selected=.Args.Type) }}
+                    {{ yield option(value="Role", selected=.Args.Type) }}
+                    {{ yield option(value="User", selected=.Args.Type) }}
+                    {{ yield option(value="Setting", selected=.Args.Type) }}
+                  </optgroup>
+                  <optgroup label="Swarm">
+                    {{ yield option(value="Registry", selected=.Args.Type) }}
+                    {{ yield option(value="Node", selected=.Args.Type) }}
+                    {{ yield option(value="Network", selected=.Args.Type) }}
+                    {{ yield option(value="Service", selected=.Args.Type) }}
+                    {{ yield option(value="Stack Task", selected=.Args.Type) }}
+                    {{ yield option(value="Stack Archive", selected=.Args.Type) }}
+                    {{ yield option(value="Secret", selected=.Args.Type) }}
+                    {{ yield option(value="Config", selected=.Args.Type) }}
+                  </optgroup>
+                  <optgroup label="Local">
+                    {{ yield option(value="Image", selected=.Args.Type) }}
+                    {{ yield option(value="Container", selected=.Args.Type) }}
+                    {{ yield option(value="Volume", selected=.Args.Type) }}
+                  </optgroup>
+                </select>
+              </span>
+            </p>
+            <p class="control">
+              <input name="name" value="{{ .Args.Name }}" class="input" placeholder="Search by resource">
+            </p>
+            <p class="control">
+              <button class="button is-primary">Search</button>
+            </p>
+          </div>
+        </form>
+      </div>
+      <div class="level-item">
+        <p class="subtitle is-5">
+          <strong>{{.Pager.Count}}</strong> events
+        </p>
+      </div>
+    </div>
+  </nav>
+
+  <table id="table-items" class="table is-bordered is-striped is-narrow is-fullwidth">
+    <thead>
+        <tr>
+          <th>Type</th>
+          <th>Resource</th>
+          <th>Action</th>
+          <th>User</th>
+          <th>Time</th>
+        </tr>
+    </thead>
+      <tbody>
+        {{range .Events}}
+        <tr>
+          <td class="is-capitalized">{{ .Type }}</td>
+          <td>
+          {{ if u := .URL(.Type, .Code); u }}
+            <a href="{{ u }}">{{ .Name }}</a>
+          {{ else }}
+            {{ .Name }}
+          {{ end }}
+          </td>
+          <td class="is-capitalized">{{ .Action }}</td>
+          <td>{{ .Username }}</td>
+          <td>{{ time(.Time) }}</td>
+        </tr>
+        {{end}}
+      </tbody>
+  </table>
+  {{ yield pager(info=.Pager) }}
+</section>
+{{ end }}

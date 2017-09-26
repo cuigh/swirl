@@ -1,0 +1,72 @@
+{{ extends "../../_layouts/default" }}
+
+{{ block script() }}
+<script>$(() => new Swirl.Stack.Task.ListPage())</script>
+{{ end }}
+
+{{ block body() }}
+<section class="hero is-info">
+  <div class="hero-body">
+    <div class="container has-text-centered">
+      <h1 class="title is-2">
+        STACK
+      </h1>
+      <h2 class="subtitle is-5">
+        A stack is a logical grouping of related services that are usually deployed together and require each other to work as intended.
+      </h2>
+    </div>
+  </div>
+  <div class="hero-foot">
+    <div class="container">
+      <nav class="tabs is-boxed">
+        <ul>
+          <li class="is-active">
+            <a href="/stack/task/">Tasks</a>
+          </li>
+          <li>
+            <a href="/stack/archive/">Archives</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>  
+</section>
+<section class="section">
+  <nav class="level">
+    <!-- Left side -->
+    <div class="level-left">
+      <div class="level-item">
+        <p class="subtitle is-5">
+          <strong>{{len(.Stacks)}}</strong> stacks
+        </p>
+      </div>      
+    </div>
+  </nav>
+  <table id="table-items" class="table is-bordered is-striped is-narrow is-fullwidth">
+      <thead>
+          <tr>
+            <th>Name</th>
+            <th>Services</th>
+            <th>Action</th>
+          </tr>
+      </thead>
+      <tbody>
+          {{range .Stacks}}
+          <tr>
+            <td>{{.Name}}</td>
+            <td>
+              <div class="tags">
+                {{range .Services}}
+                <a href="/service/{{.}}/detail" class="tag is-success">{{.}}</a>
+                {{end}}
+              </div>
+            </td>
+            <td>
+              <button class="button is-small is-danger is-outlined" data-action="delete-stack">Delete</button>
+            </td>
+          </tr>
+          {{end}}          
+      </tbody>
+  </table>
+</section>
+{{ end }}

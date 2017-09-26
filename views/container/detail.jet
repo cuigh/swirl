@@ -1,0 +1,69 @@
+{{ extends "../_layouts/default" }}
+{{ import "../_modules/detail" }}
+
+{{ block body() }}
+<section class="hero is-info">
+  <div class="hero-body">
+    <div class="container has-text-centered">
+      <h1 class="title is-2">
+        CONTAINER
+      </h1>
+      <h2 class="subtitle is-5">
+        A container is a running instance of image.
+      </h2>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <nav class="breadcrumb has-succeeds-separator is-small is-marginless" aria-label="breadcrumbs">
+    <ul>
+      <li><a href="/">Dashboard</a></li>
+      <li class="is-active"><a>Detail</a></li>
+    </ul>
+  </nav>
+</div>
+
+<section class="hero is-small is-light">
+  <div class="hero-body">
+    <div class="container">
+      <h2 class="title is-2">
+        {{ .Container.ContainerJSONBase.Name }}
+      </h2>      
+    </div>
+  </div>
+</section>
+
+<nav class="navbar has-shadow">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item is-tab is-active" href="/container/{{.Container.ContainerJSONBase.ID}}/detail">
+        Detail
+      </a>
+      <a class="navbar-item is-tab " href="/container/{{.Container.ContainerJSONBase.ID}}/raw">
+        Raw
+      </a>
+    </div>
+  </div>
+</nav>
+
+<section class="section">
+  <div class="container">
+    <div class="message is-primary">
+      <div class="message-body">
+        <dl class="is-horizontal is-marginless">
+          <dt class="has-text-left">ID</dt>
+          <dd>{{ .Container.ContainerJSONBase.ID }}</dd>
+          {{ yield desc(title="PID", value=.Container.ContainerJSONBase.State.Pid) }}
+          {{ yield desc(title="Image", value=.Container.ContainerJSONBase.Image) }}
+          {{ yield desc(title="Created at", value=.Container.ContainerJSONBase.Created) }}
+          {{ yield desc(title="Started at", value=.Container.ContainerJSONBase.State.StartedAt) }}
+          <dt class="has-text-left">Status</dt>
+          <dd><span class="tag is-{{ .Container.ContainerJSONBase.State.Status == "running" ? "success" : "danger" }}">{{ .Container.ContainerJSONBase.State.Status }}</span></dd>
+          {{ yield desc(title="Error", value=.Container.ContainerJSONBase.State.Error) }}
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>
+{{ end }}

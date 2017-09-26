@@ -1,0 +1,150 @@
+{{ extends "../_layouts/default" }}
+
+{{ block script() }}
+<script>$(() => new Swirl.Registry.ListPage())</script>
+{{ end }}
+
+{{ block body() }}
+<section class="hero is-info">
+  <div class="hero-body">
+    <div class="container has-text-centered">
+      <h1 class="title is-2">
+        REGISTRY
+      </h1>
+      <h2 class="subtitle is-5">
+        A registry is a storage and content delivery system, holding named Docker images, available in different tagged versions.
+      </h2>
+    </div>
+  </div>
+</section>
+<section class="section">
+  <nav class="level">
+    <!-- Left side -->
+    <div class="level-left">
+      <div class="level-item">
+        <p class="subtitle is-5">
+          <strong>{{len(.Registries)}}</strong> registries
+        </p>
+      </div>      
+    </div>
+    <!-- Right side -->
+    <div class="level-right">
+      <p class="level-item">
+        <button id="btn-new" class="button is-success modal-trigger" data-target="dlg-add"><span class="icon"><i class="fa fa-plus"></i></span><span>New</span></button>
+      </p>
+    </div>
+  </nav>
+
+  <table id="table-items" class="table is-bordered is-striped is-narrow is-fullwidth">
+      <thead>
+          <tr>
+            <th>Name</th>
+            <th>URL</th>
+            <th>Username</th>
+            <th>Created at</th>
+            <th>Updated at</th>
+            <th>Action</th>
+          </tr>
+      </thead>
+      <tbody>
+          {{range .Registries}}
+          <tr data-id="{{.ID}}">
+            <td>{{.Name}}</td>
+            <td>{{.URL}}</td>
+            <td>{{.Username}}</td>
+            <td>{{time(.CreatedAt)}}</td>
+            <td>{{time(.UpdatedAt)}}</td>
+            <td>
+              <button class="button is-small is-dark is-outlined" data-action="edit-registry">Edit</button>
+              <button class="button is-small is-danger is-outlined" data-action="delete-registry">Delete</button>
+            </td>
+          </tr>
+          {{end}}          
+      </tbody>
+  </table>
+</section>
+
+<div id="dlg-add" class="modal">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Add registry</p>
+      <button class="delete"></button>
+    </header>
+    <form method="post" action="create" data-form="ajax-json" data-url="-" data-message="Registry created.">
+      <section class="modal-card-body">
+        <div class="field">
+          <label class="label">Name</label>
+          <div class="control">
+            <input name="name" class="input" type="text" placeholder="Name" data-v-rule="native" required>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">URL</label>
+          <div class="control">
+            <input name="url" class="input" type="text" placeholder="Omit schema" data-v-rule="native" required>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Username</label>
+          <div class="control">
+            <input name="username" class="input" type="text" placeholder="Login account" data-v-rule="native" required>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Password</label>
+          <div class="control">
+            <input name="password" class="input" type="password" placeholder="Login password" data-v-rule="native" required>
+          </div>
+        </div>                        
+      </section>
+      <footer class="modal-card-foot">
+        <button type="submit" class="button is-primary">Submit</button>
+        <button type="button" class="button dismiss">Cancel</button>
+      </footer>
+    </form>    
+  </div>
+</div>
+<div id="dlg-edit" class="modal">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Edit registry</p>
+      <button class="delete"></button>
+    </header>
+    <form method="post" action="update" data-form="ajax-json" data-url="-" data-message="Registry updated.">
+      <input name="id" type="hidden">
+      <section class="modal-card-body">
+        <div class="field">
+          <label class="label">Name</label>
+          <div class="control">
+            <input name="name" class="input" type="text" placeholder="Name" data-v-rule="native" required>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">URL</label>
+          <div class="control">
+            <input name="url" class="input" type="text" placeholder="Omit schema" data-v-rule="native" required>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Username</label>
+          <div class="control">
+            <input name="username" class="input" type="text" placeholder="Login account" data-v-rule="native" required>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Password</label>
+          <div class="control">
+            <input name="password" class="input" type="password" placeholder="Login password">
+          </div>
+        </div>                        
+      </section>
+      <footer class="modal-card-foot">
+        <button type="submit" class="button is-primary">Submit</button>
+        <button type="button" class="button dismiss">Cancel</button>
+      </footer>
+    </form>    
+  </div>
+</div>
+{{ end }}

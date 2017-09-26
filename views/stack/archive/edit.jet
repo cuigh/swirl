@@ -1,0 +1,97 @@
+{{ extends "../../_layouts/default" }}
+
+{{ block style() }}
+<link rel="stylesheet" href="/codemirror/codemirror.css?v=5.30">
+{{ end }}
+
+{{ block script() }}
+<script src="/codemirror/codemirror.js?v=5.30"></script>
+<script src="/codemirror/mode/yaml.js?v=5.30"></script>
+<script>var editor = CodeMirror.fromTextArea(document.getElementById("txt-content"), {lineNumbers: true});</script>
+{{ end }}
+
+{{ block body() }}
+<section class="hero is-info">
+  <div class="hero-body">
+    <div class="container has-text-centered">
+      <h1 class="title is-2">
+        STACK
+      </h1>
+      <h2 class="subtitle is-5">
+        A stack is a logical grouping of related services that are usually deployed together and require each other to work as intended.
+      </h2>
+    </div>
+  </div>
+  <div class="hero-foot">
+    <div class="container">
+      <nav class="tabs is-boxed">
+        <ul>
+          <li>
+            <a href="/stack/task/">Tasks</a>
+          </li>
+          <li class="is-active">
+            <a href="/stack/archive/">Archives</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <nav class="breadcrumb has-succeeds-separator is-small is-marginless" aria-label="breadcrumbs">
+    <ul>
+      <li><a href="/">Dashboard</a></li>
+      <li><a href="/stack/archive/">Archives</a></li>
+      <li class="is-active"><a>Edit</a></li>
+    </ul>
+  </nav>
+</div>
+
+<section class="hero is-small is-light">
+  <div class="hero-body">
+    <div class="container">
+      <h2 class="title is-2">
+        {{ .Archive.Name }}
+      </h2>
+    </div>
+  </div>
+</section>
+
+<nav class="navbar has-shadow">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item is-tab" href="/stack/archive/{{.Archive.ID}}/detail">Detail</a>
+      <a class="navbar-item is-tab is-active" href="/stack/archive/{{.Archive.ID}}/edit">Edit</a>
+    </div>
+  </div>
+</nav>
+
+<section class="section">
+  <div class="container">
+    <form method="post" action="update" data-form="ajax-json" data-url="/stack/archive/">
+      <input name="id" value="{{ .Archive.ID }}" type="hidden">
+      <div class="field">
+        <label class="label">Name</label>
+        <div class="control">
+          <input name="name" class="input" value="{{ .Archive.Name }}" type="text" placeholder="" data-v-rule="native;regex" data-v-arg-regex="^[a-z0-9_-]+$" data-v-msg-regex="Name can contain only letters, digits, '_' and '-'." required>
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">Content</label>
+        <div class="control">
+          <textarea id="txt-content" name="content" class="textarea code" rows="20" placeholder="Compose file content" data-v-rule="native" required>{{ .Archive.Content }}</textarea>
+        </div>
+      </div>
+      <div class="field is-grouped">
+        <div class="control">
+          <button type="submit" class="button is-primary">Submit</button>
+        </div>
+        <div class="control">
+          <a href="/stack/archive/" class="button is-link">Cancel</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+{{ end }}

@@ -1,0 +1,25 @@
+{{ block desc(title, value) }}
+{{ if value }}<dt class="has-text-left">{{ title }}</dt><dd>{{ value }}</dd>{{ end }}
+{{ end }}
+
+{{ block tags(title, tags) }}
+{{ if tags }}
+<div class="block">
+  <div class="block-header">
+    <p>{{ title }}</p>
+  </div>
+  <div class="block-body is-bordered">
+    <div class="field is-grouped is-grouped-multiline">
+      {{range k, v := tags}}
+      <div class="control">
+      <div class="tags has-addons">
+        <span class="tag is-dark">{{k}}</span>
+        <span class="tag is-info">{{v}}</span>
+      </div>
+      </div>
+      {{end}}
+    </div>
+  </div>
+</div>
+{{ end }}
+{{ end }}

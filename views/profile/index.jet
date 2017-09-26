@@ -1,0 +1,78 @@
+{{ extends "../_layouts/default" }}
+{{ block body() }}
+<section class="hero is-primary">
+  <div class="hero-body">
+    <div class="container has-text-centered">
+      <h1 class="title is-2">PROFILE</h1>
+      <h2 class="subtitle is-5">
+        User profiles.
+      </h2>      
+    </div>
+  </div>
+  <div class="hero-foot">
+    <div class="container">
+      <nav class="tabs is-boxed">
+        <ul>
+          <li class="is-active">
+            <a href="/profile/">Profile</a>
+          </li>
+          <li>
+            <a href="/profile/password">Password</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>  
+</section>
+
+<section class="section">
+  <div class="container">
+    <h2 class="title has-text-centered">Main settings</h2>
+    <hr>
+    <div class="columns">
+      <div class="column is-6 is-offset-3">          
+        <form method="post" data-form="ajax-json" data-message="The settings have been successfully modified">
+          <div class="box is-radiusless">
+            <div class="field">
+              <label class="label">Name</label>
+              <div class="field has-addons is-marginless">
+                <div class="control">
+                  <a class="button is-static">
+                    <span class="icon is-small is-left">
+                      <i class="fa fa-user"></i>
+                    </span>
+                  </a>
+                </div>                
+                <p class="control is-expanded">
+                  <input name="name" value="{{.User.Name}}" class="input" type="text" placeholder="name" data-v-rule="native" required>
+                </p>
+              </div>
+            </div>
+            <div class="field">
+              <label class="label">Email</label>
+              <div class="field has-addons is-marginless">
+                <div class="control">
+                  <a class="button is-static">
+                    <span class="icon is-small is-left">
+                      <i class="fa fa-envelope"></i>
+                    </span>
+                  </a>
+                </div>                
+                <p class="control is-expanded">
+                  <input name="email" value="{{.User.Email}}" class="input" type="text" placeholder="Email" data-v-rule="native;email" required>
+                </p>
+              </div>
+            </div>
+            <hr>
+            <div class="field">
+              <p class="control">
+                <button class="button is-primary" type="submit">Update</button>
+              </p>
+            </div>
+          </div>          
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+{{ end }}

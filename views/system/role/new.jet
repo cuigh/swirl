@@ -1,0 +1,93 @@
+{{ extends "../../_layouts/default" }}
+{{ import "../../_modules/form" }}
+
+{{ block script() }}
+<script>$(() => new Swirl.Role.NewPage())</script>
+{{ end }}
+
+{{ block body() }}
+<section class="hero is-dark">
+  <div class="hero-body">
+    <div class="container has-text-centered">
+      <h1 class="title is-2">ROLE</h1>
+      <h2 class="subtitle is-5">
+        A role is a user group with same rights. User can belong to multiple roles.
+      </h2>      
+    </div>
+  </div>
+  <div class="hero-foot">
+    <div class="container">
+      <nav class="tabs is-boxed">
+        <ul>
+          <li class="is-active">
+            <a href="/system/role/">Roles</a>
+          </li>
+          <li>
+            <a href="/system/user/">Users</a>
+          </li>
+          <li>
+            <a href="/system/setting/">Settings</a>
+          </li>
+          <li>
+            <a href="/system/event/">Events</a>
+          </li>          
+        </ul>
+      </nav>
+    </div>
+  </div>  
+</section>
+
+<section class="section">
+  <div class="container">
+    <h2 class="title">Create role</h2>
+    <hr>
+    <form method="post" data-form="ajax-json" data-url="/system/role/">
+      <div class="field">
+        <label class="label">Name</label>
+        <div class="control">
+          <input name="name" class="input" placeholder="Role name" data-v-rule="native" required>
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">Description</label>
+        <div class="control">
+          <textarea name="desc" class="textarea" placeholder="Remark"></textarea>
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">Permissions</label>
+        <div class="control">
+          <table id="table-perms" class="table is-bordered is-fullwidth">
+            <tbody>
+              {{range .Perms}}
+              <tr>
+                <th width="150" class="is-vertical-middle has-bg-white-ter">
+                  {{ yield checkbox(id="cb-"+lower(.Name), label=.Name) content}} data-form-ignore="true" data-action="check-row"{{ end }}
+                </th>
+                <td>
+                  <div class="columns is-mobile is-multiline is-tight">
+                    {{range .Perms}}
+                    <div class="column is-one-quarter-desktop is-one-third-tablet is-half-mobile">
+                      {{ yield checkbox(name="perms", value=.Key, label=.Text) content}} data-action="check"{{ end }}
+                    </div>
+                    {{end}}
+                  </div>
+                </td>
+              </tr>
+              {{end}}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="field is-grouped">
+        <div class="control">
+          <button type="submit" class="button is-primary">Submit</button>
+        </div>
+        <div class="control">
+          <a href="/system/role/" class="button is-link">Cancel</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+{{ end }}

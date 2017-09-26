@@ -1,0 +1,501 @@
+{{ extends "../_layouts/default" }}
+{{ import "../_modules/form" }}
+
+{{ block script() }}
+<script>$(() => new Swirl.Service.NewPage())</script>
+{{ end }}
+
+{{ block dialog(name, items) }}
+<div id="dlg-add-{{ name }}" class="modal">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Add {{ name }}</p>
+      <button class="delete"></button>
+    </header>
+    <section class="modal-card-body" style="max-height: 400px; overflow-y: auto">
+      <nav class="panel">
+        <div class="panel-block">
+          <p class="control has-icons-left">
+            <input class="input is-small" type="text" placeholder="Searching is not implemented...">
+            <span class="icon is-small is-left">
+              <i class="fa fa-search"></i>
+            </span>
+          </p>
+        </div>
+        {{ range items }}
+        <label class="panel-block">
+          <input type="checkbox" value="{{ .ID }}" data-name="{{ .Spec.Name }}">
+          {{ .Spec.Name }}
+        </label>
+        {{end}}
+      </nav>
+    </section>
+    <footer class="modal-card-foot">
+      <button id="btn-add-{{ name }}" type="button" class="button is-primary">Confirm</button>
+      <button type="button" class="button dismiss">Cancel</button>
+    </footer>
+  </div>
+</div>
+{{ end }}
+
+{{ block body() }}
+<section class="hero is-info">
+  <div class="hero-body">
+    <div class="container has-text-centered">
+      <h1 class="title is-2">
+        SERVICE
+      </h1>
+      <h2 class="subtitle is-5">
+        Services are the definitions of tasks to run on a swarm.
+      </h2>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <h2 class="title">Create service</h2>
+  <hr>
+  <form id="form-service" method="post" data-form="ajax-json" data-url="/service/">
+    <div class="columns">
+      <div class="column">
+        <div class="field">
+          <label class="label">Name</label>
+          <div class="control">
+            <input name="name" class="input" type="text" placeholder="" data-v-rule="native" required>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Image</label>
+          <div class="field has-addons is-marginless">
+            <div class="control">
+              <span class="select">
+                <select id="cb-registry" name="registry">
+                  <option value="">DockerHub</option>
+                  {{range .Registries}}
+                  <option value="{{.ID}}" data-url="{{.URL}}">{{.Name}}</option>
+                  {{end}}
+                </select>
+              </span>
+            </div>
+            <p class="control">
+              <a id="a-registry-url" class="button is-static" style="background-color: white; display: none"></a>
+            </p>            
+            <div class="control is-expanded">
+              <input name="image" class="input" type="text" placeholder="" data-v-rule="native" required>
+            </div>
+          </div>
+          <p class="help">Do not enter registry host!</p>
+        </div>
+        <div class="field">
+          <label class="label">Mode</label>
+          <div class="field has-addons is-marginless">
+            <div class="control">
+              <span class="select">
+                <select id="cb-mode" name="mode">
+                  <option value="replicated">Replicated</option>
+                  <option value="global">Global</option>
+                </select>
+              </span>
+            </div>
+            <div class="control is-expanded">
+              <input id="txt-replicas" name="replicas" value="1" class="input" type="text" placeholder="" data-type="integer" data-v-rule="service-mode">
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Network</label>
+          <div class="control">
+            {{range .Networks}}
+            {{ yield checkbox(name="networks", value=.Name, label=.Name) }}
+            {{end}}
+          </div>
+        </div>
+      </div>
+      <div class="is-divider-vertical" data-content=""></div>
+      <div class="column">
+        <div class="field">
+          <label class="label">Command</label>
+          <div class="control">
+            <input name="command" class="input" type="text" placeholder="">
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Args</label>
+          <div class="control">
+            <input name="args" class="input" type="text" placeholder="">
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Work directory</label>
+          <div class="control">
+            <input name="dir" class="input" type="text" placeholder="">
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">User</label>
+          <div class="control">
+            <input name="user" class="input" type="text" placeholder="">
+          </div>
+        </div>        
+      </div>      
+    </div>
+    <fieldset>
+      <legend class="lead is-5">Environments</legend>
+      {{ yield options(name="env") }}
+    </fieldset>
+    <fieldset>
+      <legend class="lead is-5">Service Labels</legend>
+      {{ yield options(name="slabel") }}
+    </fieldset>
+    <fieldset>
+      <legend class="lead is-5">Container Labels</legend>
+      {{ yield options(name="clabel") }}
+    </fieldset>
+
+    <hr>
+    <div class="tabs is-toggle is-fullwidth is-marginless" data-target="tab-content">
+      <ul>
+        <li class="is-active">
+          <a>
+            <span>Ports</span>
+          </a>
+        </li>
+        <li>
+          <a>
+            <span>Volumes</span>
+          </a>
+        </li>
+        <li>
+          <a>
+            <span>Configurations</span>
+          </a>
+        </li>
+        <li>
+          <a>
+            <span>Resources</span>
+          </a>
+        </li>
+        <li>
+          <a>
+            <span>Placement</span>
+          </a>
+        </li>
+        <li>
+          <a>
+            <span>Schedule policy</span>
+          </a>
+        </li>
+        <li>
+          <a>
+            <span>Log driver</span>
+          </a>
+        </li>        
+      </ul>
+    </div>
+    <div id="tab-content" class="tabs-content has-no-top-border">
+      <div>
+        <div class="field">
+          <label class="label">Resolution mode</label>
+          <div class="control">
+            {{ yield radios(name="endpoint.mode", values=slice("vip", "dnsrr"), labels=slice("VIP", "DNS-RR")) }}
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Port config</label>
+          <table id="table-endpoint-ports" class="table is-bordered is-narrow is-fullwidth is-marginless" data-name="endpoint.port">
+            <thead>
+              <tr>
+                <th>Host</th>
+                <th>Container</th>
+                <th>Protocol</th>
+                <th>Mode</th>
+                <th width="50">
+                  <a class="button is-small is-outlined is-success" data-action="add-endpoint-port">
+                    <span class="icon is-small">
+                      <i class="fa fa-plus"></i>
+                    </span>
+                  </a>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div style="display: none">
+        <table id="table-mounts" class="table is-bordered is-narrow is-fullwidth is-marginless" data-name="mount">
+          <thead>
+            <tr>
+              <th width="80">Type</th>
+              <th>Source</th>
+              <th>Target</th>
+              <th width="30">ReadOnly</th>
+              <th>Propagation</th>
+              <th width="50">
+                <a class="button is-small is-outlined is-success" data-action="add-mount">
+                  <span class="icon is-small">
+                    <i class="fa fa-plus"></i>
+                  </span>
+                </a>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
+      </div>
+      <div style="display: none">
+        <div class="field">
+          <label class="label">Secrets</label>
+          <table id="table-secrets" class="table is-bordered is-narrow is-fullwidth is-marginless" data-name="secret">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>File name</th>
+                <th>UID</th>
+                <th>GID</th>
+                <th>Mode</th>
+                <th width="50">
+                  <a class="button is-small is-outlined is-success" data-action="add-secret">
+                    <span class="icon is-small">
+                      <i class="fa fa-plus"></i>
+                    </span>
+                  </a>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+          <p class="help">Secrets will be mounted as /run/secrets/$FILE_NAME in containers by default, You can specify a custom location in Docker 17.06 and higher.</p>
+        </div>
+        <div class="field">
+          <label class="label">Configs</label>
+          <table id="table-configs" class="table is-bordered is-narrow is-fullwidth is-marginless" data-name="config">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>File name</th>
+                <th>UID</th>
+                <th>GID</th>
+                <th>Mode</th>
+                <th width="50">
+                  <a class="button is-small is-outlined is-success" data-action="add-config">
+                    <span class="icon is-small">
+                      <i class="fa fa-plus"></i>
+                    </span>
+                  </a>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+          <p class="help">Configs will be mounted as /$FILE_NAME in containers by default, You can specify a custom location.</p>
+        </div>
+      </div>
+      <div style="display: none">
+        <div class="columns">
+          <div class="column">
+            <fieldset>
+              <legend class="lead is-5">Limits</legend>
+              <div class="field">
+                <label class="label">CPU</label>
+                <div class="control">
+                  <input name="resource.limit.cpu" value="1" class="input" placeholder="e.g. 1" data-type="float">
+                </div>
+              </div>
+              <div class="field">
+                <label class="label">Memory</label>
+                <div class="control">
+                  <input name="resource.limit.memory" value="" class="input" placeholder="e.g. 1G">
+                </div>
+              </div>
+            </fieldset>
+          </div>
+          <div class="is-divider-vertical" data-content=""></div>
+          <div class="column">
+            <fieldset>
+              <legend class="lead is-5">Reservations</legend>
+              <div class="field">
+                <label class="label">CPU</label>
+                <div class="control">
+                  <input name="resource.reserve.cpu" value="" class="input" placeholder="e.g. 0.1" data-type="float">
+                </div>
+              </div>
+              <div class="field">
+                <label class="label">Memory</label>
+                <div class="control">
+                  <input name="resource.reserve.memory" value="" class="input" placeholder="e.g. 10M">
+                </div>
+              </div>
+            </fieldset>
+          </div>
+        </div>
+      </div>
+      <div style="display: none">
+        <div class="field">
+          <label class="label">Constraints</label>
+          <table id="table-constraints" class="table is-bordered is-narrow is-fullwidth is-marginless" data-name="constraint">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th width="30">Operator</th>
+                <th>Value</th>
+                <th width="50">
+                  <a class="button is-small is-outlined is-success" data-action="add-constraint">
+                    <span class="icon is-small">
+                      <i class="fa fa-plus"></i>
+                    </span>
+                  </a>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+        <div class="field">
+          <label class="label">Preferences</label>
+          <table id="table-preferences" class="table is-bordered is-narrow is-fullwidth is-marginless" data-name="preference">
+            <thead>
+              <tr>
+                <th>Spread</th>
+                <th width="50">
+                  <a class="button is-small is-outlined is-success" data-action="add-preference">
+                    <span class="icon is-small">
+                      <i class="fa fa-plus"></i>
+                    </span>
+                  </a>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div style="display: none">
+        <div class="columns">
+          <div class="column">
+            <fieldset>
+              <legend class="lead is-5">Update</legend>
+              <div class="field">
+                <label class="label">Parallelism</label>
+                <div class="control">
+                  <input name="update_policy.parallelism" value="1" class="input" placeholder="" data-type="integer">
+                </div>
+              </div>
+              <div class="field">
+                <label class="label">Delay</label>
+                <div class="control">
+                  <input name="update_policy.delay" value="0s" class="input" placeholder="ns|us|ms|s|m|h">
+                </div>
+              </div>
+              <div class="field">
+                <label class="label">Failure action</label>
+                <div class="control">
+                  {{ yield radios(name="update_policy.failure_action", values=slice("pause", "continue", "rollback"), checked="pause") }}
+                </div>
+              </div>
+              <div class="field">
+                <label class="label">Order</label>
+                <div class="control">
+                  {{ yield radios(name="update_policy.order", values=slice("start-first", "stop-first"), checked="stop-first") }}
+                </div>
+              </div>
+            </fieldset>
+          </div>
+          <div class="is-divider-vertical" data-content=""></div>
+          <div class="column">
+            <fieldset>
+              <legend class="lead is-5">Rollback</legend>
+              <div class="field">
+                <label class="label">Parallelism</label>
+                <div class="control">
+                  <input name="rollback_policy.parallelism" value="1" class="input" placeholder="" data-type="integer">
+                </div>
+              </div>
+              <div class="field">
+                <label class="label">Delay</label>
+                <div class="control">
+                  <input name="rollback_policy.delay" value="0s" class="input" placeholder="ns|us|ms|s|m|h">
+                </div>
+              </div>
+              <div class="field">
+                <label class="label">Failure action</label>
+                <div class="control">
+                  {{ yield radios(name="rollback_policy.failure_action", values=slice("pause", "continue"), checked="pause") }}
+                </div>
+              </div>
+              <div class="field">
+                <label class="label">Order</label>
+                <div class="control">
+                  {{ yield radios(name="rollback_policy.order", values=slice("start-first", "stop-first"), checked="stop-first") }}
+                </div>
+              </div>
+            </fieldset>
+          </div>
+          <div class="is-divider-vertical" data-content=""></div>
+          <div class="column">
+            <fieldset>
+              <legend class="lead is-5">Restart</legend>
+              <div class="field">
+                <label class="label">Condition</label>
+                <div class="control">
+                  {{ yield radios(name="restart_policy.condition", values=slice("any", "on-failure", "none"), checked="any") }}
+                </div>
+              </div>
+              <div class="field">
+                <label class="label">MaxAttempts</label>
+                <div class="control">
+                  <input name="restart_policy.max_attempts" value="0" class="input" placeholder="" data-type="integer">
+                </div>
+              </div>
+              <div class="field">
+                <label class="label">Delay</label>
+                <div class="control">
+                  <input name="restart_policy.delay" value="5s" class="input" placeholder="ns|us|ms|s|m|h">
+                </div>
+              </div>
+              <div class="field">
+                <label class="label">Window</label>
+                <div class="control">
+                  <input name="restart_policy.window" value="0s" class="input" placeholder="ns|us|ms|s|m|h">
+                </div>
+              </div>
+            </fieldset>
+          </div>
+        </div>
+      </div>
+      <div style="display: none">
+        <div class="field">
+          <label class="label">Name</label>
+          <div class="control">
+            {{ yield radios(name="log_driver.name", values=slice("json-file", "syslog", "journald", "gelf", "fluentd", "awslogs", "splunk", "etwlogs", "gcplogs", "none")) }}
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Options</label>
+          {{ yield options(name="log_driver.option", alias="log_driver_option") }}
+        </div>
+      </div>
+    </div>
+
+    <hr>
+    <div class="field is-grouped">
+      <div class="control">
+        <button type="submit" class="button is-primary">Submit</button>
+      </div>
+      <div class="control">
+        <a href="/service/" class="button is-link">Cancel</a>
+      </div>
+    </div>
+  </form>
+</section>
+
+{{ yield dialog(name="secret", items=.Secrets) }}
+{{ yield dialog(name="config", items=.Configs) }}
+{{ end }}

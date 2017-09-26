@@ -1,0 +1,45 @@
+{{ extends "_layouts/empty" }}
+{{ block body() }}
+<section class="hero is-fullheight is-primary is-bold">
+  <div class="hero-body">
+    <div class="container">
+      <div class="columns">
+        <div class="column is-4 is-offset-4">
+          <h1 class="title has-text-centered">Sign in to Swirl</h1>
+          <form method="post" data-form="ajax-json">
+            <div class="box">
+              <div class="field">
+                <label class="label">Login Name</label>
+                <p class="control has-icons-left">
+                  <input name="name" class="input" type="text" placeholder="" data-v-rule="native" required>
+                  <span class="icon is-small is-left">
+                    <i class="fa fa-user"></i>
+                  </span>
+                </p>
+              </div>
+              <div class="field">
+                <label class="label">Password</label>
+                <p class="control has-icons-left">
+                  <input name="password" class="input" type="password" data-v-rule="native" required>
+                  <span class="icon is-small is-left">
+                    <i class="fa fa-lock"></i>
+                  </span>
+                </p>
+              </div>
+              <hr>
+              <div class="field">
+                <p class="control">
+                  <button class="button is-primary" type="submit">Sign in</button>
+                </p>
+              </div>
+            </div>
+          </form>
+          <p class="has-text-centered">
+            <a href="/password_reset">Forgot password?</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{{ end }}

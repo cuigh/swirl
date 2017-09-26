@@ -1,0 +1,10 @@
+{
+    "compilerOptions": {
+      "target": "es2015",
+      "noImplicitAny": true,
+      "removeComments": true,
+      "sourceMap": true,
+      "outFile": "js/swirl.js",
+      "lib": ["dom", "es2015.promise", "es5"]
+    }
+  }

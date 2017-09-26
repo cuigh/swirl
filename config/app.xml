@@ -1,0 +1,14 @@
+<config>
+    <app>
+        <add key="name" value="swirl"/>
+        <add key="debug" value="true"/>
+    </app>
+    <web>
+        <add key="address" value=":8001"/>
+        <add key="authorize_mode" value="?"/>
+    </web>
+    <!-- <swirl>
+        <add key="db_type" value="mongo"/>
+        <add key="db_address" value="localhost:27017/swirl"/>
+    </swirl> -->
+</config>

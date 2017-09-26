@@ -1,0 +1,12 @@
+[[constraint]]
+  name = "github.com/docker/docker"
+  source = "github.com/moby/moby"
+  branch = "master"
+
+[[constraint]]
+  name = "github.com/cuigh/auxo"
+  branch = "master"
+
+[[constraint]]
+  name = "github.com/go-ldap/ldap"
+  branch = "master"

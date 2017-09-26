@@ -1,0 +1,87 @@
+{{ extends "../_layouts/default" }}
+{{ import "../_modules/pager" }}
+
+{{ block body() }}
+<section class="hero is-info">
+  <div class="hero-body">
+    <div class="container has-text-centered">
+      <h1 class="title is-2">
+        IMAGE
+      </h1>
+      <h2 class="subtitle is-5">
+        Manage images.
+      </h2>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <nav class="level">
+    <!-- Left side -->
+    <div class="level-left">
+      <div class="level-item">
+        <form>
+          <div class="field has-addons">
+            <p class="control">
+              <input name="name" value="{{.Name}}" class="input" placeholder="Search by name">
+            </p>
+            <p class="control">
+              <button class="button is-primary">Search</button>
+            </p>
+          </div>
+        </form>
+      </div>
+      <div class="level-item">
+        <p class="subtitle is-5">
+          <strong>{{.Pager.Count}}</strong> images
+        </p>
+      </div>      
+    </div>
+    <!-- Right side -->
+    {*<div class="level-right">*}
+      {*<p class="level-item">*}
+        {*<button id="btn-delete" class="button is-danger"><span class="icon"><i class="fa fa-remove"></i></span><span>Delete</span></button>*}
+      {*</p>*}
+      {*<p class="level-item">*}
+        {*<a class="button is-success" href="new"><span class="icon"><i class="fa fa-plus"></i></span><span>New</span></a>*}
+      {*</p>*}
+    {*</div>*}
+  </nav>
+
+  <table id="table-items" class="table is-bordered is-striped is-narrow is-fullwidth">
+    <thead>
+      <tr>
+        <th width="30"><input type="checkbox" data-action="check-all"></th>
+        <th>ID</th>
+        <th>Tags</th>
+        <th>Size</th>
+        <th>Created</th>
+        {*<th width="160">Action</th>*}
+      </tr>
+    </thead>
+    <tbody>
+      {{range .Images}}
+      <tr>
+        <td><input type="checkbox" value="{{.ID}}" data-action="check"></td>
+        <td>{{ limit(.ID, 30) }}</td>
+        <td>
+          <div class="tags">
+            {{range .RepoTags}}
+            <span class="tag is-success">{{ . }}</span>
+            {{end}}
+          </div>
+        </td>
+        <td>{{ printf("%0.1f", .Size / 1024 / 1024) }} MB</td>
+        <td>{{ time(.CreatedAt) }}</td>
+        {*<td>*}
+          {*<div class="field has-addons">*}
+            {*<p class="control"><button class="button is-small is-danger is-outlined" data-action="delete-service">Delete</button></p>*}
+          {*</div>*}
+        {*</td>*}
+      </tr>          
+      {{end}}
+    </tbody>
+  </table>
+  {{ yield pager(info=.Pager) }}
+</section>
+{{ end }}

@@ -1,0 +1,101 @@
+{{ extends "../../_layouts/default" }}
+
+{{ block body() }}
+<section class="hero is-dark">
+  <div class="hero-body">
+    <div class="container has-text-centered">
+      <h1 class="title is-2">USER</h1>
+      <h2 class="subtitle is-5">
+        Manage users.
+      </h2>
+    </div>
+  </div>
+  <div class="hero-foot">
+    <div class="container">
+      <nav class="tabs is-boxed">
+        <ul>
+          <li>
+            <a href="/system/role/">Roles</a>
+          </li>
+          <li class="is-active">
+            <a href="/system/user/">Users</a>
+          </li>
+          <li>
+            <a href="/system/setting/">Settings</a>
+          </li>
+          <li>
+            <a href="/system/event/">Events</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <nav class="breadcrumb has-succeeds-separator is-small is-marginless" aria-label="breadcrumbs">
+    <ul>
+      <li><a href="/">Dashboard</a></li>
+      <li><a href="/system/user/">Users</a></li>
+      <li class="is-active"><a>Detail</a></li>
+    </ul>
+  </nav>
+</div>
+
+<section class="hero is-small is-light">
+  <div class="hero-body">
+    <div class="container">
+      <h2 class="title is-2">
+        {{ .User.Name }}
+      </h2>
+    </div>
+  </div>
+</section>
+
+<nav class="navbar has-shadow">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item is-tab is-active" href="/system/user/{{.User.LoginName}}/detail">Detail</a>
+      <a class="navbar-item is-tab" href="/system/user/{{.User.LoginName}}/edit">Edit</a>
+    </div>
+  </div>
+</nav>
+
+<section class="section">
+  <div class="container">
+    <dl class="is-horizontal">
+      <dt class="has-text-left">Login name</dt>
+      <dd>{{ .User.LoginName }}</dd>
+      <dt class="has-text-left">Email</dt>
+      <dd>{{ .User.Email }}</dd>
+      <dt class="has-text-left">Administrator</dt>
+      <dd>{{ .User.Admin ? "Yes" : "No" }}</dd>
+      <dt class="has-text-left">Type</dt>
+      <dd class="is-capitalized">{{ .User.Type }}</dd>
+      <dt class="has-text-left">Status</dt>
+      <dd>{{ .User.Status == 1 ? "Active" : "Blocked" }}</dd>
+      <dt class="has-text-left">Created at</dt>
+      <dd>{{ time(.User.CreatedAt) }}</dd>
+      <dt class="has-text-left">Updated at</dt>
+      <dd>{{ time(.User.UpdatedAt) }}</dd>
+      {{if .Roles}}
+      <dt class="has-text-left">Roles</dt>
+      <dd>
+        <div class="tags">
+        {{ roles := .Roles }}
+        {{ range .User.Roles }}
+        {{if name, ok := roles[.]; ok}}
+          <span class="tag is-success">{{ name }}</span>
+        {{end}}
+        {{ end }}
+        </div>
+      </dd>
+      {{end}}
+    </dl>
+    <a href="/system/user/" class="button is-primary">
+      <span class="icon"><i class="fa fa-reply"></i></span>
+      <span>Return</span>
+    </a>
+  </div>
+</section>
+{{ end }}

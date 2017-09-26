@@ -1,0 +1,67 @@
+{{ extends "../_layouts/default" }}
+
+{{ block style() }}
+<link rel="stylesheet" href="/highlight/highlight.css?v=9.12">
+{{ end }}
+
+{{ block script() }}
+<script src="/highlight/highlight.pack.js?v=9.12"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+{{ end }}
+
+{{ block body() }}
+<section class="hero is-info">
+  <div class="hero-body">
+    <div class="container has-text-centered">
+      <h1 class="title is-2">
+        VOLUMES
+      </h1>
+      <h2 class="subtitle is-5">
+        Create and manage persistent storage that can be attached to containers.
+      </h2>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <nav class="breadcrumb has-succeeds-separator is-small is-marginless" aria-label="breadcrumbs">
+    <ul>
+      <li><a href="/">Dashboard</a></li>
+      <li><a href="/volume/">Volumes</a></li>
+      <li class="is-active"><a>Raw</a></li>
+    </ul>
+  </nav>
+</div>
+<section class="hero is-small is-light">
+  <div class="hero-body">
+    <div class="container">
+      <h2 class="title is-2">
+        {{ .Volume }}
+      </h2>      
+    </div>
+  </div>
+</section>
+<nav class="navbar has-shadow">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item is-tab" href="/volume/{{.Volume}}/detail">
+        Detail
+      </a>
+      <a class="navbar-item is-tab is-active" href="/volume/{{.Volume}}/raw">
+        Raw
+      </a>
+    </div>
+  </div>
+</nav>
+<section class="section">
+  <div class="container">
+    <div class="content">
+      <pre class="is-paddingless"><code class="json">{{ .Raw }}</code></pre>
+    </div>
+    <a href="/volume/" class="button is-primary">
+      <span class="icon"><i class="fa fa-reply"></i></span>
+      <span>Return</span>
+    </a>
+  </div>
+</section>
+{{ end }}

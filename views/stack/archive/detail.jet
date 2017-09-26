@@ -1,0 +1,84 @@
+{{ extends "../../_layouts/default" }}
+
+{{ block style() }}
+<link rel="stylesheet" href="/highlight/highlight.css?v=9.12">
+{{ end }}
+
+{{ block script() }}
+<script src="/highlight/highlight.pack.js?v=9.12"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+{{ end }}
+
+{{ block body() }}
+<section class="hero is-info">
+  <div class="hero-body">
+    <div class="container has-text-centered">
+      <h1 class="title is-2">
+        STACK
+      </h1>
+      <h2 class="subtitle is-5">
+        A stack is a logical grouping of related services that are usually deployed together and require each other to work as intended.
+      </h2>
+    </div>
+  </div>
+  <div class="hero-foot">
+    <div class="container">
+      <nav class="tabs is-boxed">
+        <ul>
+          <li>
+            <a href="/stack/task/">Tasks</a>
+          </li>
+          <li class="is-active">
+            <a href="/stack/archive/">Archives</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <nav class="breadcrumb has-succeeds-separator is-small is-marginless" aria-label="breadcrumbs">
+    <ul>
+      <li><a href="/">Dashboard</a></li>
+      <li><a href="/stack/archive/">Archives</a></li>
+      <li class="is-active"><a>Detail</a></li>
+    </ul>
+  </nav>
+</div>
+<section class="hero is-small is-light">
+  <div class="hero-body">
+    <div class="container">
+      <h2 class="title is-2">
+        {{ .Archive.Name }}
+      </h2>
+    </div>
+  </div>
+</section>
+
+<nav class="navbar has-shadow">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item is-tab is-active" href="/stack/archive/{{.Archive.ID}}/detail">Detail</a>
+      <a class="navbar-item is-tab" href="/stack/archive/{{.Archive.ID}}/edit">Edit</a>
+    </div>
+  </div>
+</nav>
+
+<section class="section">
+  <div class="container">
+    <dl>
+      <dt>Created at</dt>
+      <dd>{{ time(.Archive.CreatedAt) }}</dd>
+      <dt>Updated at</dt>
+      <dd>{{ time(.Archive.UpdatedAt) }}</dd>
+      <dt>Content</dt>
+      <dd class="content"><pre class="is-paddingless"><code class="yaml">{{ .Archive.Content }}</code></pre></dd>
+    </dl>
+    <a href="/stack/archive/" class="button is-primary">
+      <span class="icon"><i class="fa fa-reply"></i></span>
+      <span>Return</span>
+    </a>
+  </div>
+</section>
+{{ end }}
