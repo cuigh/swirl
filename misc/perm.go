@@ -104,8 +104,10 @@ var Perms = []PermGroup{
 		Perms: []Perm{
 			{Key: "secret.list", Text: "View list"},
 			{Key: "secret.new", Text: "View new"},
+			{Key: "secret.edit", Text: "View edit"},
 			{Key: "secret.create", Text: "Create"},
 			{Key: "secret.delete", Text: "Delete"},
+			{Key: "secret.update", Text: "Update"},
 		},
 	},
 	{
@@ -113,8 +115,10 @@ var Perms = []PermGroup{
 		Perms: []Perm{
 			{Key: "config.list", Text: "View list"},
 			{Key: "config.new", Text: "View new"},
+			{Key: "config.edit", Text: "View edit"},
 			{Key: "config.create", Text: "Create"},
 			{Key: "config.delete", Text: "Delete"},
+			{Key: "config.update", Text: "Update"},
 		},
 	},
 	{

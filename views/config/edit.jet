@@ -1,0 +1,76 @@
+{{ extends "../_layouts/default" }}
+{{ import "../_modules/form" }}
+
+{{ block script() }}
+<script>$(() => new Swirl.Config.NewPage())</script>
+{{ end }}
+
+{{ block body() }}
+<section class="hero is-info">
+  <div class="hero-body">
+    <div class="container has-text-centered">
+      <h1 class="title is-2">
+        CONFIG
+      </h1>
+      <h2 class="subtitle is-5">
+        Configs are non-sensitive information that can be used by services, such as configuration files.
+      </h2>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <nav class="breadcrumb has-succeeds-separator is-small is-marginless" aria-label="breadcrumbs">
+    <ul>
+      <li><a href="/">Dashboard</a></li>
+      <li><a href="/config/">Configs</a></li>
+      <li class="is-active"><a>Edit</a></li>
+    </ul>
+  </nav>
+</div>
+<section class="hero is-small is-light">
+  <div class="hero-body">
+    <div class="container">
+      <h2 class="title is-2">
+        {{ .Config.Spec.Name }}
+      </h2>
+    </div>
+  </div>
+</section>
+
+<nav class="navbar has-shadow">
+  <div class="container">
+    <div class="navbar-brand">
+      {*<a class="navbar-item is-tab" href="/config/{{.Config.ID}}/detail">Detail</a>*}
+      {*<a class="navbar-item is-tab" href="/config/{{.Config.ID}}/raw">Raw</a>*}
+      <a class="navbar-item is-tab is-active" href="/node/{{.Config.ID}}/edit">Edit</a>
+    </div>
+  </div>
+</nav>
+
+<section class="section">
+  <div class="container">
+    <form method="post" action="update" data-form="ajax-json" data-form="ajax-json" data-url="/config/">
+      <input name="id" value="{{ .Config.ID }}" type="hidden">
+      {*<div class="field">*}
+        {*<label class="label">Data</label>*}
+        {*<div class="control">*}
+          {*<textarea name="data" class="textarea" rows="12" placeholder="Config file content" data-v-rule="native" required></textarea>*}
+        {*</div>*}
+      {*</div>*}
+      <div class="field">
+        <label class="label">Labels</label>
+        {{ yield options(name="label", items=.Config.Spec.Labels) }}
+      </div>
+      <div class="field is-grouped">
+        <div class="control">
+          <button type="submit" class="button is-primary">Submit</button>
+        </div>
+        <div class="control">
+          <a href="/config/" class="button is-link">Cancel</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+{{ end }}

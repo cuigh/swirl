@@ -15,6 +15,8 @@ type SecretController struct {
 	Delete web.HandlerFunc `path:"/delete" method:"post" name:"secret.delete" authorize:"!" desc:"delete secret"`
 	New    web.HandlerFunc `path:"/new" name:"secret.new" authorize:"!" desc:"new secret page"`
 	Create web.HandlerFunc `path:"/new" method:"post" name:"secret.create" authorize:"!" desc:"create secret"`
+	Edit   web.HandlerFunc `path:"/:id/edit" name:"secret.edit" authorize:"!" desc:"edit secret page"`
+	Update web.HandlerFunc `path:"/:id/update" method:"post" name:"secret.update" authorize:"!" desc:"update secret"`
 }
 
 func Secret() (c *SecretController) {
@@ -54,25 +56,34 @@ func Secret() (c *SecretController) {
 	}
 
 	c.Create = func(ctx web.Context) error {
-		v := struct {
-			Name   string `json:"name"`
-			Data   string `json:"data"`
-			Labels []struct {
-				Name  string `json:"name"`
-				Value string `json:"value"`
-			} `json:"labels"`
-		}{}
-		err := ctx.Bind(&v)
+		v := &model.ConfigCreateInfo{}
+		err := ctx.Bind(v)
 		if err == nil {
-			labels := make(map[string]string)
-			for _, l := range v.Labels {
-				if l.Name != "" && l.Value != "" {
-					labels[l.Name] = l.Value
-				}
-			}
-			err = docker.SecretCreate(v.Name, []byte(v.Data), labels)
+			err = docker.SecretCreate(v)
 			if err == nil {
 				biz.Event.CreateSecret(model.EventActionCreate, v.Name, ctx.User())
+			}
+		}
+		return ajaxResult(ctx, err)
+	}
+
+	c.Edit = func(ctx web.Context) error {
+		id := ctx.P("id")
+		secret, _, err := docker.SecretInspect(id)
+		if err != nil {
+			return err
+		}
+		m := newModel(ctx).Add("Secret", secret)
+		return ctx.Render("secret/edit", m)
+	}
+
+	c.Update = func(ctx web.Context) error {
+		v := &model.ConfigUpdateInfo{}
+		err := ctx.Bind(v)
+		if err == nil {
+			err = docker.SecretUpdate(v)
+			if err == nil {
+				biz.Event.CreateSecret(model.EventActionUpdate, v.Name, ctx.User())
 			}
 		}
 		return ajaxResult(ctx, err)

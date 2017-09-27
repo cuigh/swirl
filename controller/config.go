@@ -5,6 +5,7 @@ import (
 
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/auxo/util/cast"
+	"github.com/cuigh/swirl/biz"
 	"github.com/cuigh/swirl/biz/docker"
 	"github.com/cuigh/swirl/model"
 )
@@ -14,6 +15,8 @@ type ConfigController struct {
 	Delete web.HandlerFunc `path:"/delete" method:"post" name:"config.delete" authorize:"!" desc:"delete config"`
 	New    web.HandlerFunc `path:"/new" name:"config.new" authorize:"!" desc:"new config page"`
 	Create web.HandlerFunc `path:"/new" method:"post" name:"config.create" authorize:"!" desc:"create config"`
+	Edit   web.HandlerFunc `path:"/:id/edit" name:"config.edit" authorize:"!" desc:"edit config page"`
+	Update web.HandlerFunc `path:"/:id/update" method:"post" name:"config.update" authorize:"!" desc:"update config"`
 }
 
 func Config() (c *ConfigController) {
@@ -45,23 +48,35 @@ func Config() (c *ConfigController) {
 	}
 
 	c.Create = func(ctx web.Context) error {
-		v := struct {
-			Name   string `json:"name"`
-			Data   string `json:"data"`
-			Labels []struct {
-				Name  string `json:"name"`
-				Value string `json:"value"`
-			} `json:"labels"`
-		}{}
-		err := ctx.Bind(&v)
+		v := &model.ConfigCreateInfo{}
+		err := ctx.Bind(v)
 		if err == nil {
-			labels := make(map[string]string)
-			for _, l := range v.Labels {
-				if l.Name != "" && l.Value != "" {
-					labels[l.Name] = l.Value
-				}
+			err = docker.ConfigCreate(v)
+			if err == nil {
+				biz.Event.CreateConfig(model.EventActionCreate, v.Name, ctx.User())
 			}
-			err = docker.ConfigCreate(v.Name, []byte(v.Data), labels)
+		}
+		return ajaxResult(ctx, err)
+	}
+
+	c.Edit = func(ctx web.Context) error {
+		id := ctx.P("id")
+		cfg, _, err := docker.ConfigInspect(id)
+		if err != nil {
+			return err
+		}
+		m := newModel(ctx).Add("Config", cfg)
+		return ctx.Render("config/edit", m)
+	}
+
+	c.Update = func(ctx web.Context) error {
+		v := &model.ConfigUpdateInfo{}
+		err := ctx.Bind(v)
+		if err == nil {
+			err = docker.ConfigUpdate(v)
+			if err == nil {
+				biz.Event.CreateConfig(model.EventActionUpdate, v.Name, ctx.User())
+			}
 		}
 		return ajaxResult(ctx, err)
 	}

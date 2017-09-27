@@ -3,11 +3,11 @@ package model
 import (
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
+	"os"
+	"strconv"
 	"strings"
 	"time"
-	"fmt"
-	"strconv"
-	"os"
 
 	"github.com/cuigh/auxo/data/size"
 	"github.com/docker/docker/api/types"
@@ -464,6 +464,17 @@ func (pc *PlacementConstraint) ToConstraint() string {
 		return fmt.Sprintf("%s %s %s", pc.Name, pc.Operator, pc.Value)
 	}
 	return ""
+}
+
+type ConfigCreateInfo struct {
+	Name   string  `json:"name"`
+	Data   string  `json:"data"`
+	Labels Options `json:"labels"`
+}
+
+type ConfigUpdateInfo struct {
+	ID string `json:"id"`
+	ConfigCreateInfo
 }
 
 type TaskInfo struct {

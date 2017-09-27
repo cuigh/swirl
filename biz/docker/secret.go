@@ -4,11 +4,12 @@ import (
 	"context"
 	"sort"
 
+	"github.com/cuigh/swirl/misc"
+	"github.com/cuigh/swirl/model"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/swarm"
 	"github.com/docker/docker/client"
-	"github.com/cuigh/swirl/misc"
 )
 
 // SecretList return all secrets.
@@ -34,16 +35,45 @@ func SecretList(name string, pageIndex, pageSize int) (secrets []swarm.Secret, t
 }
 
 // SecretCreate create a secret.
-func SecretCreate(name string, data []byte, labels map[string]string) error {
+func SecretCreate(info *model.ConfigCreateInfo) error {
 	return mgr.Do(func(ctx context.Context, cli *client.Client) (err error) {
-		// todo:
 		spec := swarm.SecretSpec{}
-		spec.Name = name
-		spec.Data = data
-		spec.Labels = labels
+		spec.Name = info.Name
+		spec.Data = []byte(info.Data)
+		spec.Labels = info.Labels.ToMap()
 		_, err = cli.SecretCreate(ctx, spec)
 		return
 	})
+}
+
+// SecretUpdate update a config.
+func SecretUpdate(info *model.ConfigUpdateInfo) error {
+	return mgr.Do(func(ctx context.Context, cli *client.Client) (err error) {
+		var secret swarm.Secret
+		secret, _, err = cli.SecretInspectWithRaw(ctx, info.ID)
+		if err != nil {
+			return err
+		}
+
+		spec := secret.Spec
+		// only the Labels field can be updated on API 1.30
+		//spec.Name = info.Name
+		//spec.Data = []byte(info.Data)
+		spec.Labels = info.Labels.ToMap()
+		return cli.SecretUpdate(ctx, info.ID, secret.Version, spec)
+	})
+}
+
+// SecretInspect returns secret information with raw data.
+func SecretInspect(id string) (secret swarm.Secret, raw []byte, err error) {
+	var (
+		ctx context.Context
+		cli *client.Client
+	)
+	if ctx, cli, err = mgr.Client(); err == nil {
+		secret, raw, err = cli.SecretInspectWithRaw(ctx, id)
+	}
+	return
 }
 
 // SecretRemove remove a secret.

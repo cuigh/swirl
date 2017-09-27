@@ -5,6 +5,7 @@ import (
 	"sort"
 
 	"github.com/cuigh/swirl/misc"
+	"github.com/cuigh/swirl/model"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/swarm"
@@ -34,16 +35,45 @@ func ConfigList(name string, pageIndex, pageSize int) (configs []swarm.Config, t
 }
 
 // ConfigCreate create a config.
-func ConfigCreate(name string, data []byte, labels map[string]string) error {
+func ConfigCreate(info *model.ConfigCreateInfo) error {
 	return mgr.Do(func(ctx context.Context, cli *client.Client) (err error) {
-		// todo:
 		spec := swarm.ConfigSpec{}
-		spec.Name = name
-		spec.Data = data
-		spec.Labels = labels
+		spec.Name = info.Name
+		spec.Data = []byte(info.Data)
+		spec.Labels = info.Labels.ToMap()
 		_, err = cli.ConfigCreate(ctx, spec)
 		return
 	})
+}
+
+// ConfigUpdate update a config.
+func ConfigUpdate(info *model.ConfigUpdateInfo) error {
+	return mgr.Do(func(ctx context.Context, cli *client.Client) (err error) {
+		var cfg swarm.Config
+		cfg, _, err = cli.ConfigInspectWithRaw(ctx, info.ID)
+		if err != nil {
+			return err
+		}
+
+		spec := cfg.Spec
+		// only the Labels field can be updated on API 1.30
+		//spec.Name = info.Name
+		//spec.Data = []byte(info.Data)
+		spec.Labels = info.Labels.ToMap()
+		return cli.ConfigUpdate(ctx, info.ID, cfg.Version, spec)
+	})
+}
+
+// ConfigInspect returns config information with raw data.
+func ConfigInspect(id string) (cfg swarm.Config, raw []byte, err error) {
+	var (
+		ctx context.Context
+		cli *client.Client
+	)
+	if ctx, cli, err = mgr.Client(); err == nil {
+		cfg, raw, err = cli.ConfigInspectWithRaw(ctx, id)
+	}
+	return
 }
 
 // ConfigRemove remove a config.

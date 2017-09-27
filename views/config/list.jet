@@ -71,6 +71,7 @@
             <td>{{time(.CreatedAt)}}</td>
             <td>{{time(.UpdatedAt)}}</td>
             <td>
+              <a href="{{.ID}}/edit" class="button is-small is-dark is-outlined">Edit</a>
               <button class="button is-small is-danger is-outlined" data-action="delete-config">Delete</button>
             </td>
           </tr>
