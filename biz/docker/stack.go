@@ -9,6 +9,7 @@ import (
 	"github.com/cuigh/swirl/biz/docker/compose"
 	"github.com/cuigh/swirl/model"
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/swarm"
 	"github.com/docker/docker/client"
@@ -218,6 +219,11 @@ func StackDeploy(name, content string, authes map[string]string) error {
 
 func validateExternalNetworks(ctx context.Context, cli *client.Client, externalNetworks []string) error {
 	for _, networkName := range externalNetworks {
+		if !container.NetworkMode(networkName).IsUserDefined() {
+			// Networks that are not user defined always exist on all nodes as
+			// local-scoped networks, so there's no need to inspect them.
+			continue
+		}
 		network, err := cli.NetworkInspect(ctx, networkName, types.NetworkInspectOptions{})
 		switch {
 		case client.IsErrNotFound(err):
