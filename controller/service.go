@@ -19,6 +19,7 @@ type ServiceController struct {
 	List   web.HandlerFunc `path:"/" name:"service.list" authorize:"!" desc:"service list page"`
 	Detail web.HandlerFunc `path:"/:name/detail" name:"service.detail" authorize:"!" desc:"service detail page"`
 	Raw    web.HandlerFunc `path:"/:name/raw" name:"service.raw" authorize:"!" desc:"service raw page"`
+	Logs   web.HandlerFunc `path:"/:name/logs" name:"service.logs" authorize:"!" desc:"service logs page"`
 	Delete web.HandlerFunc `path:"/delete" method:"post" name:"service.delete" authorize:"!" desc:"delete service"`
 	Scale  web.HandlerFunc `path:"/scale" method:"post" name:"service.scale" authorize:"!" desc:"scale service"`
 	New    web.HandlerFunc `path:"/new" name:"service.new" authorize:"!" desc:"new service page"`
@@ -84,6 +85,20 @@ func Service() (c *ServiceController) {
 
 		m := newModel(ctx).Add("Service", name).Add("Raw", string(buf.Bytes()))
 		return ctx.Render("service/raw", m)
+	}
+
+	c.Logs = func(ctx web.Context) error {
+		name := ctx.P("name")
+		line := cast.ToIntD(ctx.Q("line"), 500)
+		timestamps := cast.ToBoolD(ctx.Q("timestamps"), false)
+		stdout, stderr, err := docker.ServiceLogs(name, line, timestamps)
+		if err != nil {
+			return err
+		}
+
+		m := newModel(ctx).Add("Service", name).Add("Line", line).Add("Timestamps", timestamps).
+			Add("Stdout", stdout.String()).Add("Stderr", stderr.String())
+		return ctx.Render("service/logs", m)
 	}
 
 	c.Delete = func(ctx web.Context) error {

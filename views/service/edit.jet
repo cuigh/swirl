@@ -91,6 +91,7 @@
     <div class="navbar-brand">
       <a class="navbar-item is-tab" href="/service/{{.Service.Name}}/detail">Detail</a>
       <a class="navbar-item is-tab" href="/service/{{.Service.Name}}/raw">Raw</a>
+      <a class="navbar-item is-tab" href="/service/{{.Service.Name}}/logs">Logs</a>
       <a class="navbar-item is-tab is-active" href="/service/{{.Service.Name}}/edit">Edit</a>
     </div>
   </div>
