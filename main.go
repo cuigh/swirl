@@ -1,6 +1,7 @@
 package main
 
 import (
+	"net/http"
 	"path/filepath"
 	"runtime"
 	"time"
@@ -18,6 +19,14 @@ import (
 )
 
 func main() {
+	// customize error handler
+	web.DefaultErrorHandler.OnCode(http.StatusNotFound, func(ctx web.Context, err error) {
+		ctx.Redirect("/404")
+	})
+	web.DefaultErrorHandler.OnCode(http.StatusForbidden, func(ctx web.Context, err error) {
+		ctx.Redirect("/403")
+	})
+
 	ws := web.Auto()
 
 	// set render/validator..

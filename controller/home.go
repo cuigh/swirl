@@ -10,6 +10,7 @@ import (
 
 type HomeController struct {
 	Index    web.HandlerFunc `path:"/" name:"index" authorize:"?" desc:"index page"`
+	Error403 web.HandlerFunc `path:"/403" name:"403" authorize:"?" desc:"403 page"`
 	Error404 web.HandlerFunc `path:"/404" name:"404" authorize:"*" desc:"404 page"`
 	Login    web.HandlerFunc `path:"/login" name:"login" authorize:"*" desc:"sign in page"`
 	InitGet  web.HandlerFunc `path:"/init" name:"init" authorize:"*" desc:"initialize page"`
@@ -95,8 +96,13 @@ func Home() (c *HomeController) {
 		return ajaxResult(ctx, err)
 	}
 
+	c.Error403 = func(ctx web.Context) error {
+		return ctx.Render("403", nil)
+	}
+
 	c.Error404 = func(ctx web.Context) error {
 		return ctx.Render("404", nil)
 	}
+
 	return
 }
