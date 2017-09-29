@@ -1,3 +1,5 @@
+[![Swirl](https://goreportcard.com/badge/cuigh/swirl)](https://goreportcard.com/report/cuigh/swirl)
+
 # SWIRL
 
 Swirl is a web management tool for Docker, focused on swarm cluster.
