@@ -77,7 +77,7 @@
       </form>
     </nav>
 
-    <div class="tabs is-toggle is-fullwidth is-marginless" data-target="tab-content">
+    <div class="tabs is-boxed" data-target="tab-content">
       <ul>
         <li class="is-active">
           <a><span>Stdout</span></a>
@@ -88,8 +88,16 @@
       </ul>
     </div>
     <div id="tab-content" class="content">
-      <pre class="is-marginless" style="max-height: 600px; padding: 0.75em">{{ .Stdout }}</pre>
-      <pre class="is-marginless" style="max-height: 600px; padding: 0.75em; display: none">{{ .Stderr }}</pre>
+      <div class="field">
+        <div class="control">
+          {{ if .Stdout }}<textarea class="textarea code is-small" rows="30" readonly>{{ .Stdout }}</textarea>{{ end }}
+        </div>
+      </div>
+      <div class="field" style="display: none">
+        <div class="control">
+          {{ if .Stderr }}<textarea class="textarea code is-small" rows="30" readonly>{{ .Stderr }}</textarea>{{ end }}
+        </div>
+      </div>
     </div>
     <a href="/service/" class="button is-primary">
       <span class="icon"><i class="fa fa-reply"></i></span>

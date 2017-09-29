@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="/lyicon/css/lyicon.css">
-    <link rel="stylesheet" href="/bulma/bulma.css?v=0.5.2">
+    <link rel="stylesheet" href="/bulma/bulma.css?v=0.5.3">
     <link rel="stylesheet" href="/swirl/css/swirl.css?v={{ version }}">
   </head>
   <body>
