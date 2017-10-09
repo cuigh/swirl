@@ -63,7 +63,6 @@ type Interface interface {
 	SessionUpdate(session *model.Session) error
 	SessionGet(token string) (*model.Session, error)
 
-	// UserDelete(id string) error
 	RegistryCreate(registry *model.Registry) error
 	RegistryUpdate(registry *model.Registry) error
 	RegistryGet(id string) (*model.Registry, error)
@@ -75,6 +74,12 @@ type Interface interface {
 	ArchiveCreate(archive *model.Archive) error
 	ArchiveUpdate(archive *model.Archive) error
 	ArchiveDelete(id string) error
+
+	TemplateList(args *model.TemplateListArgs) (tpls []*model.Template, count int, err error)
+	TemplateGet(id string) (*model.Template, error)
+	TemplateCreate(tpl *model.Template) error
+	TemplateUpdate(tpl *model.Template) error
+	TemplateDelete(id string) error
 
 	EventCreate(event *model.Event) error
 	EventList(args *model.EventListArgs) (events []*model.Event, count int, err error)

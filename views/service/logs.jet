@@ -1,19 +1,6 @@
-{{ extends "../_layouts/default" }}
+{{ extends "base" }}
 
-{{ block body() }}
-<section class="hero is-info">
-  <div class="hero-body">
-    <div class="container has-text-centered">
-      <h1 class="title is-2">
-        SERVICE
-      </h1>
-      <h2 class="subtitle is-5">
-        Services are the definitions of tasks to run on a swarm.
-      </h2>
-    </div>
-  </div>
-</section>
-
+{{ block body_content() }}
 <div class="container">
   <nav class="breadcrumb has-succeeds-separator is-small is-marginless" aria-label="breadcrumbs">
     <ul>

@@ -1,27 +1,39 @@
 {{ extends "base" }}
-{{ import "../_modules/service" }}
+{{ import "../../_modules/service" }}
 
 {{ block script() }}
 <script>$(() => new Swirl.Service.NewPage())</script>
 {{ end }}
 
 {{ block body_content() }}
+<div class="container">
+  <nav class="breadcrumb has-succeeds-separator is-small is-marginless" aria-label="breadcrumbs">
+    <ul>
+      <li><a href="/">Dashboard</a></li>
+      <li><a href="/service/">Services</a></li>
+      <li><a href="/service/template/">Templates</a></li>
+      <li class="is-active"><a>{{ .Action }}</a></li>
+    </ul>
+  </nav>
+</div>
+
 <section class="hero is-small is-light">
   <div class="hero-body">
     <div class="container">
-      <h2 class="title is-2">Create service</h2>
+      <h2 class="title is-2">{{ .Action }} service template</h2>
     </div>
   </div>
 </section>
+
 <section class="section">
   <div class="container">
-    <form method="post" data-form="ajax-json" data-url="/service/">
+    <form method="post" data-form="ajax-json" data-url="/service/template/">
       <div class="columns">
         <div class="column">
           <div class="field">
             <label class="label">Name</label>
             <div class="control">
-              <input name="name" value="{{ .Service.Name }}" class="input" type="text" placeholder="" data-v-rule="native" required>
+              <input name="name" value="{{ .Service.Name }}" class="input" type="text" placeholder="Template name" data-v-rule="native" required>
             </div>
           </div>
           <div class="field">
@@ -46,7 +58,7 @@
                 {{ end }}
               </p>
               <div class="control is-expanded">
-                <input name="image" value="{{ .Service.Image }}" class="input" type="text" placeholder="" data-v-rule="native" required>
+                <input name="image" value="{{ .Service.Image }}" class="input" type="text" placeholder="">
               </div>
             </div>
             <p class="help">Do not enter registry host!</p>
@@ -70,10 +82,11 @@
         {{ yield options_table(name="clabel", items=.Service.ContainerLabels) }}
       </fieldset>
       {{ yield form_others() }}
-      {{ yield form_submit(url="/service/") }}
+      {{ yield form_submit(url="/service/template/") }}
     </form>
   </div>
 </section>
+
 {{ yield dialog(name="secret", items=.Secrets) }}
 {{ yield dialog(name="config", items=.Configs) }}
 {{ end }}

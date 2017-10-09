@@ -19,7 +19,3 @@ type Setting struct {
 	UpdatedBy string    `bson:"updated_by" json:"updated_by,omitempty"`
 	UpdatedAt time.Time `bson:"updated_at" json:"updated_at,omitempty"`
 }
-
-func Test() {
-	time.Now().Zone()
-}

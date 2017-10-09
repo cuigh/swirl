@@ -53,6 +53,18 @@ func (b *eventBiz) CreateService(action model.EventAction, name string, user web
 	b.Create(event)
 }
 
+func (b *eventBiz) CreateServiceTemplate(action model.EventAction, id, name string, user web.User) {
+	event := &model.Event{
+		Type:     model.EventTypeServiceTemplate,
+		Action:   action,
+		Code:     id,
+		Name:     name,
+		UserID:   user.ID(),
+		Username: user.Name(),
+	}
+	b.Create(event)
+}
+
 func (b *eventBiz) CreateNetwork(action model.EventAction, id, name string, user web.User) {
 	event := &model.Event{
 		Type:     model.EventTypeNetwork,

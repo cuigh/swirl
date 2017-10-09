@@ -59,6 +59,17 @@ var Perms = []PermGroup{
 		},
 	},
 	{
+		Name: "Template",
+		Perms: []Perm{
+			{Key: "service.list", Text: "View list"},
+			{Key: "service.new", Text: "View new"},
+			{Key: "service.edit", Text: "View edit"},
+			{Key: "service.create", Text: "Create"},
+			{Key: "service.delete", Text: "Delete"},
+			{Key: "service.update", Text: "Update"},
+		},
+	},
+	{
 		Name: "Stack",
 		Perms: []Perm{
 			{Key: "stack.task.list", Text: "View task list"},

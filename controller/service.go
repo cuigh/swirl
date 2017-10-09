@@ -25,7 +25,7 @@ type ServiceController struct {
 	New    web.HandlerFunc `path:"/new" name:"service.new" authorize:"!" desc:"new service page"`
 	Create web.HandlerFunc `path:"/new" method:"post" name:"service.create" authorize:"!" desc:"create service"`
 	Edit   web.HandlerFunc `path:"/:name/edit" name:"service.edit" authorize:"!" desc:"service edit page"`
-	Update web.HandlerFunc `path:"/:name/update" method:"post" name:"service.update" authorize:"!" desc:"update service"`
+	Update web.HandlerFunc `path:"/:name/edit" method:"post" name:"service.update" authorize:"!" desc:"update service"`
 }
 
 func Service() (c *ServiceController) {
@@ -114,6 +114,30 @@ func Service() (c *ServiceController) {
 	}
 
 	c.New = func(ctx web.Context) error {
+		service := &model.ServiceInfo{}
+		tid := ctx.Q("template")
+		if tid != "" {
+			tpl, err := biz.Template.Get(tid)
+			if err != nil {
+				return err
+			}
+
+			if tpl != nil {
+				err = json.Unmarshal([]byte(tpl.Content), service)
+				if err != nil {
+					return err
+				}
+
+				if service.Registry != "" {
+					registry, err := biz.Registry.Get(service.Registry)
+					if err != nil {
+						return err
+					}
+					service.RegistryURL = registry.URL
+				}
+			}
+		}
+
 		networks, err := docker.NetworkList()
 		if err != nil {
 			return err
@@ -130,7 +154,11 @@ func Service() (c *ServiceController) {
 		if err != nil {
 			return err
 		}
-		m := newModel(ctx).Add("Networks", networks).Add("Secrets", secrets).Add("Configs", configs).Add("Registries", registries)
+		checkedNetworks := set.FromSlice(service.Networks, func(i int) interface{} { return service.Networks[i] })
+
+		m := newModel(ctx).Add("Service", service).Add("Registries", registries).
+			Add("Networks", networks).Add("CheckedNetworks", checkedNetworks).
+			Add("Secrets", secrets).Add("Configs", configs)
 		return ctx.Render("service/new", m)
 	}
 
@@ -179,17 +207,10 @@ func Service() (c *ServiceController) {
 		}
 
 		checkedNetworks := set.FromSlice(service.Endpoint.VirtualIPs, func(i int) interface{} { return service.Endpoint.VirtualIPs[i].NetworkID })
-		checkedSecrets := set.FromSlice(service.Spec.TaskTemplate.ContainerSpec.Secrets, func(i int) interface{} {
-			return service.Spec.TaskTemplate.ContainerSpec.Secrets[i].SecretName
-		})
-		checkedConfigs := set.FromSlice(service.Spec.TaskTemplate.ContainerSpec.Configs, func(i int) interface{} {
-			return service.Spec.TaskTemplate.ContainerSpec.Configs[i].ConfigName
-		})
 
 		m := newModel(ctx).Add("Service", model.NewServiceInfo(service)).
 			Add("Networks", networks).Add("CheckedNetworks", checkedNetworks).
-			Add("Secrets", secrets).Add("CheckedSecrets", checkedSecrets).
-			Add("Configs", configs).Add("CheckedConfigs", checkedConfigs)
+			Add("Secrets", secrets).Add("Configs", configs)
 		return ctx.Render("service/edit", m)
 	}
 

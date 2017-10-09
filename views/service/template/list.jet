@@ -1,38 +1,11 @@
-{{ extends "../../_layouts/default" }}
+{{ extends "base" }}
 {{ import "../../_modules/pager" }}
 
-{*{{ block script() }}*}
-{*<script>$(() => new Swirl.Service.ListPage())</script>*}
-{*{{ end }}*}
+{{ block script() }}
+<script>$(() => new Swirl.Service.Template.ListPage())</script>
+{{ end }}
 
-{{ block body() }}
-<section class="hero is-info">
-  <div class="hero-body">
-    <div class="container has-text-centered">
-      <h1 class="title is-2">
-        SERVICE TEMPLATE
-      </h1>
-      <h2 class="subtitle is-5">
-        Manage service templates.
-      </h2>
-    </div>
-  </div>
-  <div class="hero-foot">
-    <div class="container">
-      <nav class="tabs is-boxed">
-        <ul>
-          <li>
-            <a href="/service/">Services</a>
-          </li>
-          <li class="is-active">
-            <a href="/service/template/">Templates</a>
-          </li>
-        </ul>
-      </nav>
-    </div>
-  </div>
-</section>
-
+{{ block body_content() }}
 <section class="section">
   <nav class="level">
     <!-- Left side -->
@@ -41,7 +14,7 @@
         <form>
           <div class="field has-addons">
             <p class="control">
-              <input name="name" value="" class="input" placeholder="Search by name">
+              <input name="name" value="{{ .Name }}" class="input" placeholder="Search by name">
             </p>
             <p class="control">
               <button class="button is-primary">Search</button>
@@ -51,7 +24,7 @@
       </div>
       <div class="level-item">
         <p class="subtitle is-5">
-          <strong>0</strong> templates
+          <strong>{{ .Pager.Count }}</strong> templates
         </p>
       </div>      
     </div>
@@ -62,31 +35,36 @@
       </p>
     </div>
   </nav>
-
   <table id="table-items" class="table is-bordered is-striped is-narrow is-fullwidth">
     <thead>
       <tr>
         <th>Name</th>
-        <th>Description</th>
+        <th>Created at</th>
         <th>Updated at</th>
         <th width="160">Action</th>
       </tr>
     </thead>
     <tbody>
-      <tr>
-        <td><a href="">Manage Web</a></td>
-        <td>后台站点</td>
-        <td>2017-09-11 21:17:17</td>
+      {{ range .Templates }}
+      <tr data-id="{{ .ID }}">
+        <td>{{ .Name }}</td>
+        <td>{{time(.CreatedAt)}}</td>
+        <td>{{time(.UpdatedAt)}}</td>
         <td>
-          <div class="field has-addons">
-            {*<p class="control"><a href="{{.ID}}/edit" class="button is-small is-dark is-outlined">Edit</a></p>*}
-            {*<p class="control"><a href="/service/new?template={{.ID}}" class="button is-small is-success is-outlined">Create</a></p>*}
-            <p class="control"><button class="button is-small is-danger is-outlined" data-action="delete-template">Delete</button></p>
-          </div>
+          <a href="/service/new?template={{.ID}}" class="button is-small is-success is-outlined tooltip is-tooltip-bottom" data-tooltip="Create Service">
+            <span class="icon"><i class="fa fa-plus"></i></span>
+          </a>
+          <a href="{{.ID}}/edit" class="button is-small is-dark is-outlined tooltip is-tooltip-bottom" data-tooltip="Edit">
+            <span class="icon"><i class="fa fa-edit"></i></span>
+          </a>
+          <button class="button is-small is-danger is-outlined tooltip is-tooltip-bottom" data-tooltip="Delete" data-action="delete-template">
+            <span class="icon"><i class="fa fa-remove"></i></span>
+          </button>
         </td>
-      </tr>          
+      </tr>
+      {{ end }}
     </tbody>
   </table>
-  {*{{ yield pager(info=.Pager) }}*}
+  {{ yield pager(info=.Pager) }}
 </section>
 {{ end }}

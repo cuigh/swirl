@@ -1,38 +1,11 @@
-{{ extends "../_layouts/default" }}
+{{ extends "base" }}
 {{ import "../_modules/pager" }}
 
 {{ block script() }}
 <script>$(() => new Swirl.Service.ListPage())</script>
 {{ end }}
 
-{{ block body() }}
-<section class="hero is-info">
-  <div class="hero-body">
-    <div class="container has-text-centered">
-      <h1 class="title is-2">
-        SERVICE
-      </h1>
-      <h2 class="subtitle is-5">
-        Services are the definitions of tasks to run on a swarm.
-      </h2>
-    </div>
-  </div>
-  <div class="hero-foot">
-    <div class="container">
-      <nav class="tabs is-boxed">
-        <ul>
-          <li class="is-active">
-            <a href="/service/">Services</a>
-          </li>
-          <li>
-            <a href="/service/template/">Templates</a>
-          </li>
-        </ul>
-      </nav>
-    </div>
-  </div>
-</section>
-
+{{ block body_content() }}
 <section class="section">
   <nav class="level">
     <!-- Left side -->
@@ -74,7 +47,7 @@
         <th>Image</th>
         <th width="145">Mode</th>
         <th>Updated</th>
-        <th width="160">Action</th>
+        <th width="110">Action</th>
       </tr>
     </thead>
     <tbody>
@@ -91,13 +64,17 @@
         </td>
         <td>{{time(.UpdatedAt)}}</td>
         <td>
-          <div class="field has-addons">
-            <p class="control"><a href="{{.Name}}/edit" class="button is-small is-dark is-outlined">Edit</a></p>
-            {{if .Mode == "replicated"}}
-            <p class="control"><button type="button" class="button is-small is-info is-outlined" data-action="scale-service" data-replicas="{{.Replicas}}">Scale</button></p>
-            {{end}}
-            <p class="control"><button class="button is-small is-danger is-outlined" data-action="delete-service">Delete</button></p>
-          </div>
+          <a href="{{.Name}}/edit" class="button is-small is-dark is-outlined tooltip is-tooltip-bottom" data-tooltip="Edit">
+            <span class="icon"><i class="fa fa-edit"></i></span>
+          </a>
+          {{if .Mode == "replicated"}}
+          <button type="button" class="button is-small is-info is-outlined tooltip is-tooltip-bottom" data-tooltip="Scale" data-action="scale-service" data-replicas="{{.Replicas}}">
+            <span class="icon"><i class="fa fa-arrows"></i></span>
+          </button>
+          {{end}}
+          <button class="button is-small is-danger is-outlined tooltip is-tooltip-bottom" data-tooltip="Delete" data-action="delete-service">
+            <span class="icon"><i class="fa fa-remove"></i></span>
+          </button>
         </td>
       </tr>          
       {{end}}

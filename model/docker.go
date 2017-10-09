@@ -149,6 +149,7 @@ func NewServiceDetailInfo(service swarm.Service) *ServiceDetailInfo {
 type ServiceInfo struct {
 	Name            string       `json:"name"`
 	Registry        string       `json:"registry"`
+	RegistryURL     string       `json:"-"`
 	RegistryAuth    string       `json:"-"`
 	Image           string       `json:"image"`
 	Mode            string       `json:"mode"`

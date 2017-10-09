@@ -9,14 +9,15 @@ type EventType string
 
 const (
 	// swarm
-	EventTypeRegistry     EventType = "Registry"
-	EventTypeNode         EventType = "Node"
-	EventTypeNetwork      EventType = "Network"
-	EventTypeService      EventType = "Service"
-	EventTypeStackTask    EventType = "Stack Task"
-	EventTypeStackArchive EventType = "Stack Archive"
-	EventTypeSecret       EventType = "Secret"
-	EventTypeConfig       EventType = "Config"
+	EventTypeRegistry        EventType = "Registry"
+	EventTypeNode            EventType = "Node"
+	EventTypeNetwork         EventType = "Network"
+	EventTypeService         EventType = "Service"
+	EventTypeServiceTemplate EventType = "Service Template"
+	EventTypeStackTask       EventType = "Stack Task"
+	EventTypeStackArchive    EventType = "Stack Archive"
+	EventTypeSecret          EventType = "Secret"
+	EventTypeConfig          EventType = "Config"
 
 	// local
 	EventTypeVolume EventType = "Volume"

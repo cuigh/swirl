@@ -115,3 +115,14 @@
   </tbody>
 </table>
 {{ end }}
+
+{{ block form_submit(url) }}
+<div class="field is-grouped">
+  <div class="control">
+    <button type="submit" class="button is-primary">Submit</button>
+  </div>
+  <div class="control">
+    <a href="{{ url }}" class="button is-link">Cancel</a>
+  </div>
+</div>
+{{ end }}
