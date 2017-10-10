@@ -92,11 +92,21 @@ var Perms = []PermGroup{
 		},
 	},
 	{
+		Name: "Image",
+		Perms: []Perm{
+			{Key: "image.list", Text: "View list"},
+			{Key: "image.detail", Text: "View detail"},
+			{Key: "image.raw", Text: "View raw"},
+			{Key: "image.delete", Text: "Delete"},
+		},
+	},
+	{
 		Name: "Container",
 		Perms: []Perm{
 			{Key: "container.list", Text: "View list"},
 			{Key: "container.detail", Text: "View detail"},
 			{Key: "container.raw", Text: "View raw"},
+			{Key: "container.delete", Text: "Delete"},
 		},
 	},
 	{

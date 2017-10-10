@@ -57,7 +57,7 @@
         <th>Tags</th>
         <th>Size</th>
         <th>Created</th>
-        <th width="160">Action</th>
+        <th>Action</th>
       </tr>
     </thead>
     <tbody>

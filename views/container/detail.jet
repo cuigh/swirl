@@ -19,6 +19,7 @@
   <nav class="breadcrumb has-succeeds-separator is-small is-marginless" aria-label="breadcrumbs">
     <ul>
       <li><a href="/">Dashboard</a></li>
+      <li><a href="/container/">Containers</a></li>
       <li class="is-active"><a>Detail</a></li>
     </ul>
   </nav>
@@ -37,12 +38,9 @@
 <nav class="navbar has-shadow">
   <div class="container">
     <div class="navbar-brand">
-      <a class="navbar-item is-tab is-active" href="/container/{{.Container.ContainerJSONBase.ID}}/detail">
-        Detail
-      </a>
-      <a class="navbar-item is-tab " href="/container/{{.Container.ContainerJSONBase.ID}}/raw">
-        Raw
-      </a>
+      <a class="navbar-item is-tab is-active" href="/container/{{.Container.ContainerJSONBase.ID}}/detail">Detail</a>
+      <a class="navbar-item is-tab" href="/container/{{.Container.ContainerJSONBase.ID}}/raw">Raw</a>
+      <a class="navbar-item is-tab" href="/container/{{.Container.ContainerJSONBase.ID}}/logs">Logs</a>
     </div>
   </div>
 </nav>
@@ -64,6 +62,11 @@
         </dl>
       </div>
     </div>
+    {{ yield tags(title="Labels", tags=.Container.Config.Labels) }}
+    <a href="/container/" class="button is-primary">
+      <span class="icon"><i class="fa fa-reply"></i></span>
+      <span>Return</span>
+    </a>
   </div>
 </section>
 {{ end }}

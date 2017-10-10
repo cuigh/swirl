@@ -73,7 +73,7 @@
         <td><a href="/volume/{{ .Name }}/detail">{{ limit(.Name, 30) }}</a></td>
         <td>{{ .Driver }}</td>
         <td>{{ .Scope }}</td>
-        <td>{{ .Mountpoint }}</td>
+        <td>{{ limit(.Mountpoint, 50) }}</td>
         <td>
           <div class="field has-addons">
             <p class="control"><button class="button is-small is-danger is-outlined" data-action="delete-volume">Delete</button></p>

@@ -575,6 +575,14 @@ func NewImageListInfo(image types.ImageSummary) *ImageListInfo {
 	return info
 }
 
+type ContainerListArgs struct {
+	// created|restarting|running|removing|paused|exited|dead
+	Filter    string `query:"filter"`
+	Name      string `query:"name"`
+	PageIndex int    `query:"page"`
+	PageSize  int    `query:"size"`
+}
+
 type ContainerListInfo struct {
 	types.Container
 	CreatedAt time.Time
