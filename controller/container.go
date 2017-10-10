@@ -1,12 +1,10 @@
 package controller
 
 import (
-	"bytes"
-	"encoding/json"
-
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/auxo/util/cast"
 	"github.com/cuigh/swirl/biz/docker"
+	"github.com/cuigh/swirl/misc"
 	"github.com/cuigh/swirl/model"
 )
 
@@ -51,13 +49,12 @@ func Container() (c *ContainerController) {
 			return err
 		}
 
-		buf := &bytes.Buffer{}
-		err = json.Indent(buf, raw, "", "    ")
+		j, err := misc.JSONIndent(raw)
 		if err != nil {
 			return err
 		}
 
-		m := newModel(ctx).Add("Container", container).Add("Raw", string(buf.Bytes()))
+		m := newModel(ctx).Add("Container", container).Add("Raw", j)
 		return ctx.Render("container/raw", m)
 	}
 

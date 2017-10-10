@@ -1,8 +1,11 @@
 package misc
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"reflect"
+	"strings"
 )
 
 var Funcs = map[string]interface{}{
@@ -32,6 +35,9 @@ var Funcs = map[string]interface{}{
 		}
 		return s
 	},
+	"trimPrefix": func(s, prefix string) string {
+		return strings.TrimPrefix(s, prefix)
+	},
 	"slice": func(values ...interface{}) interface{} {
 		return values
 	},
@@ -44,6 +50,15 @@ func Page(count, pageIndex, pageSize int) (start, end int) {
 		start, end = 0, 0
 	} else if count < end {
 		end = count
+	}
+	return
+}
+
+func JSONIndent(raw []byte) (s string, err error) {
+	buf := &bytes.Buffer{}
+	err = json.Indent(buf, raw, "", "    ")
+	if err == nil {
+		s = buf.String()
 	}
 	return
 }

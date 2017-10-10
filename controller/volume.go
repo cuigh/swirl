@@ -1,14 +1,13 @@
 package controller
 
 import (
-	"bytes"
-	"encoding/json"
 	"strings"
 
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/auxo/util/cast"
 	"github.com/cuigh/swirl/biz"
 	"github.com/cuigh/swirl/biz/docker"
+	"github.com/cuigh/swirl/misc"
 	"github.com/cuigh/swirl/model"
 )
 
@@ -94,13 +93,12 @@ func Volume() (c *VolumeController) {
 			return err
 		}
 
-		buf := &bytes.Buffer{}
-		err = json.Indent(buf, raw, "", "    ")
+		j, err := misc.JSONIndent(raw)
 		if err != nil {
 			return err
 		}
 
-		m := newModel(ctx).Add("Volume", name).Add("Raw", string(buf.Bytes()))
+		m := newModel(ctx).Add("Volume", name).Add("Raw", j)
 		return ctx.Render("volume/raw", m)
 	}
 

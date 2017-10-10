@@ -99,18 +99,24 @@ func NetworkDisconnect(name, container string) error {
 
 // NetworkInspect return network information.
 func NetworkInspect(name string) (network types.NetworkResource, err error) {
-	mgr.Do(func(ctx context.Context, cli *client.Client) (err error) {
+	var (
+		ctx context.Context
+		cli *client.Client
+	)
+	if ctx, cli, err = mgr.Client(); err == nil {
 		network, err = cli.NetworkInspect(ctx, name, types.NetworkInspectOptions{})
-		return
-	})
+	}
 	return
 }
 
 // NetworkInspectRaw return network raw information.
 func NetworkInspectRaw(name string) (raw []byte, err error) {
-	mgr.Do(func(ctx context.Context, cli *client.Client) (err error) {
+	var (
+		ctx context.Context
+		cli *client.Client
+	)
+	if ctx, cli, err = mgr.Client(); err == nil {
 		_, raw, err = cli.NetworkInspectWithRaw(ctx, name, types.NetworkInspectOptions{})
-		return
-	})
+	}
 	return
 }

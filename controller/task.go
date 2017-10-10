@@ -1,11 +1,9 @@
 package controller
 
 import (
-	"bytes"
-	"encoding/json"
-
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/biz/docker"
+	"github.com/cuigh/swirl/misc"
 )
 
 type TaskController struct {
@@ -34,13 +32,12 @@ func Task() (c *TaskController) {
 			return err
 		}
 
-		buf := &bytes.Buffer{}
-		err = json.Indent(buf, raw, "", "    ")
+		j, err := misc.JSONIndent(raw)
 		if err != nil {
 			return err
 		}
 
-		m := newModel(ctx).Add("Task", task).Add("Raw", string(buf.Bytes()))
+		m := newModel(ctx).Add("Task", task).Add("Raw", j)
 		return ctx.Render("task/raw", m)
 	}
 

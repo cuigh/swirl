@@ -51,10 +51,13 @@ func NodeRemove(id string) error {
 
 // NodeInspect return node information.
 func NodeInspect(id string) (node swarm.Node, raw []byte, err error) {
-	mgr.Do(func(ctx context.Context, cli *client.Client) (err error) {
-		node, raw, err = cli.NodeInspectWithRaw(ctx, id)
-		return
-	})
+	var (
+		ctx context.Context
+		cli *client.Client
+	)
+	if ctx, cli, err = mgr.Client(); err == nil {
+		return cli.NodeInspectWithRaw(ctx, id)
+	}
 	return
 }
 

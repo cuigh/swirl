@@ -1,53 +1,53 @@
 {{ extends "../_layouts/default" }}
 {{ import "../_modules/detail" }}
 
-{{ block script() }}
-<script>$(() => new Swirl.Network.DetailPage())</script>
-{{ end }}
-
 {{ block body() }}
 <section class="hero is-info">
   <div class="hero-body">
     <div class="container has-text-centered">
       <h1 class="title is-2">
-        NETWORK
+        IMAGE
       </h1>
       <h2 class="subtitle is-5">
-        Networks are user-defined networks that containers can be attached to.
+        Manage images.
       </h2>
     </div>
   </div>
 </section>
+
 <div class="container">
   <nav class="breadcrumb has-succeeds-separator is-small is-marginless" aria-label="breadcrumbs">
     <ul>
       <li><a href="/">Dashboard</a></li>
-      <li><a href="/network/">Networks</a></li>
+      <li><a href="/image/">Images</a></li>
       <li class="is-active"><a>Detail</a></li>
     </ul>
   </nav>
 </div>
+
 <section class="hero is-small is-light">
   <div class="hero-body">
     <div class="container">
       <h2 class="title is-2">
-        {{ .Network.Name }}
+        {{ limit(.Image.ID, 32) }}
       </h2>      
     </div>
   </div>
 </section>
+
 <nav class="navbar has-shadow">
   <div class="container">
     <div class="navbar-brand">
-      <a class="navbar-item is-tab is-active" href="/network/{{.Network.Name}}/detail">
+      <a class="navbar-item is-tab is-active" href="/image/{{ .Image.ID }}/detail">
         Detail
       </a>
-      <a class="navbar-item is-tab" href="/network/{{.Network.Name}}/raw">
+      <a class="navbar-item is-tab" href="/image/{{ .Image.ID }}/raw">
         Raw
       </a>
     </div>
   </div>
 </nav>
+
 <section class="section">
   <div class="container">
 
@@ -55,52 +55,47 @@
       <div class="message-body">
         <dl class="is-horizontal is-marginless">
           <dt class="has-text-left">ID</dt>
-          <dd>{{ .Network.ID }}</dd>
-          <dt class="has-text-left">Driver</dt>
-          <dd>{{ .Network.Driver }}</dd>
-          <dt class="has-text-left">Scope</dt>
-          <dd>{{ .Network.Scope}}</dd>
+          <dd>{{ .Image.ID }}</dd>
+          <dt class="has-text-left">Size</dt>
+          <dd>{{ printf("%0.1f", .Image.Size / 1024 / 1024) }} MB</dd>
           <dt class="has-text-left">Created at</dt>
-          <dd>{{ time(.Network.Created) }}</dd>
-          {{ if .Network.IPAM.Config }}
-          <dt class="has-text-left">IP</dt>
-          {{range .Network.IPAM.Config}}
-          <dd>Subnet: {{ .Subnet }}, Gateway: {{ .Gateway }}</dd>
-          {{end}}
-          {{end}}
+          <dd>{{ .Image.Created }}</dd>
+          <dt class="has-text-left">Docker version</dt>
+          <dd>{{ .Image.DockerVersion }}</dd>
+          <dt class="has-text-left">Platform</dt>
+          <dd>{{ .Image.Os }}/{{ .Image.Architecture }}</dd>
+          {{ if .Image.Author }}
+          <dt class="has-text-left">Author</dt>
+          <dd>{{ .Image.Author }}</dd>
+          {{ end }}
+          {{ if .Image.RepoTags }}
+          <dt class="has-text-left">Tags</dt>
+          {{ range .Image.RepoTags }}
+          <dd><span class="tag is-success">{{ . }}</span></dd>
+          {{ end }}
+          {{ end }}
         </dl>
       </div>
     </div>
 
-    {{ yield tags(title="Options", tags=.Network.Options) }}
-    {{ yield tags(title="Labels", tags=.Network.Labels) }}
-
-    {{if .Network.Containers}}
+    {{ if .Histories }}
     <div class="block">
       <div class="block-header">
-        <p>Containers</p>
+        <p>Layers</p>
       </div>
       <div class="block-body is-paddingless">
         <table id="table-containers" class="table is-bordered is-striped is-narrow is-fullwidth is-marginless">
           <thead>
             <tr>
-              <th>Name</th>
-              <th>IPV4</th>
-              <th>IPV6</th>
-              <th>Mac</th>
-              <th>Action</th>
+              <th>Instruction</th>
+              <th>Size</th>
             </tr>
           </thead>
           <tbody>
-            {{range id, c := .Network.Containers}}
+            {{ range .Histories }}
             <tr>
-              <td><a href="/container/{{id}}/detail">{{c.Name}}</a></td>
-              <td>{{c.IPv4Address}}</td>
-              <td>{{c.IPv6Address}}</td>
-              <td>{{c.MacAddress}}</td>
-              <td>
-                <button class="button is-small is-danger is-outlined" data-action="disconnect" value="{{id}}">Leave</button>
-              </td>
+              <td>{{ trimPrefix(.CreatedBy, "/bin/sh -c #(nop) ") }}</td>
+              <td>{{ printf("%0.1f", .Size / 1024 / 1024) }} MB</td>
             </tr>
             {{end}}
           </tbody>
@@ -109,7 +104,7 @@
     </div>
     {{end}}
 
-    <a href="/network/" class="button is-primary">
+    <a href="/image/" class="button is-primary">
       <span class="icon"><i class="fa fa-reply"></i></span>
       <span>Return</span>
     </a>

@@ -53,9 +53,12 @@ func ContainerInspect(id string) (container types.ContainerJSON, err error) {
 
 // ContainerInspectRaw return container raw information.
 func ContainerInspectRaw(id string) (container types.ContainerJSON, raw []byte, err error) {
-	mgr.Do(func(ctx context.Context, cli *client.Client) (err error) {
+	var (
+		ctx context.Context
+		cli *client.Client
+	)
+	if ctx, cli, err = mgr.Client(); err == nil {
 		container, raw, err = cli.ContainerInspectWithRaw(ctx, id, true)
-		return
-	})
+	}
 	return
 }

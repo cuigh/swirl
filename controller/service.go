@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"bytes"
 	"encoding/json"
 	"strconv"
 	"strings"
@@ -12,6 +11,7 @@ import (
 	"github.com/cuigh/auxo/util/cast"
 	"github.com/cuigh/swirl/biz"
 	"github.com/cuigh/swirl/biz/docker"
+	"github.com/cuigh/swirl/misc"
 	"github.com/cuigh/swirl/model"
 )
 
@@ -77,13 +77,12 @@ func Service() (c *ServiceController) {
 			return err
 		}
 
-		buf := &bytes.Buffer{}
-		err = json.Indent(buf, raw, "", "    ")
+		j, err := misc.JSONIndent(raw)
 		if err != nil {
 			return err
 		}
 
-		m := newModel(ctx).Add("Service", name).Add("Raw", string(buf.Bytes()))
+		m := newModel(ctx).Add("Service", name).Add("Raw", j)
 		return ctx.Render("service/raw", m)
 	}
 

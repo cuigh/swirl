@@ -1944,4 +1944,44 @@ var Swirl;
         Volume.NewPage = NewPage;
     })(Volume = Swirl.Volume || (Swirl.Volume = {}));
 })(Swirl || (Swirl = {}));
+var Swirl;
+(function (Swirl) {
+    var Image;
+    (function (Image) {
+        var Modal = Swirl.Core.Modal;
+        var Table = Swirl.Core.ListTable;
+        class ListPage {
+            constructor() {
+                this.table = new Table("#table-items");
+                this.table.on("delete-image", this.deleteImage.bind(this));
+                $("#btn-delete").click(this.deleteImages.bind(this));
+            }
+            deleteImage(e) {
+                let $tr = $(e.target).closest("tr");
+                let name = $tr.find("td:eq(1)").text().trim();
+                let id = $tr.find(":checkbox:first").val();
+                Modal.confirm(`Are you sure to remove image: <strong>${name}</strong>?`, "Delete image", (dlg, e) => {
+                    $ajax.post("delete", { ids: id }).trigger(e.target).encoder("form").json(() => {
+                        $tr.remove();
+                        dlg.close();
+                    });
+                });
+            }
+            deleteImages() {
+                let ids = this.table.selectedKeys();
+                if (ids.length == 0) {
+                    Modal.alert("Please select one or more items.");
+                    return;
+                }
+                Modal.confirm(`Are you sure to remove ${ids.length} images?`, "Delete images", (dlg, e) => {
+                    $ajax.post("delete", { ids: ids.join(",") }).trigger(e.target).encoder("form").json(() => {
+                        this.table.selectedRows().remove();
+                        dlg.close();
+                    });
+                });
+            }
+        }
+        Image.ListPage = ListPage;
+    })(Image = Swirl.Image || (Swirl.Image = {}));
+})(Swirl || (Swirl = {}));
 //# sourceMappingURL=swirl.js.map

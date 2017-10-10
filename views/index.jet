@@ -75,7 +75,7 @@
         </header>
         <div class="card-content">
           {*{{yield progress(title="System", percent=0)}}*}
-          {{yield progress(title="Image", percent=30)}}
+          {{yield progress(title="Image", percent=100)}}
           {{yield progress(title="Container", percent=35)}}
           {{yield progress(title="Volume", percent=100)}}
         </div>
