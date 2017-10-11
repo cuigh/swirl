@@ -6,32 +6,35 @@ import (
 	"github.com/cuigh/swirl/model"
 )
 
+// SettingController is a controller of system setting
 type SettingController struct {
 	Index  web.HandlerFunc `path:"/" name:"setting.edit" authorize:"!" desc:"settings edit page"`
 	Update web.HandlerFunc `path:"/" name:"setting.update" method:"post" authorize:"!" desc:"update settings"`
 }
 
+// Setting creates an instance of SettingController
 func Setting() (c *SettingController) {
-	c = &SettingController{}
+	return &SettingController{
+		Index:  settingIndex,
+		Update: settingUpdate,
+	}
+}
 
-	c.Index = func(ctx web.Context) error {
-		setting, err := biz.Setting.Get()
-		if err != nil {
-			return err
-		}
-
-		m := newModel(ctx).Add("Setting", setting)
-		return ctx.Render("system/setting/index", m)
+func settingIndex(ctx web.Context) error {
+	setting, err := biz.Setting.Get()
+	if err != nil {
+		return err
 	}
 
-	c.Update = func(ctx web.Context) error {
-		setting := &model.Setting{}
-		err := ctx.Bind(setting)
-		if err == nil {
-			err = biz.Setting.Update(setting, ctx.User())
-		}
-		return ajaxResult(ctx, err)
-	}
+	m := newModel(ctx).Add("Setting", setting)
+	return ctx.Render("system/setting/index", m)
+}
 
-	return
+func settingUpdate(ctx web.Context) error {
+	setting := &model.Setting{}
+	err := ctx.Bind(setting)
+	if err == nil {
+		err = biz.Setting.Update(setting, ctx.User())
+	}
+	return ajaxResult(ctx, err)
 }

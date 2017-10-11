@@ -8,101 +8,108 @@ import (
 	"github.com/cuigh/swirl/model"
 )
 
+// HomeController is a basic controller of site
 type HomeController struct {
 	Index    web.HandlerFunc `path:"/" name:"index" authorize:"?" desc:"index page"`
-	Error403 web.HandlerFunc `path:"/403" name:"403" authorize:"?" desc:"403 page"`
-	Error404 web.HandlerFunc `path:"/404" name:"404" authorize:"*" desc:"404 page"`
 	Login    web.HandlerFunc `path:"/login" name:"login" authorize:"*" desc:"sign in page"`
 	InitGet  web.HandlerFunc `path:"/init" name:"init" authorize:"*" desc:"initialize page"`
 	InitPost web.HandlerFunc `path:"/init" method:"post" name:"init" authorize:"*" desc:"initialize system"`
+	Error403 web.HandlerFunc `path:"/403" name:"403" authorize:"?" desc:"403 page"`
+	Error404 web.HandlerFunc `path:"/404" name:"404" authorize:"*" desc:"404 page"`
 }
 
+// Home creates an instance of HomeController
 func Home() (c *HomeController) {
-	c = &HomeController{}
+	return &HomeController{
+		Index:    homeIndex,
+		Login:    homeLogin,
+		InitGet:  homeInitGet,
+		InitPost: homeInitPost,
+		Error403: homeError403,
+		Error404: homeError404,
+	}
+}
 
-	c.Index = func(ctx web.Context) (err error) {
-		var (
-			count int
-			m     = newModel(ctx)
-		)
+func homeIndex(ctx web.Context) (err error) {
+	var (
+		count int
+		m     = newModel(ctx)
+	)
 
-		if count, err = docker.NodeCount(); err != nil {
-			return
+	if count, err = docker.NodeCount(); err != nil {
+		return
+	}
+	m.Add("NodeCount", count)
+
+	if count, err = docker.NetworkCount(); err != nil {
+		return
+	}
+	m.Add("NetworkCount", count)
+
+	if count, err = docker.ServiceCount(); err != nil {
+		return
+	}
+	m.Add("ServiceCount", count)
+
+	if count, err = docker.StackCount(); err != nil {
+		return
+	}
+	m.Add("StackCount", count)
+
+	return ctx.Render("index", m)
+}
+
+func homeLogin(ctx web.Context) error {
+	count, err := biz.User.Count()
+	if err != nil {
+		return err
+	} else if count == 0 {
+		return ctx.Redirect("init")
+	}
+	if ctx.User() != nil {
+		u := ctx.Q("from")
+		if u == "" {
+			u = "/"
 		}
-		m.Add("NodeCount", count)
+		return ctx.Redirect(u)
+	}
+	return ctx.Render("login", nil)
+}
 
-		if count, err = docker.NetworkCount(); err != nil {
-			return
-		}
-		m.Add("NetworkCount", count)
+func homeInitGet(ctx web.Context) error {
+	count, err := biz.User.Count()
+	if err != nil {
+		return err
+	} else if count > 0 {
+		return ctx.Redirect("login")
+	}
+	return ctx.Render("init", nil)
+}
 
-		if count, err = docker.ServiceCount(); err != nil {
-			return
-		}
-		m.Add("ServiceCount", count)
-
-		if count, err = docker.StackCount(); err != nil {
-			return
-		}
-		m.Add("StackCount", count)
-
-		return ctx.Render("index", m)
+func homeInitPost(ctx web.Context) error {
+	count, err := biz.User.Count()
+	if err != nil {
+		return err
+	} else if count > 0 {
+		return errors.New("Swirl was already initialized")
 	}
 
-	c.Login = func(ctx web.Context) error {
-		count, err := biz.User.Count()
-		if err != nil {
-			return err
-		} else if count == 0 {
-			return ctx.Redirect("init")
-		}
-		if ctx.User() != nil {
-			u := ctx.Q("from")
-			if u == "" {
-				u = "/"
-			}
-			return ctx.Redirect(u)
-		}
-		return ctx.Render("login", nil)
+	user := &model.User{}
+	err = ctx.Bind(user)
+	if err != nil {
+		return err
 	}
 
-	c.InitGet = func(ctx web.Context) error {
-		count, err := biz.User.Count()
-		if err != nil {
-			return err
-		} else if count > 0 {
-			return ctx.Redirect("login")
-		}
-		return ctx.Render("init", nil)
-	}
+	user.Admin = true
+	user.Type = model.UserTypeInternal
+	err = biz.User.Create(user, nil)
+	return ajaxResult(ctx, err)
+}
 
-	c.InitPost = func(ctx web.Context) error {
-		count, err := biz.User.Count()
-		if err != nil {
-			return err
-		} else if count > 0 {
-			return errors.New("Swirl was already initialized")
-		}
+func homeError403(ctx web.Context) error {
+	return ctx.Render("403", nil)
+}
 
-		user := &model.User{}
-		err = ctx.Bind(user)
-		if err != nil {
-			return err
-		}
-
-		user.Admin = true
-		user.Type = model.UserTypeInternal
-		err = biz.User.Create(user, nil)
-		return ajaxResult(ctx, err)
-	}
-
-	c.Error403 = func(ctx web.Context) error {
-		return ctx.Render("403", nil)
-	}
-
-	c.Error404 = func(ctx web.Context) error {
-		return ctx.Render("404", nil)
-	}
-
-	return
+func homeError404(ctx web.Context) error {
+	return ctx.Render("404", nil)
 }

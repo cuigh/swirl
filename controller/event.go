@@ -6,33 +6,35 @@ import (
 	"github.com/cuigh/swirl/model"
 )
 
+// EventController is a controller of user events
 type EventController struct {
 	List web.HandlerFunc `path:"/" name:"event.list" authorize:"!" desc:"event list page"`
 }
 
+// Event creates an instance of EventController
 func Event() (c *EventController) {
-	c = &EventController{}
+	return &EventController{
+		List: eventList,
+	}
+}
 
-	c.List = func(ctx web.Context) error {
-		args := &model.EventListArgs{}
-		err := ctx.Bind(args)
-		if err != nil {
-			return err
-		}
-		args.PageSize = model.PageSize
-		if args.PageIndex == 0 {
-			args.PageIndex = 1
-		}
-
-		events, totalCount, err := biz.Event.List(args)
-		if err != nil {
-			return err
-		}
-
-		m := newPagerModel(ctx, totalCount, model.PageSize, args.PageIndex).
-			Add("Events", events).Add("Args", args)
-		return ctx.Render("system/event/list", m)
+func eventList(ctx web.Context) error {
+	args := &model.EventListArgs{}
+	err := ctx.Bind(args)
+	if err != nil {
+		return err
+	}
+	args.PageSize = model.PageSize
+	if args.PageIndex == 0 {
+		args.PageIndex = 1
 	}
 
-	return
+	events, totalCount, err := biz.Event.List(args)
+	if err != nil {
+		return err
+	}
+
+	m := newPagerModel(ctx, totalCount, model.PageSize, args.PageIndex).
+		Add("Events", events).Add("Args", args)
+	return ctx.Render("system/event/list", m)
 }

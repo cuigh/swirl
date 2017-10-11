@@ -10,6 +10,7 @@ import (
 	"github.com/cuigh/swirl/model"
 )
 
+// ImageController is a controller of docker image
 type ImageController struct {
 	List   web.HandlerFunc `path:"/" name:"image.list" authorize:"!" desc:"image list page"`
 	Detail web.HandlerFunc `path:"/:id/detail" name:"image.detail" authorize:"!" desc:"image detail page"`
@@ -17,6 +18,7 @@ type ImageController struct {
 	Delete web.HandlerFunc `path:"/delete" method:"post" name:"image.delete" authorize:"!" desc:"delete image"`
 }
 
+// Image creates an instance of ImageController
 func Image() (c *ImageController) {
 	return &ImageController{
 		List:   imageList,

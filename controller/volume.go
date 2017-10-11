@@ -11,6 +11,7 @@ import (
 	"github.com/cuigh/swirl/model"
 )
 
+// VolumeController is a controller of docker volume
 type VolumeController struct {
 	List   web.HandlerFunc `path:"/" name:"volume.list" authorize:"!" desc:"volume list page"`
 	New    web.HandlerFunc `path:"/new" name:"volume.new" authorize:"!" desc:"new volume page"`
@@ -21,86 +22,93 @@ type VolumeController struct {
 	Raw    web.HandlerFunc `path:"/:name/raw" name:"volume.raw" authorize:"!" desc:"volume raw page"`
 }
 
+// Volume creates an instance of VolumeController
 func Volume() (c *VolumeController) {
-	c = &VolumeController{}
+	return &VolumeController{
+		List:   volumeList,
+		New:    volumeNew,
+		Create: volumeCreate,
+		Delete: volumeDelete,
+		Prune:  volumePrune,
+		Detail: volumeDetail,
+		Raw:    volumeRaw,
+	}
+}
 
-	c.List = func(ctx web.Context) error {
-		//name := ctx.Q("name")
-		page := cast.ToIntD(ctx.Q("page"), 1)
-		volumes, totalCount, err := docker.VolumeList(page, model.PageSize)
-		if err != nil {
-			return err
-		}
-
-		m := newPagerModel(ctx, totalCount, model.PageSize, page).
-			//Add("Name", name).
-			Add("Volumes", volumes)
-		return ctx.Render("volume/list", m)
+func volumeList(ctx web.Context) error {
+	//name := ctx.Q("name")
+	page := cast.ToIntD(ctx.Q("page"), 1)
+	volumes, totalCount, err := docker.VolumeList(page, model.PageSize)
+	if err != nil {
+		return err
 	}
 
-	c.New = func(ctx web.Context) error {
-		m := newModel(ctx)
-		return ctx.Render("/volume/new", m)
+	m := newPagerModel(ctx, totalCount, model.PageSize, page).
+		//Add("Name", name).
+		Add("Volumes", volumes)
+	return ctx.Render("volume/list", m)
+}
+
+func volumeNew(ctx web.Context) error {
+	m := newModel(ctx)
+	return ctx.Render("/volume/new", m)
+}
+
+func volumeCreate(ctx web.Context) error {
+	info := &model.VolumeCreateInfo{}
+	err := ctx.Bind(info)
+	if err != nil {
+		return err
+	}
+	err = docker.VolumeCreate(info)
+	if err == nil {
+		biz.Event.CreateVolume(model.EventActionCreate, info.Name, ctx.User())
+	}
+	return ajaxResult(ctx, err)
+}
+
+func volumeDelete(ctx web.Context) error {
+	names := strings.Split(ctx.F("names"), ",")
+	for _, name := range names {
+		if err := docker.VolumeRemove(name); err != nil {
+			return ajaxResult(ctx, err)
+		} else {
+			biz.Event.CreateVolume(model.EventActionDelete, name, ctx.User())
+		}
+	}
+	return ajaxSuccess(ctx, nil)
+}
+
+func volumePrune(ctx web.Context) error {
+	report, err := docker.VolumePrune()
+	if err == nil {
+		return ajaxSuccess(ctx, report)
+	}
+	return ajaxResult(ctx, err)
+}
+
+func volumeDetail(ctx web.Context) error {
+	name := ctx.P("name")
+	volume, _, err := docker.VolumeInspectRaw(name)
+	if err != nil {
+		return err
+	}
+	m := newModel(ctx).Add("Volume", volume)
+	return ctx.Render("volume/detail", m)
+}
+
+func volumeRaw(ctx web.Context) error {
+	name := ctx.P("name")
+	_, raw, err := docker.VolumeInspectRaw(name)
+	if err != nil {
+		return err
 	}
 
-	c.Create = func(ctx web.Context) error {
-		info := &model.VolumeCreateInfo{}
-		err := ctx.Bind(info)
-		if err != nil {
-			return err
-		}
-		err = docker.VolumeCreate(info)
-		if err == nil {
-			biz.Event.CreateVolume(model.EventActionCreate, info.Name, ctx.User())
-		}
-		return ajaxResult(ctx, err)
+	j, err := misc.JSONIndent(raw)
+	if err != nil {
+		return err
 	}
 
-	c.Delete = func(ctx web.Context) error {
-		names := strings.Split(ctx.F("names"), ",")
-		for _, name := range names {
-			if err := docker.VolumeRemove(name); err != nil {
-				return ajaxResult(ctx, err)
-			} else {
-				biz.Event.CreateVolume(model.EventActionDelete, name, ctx.User())
-			}
-		}
-		return ajaxSuccess(ctx, nil)
-	}
-
-	c.Prune = func(ctx web.Context) error {
-		report, err := docker.VolumePrune()
-		if err == nil {
-			return ajaxSuccess(ctx, report)
-		}
-		return ajaxResult(ctx, err)
-	}
-
-	c.Detail = func(ctx web.Context) error {
-		name := ctx.P("name")
-		volume, _, err := docker.VolumeInspectRaw(name)
-		if err != nil {
-			return err
-		}
-		m := newModel(ctx).Add("Volume", volume)
-		return ctx.Render("volume/detail", m)
-	}
-
-	c.Raw = func(ctx web.Context) error {
-		name := ctx.P("name")
-		_, raw, err := docker.VolumeInspectRaw(name)
-		if err != nil {
-			return err
-		}
-
-		j, err := misc.JSONIndent(raw)
-		if err != nil {
-			return err
-		}
-
-		m := newModel(ctx).Add("Volume", name).Add("Raw", j)
-		return ctx.Render("volume/raw", m)
-	}
-
-	return
+	m := newModel(ctx).Add("Volume", name).Add("Raw", j)
+	return ctx.Render("volume/raw", m)
 }

@@ -10,6 +10,7 @@ import (
 	"github.com/cuigh/swirl/model"
 )
 
+// ContainerController is a controller of docker container
 type ContainerController struct {
 	List   web.HandlerFunc `path:"/" name:"container.list" authorize:"!" desc:"container list page"`
 	Detail web.HandlerFunc `path:"/:id/detail" name:"container.detail" authorize:"!" desc:"container detail page"`
@@ -18,6 +19,7 @@ type ContainerController struct {
 	Delete web.HandlerFunc `path:"/delete" method:"post" name:"container.delete" authorize:"!" desc:"delete container"`
 }
 
+// Container creates an instance of ContainerController
 func Container() (c *ContainerController) {
 	return &ContainerController{
 		List:   containerList,

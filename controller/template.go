@@ -10,6 +10,7 @@ import (
 	"github.com/cuigh/swirl/model"
 )
 
+// TemplateController is a controller of service template
 type TemplateController struct {
 	List   web.HandlerFunc `path:"/" name:"template.list" authorize:"!" desc:"service template list page"`
 	New    web.HandlerFunc `path:"/new" name:"template.new" authorize:"!" desc:"new service template page"`
@@ -19,6 +20,7 @@ type TemplateController struct {
 	Delete web.HandlerFunc `path:"/delete" method:"post" name:"template.delete" authorize:"!" desc:"delete service template"`
 }
 
+// Template creates an instance of TemplateController
 func Template() (c *TemplateController) {
 	return &TemplateController{
 		List:   templateList,
@@ -80,10 +82,13 @@ func templateCreate(ctx web.Context) error {
 	info := &model.ServiceInfo{}
 	err := ctx.Bind(info)
 	if err == nil {
-		tpl := &model.Template{Name: info.Name}
+		var (
+			content []byte
+			tpl     = &model.Template{Name: info.Name}
+		)
 
 		info.Name = ""
-		content, err := json.Marshal(info)
+		content, err = json.Marshal(info)
 		if err != nil {
 			return err
 		}
@@ -111,7 +116,8 @@ func templateEdit(ctx web.Context) error {
 
 	service.Name = tpl.Name
 	if service.Registry != "" {
-		registry, err := biz.Registry.Get(service.Registry)
+		var registry *model.Registry
+		registry, err = biz.Registry.Get(service.Registry)
 		if err != nil {
 			return err
 		}
@@ -146,13 +152,16 @@ func templateUpdate(ctx web.Context) error {
 	info := &model.ServiceInfo{}
 	err := ctx.Bind(info)
 	if err == nil {
-		tpl := &model.Template{
-			ID:   ctx.P("id"),
-			Name: info.Name,
-		}
+		var (
+			content []byte
+			tpl     = &model.Template{
+				ID:   ctx.P("id"),
+				Name: info.Name,
+			}
+		)
 
 		info.Name = ""
-		content, err := json.Marshal(info)
+		content, err = json.Marshal(info)
 		if err != nil {
 			return err
 		}

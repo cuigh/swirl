@@ -7,6 +7,7 @@ import (
 	"github.com/cuigh/swirl/model"
 )
 
+// NodeController is a controller of swarm node
 type NodeController struct {
 	List   web.HandlerFunc `path:"/" name:"node.list" authorize:"!" desc:"node list page"`
 	Detail web.HandlerFunc `path:"/:id/detail" name:"node.detail" authorize:"!" desc:"node detail page"`
@@ -16,77 +17,83 @@ type NodeController struct {
 	Update web.HandlerFunc `path:"/:id/update" method:"post" name:"node.update" authorize:"!" desc:"update node"`
 }
 
+// Node creates an instance of NodeController
 func Node() (c *NodeController) {
-	c = &NodeController{}
+	return &NodeController{
+		List:   nodeList,
+		Detail: nodeDetail,
+		Raw:    nodeRaw,
+		Delete: nodeDelete,
+		Edit:   nodeEdit,
+		Update: nodeUpdate,
+	}
+}
 
-	c.List = func(ctx web.Context) error {
-		nodes, err := docker.NodeList()
-		if err != nil {
-			return err
-		}
-
-		m := newModel(ctx).Add("Nodes", nodes)
-		return ctx.Render("node/list", m)
+func nodeList(ctx web.Context) error {
+	nodes, err := docker.NodeList()
+	if err != nil {
+		return err
 	}
 
-	c.Delete = func(ctx web.Context) error {
-		id := ctx.F("id")
-		err := docker.NodeRemove(id)
-		return ajaxResult(ctx, err)
+	m := newModel(ctx).Add("Nodes", nodes)
+	return ctx.Render("node/list", m)
+}
+
+func nodeDelete(ctx web.Context) error {
+	id := ctx.F("id")
+	err := docker.NodeRemove(id)
+	return ajaxResult(ctx, err)
+}
+
+func nodeDetail(ctx web.Context) error {
+	id := ctx.P("id")
+	node, _, err := docker.NodeInspect(id)
+	if err != nil {
+		return err
 	}
 
-	c.Detail = func(ctx web.Context) error {
-		id := ctx.P("id")
-		node, _, err := docker.NodeInspect(id)
-		if err != nil {
-			return err
-		}
-
-		tasks, err := docker.TaskList("", id)
-		if err != nil {
-			return err
-		}
-
-		m := newModel(ctx).Add("Node", node).Add("Tasks", tasks)
-		return ctx.Render("node/detail", m)
+	tasks, err := docker.TaskList("", id)
+	if err != nil {
+		return err
 	}
 
-	c.Raw = func(ctx web.Context) error {
-		id := ctx.P("id")
-		node, raw, err := docker.NodeInspect(id)
-		if err != nil {
-			return err
-		}
+	m := newModel(ctx).Add("Node", node).Add("Tasks", tasks)
+	return ctx.Render("node/detail", m)
+}
 
-		j, err := misc.JSONIndent(raw)
-		if err != nil {
-			return err
-		}
-
-		m := newModel(ctx).Add("ID", id).Add("Node", node).Add("Raw", j)
-		return ctx.Render("node/raw", m)
+func nodeRaw(ctx web.Context) error {
+	id := ctx.P("id")
+	node, raw, err := docker.NodeInspect(id)
+	if err != nil {
+		return err
 	}
 
-	c.Edit = func(ctx web.Context) error {
-		id := ctx.P("id")
-		node, _, err := docker.NodeInspect(id)
-		if err != nil {
-			return err
-		}
-
-		m := newModel(ctx).Add("Node", node)
-		return ctx.Render("node/edit", m)
+	j, err := misc.JSONIndent(raw)
+	if err != nil {
+		return err
 	}
 
-	c.Update = func(ctx web.Context) error {
-		id := ctx.P("id")
-		info := &model.NodeUpdateInfo{}
-		err := ctx.Bind(info)
-		if err == nil {
-			err = docker.NodeUpdate(id, info)
-		}
-		return ajaxResult(ctx, err)
+	m := newModel(ctx).Add("ID", id).Add("Node", node).Add("Raw", j)
+	return ctx.Render("node/raw", m)
+}
+
+func nodeEdit(ctx web.Context) error {
+	id := ctx.P("id")
+	node, _, err := docker.NodeInspect(id)
+	if err != nil {
+		return err
 	}
 
-	return
+	m := newModel(ctx).Add("Node", node)
+	return ctx.Render("node/edit", m)
+}
+
+func nodeUpdate(ctx web.Context) error {
+	id := ctx.P("id")
+	info := &model.NodeUpdateInfo{}
+	err := ctx.Bind(info)
+	if err == nil {
+		err = docker.NodeUpdate(id, info)
+	}
+	return ajaxResult(ctx, err)
 }

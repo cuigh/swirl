@@ -7,6 +7,7 @@ import (
 	"github.com/cuigh/swirl/model"
 )
 
+// UserController is a controller of user
 type UserController struct {
 	Index   web.HandlerFunc `path:"/" name:"user.list" authorize:"!" desc:"user list page"`
 	New     web.HandlerFunc `path:"/new" name:"user.new" authorize:"!" desc:"new user page"`
@@ -19,133 +20,142 @@ type UserController struct {
 	Delete  web.HandlerFunc `path:"/delete" method:"post" name:"user.delete" authorize:"!" desc:"delete user"`
 }
 
+// User creates an instance of UserController
 func User() (c *UserController) {
-	c = &UserController{}
+	return &UserController{
+		Index:   userIndex,
+		New:     userNew,
+		Create:  userCreate,
+		Detail:  userDetail,
+		Edit:    userEdit,
+		Update:  userUpdate,
+		Block:   userBlock,
+		Unblock: userUnblock,
+		Delete:  userDelete,
+	}
+}
 
-	c.Index = func(ctx web.Context) error {
-		args := &model.UserListArgs{}
-		err := ctx.Bind(args)
-		if err != nil {
-			return err
-		}
-		args.PageSize = model.PageSize
-		if args.PageIndex == 0 {
-			args.PageIndex = 1
-		}
-
-		users, totalCount, err := biz.User.List(args)
-		if err != nil {
-			return err
-		}
-
-		m := newPagerModel(ctx, totalCount, model.PageSize, args.PageIndex).
-			Add("Query", args.Query).
-			Add("Filter", args.Filter).
-			Add("Users", users)
-		return ctx.Render("system/user/list", m)
+func userIndex(ctx web.Context) error {
+	args := &model.UserListArgs{}
+	err := ctx.Bind(args)
+	if err != nil {
+		return err
+	}
+	args.PageSize = model.PageSize
+	if args.PageIndex == 0 {
+		args.PageIndex = 1
 	}
 
-	c.New = func(ctx web.Context) error {
-		roles, err := biz.Role.List()
-		if err != nil {
-			return err
-		}
-
-		m := newModel(ctx).Add("Roles", roles)
-		return ctx.Render("system/user/new", m)
+	users, totalCount, err := biz.User.List(args)
+	if err != nil {
+		return err
 	}
 
-	c.Create = func(ctx web.Context) error {
-		user := &model.User{}
-		err := ctx.Bind(user)
-		if err == nil {
-			user.Type = model.UserTypeInternal
-			err = biz.User.Create(user, ctx.User())
-		}
-		return ajaxResult(ctx, err)
+	m := newPagerModel(ctx, totalCount, model.PageSize, args.PageIndex).
+		Add("Query", args.Query).
+		Add("Filter", args.Filter).
+		Add("Users", users)
+	return ctx.Render("system/user/list", m)
+}
+
+func userNew(ctx web.Context) error {
+	roles, err := biz.Role.List()
+	if err != nil {
+		return err
 	}
 
-	c.Detail = func(ctx web.Context) error {
-		name := ctx.P("name")
-		user, err := biz.User.GetByName(name)
-		if err != nil {
-			return err
-		}
-		if user == nil {
-			return web.ErrNotFound
-		}
+	m := newModel(ctx).Add("Roles", roles)
+	return ctx.Render("system/user/new", m)
+}
 
-		var (
-			roles map[string]string
-			role  *model.Role
-		)
-		if len(user.Roles) > 0 {
-			roles = map[string]string{}
-			for _, id := range user.Roles {
-				role, err = biz.Role.Get(id)
-				if err != nil {
-					return err
-				} else if role != nil {
-					roles[id] = role.Name
-				} else {
-					log.Get("user").Warnf("Role %v is invalid", id)
-				}
+func userCreate(ctx web.Context) error {
+	user := &model.User{}
+	err := ctx.Bind(user)
+	if err == nil {
+		user.Type = model.UserTypeInternal
+		err = biz.User.Create(user, ctx.User())
+	}
+	return ajaxResult(ctx, err)
+}
+
+func userDetail(ctx web.Context) error {
+	name := ctx.P("name")
+	user, err := biz.User.GetByName(name)
+	if err != nil {
+		return err
+	}
+	if user == nil {
+		return web.ErrNotFound
+	}
+
+	var (
+		roles map[string]string
+		role  *model.Role
+	)
+	if len(user.Roles) > 0 {
+		roles = map[string]string{}
+		for _, id := range user.Roles {
+			role, err = biz.Role.Get(id)
+			if err != nil {
+				return err
+			} else if role != nil {
+				roles[id] = role.Name
+			} else {
+				log.Get("user").Warnf("Role %v is invalid", id)
 			}
 		}
-
-		m := newModel(ctx).Add("User", user).Add("Roles", roles)
-		return ctx.Render("system/user/detail", m)
 	}
 
-	c.Edit = func(ctx web.Context) error {
-		name := ctx.P("name")
-		user, err := biz.User.GetByName(name)
-		if err != nil {
-			return err
-		}
-		if user == nil {
-			return web.ErrNotFound
-		}
+	m := newModel(ctx).Add("User", user).Add("Roles", roles)
+	return ctx.Render("system/user/detail", m)
+}
 
-		roles, err := biz.Role.List()
-		if err != nil {
-			return err
-		}
-
-		userRoles := make(map[string]struct{})
-		for _, id := range user.Roles {
-			userRoles[id] = model.Placeholder
-		}
-		m := newModel(ctx).Add("User", user).Add("Roles", roles).Add("UserRoles", userRoles)
-		return ctx.Render("system/user/edit", m)
+func userEdit(ctx web.Context) error {
+	name := ctx.P("name")
+	user, err := biz.User.GetByName(name)
+	if err != nil {
+		return err
+	}
+	if user == nil {
+		return web.ErrNotFound
 	}
 
-	c.Update = func(ctx web.Context) error {
-		user := &model.User{}
-		err := ctx.Bind(user)
-		if err == nil {
-			err = biz.User.Update(user, ctx.User())
-		}
-		return ajaxResult(ctx, err)
+	roles, err := biz.Role.List()
+	if err != nil {
+		return err
 	}
 
-	c.Block = func(ctx web.Context) error {
-		id := ctx.F("id")
-		err := biz.User.Block(id)
-		return ajaxResult(ctx, err)
+	userRoles := make(map[string]struct{})
+	for _, id := range user.Roles {
+		userRoles[id] = model.Placeholder
 	}
+	m := newModel(ctx).Add("User", user).Add("Roles", roles).Add("UserRoles", userRoles)
+	return ctx.Render("system/user/edit", m)
+}
 
-	c.Unblock = func(ctx web.Context) error {
-		id := ctx.F("id")
-		err := biz.User.Unblock(id)
-		return ajaxResult(ctx, err)
+func userUpdate(ctx web.Context) error {
+	user := &model.User{}
+	err := ctx.Bind(user)
+	if err == nil {
+		err = biz.User.Update(user, ctx.User())
 	}
+	return ajaxResult(ctx, err)
+}
 
-	c.Delete = func(ctx web.Context) error {
-		id := ctx.F("id")
-		err := biz.User.Delete(id)
-		return ajaxResult(ctx, err)
-	}
+func userBlock(ctx web.Context) error {
+	id := ctx.F("id")
+	err := biz.User.Block(id)
+	return ajaxResult(ctx, err)
+}
 
-	return
+func userUnblock(ctx web.Context) error {
+	id := ctx.F("id")
+	err := biz.User.Unblock(id)
+	return ajaxResult(ctx, err)
+}
+
+func userDelete(ctx web.Context) error {
+	id := ctx.F("id")
+	err := biz.User.Delete(id)
+	return ajaxResult(ctx, err)
 }

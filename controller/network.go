@@ -8,6 +8,7 @@ import (
 	"github.com/cuigh/swirl/model"
 )
 
+// NetworkController is a controller of docker network
 type NetworkController struct {
 	List       web.HandlerFunc `path:"/" name:"network.list" authorize:"!" desc:"network list page"`
 	New        web.HandlerFunc `path:"/new" name:"network.new" authorize:"!" desc:"new network page"`
@@ -18,82 +19,88 @@ type NetworkController struct {
 	Raw        web.HandlerFunc `path:"/:name/raw" name:"network.raw" authorize:"!" desc:"network raw page"`
 }
 
-// Network create a NetworkController instance.
+// Network creates a NetworkController instance.
 func Network() (c *NetworkController) {
-	c = &NetworkController{}
+	return &NetworkController{
+		List:       networkList,
+		New:        networkNew,
+		Create:     networkCreate,
+		Delete:     networkDelete,
+		Disconnect: networkDisconnect,
+		Detail:     networkDetail,
+		Raw:        networkRaw,
+	}
+}
 
-	c.List = func(ctx web.Context) error {
-		networks, err := docker.NetworkList()
-		if err != nil {
-			return err
-		}
-
-		m := newModel(ctx).Add("Networks", networks)
-		return ctx.Render("network/list", m)
+func networkList(ctx web.Context) error {
+	networks, err := docker.NetworkList()
+	if err != nil {
+		return err
 	}
 
-	c.New = func(ctx web.Context) error {
-		m := newModel(ctx)
-		return ctx.Render("/network/new", m)
+	m := newModel(ctx).Add("Networks", networks)
+	return ctx.Render("network/list", m)
+}
+
+func networkNew(ctx web.Context) error {
+	m := newModel(ctx)
+	return ctx.Render("/network/new", m)
+}
+
+func networkCreate(ctx web.Context) error {
+	info := &model.NetworkCreateInfo{}
+	err := ctx.Bind(info)
+	if err != nil {
+		return err
+	}
+	err = docker.NetworkCreate(info)
+	if err == nil {
+		biz.Event.CreateNetwork(model.EventActionCreate, info.Name, info.Name, ctx.User())
+	}
+	return ajaxResult(ctx, err)
+}
+
+func networkDelete(ctx web.Context) error {
+	name := ctx.F("name")
+	err := docker.NetworkRemove(name)
+	if err == nil {
+		biz.Event.CreateNetwork(model.EventActionDelete, name, name, ctx.User())
+	}
+	return ajaxResult(ctx, err)
+}
+
+func networkDisconnect(ctx web.Context) error {
+	name := ctx.P("name")
+	container := ctx.F("container")
+	err := docker.NetworkDisconnect(name, container)
+	if err == nil {
+		biz.Event.CreateNetwork(model.EventActionDisconnect, name, name+" <-> "+container, ctx.User())
+	}
+	return ajaxResult(ctx, err)
+}
+
+func networkDetail(ctx web.Context) error {
+	name := ctx.P("name")
+	network, err := docker.NetworkInspect(name)
+	if err != nil {
+		return err
+	}
+	m := newModel(ctx).Add("Network", network)
+	return ctx.Render("network/detail", m)
+}
+
+func networkRaw(ctx web.Context) error {
+	name := ctx.P("name")
+	raw, err := docker.NetworkInspectRaw(name)
+	if err != nil {
+		return err
 	}
 
-	c.Create = func(ctx web.Context) error {
-		info := &model.NetworkCreateInfo{}
-		err := ctx.Bind(info)
-		if err != nil {
-			return err
-		}
-		err = docker.NetworkCreate(info)
-		if err == nil {
-			biz.Event.CreateNetwork(model.EventActionCreate, info.Name, info.Name, ctx.User())
-		}
-		return ajaxResult(ctx, err)
+	j, err := misc.JSONIndent(raw)
+	if err != nil {
+		return err
 	}
 
-	c.Delete = func(ctx web.Context) error {
-		name := ctx.F("name")
-		err := docker.NetworkRemove(name)
-		if err == nil {
-			biz.Event.CreateNetwork(model.EventActionDelete, name, name, ctx.User())
-		}
-		return ajaxResult(ctx, err)
-	}
-
-	c.Disconnect = func(ctx web.Context) error {
-		name := ctx.P("name")
-		container := ctx.F("container")
-		err := docker.NetworkDisconnect(name, container)
-		if err == nil {
-			biz.Event.CreateNetwork(model.EventActionDisconnect, name, name+" <-> "+container, ctx.User())
-		}
-		return ajaxResult(ctx, err)
-	}
-
-	c.Detail = func(ctx web.Context) error {
-		name := ctx.P("name")
-		network, err := docker.NetworkInspect(name)
-		if err != nil {
-			return err
-		}
-		m := newModel(ctx).Add("Network", network)
-		return ctx.Render("network/detail", m)
-	}
-
-	c.Raw = func(ctx web.Context) error {
-		name := ctx.P("name")
-		raw, err := docker.NetworkInspectRaw(name)
-		if err != nil {
-			return err
-		}
-
-		j, err := misc.JSONIndent(raw)
-		if err != nil {
-			return err
-		}
-
-		m := newModel(ctx).Add("Network", name).Add("Raw", j)
-		return ctx.Render("network/raw", m)
-	}
-
-	return
+	m := newModel(ctx).Add("Network", name).Add("Raw", j)
+	return ctx.Render("network/raw", m)
 }
