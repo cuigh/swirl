@@ -89,8 +89,8 @@ namespace Swirl.Service {
                 <td>
                   <div class="select is-small">
                     <select name="endpoint.ports[${this.index}].publish_mode">
-                      <option value="rprivate">ingress</option>
-                      <option value="private">host</option>
+                      <option value="ingress">ingress</option>
+                      <option value="host">host</option>
                     </select>
                   </div>
                 </td>
