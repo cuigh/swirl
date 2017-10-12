@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"path/filepath"
 	"runtime"
@@ -19,6 +20,11 @@ import (
 )
 
 func main() {
+	setting, err := biz.Setting.Get()
+	if err != nil {
+		panic(fmt.Sprintf("Load setting failed: %v", err))
+	}
+
 	// customize error handler
 	web.DefaultErrorHandler.OnCode(http.StatusNotFound, func(ctx web.Context, err error) {
 		ctx.Redirect("/404")
@@ -31,7 +37,8 @@ func main() {
 
 	// set render/validator..
 	ws.Renderer = jet.New().SetDebug(config.App().Debug).
-		AddFunc("time", biz.Setting.Time).
+		AddFunc("time", misc.FormatTime(setting.TimeZone.Offset)).
+		AddFunc("i18n", misc.Message(setting.Language)).
 		AddFuncs(misc.Funcs).
 		AddVariable("version", misc.Version).
 		AddVariable("go_version", runtime.Version())

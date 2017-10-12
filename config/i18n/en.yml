@@ -1,0 +1,48 @@
+# common
+description: A Docker management tool, focused on Swarm cluster.
+copyright: All rights reserved.
+
+# button
+button.login: Sign in
+button.logout: Sign out
+button.search: Search
+button.submit: Submit
+button.cancel: Cancel
+button.delete: Delete
+
+# menu
+menu.dashboard: Dashboard
+menu.local: Local
+menu.image: Images
+menu.container: Containers
+menu.volume: Volumes
+menu.swarm: Swarm
+menu.registry: Registries
+menu.node: Nodes
+menu.network: Networks
+menu.service: Services
+menu.stack: Stacks
+menu.task: Tasks
+menu.secret: Secrets
+menu.config: Config
+menu.system: System
+menu.role: Roles
+menu.user: Users
+menu.setting: Settings
+menu.event: Events
+menu.version: Version
+menu.profile: Profile
+menu.password: Password
+
+# dashboard
+dashboard.node: Nodes
+dashboard.network: Networks
+dashboard.service: Services
+dashboard.stack: Stacks
+dashboard.feature: Features
+
+# login page
+login.title: Sign in to Swirl
+login.name: Login Name
+login.password: Password
+login.forgot-password: Forgot password?

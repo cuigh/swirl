@@ -6,6 +6,9 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
+	"time"
+
+	"github.com/cuigh/auxo/util/i18n"
 )
 
 var Funcs = map[string]interface{}{
@@ -41,6 +44,32 @@ var Funcs = map[string]interface{}{
 	"slice": func(values ...interface{}) interface{} {
 		return values
 	},
+}
+
+func Message(lang string) func(key string, args ...interface{}) string {
+	t, err := i18n.Find(lang, "en")
+	if err != nil {
+		panic(err)
+	}
+
+	return func(key string, args ...interface{}) string {
+		return t.Format(key, args...)
+	}
+}
+
+func FormatTime(offset int32) func(t time.Time) string {
+	const layout = "2006-01-02 15:04:05"
+
+	var loc *time.Location
+	if offset == 0 {
+		loc = time.Local
+	} else {
+		loc = time.FixedZone("", int(offset))
+	}
+
+	return func(t time.Time) string {
+		return t.In(loc).Format(layout)
+	}
 }
 
 func Page(count, pageIndex, pageSize int) (start, end int) {

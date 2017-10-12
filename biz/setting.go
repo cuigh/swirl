@@ -12,7 +12,6 @@ import (
 var Setting = &settingBiz{}
 
 type settingBiz struct {
-	loc *time.Location
 }
 
 func (b *settingBiz) Get() (setting *model.Setting, err error) {
@@ -32,16 +31,4 @@ func (b *settingBiz) Update(setting *model.Setting, user web.User) (err error) {
 		}
 	})
 	return
-}
-
-func (b *settingBiz) Time(t time.Time) string {
-	if b.loc == nil {
-		// todo: auto refresh settings after update
-		if s, err := b.Get(); err == nil && s != nil {
-			b.loc = time.FixedZone(s.TimeZone.Name, int(s.TimeZone.Offset))
-		} else {
-			b.loc = time.Local
-		}
-	}
-	return t.In(b.loc).Format("2006-01-02 15:04:05")
 }

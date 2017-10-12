@@ -146,8 +146,8 @@
             <div class="control has-icons-left">
               <div class="select">
                 <select name="lang">
-                  <option value="en">English</option>
-                  {*<option value="zh">Chinese</option>*}
+                  {{ yield option(value="en", label="English", selected=.Setting.Language) }}
+                  {{ yield option(value="zh", label="中文", selected=.Setting.Language) }}
                 </select>
               </div>
               <div class="icon is-left">

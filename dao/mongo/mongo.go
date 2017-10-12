@@ -3,6 +3,8 @@ package mongo
 import (
 	"errors"
 
+	"time"
+
 	"github.com/cuigh/auxo/log"
 	"gopkg.in/mgo.v2"
 )
@@ -29,6 +31,9 @@ var (
 			mgo.Index{Key: []string{"type"}},
 			mgo.Index{Key: []string{"name"}},
 			mgo.Index{Key: []string{"-time"}},
+		},
+		"template": {
+			mgo.Index{Key: []string{"name"}, Unique: true},
 		},
 	}
 )
@@ -59,7 +64,7 @@ func New(addr string) (*Dao, error) {
 		return nil, errors.New("database address must be configured for mongo storage")
 	}
 
-	s, err := mgo.Dial(addr)
+	s, err := mgo.DialWithTimeout(addr, time.Second*5)
 	if err != nil {
 		return nil, err
 	}

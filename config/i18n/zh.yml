@@ -1,0 +1,48 @@
+# common
+description: 一个 Docker 管理工具，专注于 Swarm 集群。
+copyright: 保留所有权利。
+
+# button
+button.login: 登录
+button.logout: 登出
+button.search: 搜索
+button.submit: 提交
+button.cancel: 取消
+button.delete: 删除
+
+# menu
+menu.dashboard: 仪表盘
+menu.local: 单机
+menu.image: 镜像
+menu.container: 容器
+menu.volume: 数据卷
+menu.swarm: 集群
+menu.registry: 镜像仓库
+menu.node: 节点
+menu.network: 网络
+menu.service: 服务
+menu.stack: 编排
+menu.task: 任务
+menu.secret: 私密配置
+menu.config: 常规配置
+menu.system: 系统
+menu.role: 角色
+menu.user: 用户
+menu.setting: 设置
+menu.event: 事件
+menu.version: 版本
+menu.profile: 资料
+menu.password: 密码
+
+# dashboard
+dashboard.node: 节点
+dashboard.network: 网络
+dashboard.service: 服务
+dashboard.stack: 编排
+dashboard.feature: 功能
+
+# login page
+login.title: 登录到 Swirl
+login.name: 登录名
+login.password: 密码
+login.forgot-password: 忘记密码？

@@ -34,15 +34,13 @@
       <h1 class="title is-2">
         SWIRL <span class="tag is-success">V{{ version }}</span>
       </h1>
-      <h2 class="subtitle is-5">
-        Another Docker Swarm Management System.
-      </h2>
+      <h2 class="subtitle is-5">{{ i18n("description") }}</h2>
       <p>
         <a id="btn-add" class="button is-primary" href="https://github.com/cuigh/swirl" target="_blank">
           <span class="icon">
             <i class="fa fa-github"></i>
           </span>
-          <span>Fork me</span>
+          <span>GitHub</span>
         </a>
         {*<a id="btn-add" class="button is-success" href="https://cuigh.tech/swirl" target="_blank">*}
           {*<span class="icon">*}
@@ -60,55 +58,54 @@
     WARNING: Swirl is running on basic mode now, some features are disabled. You can enable full features by configuring database.
   </div>
   <div class="columns">
-    {{yield infobox(style="success", icon="cubes", text="Nodes", url="/node/", count=.NodeCount)}}
-    {{yield infobox(style="info", icon="globe", text="Networks", url="/network/", count=.NetworkCount)}}
-    {{yield infobox(style="danger", icon="ticket", text="Services", url="/service/", count=.ServiceCount)}}
-    {{yield infobox(style="primary", icon="server", text="Stacks", url="/stack/task/", count=.StackCount)}}
+    {{yield infobox(style="success", icon="cubes", text=i18n("dashboard.node"), url="/node/", count=.NodeCount)}}
+    {{yield infobox(style="info", icon="globe", text=i18n("dashboard.network"), url="/network/", count=.NetworkCount)}}
+    {{yield infobox(style="danger", icon="ticket", text=i18n("dashboard.service"), url="/service/", count=.ServiceCount)}}
+    {{yield infobox(style="primary", icon="server", text=i18n("dashboard.stack"), url="/stack/task/", count=.StackCount)}}
   </div>
   <hr>
-  <h3 class="title is-5">Features</h3>
+  <h3 class="title is-5">{{ i18n("dashboard.feature") }}</h3>
   <div class="columns">
     <div class="column is-4">
       <div class="card is-fullwidth">
         <header class="card-header">
-          <h4 class="card-header-title"><strong>Local</strong></h4>
+          <h4 class="card-header-title"><strong>{{ i18n("menu.local") }}</strong></h4>
         </header>
         <div class="card-content">
-          {*{{yield progress(title="System", percent=0)}}*}
-          {{yield progress(title="Image", percent=100)}}
-          {{yield progress(title="Container", percent=80)}}
-          {{yield progress(title="Volume", percent=100)}}
+          {{yield progress(title=i18n("menu.image"), percent=100)}}
+          {{yield progress(title=i18n("menu.container"), percent=80)}}
+          {{yield progress(title=i18n("menu.volume"), percent=100)}}
         </div>
       </div>
     </div>
     <div class="column is-4">
       <div class="card is-fullwidth">
         <header class="card-header">
-          <h4 class="card-header-title"><strong>Swarm</strong></h4>
+          <h4 class="card-header-title"><strong>{{ i18n("menu.swarm") }}</strong></h4>
         </header>
         <div class="card-content">
-          {{yield progress(title="Registry", percent=100)}}          
-          {{yield progress(title="Node", percent=100)}}
-          {{yield progress(title="Network", percent=100)}}
-          {{yield progress(title="Service", percent=100)}}
-          {{yield progress(title="Stack", percent=100)}}
-          {{yield progress(title="Task", percent=100)}}
-          {{yield progress(title="Secret", percent=100)}}
-          {{yield progress(title="Config", percent=100)}}
+          {{yield progress(title=i18n("menu.registry"), percent=100)}}
+          {{yield progress(title=i18n("menu.node"), percent=100)}}
+          {{yield progress(title=i18n("menu.network"), percent=100)}}
+          {{yield progress(title=i18n("menu.service"), percent=100)}}
+          {{yield progress(title=i18n("menu.stack"), percent=100)}}
+          {{yield progress(title=i18n("menu.task"), percent=100)}}
+          {{yield progress(title=i18n("menu.secret"), percent=100)}}
+          {{yield progress(title=i18n("menu.config"), percent=100)}}
         </div>
       </div>
     </div>    
     <div class="column is-4">
       <div class="card is-fullwidth">
         <header class="card-header">
-          <h4 class="card-header-title"><strong>System</strong></h4>
+          <h4 class="card-header-title"><strong>{{ i18n("menu.system") }}</strong></h4>
         </header>
         <div class="card-content">
-          {{yield progress(title="Profile", percent=100)}}
-          {{yield progress(title="Role", percent=100)}}
-          {{yield progress(title="User", percent=100)}}
-          {{yield progress(title="Setting", percent=100)}}
-          {{yield progress(title="Event", percent=80)}}
+          {{yield progress(title=i18n("menu.profile"), percent=100)}}
+          {{yield progress(title=i18n("menu.role"), percent=100)}}
+          {{yield progress(title=i18n("menu.user"), percent=100)}}
+          {{yield progress(title=i18n("menu.setting"), percent=100)}}
+          {{yield progress(title=i18n("menu.event"), percent=80)}}
         </div>
       </div>
     </div>

@@ -23,38 +23,38 @@
         </div>
         <div id="menu-top" class="navbar-menu">
           <div class="navbar-start">
-            <a class="navbar-item" href="/">Dashboard</a>
+            <a class="navbar-item" href="/">{{ i18n("menu.dashboard") }}</a>
             <div class="navbar-item has-dropdown is-hoverable">
-              <div class="navbar-link">Local</div>
+              <div class="navbar-link">{{ i18n("menu.local") }}</div>
               <div class="navbar-dropdown ">
-                <a class="navbar-item" href="/image/">Images</a>
-                <a class="navbar-item" href="/container/">Containers</a>
-                <a class="navbar-item" href="/volume/">Volumes</a>
+                <a class="navbar-item" href="/image/">{{ i18n("menu.image") }}</a>
+                <a class="navbar-item" href="/container/">{{ i18n("menu.container") }}</a>
+                <a class="navbar-item" href="/volume/">{{ i18n("menu.volume") }}</a>
               </div>
             </div>               
             <div class="navbar-item has-dropdown is-hoverable">
-              <div class="navbar-link">Swarm</div>
+              <div class="navbar-link">{{ i18n("menu.swarm") }}</div>
               <div class="navbar-dropdown ">
-                <a class="navbar-item" href="/registry/">Registries</a>
-                <a class="navbar-item" href="/node/">Nodes</a>
-                <a class="navbar-item" href="/network/">Networks</a>
-                <a class="navbar-item" href="/service/">Services</a>
-                <a class="navbar-item" href="/stack/task/">Stacks</a>
-                <a class="navbar-item" href="/secret/">Secrets</a>
-                <a class="navbar-item" href="/config/">Configs</a>
+                <a class="navbar-item" href="/registry/">{{ i18n("menu.registry") }}</a>
+                <a class="navbar-item" href="/node/">{{ i18n("menu.node") }}</a>
+                <a class="navbar-item" href="/network/">{{ i18n("menu.network") }}</a>
+                <a class="navbar-item" href="/service/">{{ i18n("menu.service") }}</a>
+                <a class="navbar-item" href="/stack/task/">{{ i18n("menu.stack") }}</a>
+                <a class="navbar-item" href="/secret/">{{ i18n("menu.secret") }}</a>
+                <a class="navbar-item" href="/config/">{{ i18n("menu.config") }}</a>
               </div>
             </div>              
             <div class="navbar-item has-dropdown is-hoverable">
-              <div class="navbar-link">System</div>
+              <div class="navbar-link">{{ i18n("menu.system") }}</div>
               <div class="navbar-dropdown ">
-                <a class="navbar-item" href="/system/role/">Roles</a>
-                <a class="navbar-item" href="/system/user/">Users</a>
-                <a class="navbar-item" href="/system/setting/">Settings</a>
-                <a class="navbar-item" href="/system/event/">Events</a>
+                <a class="navbar-item" href="/system/role/">{{ i18n("menu.role") }}</a>
+                <a class="navbar-item" href="/system/user/">{{ i18n("menu.user") }}</a>
+                <a class="navbar-item" href="/system/setting/">{{ i18n("menu.setting") }}</a>
+                <a class="navbar-item" href="/system/event/">{{ i18n("menu.event") }}</a>
                 <hr class="navbar-divider">
                 <div class="navbar-item">
                   <div class="navbar-content">
-                    <strong>Version {{ version }}({{ go_version }})</strong>
+                    <strong>{{ i18n("menu.version") }} {{ version }}({{ go_version }})</strong>
                   </div>
                 </div>
               </div>
@@ -67,14 +67,14 @@
             <div class="navbar-item has-dropdown is-hoverable is-narrow">
               <div class="navbar-link is-narrow"><span class="icon"><i class="fa fa-user"></i></span></div>
               <div class="navbar-dropdown is-right">
-                <a class="navbar-item" href="/profile/">Profile</a>
-                <a class="navbar-item" href="/profile/password">Password</a>
+                <a class="navbar-item" href="/profile/">{{ i18n("menu.profile") }}</a>
+                <a class="navbar-item" href="/profile/password">{{ i18n("menu.password") }}</a>
               </div>  
             </div>
             <div class="navbar-item">
               <div class="field">
                 <p class="control">
-                  <a class="button is-outlined tooltip is-tooltip-bottom" href="/logout" data-tooltip="Sign out">
+                  <a class="button is-outlined tooltip is-tooltip-bottom" href="/logout" data-tooltip="{{ i18n("button.logout") }}">
                     <span class="icon">
                       <i class="fa fa-sign-out"></i>
                     </span>
@@ -91,7 +91,7 @@
     <footer class="footer" style="padding-bottom: 3em">
       <div class="container">
         <div class="content has-text-centered">
-          <p>© 2017 <a href="https://github.com/cuigh/swirl" target="_blank">cuigh</a>. All rights reserved.</p>
+          <p>© 2017 <a href="https://github.com/cuigh/swirl" target="_blank">cuigh</a>. {{ i18n("copyright") }}</p>
         </div>
       </div>
     </footer>
