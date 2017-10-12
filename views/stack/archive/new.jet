@@ -1,5 +1,15 @@
 {{ extends "../../_layouts/default" }}
 
+{{ block style() }}
+<link rel="stylesheet" href="/codemirror/codemirror.css?v=5.30">
+{{ end }}
+
+{{ block script() }}
+<script src="/codemirror/codemirror.js?v=5.30"></script>
+<script src="/codemirror/mode/yaml.js?v=5.30"></script>
+<script>var editor = CodeMirror.fromTextArea(document.getElementById("txt-content"), {lineNumbers: true});</script>
+{{ end }}
+
 {{ block body() }}
 <section class="hero is-info">
   <div class="hero-body">
@@ -37,7 +47,7 @@
       <div class="field">
         <label class="label">Content</label>
         <div class="control">
-          <textarea name="content" class="textarea" rows="20" placeholder="Compose file content" data-v-rule="native" required></textarea>
+          <textarea id="txt-content" name="content" class="textarea" rows="20" placeholder="Compose file content" data-v-rule="native" required></textarea>
         </div>
       </div>
       <div class="field is-grouped">
