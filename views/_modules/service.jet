@@ -194,7 +194,7 @@
           <td><input name="mounts[{{i}}].dst" value="{{m.Target}}" class="input is-small" placeholder="path in container"></td>
           <td>
             <div class="select is-small">
-              {{ yield select(name="mounts["+i+"].read_only", values=slice("false", "true"), labels=slice("No", "Yes"), selected=m.Type, dt="bool") }}
+              {{ yield select(name="mounts["+i+"].read_only", values=slice("false", "true"), labels=slice("No", "Yes"), selected=m.ReadOnly, dt="bool") }}
             </div>
           </td>
           <td>
