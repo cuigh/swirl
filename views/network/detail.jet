@@ -9,21 +9,17 @@
 <section class="hero is-info">
   <div class="hero-body">
     <div class="container has-text-centered">
-      <h1 class="title is-2">
-        NETWORK
-      </h1>
-      <h2 class="subtitle is-5">
-        Networks are user-defined networks that containers can be attached to.
-      </h2>
+      <h1 class="title is-2 is-uppercase">{{ i18n("network.title") }}</h1>
+      <h2 class="subtitle is-5">{{ i18n("network.description") }}</h2>
     </div>
   </div>
 </section>
 <div class="container">
   <nav class="breadcrumb has-succeeds-separator is-small is-marginless" aria-label="breadcrumbs">
     <ul>
-      <li><a href="/">Dashboard</a></li>
-      <li><a href="/network/">Networks</a></li>
-      <li class="is-active"><a>Detail</a></li>
+      <li><a href="/">{{ i18n("menu.dashboard") }}</a></li>
+      <li><a href="/network/">{{ i18n("menu.network") }}</a></li>
+      <li class="is-active"><a>{{ i18n("menu.detail") }}</a></li>
     </ul>
   </nav>
 </div>
@@ -39,12 +35,8 @@
 <nav class="navbar has-shadow">
   <div class="container">
     <div class="navbar-brand">
-      <a class="navbar-item is-tab is-active" href="/network/{{.Network.Name}}/detail">
-        Detail
-      </a>
-      <a class="navbar-item is-tab" href="/network/{{.Network.Name}}/raw">
-        Raw
-      </a>
+      <a class="navbar-item is-tab is-active" href="/network/{{.Network.Name}}/detail">{{ i18n("menu.detail") }}</a>
+      <a class="navbar-item is-tab" href="/network/{{.Network.Name}}/raw">{{ i18n("menu.raw") }}</a>
     </div>
   </div>
 </nav>
@@ -54,13 +46,13 @@
     <div class="message is-primary">
       <div class="message-body">
         <dl class="is-horizontal is-marginless">
-          <dt class="has-text-left">ID</dt>
+          <dt class="has-text-left">{{ i18n("field.id") }}</dt>
           <dd>{{ .Network.ID }}</dd>
           <dt class="has-text-left">Driver</dt>
           <dd>{{ .Network.Driver }}</dd>
           <dt class="has-text-left">Scope</dt>
           <dd>{{ .Network.Scope}}</dd>
-          <dt class="has-text-left">Created at</dt>
+          <dt class="has-text-left">{{ i18n("field.created-at") }}</dt>
           <dd>{{ time(.Network.Created) }}</dd>
           {{ if .Network.IPAM.Config }}
           <dt class="has-text-left">IP</dt>
@@ -84,11 +76,11 @@
         <table id="table-containers" class="table is-bordered is-striped is-narrow is-fullwidth is-marginless">
           <thead>
             <tr>
-              <th>Name</th>
+              <th>{{ i18n("field.name") }}</th>
               <th>IPV4</th>
               <th>IPV6</th>
               <th>Mac</th>
-              <th>Action</th>
+              <th>{{ i18n("field.action") }}</th>
             </tr>
           </thead>
           <tbody>
@@ -99,7 +91,7 @@
               <td>{{c.IPv6Address}}</td>
               <td>{{c.MacAddress}}</td>
               <td>
-                <button class="button is-small is-danger is-outlined" data-action="disconnect" value="{{id}}">Leave</button>
+                <button class="button is-small is-danger is-outlined" data-action="disconnect" value="{{id}}">{{ i18n("button.leave") }}</button>
               </td>
             </tr>
             {{end}}
@@ -111,7 +103,7 @@
 
     <a href="/network/" class="button is-primary">
       <span class="icon"><i class="fa fa-reply"></i></span>
-      <span>Return</span>
+      <span>{{ i18n("button.return") }}</span>
     </a>
   </div>
 </section>

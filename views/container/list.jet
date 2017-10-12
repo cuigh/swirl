@@ -9,12 +9,8 @@
 <section class="hero is-info">
   <div class="hero-body">
     <div class="container has-text-centered">
-      <h1 class="title is-2">
-        CONTAINER
-      </h1>
-      <h2 class="subtitle is-5">
-        A container is a running instance of image.
-      </h2>
+      <h1 class="title is-2 is-uppercase">{{ i18n("container.title") }}</h1>
+      <h2 class="subtitle is-5">{{ i18n("container.description") }}</h2>
     </div>
   </div>
 </section>
@@ -30,14 +26,14 @@
               <input name="name" value="{{.Name}}" class="input" placeholder="Search by name">
             </p>
             <p class="control">
-              <button class="button is-primary">Search</button>
+              <button class="button is-primary">{{ i18n("button.search") }}</button>
             </p>
           </div>
         </form>
       </div>
       <div class="level-item">
         <p class="subtitle is-5">
-          <strong>{{.Pager.Count}}</strong> containers
+          <strong>{{.Pager.Count}}</strong> <span class="is-lowercase">{{ i18n("menu.container") }}</span>
         </p>
       </div>      
     </div>
@@ -58,7 +54,7 @@
         {{end}}
       </p>
       <p class="level-item">
-        <button id="btn-delete" class="button is-danger"><span class="icon"><i class="fa fa-remove"></i></span><span>Delete</span></button>
+        <button id="btn-delete" class="button is-danger"><span class="icon"><i class="fa fa-remove"></i></span><span>{{ i18n("button.delete") }}</span></button>
       </p>
     </div>
   </nav>
@@ -67,11 +63,11 @@
     <thead>
       <tr>
         <th width="30"><input type="checkbox" data-action="check-all"></th>
-        <th>Name</th>
-        <th>Image</th>
-        <th>State</th>
-        <th>Created</th>
-        <th>Action</th>
+        <th>{{ i18n("field.name") }}</th>
+        <th>{{ i18n("field.image") }}</th>
+        <th>{{ i18n("field.state") }}</th>
+        <th>{{ i18n("field.created-at") }}</th>
+        <th>{{ i18n("field.action") }}</th>
       </tr>
     </thead>
     <tbody>
@@ -84,7 +80,7 @@
         <td>{{ time(.CreatedAt) }}</td>
         <td>
           <div class="field has-addons">
-            <p class="control"><button class="button is-small is-danger is-outlined" data-action="delete-container">Delete</button></p>
+            <p class="control"><button class="button is-small is-danger is-outlined" data-action="delete-container">{{ i18n("button.delete") }}</button></p>
           </div>
         </td>
       </tr>          

@@ -8,12 +8,8 @@
 <section class="hero is-info">
   <div class="hero-body">
     <div class="container has-text-centered">
-      <h1 class="title is-2">
-        STACK
-      </h1>
-      <h2 class="subtitle is-5">
-        A stack is a logical grouping of related services that are usually deployed together and require each other to work as intended.
-      </h2>
+      <h1 class="title is-2 is-uppercase">{{ i18n("stack.title") }}</h1>
+      <h2 class="subtitle is-5">{{ i18n("stack.description") }}</h2>
     </div>
   </div>
   <div class="hero-foot">
@@ -21,10 +17,10 @@
       <nav class="tabs is-boxed">
         <ul>
           <li class="is-active">
-            <a href="/stack/task/">Tasks</a>
+            <a href="/stack/task/">{{ i18n("menu.stack.task") }}</a>
           </li>
           <li>
-            <a href="/stack/archive/">Archives</a>
+            <a href="/stack/archive/">{{ i18n("menu.stack.archive") }}</a>
           </li>
         </ul>
       </nav>
@@ -37,7 +33,8 @@
     <div class="level-left">
       <div class="level-item">
         <p class="subtitle is-5">
-          <strong>{{len(.Stacks)}}</strong> stacks
+          <strong>{{len(.Stacks)}}</strong>
+          <span class="is-lowercase">{{ i18n("menu.stack") }}</span>
         </p>
       </div>      
     </div>
@@ -45,9 +42,9 @@
   <table id="table-items" class="table is-bordered is-striped is-narrow is-fullwidth">
       <thead>
           <tr>
-            <th>Name</th>
+            <th>{{ i18n("field.name") }}</th>
             <th>Services</th>
-            <th>Action</th>
+            <th>{{ i18n("field.action") }}</th>
           </tr>
       </thead>
       <tbody>
@@ -62,7 +59,7 @@
               </div>
             </td>
             <td>
-              <button class="button is-small is-danger is-outlined" data-action="delete-stack">Delete</button>
+              <button class="button is-small is-danger is-outlined" data-action="delete-stack">{{ i18n("button.delete") }}</button>
             </td>
           </tr>
           {{end}}          

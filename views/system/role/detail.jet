@@ -1,43 +1,12 @@
-{{ extends "../../_layouts/default" }}
+{{ extends "_base" }}
 
-{{ block body() }}
-<section class="hero is-dark">
-  <div class="hero-body">
-    <div class="container has-text-centered">
-      <h1 class="title is-2">ROLE</h1>
-      <h2 class="subtitle is-5">
-        A role is a user group with same rights. User can belong to multiple roles.
-      </h2>
-    </div>
-  </div>
-  <div class="hero-foot">
-    <div class="container">
-      <nav class="tabs is-boxed">
-        <ul>
-          <li class="is-active">
-            <a href="/system/role/">Roles</a>
-          </li>
-          <li>
-            <a href="/system/user/">Users</a>
-          </li>
-          <li>
-            <a href="/system/setting/">Settings</a>
-          </li>
-          <li>
-            <a href="/system/event/">Events</a>
-          </li>
-        </ul>
-      </nav>
-    </div>
-  </div>
-</section>
-
+{{ block body_content() }}
 <div class="container">
   <nav class="breadcrumb has-succeeds-separator is-small is-marginless" aria-label="breadcrumbs">
     <ul>
-      <li><a href="/">Dashboard</a></li>
-      <li><a href="/system/role/">Roles</a></li>
-      <li class="is-active"><a>Detail</a></li>
+      <li><a href="/">{{ i18n("menu.dashboard") }}</a></li>
+      <li><a href="/system/role/">{{ i18n("menu.role") }}</a></li>
+      <li class="is-active"><a>{{ i18n("menu.detail") }}</a></li>
     </ul>
   </nav>
 </div>
@@ -54,8 +23,8 @@
 <nav class="navbar has-shadow">
   <div class="container">
     <div class="navbar-brand">
-      <a class="navbar-item is-tab is-active" href="/system/role/{{.Role.ID}}/detail">Detail</a>
-      <a class="navbar-item is-tab" href="/system/role/{{.Role.ID}}/edit">Edit</a>
+      <a class="navbar-item is-tab is-active" href="/system/role/{{.Role.ID}}/detail">{{ i18n("menu.detail") }}</a>
+      <a class="navbar-item is-tab" href="/system/role/{{.Role.ID}}/edit">{{ i18n("menu.edit") }}</a>
     </div>
   </div>
 </nav>
@@ -90,7 +59,7 @@
     </dl>
     <a href="/system/role/" class="button is-primary">
       <span class="icon"><i class="fa fa-reply"></i></span>
-      <span>Return</span>
+      <span>{{ i18n("button.return") }}</span>
     </a>
   </div>
 </section>

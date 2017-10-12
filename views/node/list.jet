@@ -8,12 +8,8 @@
 <section class="hero is-info">
   <div class="hero-body">
     <div class="container has-text-centered">
-      <h1 class="title is-2">
-        NODE
-      </h1>
-      <h2 class="subtitle is-5">
-        Nodes are instances of the Engine participating in a swarm.
-      </h2>
+      <h1 class="title is-2 is-uppercase">{{ i18n("node.title") }}</h1>
+      <h2 class="subtitle is-5">{{ i18n("node.description") }}</h2>
     </div>
   </div>
 </section>
@@ -24,7 +20,8 @@
     <div class="level-left">
       <div class="level-item">
         <p class="subtitle is-5">
-          <strong>{{len(.Nodes)}}</strong> nodes
+          <strong>{{len(.Nodes)}}</strong>
+          <span class="is-lowercase">{{ i18n("menu.node") }}</span>
         </p>
       </div>      
     </div>
@@ -33,14 +30,14 @@
   <table id="table-items" class="table is-bordered is-striped is-narrow is-fullwidth">
       <thead>
           <tr>
-            <th>Name</th>
+            <th>{{ i18n("field.name") }}</th>
             <th>Role</th>
             <th>Version</th>
             <th>CPU</th>
             <th>Memory</th>
             <th>Address</th>
-            <th>Status</th>
-            <th>Action</th>
+            <th>{{ i18n("field.status") }}</th>
+            <th>{{ i18n("field.action") }}</th>
           </tr>
       </thead>
       <tbody>
@@ -54,8 +51,8 @@
             <td>{{.Address}}</td>
             <td><span class="tag is-{{.Status == "ready" ? "success" : (.Status == "down" ? "danger" : "warning")}}">{{.Status}}</span></td>
             <td>
-              <a href="{{.ID}}/edit" class="button is-small is-dark is-outlined">Edit</a>
-              <button class="button is-small is-danger is-outlined" data-action="delete-node" value="{{.ID}}">Delete</button>
+              <a href="{{.ID}}/edit" class="button is-small is-dark is-outlined">{{ i18n("button.edit") }}</a>
+              <button class="button is-small is-danger is-outlined" data-action="delete-node" value="{{.ID}}">{{ i18n("button.delete") }}</button>
             </td>
           </tr>
           {{end}}          

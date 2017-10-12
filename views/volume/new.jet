@@ -9,12 +9,8 @@
 <section class="hero is-info">
   <div class="hero-body">
     <div class="container has-text-centered">
-      <h1 class="title is-2">
-        VOLUMES
-      </h1>
-      <h2 class="subtitle is-5">
-        Create and manage persistent storage that can be attached to containers.
-      </h2>
+      <h1 class="title is-2 is-uppercase">{{ i18n("volume.title") }}</h1>
+      <h2 class="subtitle is-5">{{ i18n("volume.description") }}</h2>
     </div>
   </div>
 </section>
@@ -27,7 +23,7 @@
       <div class="columns is-bottom-marginless">
         <div class="column is-6">
           <div class="field">
-            <label class="label">Name</label>
+            <label class="label">{{ i18n("field.name") }}</label>
             <div class="control">
               <input name="name" class="input" placeholder="Name" data-v-rule="native" required>
             </div>
@@ -56,10 +52,10 @@
       </fieldset>
       <div class="field is-grouped">
           <div class="control">
-            <button type="submit" class="button is-primary">Submit</button>
+            <button type="submit" class="button is-primary">{{ i18n("button.submit") }}</button>
           </div>
           <div class="control">
-            <a href="/volume/" class="button is-link">Cancel</a>
+            <a href="/volume/" class="button is-link">{{ i18n("button.cancel") }}</a>
           </div>
         </div>
     </form>

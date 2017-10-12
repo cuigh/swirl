@@ -1,38 +1,7 @@
-{{ extends "../../_layouts/default" }}
+{{ extends "_base" }}
 {{ import "../../_modules/form" }}
 
-{{ block body() }}
-<section class="hero is-dark">
-  <div class="hero-body">
-    <div class="container has-text-centered">
-      <h1 class="title is-2">USER</h1>
-      <h2 class="subtitle is-5">
-        You ever have that feeling where you're not sure if you're awake or still dreaming?
-      </h2>      
-    </div>
-  </div>
-  <div class="hero-foot">
-    <div class="container">
-      <nav class="tabs is-boxed">
-        <ul>
-          <li>
-            <a href="/system/role/">Roles</a>
-          </li>
-          <li class="is-active">
-            <a href="/system/user/">Users</a>
-          </li>
-          <li>
-            <a href="/system/setting/">Settings</a>
-          </li>
-          <li>
-            <a href="/system/event/">Events</a>
-          </li>          
-        </ul>
-      </nav>
-    </div>
-  </div>  
-</section>
-
+{{ block body_content() }}
 <section class="section">
   <div class="container">
     <h2 class="title">Create user</h2>
@@ -41,7 +10,7 @@
       <div class="columns is-bottom-marginless">
         <div class="column is-6">
           <div class="field">
-            <label class="label">Name</label>
+            <label class="label">{{ i18n("field.name") }}</label>
             <div class="control has-icons-left">
               <input name="name" class="input" placeholder="Name" data-v-rule="native" required>
               <span class="icon is-small is-left">
@@ -50,7 +19,7 @@
             </div>
           </div>
           <div class="field">
-            <label class="label">Login name</label>
+            <label class="label">{{ i18n("field.login-name") }}</label>
             <div class="control has-icons-left">
               <input name="login_name" class="input" placeholder="Login name" data-v-rule="native" required>
               <span class="icon is-small is-left">
@@ -59,7 +28,7 @@
             </div>
           </div>
           <div class="field">
-            <label class="label">Email</label>
+            <label class="label">{{ i18n("field.email") }}</label>
             <div class="control has-icons-left">
               <input name="email" class="input" placeholder="Email" data-v-rule="native" required>
               <span class="icon is-small is-left">
@@ -70,7 +39,7 @@
         </div>
         <div class="column is-6">
           <div class="field">
-            <label class="label">Password</label>
+            <label class="label">{{ i18n("field.password") }}</label>
             <div class="control has-icons-left">
               <input id="txt-password" name="password" type="password" class="input" placeholder="Password" data-v-rule="native" required>
               <span class="icon is-small is-left">
@@ -93,7 +62,7 @@
         {{ yield switch(id="cb-admin", name="admin", label="Administrator") }}
       </div>
       <div class="field">
-        <label class="label">Type</label>
+        <label class="label">{{ i18n("field.type") }}</label>
         <div class="control">
           {{ yield radio(name="type", value="internal", label="Internal", checked="internal") }}
           {{ yield radio(name="type", value="ldap", label="LDAP") }}
@@ -107,14 +76,7 @@
           {{end}}
         </div>
       </div>
-      <div class="field is-grouped">
-          <div class="control">
-            <button type="submit" class="button is-primary">Submit</button>
-          </div>
-          <div class="control">
-            <a href="/system/user/" class="button is-link">Cancel</a>
-          </div>
-        </div>
+      {{ yield form_submit(url="/system/user/") }}
     </form>
   </div>
 </section>

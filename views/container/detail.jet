@@ -5,12 +5,8 @@
 <section class="hero is-info">
   <div class="hero-body">
     <div class="container has-text-centered">
-      <h1 class="title is-2">
-        CONTAINER
-      </h1>
-      <h2 class="subtitle is-5">
-        A container is a running instance of image.
-      </h2>
+      <h1 class="title is-2 is-uppercase">{{ i18n("container.title") }}</h1>
+      <h2 class="subtitle is-5">{{ i18n("container.description") }}</h2>
     </div>
   </div>
 </section>
@@ -18,9 +14,9 @@
 <div class="container">
   <nav class="breadcrumb has-succeeds-separator is-small is-marginless" aria-label="breadcrumbs">
     <ul>
-      <li><a href="/">Dashboard</a></li>
-      <li><a href="/container/">Containers</a></li>
-      <li class="is-active"><a>Detail</a></li>
+      <li><a href="/">{{ i18n("menu.dashboard") }}</a></li>
+      <li><a href="/container/">{{ i18n("menu.container") }}</a></li>
+      <li class="is-active"><a>{{ i18n("menu.detail") }}</a></li>
     </ul>
   </nav>
 </div>
@@ -38,9 +34,9 @@
 <nav class="navbar has-shadow">
   <div class="container">
     <div class="navbar-brand">
-      <a class="navbar-item is-tab is-active" href="/container/{{.Container.ContainerJSONBase.ID}}/detail">Detail</a>
-      <a class="navbar-item is-tab" href="/container/{{.Container.ContainerJSONBase.ID}}/raw">Raw</a>
-      <a class="navbar-item is-tab" href="/container/{{.Container.ContainerJSONBase.ID}}/logs">Logs</a>
+      <a class="navbar-item is-tab is-active" href="/container/{{.Container.ContainerJSONBase.ID}}/detail">{{ i18n("menu.detail") }}</a>
+      <a class="navbar-item is-tab" href="/container/{{.Container.ContainerJSONBase.ID}}/raw">{{ i18n("menu.raw") }}</a>
+      <a class="navbar-item is-tab" href="/container/{{.Container.ContainerJSONBase.ID}}/logs">{{ i18n("menu.log") }}</a>
     </div>
   </div>
 </nav>
@@ -50,11 +46,11 @@
     <div class="message is-primary">
       <div class="message-body">
         <dl class="is-horizontal is-marginless">
-          <dt class="has-text-left">ID</dt>
+          <dt class="has-text-left">{{ i18n("field.id") }}</dt>
           <dd>{{ .Container.ContainerJSONBase.ID }}</dd>
           {{ yield desc(title="PID", value=.Container.ContainerJSONBase.State.Pid) }}
-          {{ yield desc(title="Image", value=.Container.ContainerJSONBase.Image) }}
-          {{ yield desc(title="Created at", value=.Container.ContainerJSONBase.Created) }}
+          {{ yield desc(title=i18n("field.image"), value=.Container.ContainerJSONBase.Image) }}
+          {{ yield desc(title=i18n("field.created-at"), value=.Container.ContainerJSONBase.Created) }}
           {{ yield desc(title="Started at", value=.Container.ContainerJSONBase.State.StartedAt) }}
           <dt class="has-text-left">Status</dt>
           <dd><span class="tag is-{{ .Container.ContainerJSONBase.State.Status == "running" ? "success" : "danger" }}">{{ .Container.ContainerJSONBase.State.Status }}</span></dd>
@@ -65,7 +61,7 @@
     {{ yield tags(title="Labels", tags=.Container.Config.Labels) }}
     <a href="/container/" class="button is-primary">
       <span class="icon"><i class="fa fa-reply"></i></span>
-      <span>Return</span>
+      <span>{{ i18n("button.return") }}</span>
     </a>
   </div>
 </section>

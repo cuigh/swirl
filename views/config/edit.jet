@@ -9,12 +9,8 @@
 <section class="hero is-info">
   <div class="hero-body">
     <div class="container has-text-centered">
-      <h1 class="title is-2">
-        CONFIG
-      </h1>
-      <h2 class="subtitle is-5">
-        Configs are non-sensitive information that can be used by services, such as configuration files.
-      </h2>
+      <h1 class="title is-2 is-uppercase">{{ i18n("config.title") }}</h1>
+      <h2 class="subtitle is-5">{{ i18n("config.description") }}</h2>
     </div>
   </div>
 </section>
@@ -22,9 +18,9 @@
 <div class="container">
   <nav class="breadcrumb has-succeeds-separator is-small is-marginless" aria-label="breadcrumbs">
     <ul>
-      <li><a href="/">Dashboard</a></li>
-      <li><a href="/config/">Configs</a></li>
-      <li class="is-active"><a>Edit</a></li>
+      <li><a href="/">{{ i18n("menu.dashboard") }}</a></li>
+      <li><a href="/config/">{{ i18n("menu.config") }}</a></li>
+      <li class="is-active"><a>{{ i18n("menu.edit") }}</a></li>
     </ul>
   </nav>
 </div>
@@ -43,7 +39,7 @@
     <div class="navbar-brand">
       {*<a class="navbar-item is-tab" href="/config/{{.Config.ID}}/detail">Detail</a>*}
       {*<a class="navbar-item is-tab" href="/config/{{.Config.ID}}/raw">Raw</a>*}
-      <a class="navbar-item is-tab is-active" href="/node/{{.Config.ID}}/edit">Edit</a>
+      <a class="navbar-item is-tab is-active" href="/node/{{.Config.ID}}/edit">{{ i18n("menu.edit") }}</a>
     </div>
   </div>
 </nav>
@@ -62,14 +58,7 @@
         <label class="label">Labels</label>
         {{ yield options(name="label", items=.Config.Spec.Labels) }}
       </div>
-      <div class="field is-grouped">
-        <div class="control">
-          <button type="submit" class="button is-primary">Submit</button>
-        </div>
-        <div class="control">
-          <a href="/config/" class="button is-link">Cancel</a>
-        </div>
-      </div>
+      {{ yield form_submit(url="/config/") }}
     </form>
   </div>
 </section>

@@ -5,12 +5,8 @@
 <section class="hero is-info">
   <div class="hero-body">
     <div class="container has-text-centered">
-      <h1 class="title is-2">
-        VOLUMES
-      </h1>
-      <h2 class="subtitle is-5">
-        Create and manage persistent storage that can be attached to containers.
-      </h2>
+      <h1 class="title is-2 is-uppercase">{{ i18n("volume.title") }}</h1>
+      <h2 class="subtitle is-5">{{ i18n("volume.description") }}</h2>
     </div>
   </div>
 </section>
@@ -18,9 +14,9 @@
 <div class="container">
   <nav class="breadcrumb has-succeeds-separator is-small is-marginless" aria-label="breadcrumbs">
     <ul>
-      <li><a href="/">Dashboard</a></li>
-      <li><a href="/volume/">Volumes</a></li>
-      <li class="is-active"><a>Detail</a></li>
+      <li><a href="/">{{ i18n("menu.dashboard") }}</a></li>
+      <li><a href="/volume/">{{ i18n("menu.volume") }}</a></li>
+      <li class="is-active"><a>{{ i18n("menu.detail") }}</a></li>
     </ul>
   </nav>
 </div>
@@ -36,12 +32,8 @@
 <nav class="navbar has-shadow">
   <div class="container">
     <div class="navbar-brand">
-      <a class="navbar-item is-tab is-active" href="/volume/{{.Volume.Name}}/detail">
-        Detail
-      </a>
-      <a class="navbar-item is-tab " href="/volume/{{.Volume.Name}}/raw">
-        Raw
-      </a>
+      <a class="navbar-item is-tab is-active" href="/volume/{{.Volume.Name}}/detail">{{ i18n("menu.detail") }}</a>
+      <a class="navbar-item is-tab " href="/volume/{{.Volume.Name}}/raw">{{ i18n("menu.raw") }}</a>
     </div>
   </div>
 </nav>
@@ -63,7 +55,7 @@
     {{ yield tags(title="Labels", tags=.Volume.Labels) }}
     <a href="/volume/" class="button is-primary">
       <span class="icon"><i class="fa fa-reply"></i></span>
-      <span>Return</span>
+      <span>{{ i18n("button.return") }}</span>
     </a>
   </div>
 </section>

@@ -8,12 +8,8 @@
 <section class="hero is-info">
   <div class="hero-body">
     <div class="container has-text-centered">
-      <h1 class="title is-2">
-        NETWORK
-      </h1>
-      <h2 class="subtitle is-5">
-        Networks are user-defined networks that containers can be attached to.
-      </h2>
+      <h1 class="title is-2 is-uppercase">{{ i18n("network.title") }}</h1>
+      <h2 class="subtitle is-5">{{ i18n("network.description") }}</h2>
     </div>
   </div>
 </section>
@@ -23,14 +19,15 @@
     <div class="level-left">
       <div class="level-item">
         <p class="subtitle is-5">
-          <strong>{{len(.Networks)}}</strong> networks
+          <strong>{{len(.Networks)}}</strong>
+          <span class="is-lowercase">{{ i18n("menu.network") }}</span>
         </p>
       </div>      
     </div>
     <!-- Right side -->
     <div class="level-right">
       <p class="level-item">
-        <a href="new" class="button is-success"><span class="icon"><i class="fa fa-plus"></i></span><span>New</span></a>
+        <a href="new" class="button is-success"><span class="icon"><i class="fa fa-plus"></i></span><span>{{ i18n("button.new") }}</span></a>
       </p>
     </div>
   </nav>
@@ -38,11 +35,11 @@
   <table id="table-items" class="table is-bordered is-striped is-narrow is-fullwidth">
       <thead>
           <tr>
-            <th>Name</th>
-            <th>ID</th>
+            <th>{{ i18n("field.name") }}</th>
+            <th>{{ i18n("field.id") }}</th>
             <th>Scope</th>
             <th>Driver</th>
-            <th>Action</th>
+            <th>{{ i18n("field.action") }}</th>
           </tr>
       </thead>
       <tbody>
@@ -53,7 +50,7 @@
             <td><span class="tag is-{{.Scope == "swarm" ? "info" : "grey"}}">{{.Scope}}</span></td>
             <td>{{.Driver}}</td>
             <td>
-              <button class="button is-small is-danger is-outlined" data-action="delete-network">Delete</button>
+              <button class="button is-small is-danger is-outlined" data-action="delete-network">{{ i18n("button.delete") }}</button>
             </td>
           </tr>
           {{end}}          

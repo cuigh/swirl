@@ -9,12 +9,8 @@
 <section class="hero is-info">
   <div class="hero-body">
     <div class="container has-text-centered">
-      <h1 class="title is-2">
-        NODE
-      </h1>
-      <h2 class="subtitle is-5">
-        Nodes are instances of the Engine participating in a swarm.
-      </h2>
+      <h1 class="title is-2 is-uppercase">{{ i18n("node.title") }}</h1>
+      <h2 class="subtitle is-5">{{ i18n("node.description") }}</h2>
     </div>
   </div>
 </section>
@@ -22,9 +18,9 @@
 <div class="container">
   <nav class="breadcrumb has-succeeds-separator is-small is-marginless" aria-label="breadcrumbs">
     <ul>
-      <li><a href="/">Dashboard</a></li>
-      <li><a href="/node/">Nodes</a></li>
-      <li class="is-active"><a>Edit</a></li>
+      <li><a href="/">{{ i18n("menu.dashboard") }}</a></li>
+      <li><a href="/node/">{{ i18n("menu.node") }}</a></li>
+      <li class="is-active"><a>{{ i18n("menu.edit") }}</a></li>
     </ul>
   </nav>
 </div>
@@ -41,9 +37,9 @@
 <nav class="navbar has-shadow">
   <div class="container">
     <div class="navbar-brand">
-      <a class="navbar-item is-tab" href="/node/{{.Node.ID}}/detail">Detail</a>
-      <a class="navbar-item is-tab" href="/node/{{.Node.ID}}/raw">Raw</a>
-      <a class="navbar-item is-tab is-active" href="/node/{{.Node.ID}}/edit">Edit</a>
+      <a class="navbar-item is-tab" href="/node/{{.Node.ID}}/detail">{{ i18n("menu.detail") }}</a>
+      <a class="navbar-item is-tab" href="/node/{{.Node.ID}}/raw">{{ i18n("menu.raw") }}</a>
+      <a class="navbar-item is-tab is-active" href="/node/{{.Node.ID}}/edit">{{ i18n("menu.edit") }}</a>
     </div>
   </div>
 </nav>
@@ -53,7 +49,7 @@
     <form method="post" action="update" data-form="ajax-json" data-url="/node/">
       <input name="version" value="{{ .Node.Version.Index }}" data-type="integer" type="hidden">
       <div class="field">
-        <label class="label">Name</label>
+        <label class="label">{{ i18n("field.name") }}</label>
         <div class="control">
           <input name="name" value="{{ .Node.Spec.Name }}" class="input" placeholder="">
         </div>
@@ -77,14 +73,7 @@
         <legend class="lead is-5">Labels</legend>
         {{ yield options(name="label", items=.Node.Spec.Labels) }}
       </fieldset>
-      <div class="field is-grouped">
-        <div class="control">
-          <button type="submit" class="button is-primary">Submit</button>
-        </div>
-        <div class="control">
-          <a href="/node/" class="button is-link">Cancel</a>
-        </div>
-      </div>
+      {{ yield form_submit(url="/node/") }}
     </form>
   </div>
 </section>

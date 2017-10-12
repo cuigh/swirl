@@ -1,7 +1,7 @@
 {{ block pager(info) }}
   <nav class="pagination is-centered">
-    <a class="pagination-previous" {{ if info.Page > 1 }}href="{{ info.URL(info.Page-1) }}"{{ else }}disabled{{ end }}>Previous</a>
-    <a class="pagination-next" {{ if info.Page < info.MaxPage }}href="{{ info.URL(info.Page+1) }}"{{ else }}disabled{{ end }}>Next</a>
+    <a class="pagination-previous" {{ if info.Page > 1 }}href="{{ info.URL(info.Page-1) }}"{{ else }}disabled{{ end }}>{{ i18n("button.previous") }}</a>
+    <a class="pagination-next" {{ if info.Page < info.MaxPage }}href="{{ info.URL(info.Page+1) }}"{{ else }}disabled{{ end }}>{{ i18n("button.next") }}</a>
     <ul class="pagination-list">
       {{ range info.Pages }}
       <li>

@@ -5,21 +5,17 @@
 <section class="hero is-info">
   <div class="hero-body">
     <div class="container has-text-centered">
-      <h1 class="title is-2">
-        NODE
-      </h1>
-      <h2 class="subtitle is-5">
-        Nodes are instances of the Engine participating in a swarm.
-      </h2>
+      <h1 class="title is-2 is-uppercase">{{ i18n("node.title") }}</h1>
+      <h2 class="subtitle is-5">{{ i18n("node.description") }}</h2>
     </div>
   </div>
 </section>
 <div class="container">
   <nav class="breadcrumb has-succeeds-separator is-small is-marginless" aria-label="breadcrumbs">
     <ul>
-      <li><a href="/">Dashboard</a></li>
-      <li><a href="/node/">Nodes</a></li>
-      <li class="is-active"><a>Detail</a></li>
+      <li><a href="/">{{ i18n("menu.dashboard") }}</a></li>
+      <li><a href="/node/">{{ i18n("menu.node") }}</a></li>
+      <li class="is-active"><a>{{ i18n("menu.detail") }}</a></li>
     </ul>
   </nav>
 </div>
@@ -36,9 +32,9 @@
 <nav class="navbar has-shadow">
   <div class="container">
     <div class="navbar-brand">
-      <a class="navbar-item is-tab is-active" href="/node/{{.Node.ID}}/detail">Detail</a>
-      <a class="navbar-item is-tab" href="/node/{{.Node.ID}}/raw">Raw</a>
-      <a class="navbar-item is-tab" href="/node/{{.Node.ID}}/edit">Edit</a>
+      <a class="navbar-item is-tab is-active" href="/node/{{.Node.ID}}/detail">{{ i18n("menu.detail") }}</a>
+      <a class="navbar-item is-tab" href="/node/{{.Node.ID}}/raw">{{ i18n("menu.raw") }}</a>
+      <a class="navbar-item is-tab" href="/node/{{.Node.ID}}/edit">{{ i18n("menu.edit") }}</a>
     </div>
   </div>
 </nav>
@@ -48,7 +44,7 @@
     <div class="message is-primary">
       <div class="message-body">
         <dl class="is-horizontal is-marginless">
-          <dt class="has-text-left">ID</dt>
+          <dt class="has-text-left">{{ i18n("field.id") }}</dt>
           <dd>{{ .Node.ID }}</dd>
           <dt class="has-text-left">Hostname</dt>
           <dd>{{ .Node.Description.Hostname }}</dd>
@@ -60,9 +56,9 @@
           <dd>{{ .Node.Status.State}}</dd>
           <dt class="has-text-left">Address</dt>
           <dd>{{ .Node.Status.Addr}}</dd>
-          <dt class="has-text-left">Created at</dt>
+          <dt class="has-text-left">{{ i18n("field.created-at") }}</dt>
           <dd>{{ time(.Node.CreatedAt) }}</dd>
-          <dt class="has-text-left">Updated at</dt>
+          <dt class="has-text-left">{{ i18n("field.updated-at") }}</dt>
           <dd>{{ time(.Node.UpdatedAt) }}</dd>
         </dl>
       </div>
@@ -90,7 +86,7 @@
           <dd>{{ .Node.ManagerStatus.Leader ? "Yes" : "No" }}</dd>
           <dt class="has-text-left">Reachability</dt>
           <dd>{{ .Node.ManagerStatus.Reachability }}</dd>
-          <dt class="has-text-left">Addr</dt>
+          <dt class="has-text-left">Address</dt>
           <dd>{{ .Node.ManagerStatus.Addr}}</dd>
         </dl>
       </div>
@@ -108,10 +104,10 @@
         <table class="table is-bordered is-striped is-narrow is-fullwidth is-marginless">
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Status</th>
-              <th>Image</th>
-              <th>Updated at</th>
+              <th>{{ i18n("field.id") }}</th>
+              <th>{{ i18n("field.status") }}</th>
+              <th>{{ i18n("field.image") }}</th>
+              <th>{{ i18n("field.updated-at") }}</th>
             </tr>
           </thead>
           <tbody>
@@ -131,7 +127,7 @@
 
     <a href="/node/" class="button is-primary">
       <span class="icon"><i class="fa fa-reply"></i></span>
-      <span>Return</span>
+      <span>{{ i18n("button.return") }}</span>
     </a>
   </div>
 </section>

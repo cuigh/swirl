@@ -5,12 +5,8 @@
 <section class="hero is-info">
   <div class="hero-body">
     <div class="container has-text-centered">
-      <h1 class="title is-2">
-        IMAGE
-      </h1>
-      <h2 class="subtitle is-5">
-        Manage images.
-      </h2>
+      <h1 class="title is-2 is-uppercase">{{ i18n("image.title") }}</h1>
+      <h2 class="subtitle is-5">{{ i18n("image.description") }}</h2>
     </div>
   </div>
 </section>
@@ -18,9 +14,9 @@
 <div class="container">
   <nav class="breadcrumb has-succeeds-separator is-small is-marginless" aria-label="breadcrumbs">
     <ul>
-      <li><a href="/">Dashboard</a></li>
-      <li><a href="/image/">Images</a></li>
-      <li class="is-active"><a>Detail</a></li>
+      <li><a href="/">{{ i18n("menu.dashboard") }}</a></li>
+      <li><a href="/image/">{{ i18n("menu.image") }}</a></li>
+      <li class="is-active"><a>{{ i18n("menu.detail") }}</a></li>
     </ul>
   </nav>
 </div>
@@ -38,12 +34,8 @@
 <nav class="navbar has-shadow">
   <div class="container">
     <div class="navbar-brand">
-      <a class="navbar-item is-tab is-active" href="/image/{{ .Image.ID }}/detail">
-        Detail
-      </a>
-      <a class="navbar-item is-tab" href="/image/{{ .Image.ID }}/raw">
-        Raw
-      </a>
+      <a class="navbar-item is-tab is-active" href="/image/{{ .Image.ID }}/detail">{{ i18n("menu.detail") }}</a>
+      <a class="navbar-item is-tab" href="/image/{{ .Image.ID }}/raw">{{ i18n("menu.raw") }}</a>
     </div>
   </div>
 </nav>
@@ -54,22 +46,22 @@
     <div class="message is-primary">
       <div class="message-body">
         <dl class="is-horizontal is-marginless">
-          <dt class="has-text-left">ID</dt>
+          <dt class="has-text-left">{{ i18n("field.id") }}</dt>
           <dd>{{ .Image.ID }}</dd>
-          <dt class="has-text-left">Size</dt>
+          <dt class="has-text-left">{{ i18n("field.size") }}</dt>
           <dd>{{ printf("%0.1f", .Image.Size / 1024 / 1024) }} MB</dd>
-          <dt class="has-text-left">Created at</dt>
+          <dt class="has-text-left">{{ i18n("field.created-at") }}</dt>
           <dd>{{ .Image.Created }}</dd>
-          <dt class="has-text-left">Docker version</dt>
+          <dt class="has-text-left">Docker {{ i18n("image.docker-version") }}</dt>
           <dd>{{ .Image.DockerVersion }}</dd>
-          <dt class="has-text-left">Platform</dt>
+          <dt class="has-text-left">{{ i18n("image.platform") }}</dt>
           <dd>{{ .Image.Os }}/{{ .Image.Architecture }}</dd>
           {{ if .Image.Author }}
-          <dt class="has-text-left">Author</dt>
+          <dt class="has-text-left">{{ i18n("image.author") }}</dt>
           <dd>{{ .Image.Author }}</dd>
           {{ end }}
           {{ if .Image.RepoTags }}
-          <dt class="has-text-left">Tags</dt>
+          <dt class="has-text-left">{{ i18n("field.tag") }}</dt>
           {{ range .Image.RepoTags }}
           <dd><span class="tag is-success">{{ . }}</span></dd>
           {{ end }}
@@ -81,14 +73,14 @@
     {{ if .Histories }}
     <div class="block">
       <div class="block-header">
-        <p>Layers</p>
+        <p>{{ i18n("image.layer") }}</p>
       </div>
       <div class="block-body is-paddingless">
         <table id="table-containers" class="table is-bordered is-striped is-narrow is-fullwidth is-marginless">
           <thead>
             <tr>
-              <th>Instruction</th>
-              <th>Size</th>
+              <th>{{ i18n("image.instruction") }}</th>
+              <th>{{ i18n("field.size") }}</th>
             </tr>
           </thead>
           <tbody>
@@ -106,7 +98,7 @@
 
     <a href="/image/" class="button is-primary">
       <span class="icon"><i class="fa fa-reply"></i></span>
-      <span>Return</span>
+      <span>{{ i18n("button.return") }}</span>
     </a>
   </div>
 </section>

@@ -9,9 +9,9 @@
 <div class="container">
   <nav class="breadcrumb has-succeeds-separator is-small is-marginless" aria-label="breadcrumbs">
     <ul>
-      <li><a href="/">Dashboard</a></li>
-      <li><a href="/service/">Services</a></li>
-      <li class="is-active"><a>Edit</a></li>
+      <li><a href="/">{{ i18n("menu.dashboard") }}</a></li>
+      <li><a href="/service/">{{ i18n("menu.service") }}</a></li>
+      <li class="is-active"><a>{{ i18n("menu.edit") }}</a></li>
     </ul>
   </nav>
 </div>
@@ -25,10 +25,10 @@
 <nav class="navbar has-shadow">
   <div class="container">
     <div class="navbar-brand">
-      <a class="navbar-item is-tab" href="/service/{{.Service.Name}}/detail">Detail</a>
-      <a class="navbar-item is-tab" href="/service/{{.Service.Name}}/raw">Raw</a>
-      <a class="navbar-item is-tab" href="/service/{{.Service.Name}}/logs">Logs</a>
-      <a class="navbar-item is-tab is-active" href="/service/{{.Service.Name}}/edit">Edit</a>
+      <a class="navbar-item is-tab" href="/service/{{.Service.Name}}/detail">{{ i18n("menu.detail") }}</a>
+      <a class="navbar-item is-tab" href="/service/{{.Service.Name}}/raw">{{ i18n("menu.raw") }}</a>
+      <a class="navbar-item is-tab" href="/service/{{.Service.Name}}/logs">{{ i18n("menu.log") }}</a>
+      <a class="navbar-item is-tab is-active" href="/service/{{.Service.Name}}/edit">{{ i18n("menu.edit") }}</a>
     </div>
   </div>
 </nav>

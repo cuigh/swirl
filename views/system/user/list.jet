@@ -1,42 +1,11 @@
-{{ extends "../../_layouts/default" }}
+{{ extends "_base" }}
 {{ import "../../_modules/pager" }}
 
 {{ block script() }}
 <script>$(() => new Swirl.User.ListPage())</script>
 {{ end }}
 
-{{ block body() }}
-<section class="hero is-dark">
-  <div class="hero-body">
-    <div class="container has-text-centered">
-      <h1 class="title is-2">USER</h1>
-      <h2 class="subtitle is-5">
-        Manage users.
-      </h2>      
-    </div>
-  </div>
-  <div class="hero-foot">
-    <div class="container">
-      <nav class="tabs is-boxed">
-        <ul>
-          <li>
-            <a href="/system/role/">Roles</a>
-          </li>
-          <li class="is-active">
-            <a href="/system/user/">Users</a>
-          </li>
-          <li>
-            <a href="/system/setting/">Settings</a>
-          </li>
-          <li>
-            <a href="/system/event/">Events</a>
-          </li>          
-        </ul>
-      </nav>
-    </div>
-  </div>  
-</section>
-
+{{ block body_content() }}
 <section class="section">
   <nav class="level">
     <!-- Left side -->
@@ -49,14 +18,15 @@
               <input name="query" value="{{.Query}}" class="input" type="text" placeholder="Search by name, login name and email">
             </p>
             <p class="control">
-              <button type="submit" class="button is-primary">Search</button>
+              <button type="submit" class="button is-primary">{{ i18n("button.search") }}</button>
             </p>
           </div>
         </form>
       </div>
       <div class="level-item">
         <p class="subtitle is-5">
-          <strong>{{.Pager.Count}}</strong> users
+          <strong>{{.Pager.Count}}</strong>
+          <span class="is-lowercase">{{ i18n("menu.user") }}</span>
         </p>
       </div>      
     </div>
@@ -90,7 +60,7 @@
         <a href="?filter=blocked">Blocked</a>        
         {{end}}
       <p class="level-item">
-        <a href="new" class="button is-success"><span class="icon"><i class="fa fa-plus"></i></span><span>New</span></a>
+        <a href="new" class="button is-success"><span class="icon"><i class="fa fa-plus"></i></span><span>{{ i18n("button.new") }}</span></a>
       </p>
     </div>
   </nav>
@@ -98,13 +68,13 @@
   <table id="table-items" class="table is-bordered is-striped is-narrow is-fullwidth">
     <thead>
         <tr>
-          <th>Name</th>
-          <th>Login Name</th>
-          <th>Email</th>
-          <th>Type</th>
-          <th>Status</th>
-          <th>Created at</th>
-          <th>Action</th>
+          <th>{{ i18n("field.name") }}</th>
+          <th>{{ i18n("field.login-name") }}</th>
+          <th>{{ i18n("field.email") }}</th>
+          <th>{{ i18n("field.type") }}</th>
+          <th>{{ i18n("field.status") }}</th>
+          <th>{{ i18n("field.created-at") }}</th>
+          <th>{{ i18n("field.action") }}</th>
         </tr>
     </thead>
       <tbody>
@@ -117,13 +87,13 @@
           <td><span class="tag is-{{.Status == 1 ? "success" : "warning"}}">{{.Status == 1 ? "Active" : "Blocked"}}</span></td>
           <td>{{time(.CreatedAt)}}</td>
           <td>
-            <a href="{{.LoginName}}/edit" class="button is-small is-dark is-outlined">Edit</a>
+            <a href="{{.LoginName}}/edit" class="button is-small is-dark is-outlined">{{ i18n("button.edit") }}</a>
             {{if .Status == 1}}
-            <button class="button is-small is-warning is-outlined" data-action="block-user">Block</button>
+            <button class="button is-small is-warning is-outlined" data-action="block-user">{{ i18n("user.button.block") }}</button>
             {{else}}
-            <button class="button is-small is-warning is-outlined" data-action="unblock-user">Unblock</button>
+            <button class="button is-small is-warning is-outlined" data-action="unblock-user">{{ i18n("user.button.unblock") }}</button>
             {{end}}
-            <button class="button is-small is-danger is-outlined" data-action="delete-user">Delete</button>
+            <button class="button is-small is-danger is-outlined" data-action="delete-user">{{ i18n("button.delete") }}</button>
           </td>
         </tr>
         {{end}}

@@ -13,12 +13,8 @@
 <section class="hero is-info">
   <div class="hero-body">
     <div class="container has-text-centered">
-      <h1 class="title is-2">
-        IMAGE
-      </h1>
-      <h2 class="subtitle is-5">
-        Manage images.
-      </h2>
+      <h1 class="title is-2 is-uppercase">{{ i18n("image.title") }}</h1>
+      <h2 class="subtitle is-5">{{ i18n("image.description") }}</h2>
     </div>
   </div>
 </section>
@@ -26,9 +22,9 @@
 <div class="container">
   <nav class="breadcrumb has-succeeds-separator is-small is-marginless" aria-label="breadcrumbs">
     <ul>
-      <li><a href="/">Dashboard</a></li>
-      <li><a href="/image/">Images</a></li>
-      <li class="is-active"><a>Raw</a></li>
+      <li><a href="/">{{ i18n("menu.dashboard") }}</a></li>
+      <li><a href="/image/">{{ i18n("menu.image") }}</a></li>
+      <li class="is-active"><a>{{ i18n("menu.raw") }}</a></li>
     </ul>
   </nav>
 </div>
@@ -46,12 +42,8 @@
 <nav class="navbar has-shadow">
   <div class="container">
     <div class="navbar-brand">
-      <a class="navbar-item is-tab" href="/image/{{ .Image.ID }}/detail">
-        Detail
-      </a>
-      <a class="navbar-item is-tab is-active" href="/image/{{ .Image.ID }}/raw">
-        Raw
-      </a>
+      <a class="navbar-item is-tab" href="/image/{{ .Image.ID }}/detail">{{ i18n("menu.detail") }}</a>
+      <a class="navbar-item is-tab is-active" href="/image/{{ .Image.ID }}/raw">{{ i18n("menu.raw") }}</a>
     </div>
   </div>
 </nav>
@@ -63,7 +55,7 @@
     </div>
     <a href="/image/" class="button is-primary">
       <span class="icon"><i class="fa fa-reply"></i></span>
-      <span>Return</span>
+      <span>{{ i18n("button.return") }}</span>
     </a>
   </div>
 </section>

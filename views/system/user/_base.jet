@@ -1,0 +1,33 @@
+{{ extends "../../_layouts/default" }}
+
+{{ block body() }}
+<section class="hero is-dark">
+  <div class="hero-body">
+    <div class="container has-text-centered">
+      <h1 class="title is-2 is-uppercase">{{ i18n("user.title") }}</h1>
+      <h2 class="subtitle is-5">{{ i18n("user.description") }}</h2>
+    </div>
+  </div>
+  <div class="hero-foot">
+    <div class="container">
+      <nav class="tabs is-boxed">
+        <ul>
+          <li>
+            <a href="/system/role/">{{ i18n("menu.role") }}</a>
+          </li>
+          <li class="is-active">
+            <a href="/system/user/">{{ i18n("menu.user") }}</a>
+          </li>
+          <li>
+            <a href="/system/setting/">{{ i18n("menu.setting") }}</a>
+          </li>
+          <li>
+            <a href="/system/event/">{{ i18n("menu.event") }}</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</section>
+{{ yield body_content() }}
+{{ end }}

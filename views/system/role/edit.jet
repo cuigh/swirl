@@ -1,48 +1,17 @@
-{{ extends "../../_layouts/default" }}
+{{ extends "_base" }}
 {{ import "../../_modules/form" }}
 
 {{ block script() }}
 <script>$(() => new Swirl.Role.EditPage())</script>
 {{ end }}
 
-{{ block body() }}
-<section class="hero is-dark">
-  <div class="hero-body">
-    <div class="container has-text-centered">
-      <h1 class="title is-2">ROLE</h1>
-      <h2 class="subtitle is-5">
-        A role is a user group with same rights. User can belong to multiple roles.
-      </h2>      
-    </div>
-  </div>
-  <div class="hero-foot">
-    <div class="container">
-      <nav class="tabs is-boxed">
-        <ul>
-          <li class="is-active">
-            <a href="/system/role/">Roles</a>
-          </li>
-          <li>
-            <a href="/system/user/">Users</a>
-          </li>
-          <li>
-            <a href="/system/setting/">Settings</a>
-          </li>
-          <li>
-            <a href="/system/event/">Events</a>
-          </li>          
-        </ul>
-      </nav>
-    </div>
-  </div>  
-</section>
-
+{{ block body_content() }}
 <div class="container">
   <nav class="breadcrumb has-succeeds-separator is-small is-marginless" aria-label="breadcrumbs">
     <ul>
-      <li><a href="/">Dashboard</a></li>
-      <li><a href="/system/role/">Roles</a></li>
-      <li class="is-active"><a>Edit</a></li>
+      <li><a href="/">{{ i18n("menu.dashboard") }}</a></li>
+      <li><a href="/system/role/">{{ i18n("menu.role") }}</a></li>
+      <li class="is-active"><a>{{ i18n("menu.edit") }}</a></li>
     </ul>
   </nav>
 </div>
@@ -60,8 +29,8 @@
 <nav class="navbar has-shadow">
   <div class="container">
     <div class="navbar-brand">
-      <a class="navbar-item is-tab" href="/system/role/{{.Role.ID}}/detail">Detail</a>
-      <a class="navbar-item is-tab is-active" href="/system/role/{{.Role.ID}}/edit">Edit</a>
+      <a class="navbar-item is-tab" href="/system/role/{{.Role.ID}}/detail">{{ i18n("menu.detail") }}</a>
+      <a class="navbar-item is-tab is-active" href="/system/role/{{.Role.ID}}/edit">{{ i18n("menu.edit") }}</a>
     </div>
   </div>
 </nav>
@@ -70,7 +39,7 @@
   <div class="container">
     <form method="post" action="update" data-form="ajax-json" data-url="/system/role/">
       <div class="field">
-        <label class="label">Name</label>
+        <label class="label">{{ i18n("field.name") }}</label>
         <div class="control">
           <input name="name" value="{{.Role.Name}}" class="input" placeholder="Role name" data-v-rule="native" required>
         </div>
@@ -107,14 +76,7 @@
           </table>
         </div>
       </div>
-      <div class="field is-grouped">
-        <div class="control">
-          <button type="submit" class="button is-primary">Submit</button>
-        </div>
-        <div class="control">
-          <a href="/system/role/" class="button is-link">Cancel</a>
-        </div>
-      </div>
+      {{ yield form_submit(url="/system/role/") }}
     </form>
   </div>
 </section>

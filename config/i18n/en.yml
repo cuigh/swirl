@@ -8,7 +8,36 @@ button.logout: Sign out
 button.search: Search
 button.submit: Submit
 button.cancel: Cancel
+button.confirm: Confirm
 button.delete: Delete
+button.prune: Prune
+button.new: New
+button.edit: Edit
+button.save: Save
+button.update: Update
+button.return: Return
+button.leave: Leave
+button.scale: Scale
+button.previous: Previous
+button.next: Next
+
+# field
+field.name: Name
+field.login-name: Login name
+field.password: Password
+field.id: ID
+field.tag: Tags
+field.size: Size
+field.created-at: Created at
+field.created-by: Created by
+field.updated-at: Updated at
+field.action: Action
+field.value: Value
+field.email: Email
+field.status: Status
+field.state: State
+field.type: Type
+field.image: Image
 
 # menu
 menu.dashboard: Dashboard
@@ -21,7 +50,10 @@ menu.registry: Registries
 menu.node: Nodes
 menu.network: Networks
 menu.service: Services
+menu.service.template: Templates
 menu.stack: Stacks
+menu.stack.task: Tasks
+menu.stack.archive: Archives
 menu.task: Tasks
 menu.secret: Secrets
 menu.config: Config
@@ -33,6 +65,16 @@ menu.event: Events
 menu.version: Version
 menu.profile: Profile
 menu.password: Password
+menu.detail: Detail
+menu.raw: Raw
+menu.edit: Edit
+menu.log: Logs
+
+# login page
+login.title: Sign in to Swirl
+login.name: Login Name
+login.password: Password
+login.forgot-password: Forgot password?
 
 # dashboard
 dashboard.node: Nodes
@@ -41,8 +83,75 @@ dashboard.service: Services
 dashboard.stack: Stacks
 dashboard.feature: Features
 
-# login page
-login.title: Sign in to Swirl
-login.name: Login Name
-login.password: Password
-login.forgot-password: Forgot password?
+# image pages
+image.title: Image
+image.description: An image packages all the files and settings required to run a container.
+image.placeholder.search: Search by name
+image.docker-version: version
+image.layer: Layers
+image.platform: Platform
+image.author: Author
+image.instruction: Instruction
+
+# container pages
+container.title: Container
+container.description: A container is a running instance of image.
+
+# volume pages
+volume.title: Volume
+volume.description: Create and manage persistent storage that can be attached to containers.
+
+# registry pages
+registry.title: Registry
+registry.description: A registry is a storage and content delivery system, holding named Docker images, available in different tagged versions.
+
+# node pages
+node.title: Node
+node.description: Nodes are instances of the Engine participating in a swarm.
+
+# network pages
+network.title: Network
+network.description: Networks are user-defined networks that containers can be attached to.
+
+# service pages
+service.title: Service
+service.description: Services are the definitions of tasks to run on a swarm.
+
+# service template pages
+service.template.title: Service Template
+service.template.description: Pre-defined service template to simplify similar service creation.
+service.template.button.create: Create service
+
+# stack pages
+stack.title: Stack
+stack.description: A stack is a logical grouping of related services that are usually deployed together and require each other to work as intended.
+
+# secret pages
+secret.title: Secret
+secret.description: Secrets are sensitive data that can be used by services.
+
+# config pages
+config.title: Config
+config.description: Configs are non-sensitive information that can be used by services, such as configuration files.
+
+# role pages
+role.title: Role
+role.description: A role is a user group with same rights. User can belong to multiple roles.
+
+# user pages
+user.title: User
+user.description: Manage users for using Swirl system.
+user.button.block: Block
+user.button.unblock: Unblock
+
+# setting pages
+setting.title: Setting
+setting.description: Manage Swirl system settings.
+
+# event pages
+event.title: Event
+event.description: Manage all user events.
+
+# profile pages
+profile.title: Profile
+profile.description: User profiles.

@@ -5,9 +5,9 @@
 <div class="container">
   <nav class="breadcrumb has-succeeds-separator is-small is-marginless" aria-label="breadcrumbs">
     <ul>
-      <li><a href="/">Dashboard</a></li>
-      <li><a href="/service/">Services</a></li>
-      <li class="is-active"><a>Detail</a></li>
+      <li><a href="/">{{ i18n("menu.dashboard") }}</a></li>
+      <li><a href="/service/">{{ i18n("menu.service") }}</a></li>
+      <li class="is-active"><a>{{ i18n("menu.detail") }}</a></li>
     </ul>
   </nav>
 </div>
@@ -25,10 +25,10 @@
 <nav class="navbar has-shadow">
   <div class="container">
     <div class="navbar-brand">
-      <a class="navbar-item is-tab is-active" href="/service/{{.Service.Spec.Name}}/detail">Detail</a>
-      <a class="navbar-item is-tab" href="/service/{{.Service.Spec.Name}}/raw">Raw</a>
-      <a class="navbar-item is-tab" href="/service/{{.Service.Spec.Name}}/logs">Logs</a>
-      <a class="navbar-item is-tab" href="/service/{{.Service.Spec.Name}}/edit">Edit</a>
+      <a class="navbar-item is-tab is-active" href="/service/{{.Service.Spec.Name}}/detail">{{ i18n("menu.detail") }}</a>
+      <a class="navbar-item is-tab" href="/service/{{.Service.Spec.Name}}/raw">{{ i18n("menu.raw") }}</a>
+      <a class="navbar-item is-tab" href="/service/{{.Service.Spec.Name}}/logs">{{ i18n("menu.log") }}</a>
+      <a class="navbar-item is-tab" href="/service/{{.Service.Spec.Name}}/edit">{{ i18n("menu.edit") }}</a>
     </div>
   </div>
 </nav>
@@ -40,7 +40,7 @@
       <dl class="is-horizontal is-marginless">
         <dt class="has-text-left">ID</dt>
         <dd>{{ .Service.ID }}</dd>
-        <dt class="has-text-left">Image</dt>
+        <dt class="has-text-left">{{ i18n("field.image") }}</dt>
         <dd>{{ .Service.Spec.TaskTemplate.ContainerSpec.Image }}</dd>
         <dt class="has-text-left">Mode</dt>
         <dd>
@@ -67,9 +67,9 @@
         <dt class="has-text-left">User</dt>
         <dd>{{ .Service.Spec.TaskTemplate.ContainerSpec.User }}</dd>
         {{ end }}
-        <dt class="has-text-left">Created at</dt>
+        <dt class="has-text-left">{{ i18n("field.created-at") }}</dt>
         <dd>{{ time(.Service.CreatedAt) }}</dd>
-        <dt class="has-text-left">Updated at</dt>
+        <dt class="has-text-left">{{ i18n("field.updated-at") }}</dt>
         <dd>{{ time(.Service.UpdatedAt) }}</dd>
       </dl>
       </div>
@@ -444,7 +444,7 @@
 
     <a href="/service/" class="button is-primary">
       <span class="icon"><i class="fa fa-reply"></i></span>
-      <span>Return</span>
+      <span>{{ i18n("button.return") }}</span>
     </a>
   </div>
 </section>

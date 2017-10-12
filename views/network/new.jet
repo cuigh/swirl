@@ -9,12 +9,8 @@
 <section class="hero is-info">
   <div class="hero-body">
     <div class="container has-text-centered">
-      <h1 class="title is-2">
-        NETWORK
-      </h1>
-      <h2 class="subtitle is-5">
-        Networks are user-defined networks that containers can be attached to.
-      </h2>
+      <h1 class="title is-2 is-uppercase">{{ i18n("network.title") }}</h1>
+      <h2 class="subtitle is-5">{{ i18n("network.description") }}</h2>
     </div>
   </div>
 </section>
@@ -27,7 +23,7 @@
       <div class="columns is-bottom-marginless">
         <div class="column is-6">
           <div class="field">
-            <label class="label">Name</label>
+            <label class="label">{{ i18n("field.name") }}</label>
             <div class="control">
               <input name="name" class="input" placeholder="Name" data-v-rule="native" required>
             </div>
@@ -114,14 +110,7 @@
         <legend class="lead is-5">Labels</legend>
         {{ yield options(name="label") }}
       </fieldset>
-      <div class="field is-grouped">
-          <div class="control">
-            <button type="submit" class="button is-primary">Submit</button>
-          </div>
-          <div class="control">
-            <a href="/network/" class="button is-link">Cancel</a>
-          </div>
-        </div>
+      {{ yield form_submit(url="/network/") }}
     </form>
   </div>
 </section>

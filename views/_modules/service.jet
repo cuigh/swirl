@@ -556,8 +556,8 @@
       </nav>
     </section>
     <footer class="modal-card-foot">
-      <button id="btn-add-{{ name }}" type="button" class="button is-primary">Confirm</button>
-      <button type="button" class="button dismiss">Cancel</button>
+      <button id="btn-add-{{ name }}" type="button" class="button is-primary">{{ i18n("button.confirm") }}</button>
+      <button type="button" class="button dismiss">{{ i18n("button.cancel") }}</button>
     </footer>
   </div>
 </div>

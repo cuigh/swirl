@@ -4,12 +4,8 @@
 <section class="hero is-info">
   <div class="hero-body">
     <div class="container has-text-centered">
-      <h1 class="title is-2">
-        SERVICE
-      </h1>
-      <h2 class="subtitle is-5">
-        Services are the definitions of tasks to run on a swarm.
-      </h2>
+      <h1 class="title is-2 is-uppercase">{{ i18n("service.title") }}</h1>
+      <h2 class="subtitle is-5">{{ i18n("service.description") }}</h2>
     </div>
   </div>
   <div class="hero-foot">
@@ -17,10 +13,10 @@
       <nav class="tabs is-boxed">
         <ul>
           <li class="is-active">
-            <a href="/service/">Services</a>
+            <a href="/service/">{{ i18n("menu.service") }}</a>
           </li>
           <li>
-            <a href="/service/template/">Templates</a>
+            <a href="/service/template/">{{ i18n("menu.service.template") }}</a>
           </li>
         </ul>
       </nav>

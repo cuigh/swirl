@@ -9,23 +9,19 @@
 <section class="hero is-info">
   <div class="hero-body">
     <div class="container has-text-centered">
-      <h1 class="title is-2">
-        CONFIG
-      </h1>
-      <h2 class="subtitle is-5">
-        Configs are non-sensitive information that can be used by services, such as configuration files.
-      </h2>
+      <h1 class="title is-2 is-uppercase">{{ i18n("config.title") }}</h1>
+      <h2 class="subtitle is-5">{{ i18n("config.description") }}</h2>
     </div>
   </div>
 </section>
 
 <section class="section">
-  <h2 class="title">Create config</h1>
+  <h2 class="title">Create config</h2>
   <hr>
   <form method="post" data-form="ajax-json" data-url="/config/">
     <div class="field is-horizontal">
       <div class="field-label is-normal">
-        <label class="label">Name</label>
+        <label class="label">{{ i18n("field.name") }}</label>
       </div>
       <div class="field-body">
         <div class="field">
@@ -63,8 +59,8 @@
       <div class="field-body">
         <div class="field">
           <div class="control">
-            <button type="submit" class="button is-primary">Submit</button>
-            <a href="/config/" class="button is-link">Cancel</a>
+            <button type="submit" class="button is-primary">{{ i18n("button.submit") }}</button>
+            <a href="/config/" class="button is-link">{{ i18n("button.cancel") }}</a>
           </div>
         </div>
       </div>

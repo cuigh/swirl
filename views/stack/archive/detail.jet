@@ -13,12 +13,8 @@
 <section class="hero is-info">
   <div class="hero-body">
     <div class="container has-text-centered">
-      <h1 class="title is-2">
-        STACK
-      </h1>
-      <h2 class="subtitle is-5">
-        A stack is a logical grouping of related services that are usually deployed together and require each other to work as intended.
-      </h2>
+      <h1 class="title is-2 is-uppercase">{{ i18n("stack.title") }}</h1>
+      <h2 class="subtitle is-5">{{ i18n("stack.description") }}</h2>
     </div>
   </div>
   <div class="hero-foot">

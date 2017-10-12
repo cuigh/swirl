@@ -1,44 +1,13 @@
-{{ extends "../../_layouts/default" }}
+{{ extends "_base" }}
 {{ import "../../_modules/form" }}
 
-{{ block body() }}
-<section class="hero is-dark">
-  <div class="hero-body">
-    <div class="container has-text-centered">
-      <h1 class="title is-2">USER</h1>
-      <h2 class="subtitle is-5">
-        You ever have that feeling where you're not sure if you're awake or still dreaming?
-      </h2>      
-    </div>
-  </div>
-  <div class="hero-foot">
-    <div class="container">
-      <nav class="tabs is-boxed">
-        <ul>
-          <li>
-            <a href="/system/role/">Roles</a>
-          </li>
-          <li class="is-active">
-            <a href="/system/user/">Users</a>
-          </li>
-          <li>
-            <a href="/system/setting/">Settings</a>
-          </li>
-          <li>
-            <a href="/system/event/">Events</a>
-          </li>          
-        </ul>
-      </nav>
-    </div>
-  </div>  
-</section>
-
+{{ block body_content() }}
 <div class="container">
   <nav class="breadcrumb has-succeeds-separator is-small is-marginless" aria-label="breadcrumbs">
     <ul>
-      <li><a href="/">Dashboard</a></li>
-      <li><a href="/system/user/">Users</a></li>
-      <li class="is-active"><a>Edit</a></li>
+      <li><a href="/">{{ i18n("menu.dashboard") }}</a></li>
+      <li><a href="/system/user/">{{ i18n("menu.user") }}</a></li>
+      <li class="is-active"><a>{{ i18n("menu.edit") }}</a></li>
     </ul>
   </nav>
 </div>
@@ -56,8 +25,8 @@
 <nav class="navbar has-shadow">
   <div class="container">
     <div class="navbar-brand">
-      <a class="navbar-item is-tab" href="/system/user/{{.User.LoginName}}/detail">Detail</a>
-      <a class="navbar-item is-tab is-active" href="/system/user/{{.User.LoginName}}/edit">Edit</a>
+      <a class="navbar-item is-tab" href="/system/user/{{.User.LoginName}}/detail">{{ i18n("menu.detail") }}</a>
+      <a class="navbar-item is-tab is-active" href="/system/user/{{.User.LoginName}}/edit">{{ i18n("menu.edit") }}</a>
     </div>
   </div>
 </nav>
@@ -69,7 +38,7 @@
       <div class="columns is-bottom-marginless">
         <div class="column is-6">
           <div class="field">
-            <label class="label">Name</label>
+            <label class="label">{{ i18n("field.name") }}</label>
             <div class="control has-icons-left">
               <input name="name" value="{{ .User.Name }}" class="input" placeholder="Name" data-v-rule="native" required>
               <span class="icon is-small is-left">
@@ -80,7 +49,7 @@
         </div>
         <div class="column is-6">
           <div class="field">
-            <label class="label">Email</label>
+            <label class="label">{{ i18n("field.email") }}</label>
             <div class="control has-icons-left">
               <input name="email" value="{{ .User.Email }}" class="input" placeholder="Email" data-v-rule="native" required>
               <span class="icon is-small is-left">
@@ -94,7 +63,7 @@
         {{ yield switch(id="cb-admin", name="admin", label="Administrator", checked=.User.Admin) }}
       </div>
       <div class="field">
-        <label class="label">Type</label>
+        <label class="label">{{ i18n("field.type") }}</label>
         <div class="control">
           {{ yield radio(name="type", value="internal", label="Internal", checked=.User.Type) }}
           {{ yield radio(name="type", value="ldap", label="LDAP", checked=.User.Type) }}
@@ -109,14 +78,7 @@
           {{end}}
         </div>
       </div>
-      <div class="field is-grouped">
-          <div class="control">
-            <button type="submit" class="button is-primary">Submit</button>
-          </div>
-          <div class="control">
-            <button class="button is-link">Cancel</button>
-          </div>
-        </div>
+      {{ yield form_submit(url="/system/user/") }}
     </form>
   </div>
 </section>

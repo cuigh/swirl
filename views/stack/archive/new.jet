@@ -4,12 +4,8 @@
 <section class="hero is-info">
   <div class="hero-body">
     <div class="container has-text-centered">
-      <h1 class="title is-2">
-        STACK
-      </h1>
-      <h2 class="subtitle is-5">
-        A stack is a logical grouping of related services that are usually deployed together and require each other to work as intended.
-      </h2>
+      <h1 class="title is-2 is-uppercase">{{ i18n("stack.title") }}</h1>
+      <h2 class="subtitle is-5">{{ i18n("stack.description") }}</h2>
     </div>
   </div>
   <div class="hero-foot">
@@ -17,10 +13,10 @@
       <nav class="tabs is-boxed">
         <ul>
           <li>
-            <a href="/stack/task/">Tasks</a>
+            <a href="/stack/task/">{{ i18n("menu.stack.task") }}</a>
           </li>
           <li class="is-active">
-            <a href="/stack/archive/">Archives</a>
+            <a href="/stack/archive/">{{ i18n("menu.stack.archive") }}</a>
           </li>
         </ul>
       </nav>
@@ -33,7 +29,7 @@
     <hr>
     <form method="post" data-form="ajax-json" data-url="/stack/archive/">
       <div class="field">
-        <label class="label">Name</label>
+        <label class="label">{{ i18n("field.name") }}</label>
         <div class="control">
           <input name="name" class="input" type="text" placeholder="" data-v-rule="native;regex" data-v-arg-regex="^[a-z0-9_-]+$" data-v-msg-regex="Name can contain only letters, digits, '_' and '-'." required>
         </div>
@@ -46,10 +42,10 @@
       </div>
       <div class="field is-grouped">
         <div class="control">
-          <button type="submit" class="button is-primary">Submit</button>
+          <button type="submit" class="button is-primary">{{ i18n("button.submit") }}</button>
         </div>
         <div class="control">
-          <a href="/stack/archive/" class="button is-link">Cancel</a>
+          <a href="/stack/archive/" class="button is-link">{{ i18n("button.cancel") }}</a>
         </div>
       </div>
     </form>

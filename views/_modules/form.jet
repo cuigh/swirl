@@ -39,8 +39,8 @@
 <table id="table-{{n}}s" class="table is-bordered is-striped is-narrow is-marginless is-fullwidth" data-name="{{name}}">
   <thead>
     <tr>
-      <th>Name</th>
-      <th>Value</th>
+      <th>{{ i18n("field.name") }}</th>
+      <th>{{ i18n("field.value") }}</th>
       <th width="48">
         <a class="button is-small is-success is-outlined" data-action="add-{{n}}">
           <span class="icon is-small">
@@ -81,8 +81,8 @@
 <table id="table-{{n}}s" class="table is-bordered is-striped is-narrow is-marginless is-fullwidth" data-name="{{name}}">
   <thead>
     <tr>
-      <th>Name</th>
-      <th>Value</th>
+      <th>{{ i18n("field.name") }}</th>
+      <th>{{ i18n("field.value") }}</th>
       <th width="48">
         <a class="button is-small is-success is-outlined" data-action="add-{{n}}">
           <span class="icon is-small">
@@ -119,10 +119,10 @@
 {{ block form_submit(url) }}
 <div class="field is-grouped">
   <div class="control">
-    <button type="submit" class="button is-primary">Submit</button>
+    <button type="submit" class="button is-primary">{{ i18n("button.submit") }}</button>
   </div>
   <div class="control">
-    <a href="{{ url }}" class="button is-link">Cancel</a>
+    <a href="{{ url }}" class="button is-link">{{ i18n("button.cancel") }}</a>
   </div>
 </div>
 {{ end }}
