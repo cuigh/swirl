@@ -40,6 +40,7 @@ func main() {
 		AddFunc("time", misc.FormatTime(setting.TimeZone.Offset)).
 		AddFunc("i18n", misc.Message(setting.Language)).
 		AddFuncs(misc.Funcs).
+		AddVariable("language", setting.Language).
 		AddVariable("version", misc.Version).
 		AddVariable("go_version", runtime.Version())
 	ws.Validator = valid.New()
