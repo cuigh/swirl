@@ -1,4 +1,4 @@
-{{ extends "base" }}
+{{ extends "_base" }}
 {{ import "../_modules/pager" }}
 
 {{ block script() }}

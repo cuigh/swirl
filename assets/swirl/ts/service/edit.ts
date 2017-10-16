@@ -18,7 +18,7 @@ namespace Swirl.Service {
                 return { ok: true }
             }
 
-            const regex = /^[1-9]\d*$/;
+            const regex = /^(0|[1-9]\d*)$/;
             return { ok: regex.test($.trim($input.val())) };
         }
     }
@@ -217,7 +217,7 @@ namespace Swirl.Service {
             this.config = new ConfigTable("#table-configs");
 
             // register custom validators
-            Validator.register("service-mode", new ServiceModeRule(this.$mode), "Please input a positive integer.");
+            Validator.register("service-mode", new ServiceModeRule(this.$mode), "Please input a valid integer.");
 
             // bind events
             this.$mode.change(e => this.$replicas.toggle(this.$mode.val() != "global"))

@@ -13,7 +13,7 @@
       </span>
     </div>
     <div class="control is-expanded">
-      <input id="txt-replicas" name="replicas" class="input" placeholder="" data-type="integer" data-v-rule="service-mode" {{if .Service.Mode == "global"}}style="display: none"{{else}}value="{{ trimZero(.Service.Replicas) }}"{{end}}>
+      <input id="txt-replicas" name="replicas" class="input" placeholder="" data-type="integer" data-v-rule="service-mode" {{if .Service.Mode == "global"}}style="display: none"{{else}}value="{{ .Service.Replicas }}"{{end}}>
     </div>
   </div>
 </div>

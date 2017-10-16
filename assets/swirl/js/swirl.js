@@ -1535,7 +1535,7 @@ var Swirl;
                 if (this.$mode.val() == "global") {
                     return { ok: true };
                 }
-                const regex = /^[1-9]\d*$/;
+                const regex = /^(0|[1-9]\d*)$/;
                 return { ok: regex.test($.trim($input.val())) };
             }
         }
@@ -1712,7 +1712,7 @@ var Swirl;
                 new PreferenceTable("#table-preferences");
                 this.secret = new ConfigTable("#table-secrets");
                 this.config = new ConfigTable("#table-configs");
-                Validator.register("service-mode", new ServiceModeRule(this.$mode), "Please input a positive integer.");
+                Validator.register("service-mode", new ServiceModeRule(this.$mode), "Please input a valid integer.");
                 this.$mode.change(e => this.$replicas.toggle(this.$mode.val() != "global"));
                 $("#btn-add-secret").click(() => EditPage.addConfig(this.secret));
                 $("#btn-add-config").click(() => EditPage.addConfig(this.config));
