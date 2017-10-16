@@ -37,8 +37,8 @@
           <tr>
             <th>{{ i18n("field.name") }}</th>
             <th>{{ i18n("field.id") }}</th>
-            <th>Scope</th>
-            <th>Driver</th>
+            <th>{{ i18n("field.scope") }}</th>
+            <th>{{ i18n("field.driver") }}</th>
             <th>{{ i18n("field.action") }}</th>
           </tr>
       </thead>

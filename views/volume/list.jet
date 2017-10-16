@@ -56,9 +56,9 @@
       <tr>
         <th width="30"><input type="checkbox" data-action="check-all"></th>
         <th>{{ i18n("field.name") }}</th>
-        <th>Driver</th>
-        <th>Scope</th>
-        <th>Mount point</th>
+        <th>{{ i18n("field.driver") }}</th>
+        <th>{{ i18n("field.scope") }}</th>
+        <th>{{ i18n("volume.field.mount") }}</th>
         <th>{{ i18n("field.action") }}</th>
       </tr>
     </thead>

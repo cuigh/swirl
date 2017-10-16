@@ -35,7 +35,7 @@
             <th>Version</th>
             <th>CPU</th>
             <th>Memory</th>
-            <th>Address</th>
+            <th>{{ i18n("field.address") }}</th>
             <th>{{ i18n("field.status") }}</th>
             <th>{{ i18n("field.action") }}</th>
           </tr>

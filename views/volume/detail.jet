@@ -42,11 +42,11 @@
     <div class="message is-primary">
       <div class="message-body">
         <dl class="is-horizontal is-marginless">
-          <dt class="has-text-left">Driver</dt>
+          <dt class="has-text-left">{{ i18n("field.driver") }}</dt>
           <dd>{{ .Volume.Driver }}</dd>
-          <dt class="has-text-left">Scope</dt>
+          <dt class="has-text-left">{{ i18n("field.scope") }}</dt>
           <dd>{{ .Volume.Scope}}</dd>
-          <dt class="has-text-left">Mount point</dt>
+          <dt class="has-text-left">{{ i18n("volume.field.mount") }}</dt>
           <dd>{{ .Volume.Mountpoint }}</dd>
         </dl>
       </div>

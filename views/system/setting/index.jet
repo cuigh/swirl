@@ -55,12 +55,12 @@
         </div>
         <div class="field is-horizontal">
           <div class="field-label is-normal">
-            <label class="label">Address</label>
+            <label class="label">{{ i18n("field.address") }}</label>
           </div>
           <div class="field-body">
             <div class="field">
               <div class="control">
-                <input name="ldap.address" value="{{ .Setting.LDAP.Address }}" class="input" type="text" placeholder="Address">
+                <input name="ldap.address" value="{{ .Setting.LDAP.Address }}" class="input" type="text" placeholder="e.g. 127.0.0.1:389">
               </div>
             </div>
           </div>
@@ -72,7 +72,7 @@
           <div class="field-body">
             <div class="field">
               <div class="control">
-                <input name="ldap.base_dn" value="{{ .Setting.LDAP.BaseDN }}" class="input" type="text" placeholder="Base DN">
+                <input name="ldap.base_dn" value="{{ .Setting.LDAP.BaseDN }}" class="input" type="text" placeholder="e.g. dc=xxx,dc=com">
               </div>
             </div>
           </div>
@@ -84,7 +84,7 @@
           <div class="field-body">
             <div class="field">
               <div class="control">
-                <input name="ldap.login_attr" value="{{ .Setting.LDAP.LoginAttr }}" class="input" type="text" placeholder="Login name">
+                <input name="ldap.login_attr" value="{{ .Setting.LDAP.LoginAttr }}" class="input" type="text" placeholder="e.g. cn">
               </div>
             </div>
           </div>
@@ -96,7 +96,7 @@
           <div class="field-body">
             <div class="field">
               <div class="control">
-                <input name="ldap.name_attr" value="{{ .Setting.LDAP.NameAttr }}" class="input" type="text" placeholder="Username">
+                <input name="ldap.name_attr" value="{{ .Setting.LDAP.NameAttr }}" class="input" type="text" placeholder="e.g. displayName">
               </div>
             </div>
           </div>
@@ -108,7 +108,7 @@
           <div class="field-body">
             <div class="field">
               <div class="control">
-                <input name="ldap.email_attr" value="{{ .Setting.LDAP.EmailAttr }}" class="input" type="text" placeholder="Email">
+                <input name="ldap.email_attr" value="{{ .Setting.LDAP.EmailAttr }}" class="input" type="text" placeholder="e.g. mail">
               </div>
             </div>
           </div>
@@ -156,7 +156,7 @@
       <hr>
       <div class="field">
         <p class="control">
-          <button class="button is-primary" type="submit">Save</button>
+          <button class="button is-primary" type="submit">{{ i18n("button.save") }}</button>
         </p>
       </div>
     </form>

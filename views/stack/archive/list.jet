@@ -76,7 +76,7 @@
             <td>{{time(.UpdatedAt)}}</td>
             <td>
               <a href="{{.ID}}/edit" class="button is-small is-dark is-outlined">{{ i18n("button.edit") }}</a>
-              <button type="button" class="button is-small is-info is-outlined" data-action="deploy-archive">Deploy</button>
+              <button type="button" class="button is-small is-info is-outlined" data-action="deploy-archive">{{ i18n("stack.button.deploy") }}</button>
               <button type="button" class="button is-small is-danger is-outlined" data-action="delete-archive">{{ i18n("button.delete") }}</button>
             </td>
           </tr>

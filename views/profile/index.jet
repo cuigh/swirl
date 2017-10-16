@@ -40,7 +40,7 @@
                   </a>
                 </div>                
                 <p class="control is-expanded">
-                  <input name="name" value="{{.User.Name}}" class="input" type="text" placeholder="name" data-v-rule="native" required>
+                  <input name="name" value="{{.User.Name}}" class="input" type="text" placeholder="" data-v-rule="native" required>
                 </p>
               </div>
             </div>
@@ -55,7 +55,7 @@
                   </a>
                 </div>                
                 <p class="control is-expanded">
-                  <input name="email" value="{{.User.Email}}" class="input" type="text" placeholder="Email" data-v-rule="native;email" required>
+                  <input name="email" value="{{.User.Email}}" class="input" type="text" placeholder="" data-v-rule="native;email" required>
                 </p>
               </div>
             </div>

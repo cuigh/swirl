@@ -31,7 +31,7 @@
         </div>
       </div>
       <div id="drivers" class="field">
-        <label class="label">Driver</label>
+        <label class="label">{{ i18n("field.driver") }}</label>
         <div class="field is-grouped is-grouped-multiline">
         <div class="control">
           {{ yield radio(name="driver", value="overlay", label="Overlay", checked="overlay") }}

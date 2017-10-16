@@ -38,6 +38,9 @@ field.status: Status
 field.state: State
 field.type: Type
 field.image: Image
+field.address: Address
+field.driver: Driver
+field.scope: Scope
 
 # menu
 menu.dashboard: Dashboard
@@ -100,6 +103,7 @@ container.description: A container is a running instance of image.
 # volume pages
 volume.title: Volume
 volume.description: Create and manage persistent storage that can be attached to containers.
+volume.field.mount: Mount point
 
 # registry pages
 registry.title: Registry
@@ -125,6 +129,7 @@ service.template.button.create: Create service
 # stack pages
 stack.title: Stack
 stack.description: A stack is a logical grouping of related services that are usually deployed together and require each other to work as intended.
+stack.button.deploy: Deploy
 
 # secret pages
 secret.title: Secret
@@ -155,3 +160,6 @@ event.description: Manage all user events.
 # profile pages
 profile.title: Profile
 profile.description: User profiles.
+profile.field.password.current: Current password
+profile.field.password.new: New password
+profile.field.password.confirm: Password confirmation

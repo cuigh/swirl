@@ -38,6 +38,9 @@ field.status: 状态
 field.state: 状态
 field.type: 类型
 field.image: 镜像
+field.address: 地址
+field.driver: 驱动
+field.scope: 范围
 
 # menu
 menu.dashboard: 仪表盘
@@ -100,6 +103,7 @@ container.description: 容器是镜像的运行实例。
 # volume pages
 volume.title: 数据卷
 volume.description: 创建和管理能够附加到容器的持久化存储。
+volume.field.mount: 挂载点
 
 # registry pages
 registry.title: 镜像仓库
@@ -125,6 +129,7 @@ service.template.button.create: 创建服务
 # stack pages
 stack.title: 编排
 stack.description: 编排是相关服务的一个逻辑分组，这些服务通常互相依赖，需要一块部署。
+stack.button.deploy: 部署
 
 # secret pages
 secret.title: 私密配置
@@ -155,3 +160,6 @@ event.description: 管理用户操作日志。
 # profile pages
 profile.title: 资料
 profile.description: 用户个人信息。
+profile.field.password.current: 当前密码
+profile.field.password.new: 新密码
+profile.field.password.confirm: 新密码确认

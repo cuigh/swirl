@@ -48,9 +48,9 @@
         <dl class="is-horizontal is-marginless">
           <dt class="has-text-left">{{ i18n("field.id") }}</dt>
           <dd>{{ .Network.ID }}</dd>
-          <dt class="has-text-left">Driver</dt>
+          <dt class="has-text-left">{{ i18n("field.driver") }}</dt>
           <dd>{{ .Network.Driver }}</dd>
-          <dt class="has-text-left">Scope</dt>
+          <dt class="has-text-left">{{ i18n("field.scope") }}</dt>
           <dd>{{ .Network.Scope}}</dd>
           <dt class="has-text-left">{{ i18n("field.created-at") }}</dt>
           <dd>{{ time(.Network.Created) }}</dd>
