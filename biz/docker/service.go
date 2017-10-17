@@ -151,11 +151,13 @@ func ServiceUpdate(info *model.ServiceInfo) error {
 		// Mode
 		if info.Mode == "replicated" {
 			if spec.Mode.Replicated == nil {
+				spec.Mode.Global = nil
 				spec.Mode.Replicated = &swarm.ReplicatedService{Replicas: &info.Replicas}
 			} else {
 				spec.Mode.Replicated.Replicas = &info.Replicas
 			}
 		} else if info.Mode == "global" && spec.Mode.Global == nil {
+			spec.Mode.Replicated = nil
 			spec.Mode.Global = &swarm.GlobalService{}
 		}
 
