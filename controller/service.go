@@ -222,9 +222,10 @@ func serviceEdit(ctx web.Context) error {
 		return err
 	}
 
+	stack := service.Spec.Labels["com.docker.stack.namespace"]
 	checkedNetworks := set.FromSlice(service.Endpoint.VirtualIPs, func(i int) interface{} { return service.Endpoint.VirtualIPs[i].NetworkID })
 
-	m := newModel(ctx).Add("Service", model.NewServiceInfo(service)).
+	m := newModel(ctx).Add("Service", model.NewServiceInfo(service)).Add("Stack", stack).
 		Add("Networks", networks).Add("CheckedNetworks", checkedNetworks).
 		Add("Secrets", secrets).Add("Configs", configs)
 	return ctx.Render("service/edit", m)

@@ -120,6 +120,7 @@ network.description: 能够连接到容器的 Docker 预置和用户自定义的
 # service pages
 service.title: 服务
 service.description: 服务是在 Swarm 集群中运行的任务定义。
+service.edit.warning: "注意: 这个服务属于编排 %s，通常你应该修改原始的编排而不是直接修改此服务信息，否则后续重新部署编排时这些修改将会丢失。"
 
 # service template pages
 service.template.title: 服务模板

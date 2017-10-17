@@ -64,6 +64,9 @@
       {{ yield form_others() }}
       {{ yield form_submit(url="/service/") }}
     </form>
+    {{ if .Stack }}
+    <div class="notification is-warning" style="margin-top: 1.5em">{{ i18n("service.edit.warning", .Stack) }}</div>
+    {{ end }}
   </div>
 </section>
 {{ yield dialog(name="secret", items=.Secrets) }}

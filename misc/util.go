@@ -53,7 +53,10 @@ func Message(lang string) func(key string, args ...interface{}) string {
 	}
 
 	return func(key string, args ...interface{}) string {
-		return t.Format(key, args...)
+		if s := t.Format(key, args...); s != "" {
+			return s
+		}
+		return "[" + key + "]"
 	}
 }
 
