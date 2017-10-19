@@ -132,6 +132,10 @@ stack.title: Stack
 stack.description: A stack is a logical grouping of related services that are usually deployed together and require each other to work as intended.
 stack.button.deploy: Deploy
 
+# task pages
+task.title: Task
+task.description: A task is a container running on a swarm. It is the atomic scheduling unit of swarm.
+
 # secret pages
 secret.title: Secret
 secret.description: Secrets are sensitive data that can be used by services.

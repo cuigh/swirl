@@ -52,7 +52,7 @@ func nodeDetail(ctx web.Context) error {
 		return err
 	}
 
-	tasks, err := docker.TaskList("", id)
+	tasks, _, err := docker.TaskList(&model.TaskListArgs{Node: id})
 	if err != nil {
 		return err
 	}

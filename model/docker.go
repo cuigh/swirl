@@ -478,6 +478,15 @@ type ConfigUpdateInfo struct {
 	ConfigCreateInfo
 }
 
+type TaskListArgs struct {
+	Service   string `query:"service"`
+	Node      string `query:"node"`
+	Name      string `query:"name"`
+	State     string `query:"state"`
+	PageIndex int    `query:"page"`
+	PageSize  int    `query:"size"`
+}
+
 type TaskInfo struct {
 	swarm.Task
 	NodeName string

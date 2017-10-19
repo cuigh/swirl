@@ -87,6 +87,7 @@ var Perms = []PermGroup{
 	{
 		Name: "Task",
 		Perms: []Perm{
+			{Key: "task.list", Text: "View list"},
 			{Key: "task.detail", Text: "View detail"},
 			{Key: "task.raw", Text: "View raw"},
 		},

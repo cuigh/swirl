@@ -75,7 +75,7 @@ func serviceDetail(ctx web.Context) error {
 		info.Networks = append(info.Networks, model.Network{ID: vip.NetworkID, Name: n.Name, Address: vip.Addr})
 	}
 
-	tasks, err := docker.TaskList(name, "")
+	tasks, _, err := docker.TaskList(&model.TaskListArgs{Service: name})
 	if err != nil {
 		return err
 	}

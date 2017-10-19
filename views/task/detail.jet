@@ -1,23 +1,12 @@
-{{ extends "../_layouts/default" }}
+{{ extends "_base" }}
 
-{{ block body() }}
-<section class="hero is-info">
-  <div class="hero-body">
-    <div class="container has-text-centered">
-      <h1 class="title is-2">
-        TASK
-      </h1>
-      <h2 class="subtitle is-5">
-        A task is a container running on a swarm. It is the atomic scheduling unit of swarm.
-      </h2>
-    </div>
-  </div>
-</section>
+{{ block body_content() }}
 <div class="container">
   <nav class="breadcrumb has-succeeds-separator is-small is-marginless" aria-label="breadcrumbs">
     <ul>
-      <li><a href="/">Dashboard</a></li>
-      <li class="is-active"><a>Detail</a></li>
+      <li><a href="/">{{ i18n("menu.dashboard") }}</a></li>
+      <li><a href="/task/">{{ i18n("menu.task") }}</a></li>
+      <li class="is-active"><a>{{ i18n("menu.detail") }}</a></li>
     </ul>
   </nav>
 </div>
@@ -26,19 +15,15 @@
     <div class="container">
       <h2 class="title is-2">
         {{ .Task.Name ? .Task.Name : .Task.ID }}
-      </h2>      
+      </h2>
     </div>
   </div>
 </section>
 <nav class="navbar has-shadow">
   <div class="container">
     <div class="navbar-brand">
-      <a class="navbar-item is-tab is-active" href="/task/{{.Task.ID}}/detail">
-        Detail
-      </a>
-      <a class="navbar-item is-tab " href="/task/{{.Task.ID}}/raw">
-        Raw
-      </a>
+      <a class="navbar-item is-tab is-active" href="/task/{{.Task.ID}}/detail">{{ i18n("menu.detail") }}</a>
+      <a class="navbar-item is-tab " href="/task/{{.Task.ID}}/raw">{{ i18n("menu.raw") }}</a>
     </div>
   </div>
 </nav>
@@ -104,6 +89,10 @@
       </div>
     </div>
     {{ end }}
+    <a href="/task/" class="button is-primary">
+      <span class="icon"><i class="fa fa-reply"></i></span>
+      <span>{{ i18n("button.return") }}</span>
+    </a>
   </div>
 </section>
 {{ end }}

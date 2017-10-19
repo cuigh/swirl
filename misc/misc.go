@@ -9,7 +9,7 @@ import (
 
 const (
 	// Version is the version of Swirl
-	Version = "0.5.5"
+	Version = "0.5.6"
 )
 
 const (

@@ -2,10 +2,12 @@ package docker
 
 import (
 	"context"
+	"io"
+	"math"
 	"sort"
 
-	"io"
-
+	"github.com/cuigh/auxo/util/choose"
+	"github.com/cuigh/swirl/misc"
 	"github.com/cuigh/swirl/model"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
@@ -14,35 +16,50 @@ import (
 )
 
 // TaskList return all running tasks of a service or a node.
-func TaskList(service, node string) (infos []*model.TaskInfo, err error) {
+func TaskList(args *model.TaskListArgs) (infos []*model.TaskInfo, totalCount int, err error) {
 	err = mgr.Do(func(ctx context.Context, cli *client.Client) (err error) {
 		var (
 			tasks []swarm.Task
+			opts  = types.TaskListOptions{
+				Filters: filters.NewArgs(),
+			}
 		)
 
-		opts := types.TaskListOptions{
-			Filters: filters.NewArgs(),
+		if args.PageIndex < 1 {
+			args.PageIndex = 1
 		}
-		if service != "" {
-			opts.Filters.Add("service", service)
+		if args.PageSize < 1 {
+			args.PageSize = math.MaxInt32
 		}
-		if node != "" {
-			opts.Filters.Add("node", node)
+		if args.Service != "" {
+			opts.Filters.Add("service", args.Service)
 		}
+		if args.Node != "" {
+			opts.Filters.Add("node", args.Node)
+		}
+		if args.Name != "" {
+			opts.Filters.Add("name", args.Name)
+		}
+		if args.State != "" {
+			opts.Filters.Add("desired-state", args.State)
+		}
+
 		tasks, err = cli.TaskList(ctx, opts)
-		if err == nil && len(tasks) > 0 {
+		totalCount = len(tasks)
+		if err == nil && totalCount > 0 {
 			sort.Slice(tasks, func(i, j int) bool {
 				return tasks[i].UpdatedAt.After(tasks[j].UpdatedAt)
 			})
+			start, end := misc.Page(totalCount, args.PageIndex, args.PageSize)
+			tasks = tasks[start:end]
 
 			nodes := make(map[string]string)
 			for _, t := range tasks {
 				if _, ok := nodes[t.NodeID]; !ok {
 					if n, _, e := cli.NodeInspectWithRaw(ctx, t.NodeID); e == nil {
-						nodes[t.NodeID] = n.Description.Hostname
+						nodes[t.NodeID] = choose.String(n.Spec.Name == "", n.Description.Hostname, n.Spec.Name)
 					} else {
 						nodes[t.NodeID] = ""
-						//mgr.Logger().Warnf("Node %s of task %s can't be load: %s", t.NodeID, t.ID, e)
 					}
 				}
 			}

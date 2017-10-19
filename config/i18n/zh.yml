@@ -132,6 +132,10 @@ stack.title: 编排
 stack.description: 编排是相关服务的一个逻辑分组，这些服务通常互相依赖，需要一块部署。
 stack.button.deploy: 部署
 
+# task pages
+task.title: 任务
+task.description: 任务是运行在 Swarm 集群上的一个容器，它是 Swarm 调度的原子单元。
+
 # secret pages
 secret.title: 私密配置
 secret.description: 运行服务需要的敏感数据，如密钥。
