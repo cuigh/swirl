@@ -30,7 +30,7 @@ func Image() (c *ImageController) {
 
 func imageList(ctx web.Context) error {
 	name := ctx.Q("name")
-	page := cast.ToIntD(ctx.Q("page"), 1)
+	page := cast.ToInt(ctx.Q("page"), 1)
 	images, totalCount, err := docker.ImageList(name, page, model.PageSize)
 	if err != nil {
 		return err

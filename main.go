@@ -13,7 +13,6 @@ import (
 	"github.com/cuigh/auxo/net/web/auth"
 	"github.com/cuigh/auxo/net/web/middleware"
 	"github.com/cuigh/auxo/net/web/renderer/jet"
-	valid "github.com/cuigh/auxo/net/web/validator"
 	"github.com/cuigh/swirl/biz"
 	"github.com/cuigh/swirl/controller"
 	"github.com/cuigh/swirl/misc"
@@ -43,7 +42,7 @@ func main() {
 		AddVariable("language", setting.Language).
 		AddVariable("version", misc.Version).
 		AddVariable("go_version", runtime.Version())
-	ws.Validator = valid.New()
+	//ws.Validator = valid.New()
 
 	// register global filters
 	ws.Filter(middleware.Recover())

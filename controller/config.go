@@ -34,7 +34,7 @@ func Config() (c *ConfigController) {
 
 func configList(ctx web.Context) error {
 	name := ctx.Q("name")
-	page := cast.ToIntD(ctx.Q("page"), 1)
+	page := cast.ToInt(ctx.Q("page"), 1)
 	configs, totalCount, err := docker.ConfigList(name, page, model.PageSize)
 	if err != nil {
 		return err

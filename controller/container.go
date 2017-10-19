@@ -87,8 +87,8 @@ func containerLogs(ctx web.Context) error {
 		return err
 	}
 
-	line := cast.ToIntD(ctx.Q("line"), 500)
-	timestamps := cast.ToBoolD(ctx.Q("timestamps"), false)
+	line := cast.ToInt(ctx.Q("line"), 500)
+	timestamps := cast.ToBool(ctx.Q("timestamps"), false)
 	stdout, stderr, err := docker.ContainerLogs(id, line, timestamps)
 	if err != nil {
 		return err

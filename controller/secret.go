@@ -33,7 +33,7 @@ func Secret() (c *SecretController) {
 }
 func secretList(ctx web.Context) error {
 	name := ctx.Q("name")
-	page := cast.ToIntD(ctx.Q("page"), 1)
+	page := cast.ToInt(ctx.Q("page"), 1)
 	secrets, totalCount, err := docker.SecretList(name, page, model.PageSize)
 	if err != nil {
 		return err

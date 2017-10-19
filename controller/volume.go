@@ -37,7 +37,7 @@ func Volume() (c *VolumeController) {
 
 func volumeList(ctx web.Context) error {
 	//name := ctx.Q("name")
-	page := cast.ToIntD(ctx.Q("page"), 1)
+	page := cast.ToInt(ctx.Q("page"), 1)
 	volumes, totalCount, err := docker.VolumeList(page, model.PageSize)
 	if err != nil {
 		return err

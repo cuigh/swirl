@@ -47,7 +47,7 @@ func Service() (c *ServiceController) {
 
 func serviceList(ctx web.Context) error {
 	name := ctx.Q("name")
-	page := cast.ToIntD(ctx.Q("page"), 1)
+	page := cast.ToInt(ctx.Q("page"), 1)
 	services, totalCount, err := docker.ServiceList(name, page, model.PageSize)
 	if err != nil {
 		return err
@@ -102,8 +102,8 @@ func serviceRaw(ctx web.Context) error {
 
 func serviceLogs(ctx web.Context) error {
 	name := ctx.P("name")
-	line := cast.ToIntD(ctx.Q("line"), 500)
-	timestamps := cast.ToBoolD(ctx.Q("timestamps"), false)
+	line := cast.ToInt(ctx.Q("line"), 500)
+	timestamps := cast.ToBool(ctx.Q("timestamps"), false)
 	stdout, stderr, err := docker.ServiceLogs(name, line, timestamps)
 	if err != nil {
 		return err
