@@ -53,10 +53,10 @@
   <tbody>
     {{if items}}
     {{ i := 0 }}
-    {{range n, v := items}}
+    {{range k, v := items}}
     <tr>
       <td>
-        <input name="{{name}}s[{{i}}].name" class="input is-small" type="text" value="{{n}}">
+        <input name="{{name}}s[{{i}}].name" class="input is-small" type="text" value="{{k}}">
       </td>
       <td>
         <input name="{{name}}s[{{i}}].value" class="input is-small" type="text" value="{{v}}">
