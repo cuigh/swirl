@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html lang="{{ language == "" ? "en" : language }}">
   <head>
+    <title>Swirl</title>
     <meta charset="utf-8">
+    <meta name="keywords" content="swirl,docker,moby,swarm,docker-compose,docker-ui,docker-web-management">
+    <meta name="description" content="{{ i18n("description") }}">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="/lyicon/css/lyicon.css">
     <link rel="stylesheet" href="/bulma/bulma.css?v=0.5.3">
