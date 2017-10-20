@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/cuigh/auxo/ext/texts"
 	"github.com/cuigh/swirl/misc"
 	"github.com/cuigh/swirl/model"
 	"github.com/docker/docker/api/types"
@@ -547,5 +548,152 @@ func ServiceLogs(name string, line int, timestamps bool) (stdout, stderr *bytes.
 		stderr = &bytes.Buffer{}
 		_, err = stdcopy.StdCopy(stdout, stderr, rc)
 	}
+	return
+}
+
+// todo: support auto wrapping
+// ServiceCommand returns the docker command line to create this service.
+func ServiceCommand(name string) (cmd string, err error) {
+	var (
+		ctx context.Context
+		cli *client.Client
+	)
+
+	ctx, cli, err = mgr.Client()
+	if err != nil {
+		return
+	}
+
+	service, _, err := cli.ServiceInspectWithRaw(ctx, name, types.ServiceInspectOptions{})
+	if err != nil {
+		return
+	}
+
+	si := model.NewServiceInfo(service)
+	b := texts.GetBuilder()
+	b.Append("docker service create --name ", si.Name)
+	if si.Mode == "global" {
+		b.Append(" --mode global")
+	} else if si.Replicas > 1 {
+		b.AppendFormat(" --replicas %d", si.Replicas)
+	}
+	for _, n := range service.Spec.TaskTemplate.Networks {
+		var network types.NetworkResource
+		network, err = cli.NetworkInspect(ctx, n.Target, types.NetworkInspectOptions{})
+		b.Append(" --network ", network.Name)
+	}
+	if len(si.Endpoint.Ports) > 0 {
+		if si.Endpoint.Mode == swarm.ResolutionModeDNSRR {
+			b.AppendFormat(" --endpoint-mode %s", si.Endpoint.Mode)
+		}
+		for _, p := range si.Endpoint.Ports {
+			b.AppendFormat(" --publish mode=%s,target=%d,published=%d,protocol=%s", p.PublishMode, p.TargetPort, p.PublishedPort, p.Protocol)
+		}
+	}
+	for _, c := range si.Placement.Constraints {
+		b.AppendFormat(" --constraint '%s'", c.ToConstraint())
+	}
+	for _, p := range si.Placement.Preferences {
+		b.AppendFormat(" --placement-pref '%s'", p.Spread)
+	}
+	for _, e := range si.Environments {
+		b.AppendFormat(" --env '%s=%s'", e.Name, e.Value)
+	}
+	for _, l := range si.ServiceLabels {
+		b.AppendFormat(" --label '%s=%s'", l.Name, l.Value)
+	}
+	for _, l := range si.ContainerLabels {
+		b.AppendFormat(" --container-label '%s=%s'", l.Name, l.Value)
+	}
+	for _, mnt := range si.Mounts {
+		// todo: add mnt.Propagation
+		b.AppendFormat(" --mount type=%s,source=%s,destination=%s", mnt.Type, mnt.Source, mnt.Target)
+		if mnt.ReadOnly {
+			b.Append(",ro=1")
+		}
+	}
+	// todo: uid/gid
+	for _, c := range si.Configs {
+		b.AppendFormat(" --config source=%s,target=%s,mode=0%d", c.Name, c.FileName, c.Mode)
+	}
+	for _, c := range si.Secrets {
+		b.AppendFormat(" --secret source=%s,target=%s,mode=0%d", c.Name, c.FileName, c.Mode)
+	}
+	if si.Resource.Limit.IsSet() {
+		if si.Resource.Limit.CPU > 0 {
+			b.AppendFormat(" --limit-cpu %.2f", si.Resource.Limit.CPU)
+		}
+		if si.Resource.Limit.Memory != "" {
+			b.Append(" --limit-memory ", si.Resource.Limit.Memory)
+		}
+	}
+	if si.Resource.Reserve.IsSet() {
+		if si.Resource.Reserve.CPU > 0 {
+			b.AppendFormat(" --reserve-cpu %.2f", si.Resource.Reserve.CPU)
+		}
+		if si.Resource.Reserve.Memory != "" {
+			b.Append(" --reserve-memory ", si.Resource.Reserve.Memory)
+		}
+	}
+	if si.LogDriver.Name != "" {
+		b.Append(" --log-driver ", si.LogDriver.Name)
+		for _, opt := range si.LogDriver.Options {
+			b.AppendFormat(" --log-opt '%s=%s'", opt.Name, opt.Value)
+		}
+	}
+	// UpdatePolicy
+	if si.UpdatePolicy.Parallelism > 0 {
+		b.AppendFormat(" --update-parallelism %d", si.UpdatePolicy.Parallelism)
+	}
+	if si.UpdatePolicy.Delay != "" {
+		b.Append(" --update-delay ", si.UpdatePolicy.Delay)
+	}
+	if si.UpdatePolicy.FailureAction != "" {
+		b.Append(" --update-failure-action ", si.UpdatePolicy.FailureAction)
+	}
+	if si.UpdatePolicy.Order != "" {
+		b.Append(" --update-order ", si.UpdatePolicy.Order)
+	}
+	// RollbackPolicy
+	if si.RollbackPolicy.Parallelism > 0 {
+		b.AppendFormat(" --rollback-parallelism %d", si.RollbackPolicy.Parallelism)
+	}
+	if si.RollbackPolicy.Delay != "" {
+		b.Append(" --rollback-delay ", si.RollbackPolicy.Delay)
+	}
+	if si.RollbackPolicy.FailureAction != "" {
+		b.Append(" --rollback-failure-action ", si.RollbackPolicy.FailureAction)
+	}
+	if si.RollbackPolicy.Order != "" {
+		b.Append(" --rollback-order ", si.RollbackPolicy.Order)
+	}
+	// RestartPolicy
+	if si.RestartPolicy.Condition != "" {
+		b.AppendFormat(" --restart-condition %s", si.RestartPolicy.Condition)
+	}
+	if si.RestartPolicy.MaxAttempts > 0 {
+		b.AppendFormat(" --restart-max-attempts %d", si.RestartPolicy.MaxAttempts)
+	}
+	if si.RestartPolicy.Delay != "" {
+		b.Append(" --restart-delay ", si.RestartPolicy.Delay)
+	}
+	if si.RestartPolicy.Window != "" {
+		b.Append(" --restart-window ", si.RestartPolicy.Window)
+	}
+	//b.Append(" --with-registry-auth")
+	if si.Dir != "" {
+		b.Append(" --workdir ", si.Dir)
+	}
+	if si.User != "" {
+		b.Append(" --user ", si.User)
+	}
+	b.Append(" ", si.Image)
+	if si.Command != "" {
+		b.Append(" ", si.Command)
+	}
+	if si.Args != "" {
+		b.Append(" ", si.Args)
+	}
+	cmd = b.String()
 	return
 }

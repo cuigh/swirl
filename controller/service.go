@@ -80,7 +80,12 @@ func serviceDetail(ctx web.Context) error {
 		return err
 	}
 
-	m := newModel(ctx).Add("Service", info).Add("Tasks", tasks)
+	cmd, err := docker.ServiceCommand(name)
+	if err != nil {
+		return err
+	}
+
+	m := newModel(ctx).Add("Service", info).Add("Tasks", tasks).Add("Command", cmd)
 	return ctx.Render("service/detail", m)
 }
 

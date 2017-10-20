@@ -75,6 +75,15 @@
       </div>
     </div>
 
+    <div class="block">
+      <div class="block-header">
+        <p>Command line</p>
+      </div>
+      <div class="block-body is-bordered">
+        {{ .Command }}
+      </div>
+    </div>
+
     {{if .Service.Endpoint.VirtualIPs}}
     <div class="block">
       <div class="block-header">

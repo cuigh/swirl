@@ -282,13 +282,17 @@ func NewServiceInfo(service swarm.Service) *ServiceInfo {
 	}
 	if spec.UpdateConfig != nil {
 		si.UpdatePolicy.Parallelism = spec.UpdateConfig.Parallelism
-		si.UpdatePolicy.Delay = spec.UpdateConfig.Delay.String()
+		if spec.UpdateConfig.Delay > 0 {
+			si.UpdatePolicy.Delay = spec.UpdateConfig.Delay.String()
+		}
 		si.UpdatePolicy.FailureAction = spec.UpdateConfig.FailureAction
 		si.UpdatePolicy.Order = spec.UpdateConfig.Order
 	}
 	if spec.RollbackConfig != nil {
 		si.RollbackPolicy.Parallelism = spec.RollbackConfig.Parallelism
-		si.RollbackPolicy.Delay = spec.RollbackConfig.Delay.String()
+		if spec.RollbackConfig.Delay > 0 {
+			si.RollbackPolicy.Delay = spec.RollbackConfig.Delay.String()
+		}
 		si.RollbackPolicy.FailureAction = spec.RollbackConfig.FailureAction
 		si.RollbackPolicy.Order = spec.RollbackConfig.Order
 	}
@@ -297,10 +301,10 @@ func NewServiceInfo(service swarm.Service) *ServiceInfo {
 		if spec.TaskTemplate.RestartPolicy.MaxAttempts != nil {
 			si.RestartPolicy.MaxAttempts = *spec.TaskTemplate.RestartPolicy.MaxAttempts
 		}
-		if spec.TaskTemplate.RestartPolicy.Delay != nil {
+		if spec.TaskTemplate.RestartPolicy.Delay != nil && *spec.TaskTemplate.RestartPolicy.Delay > 0 {
 			si.RestartPolicy.Delay = spec.TaskTemplate.RestartPolicy.Delay.String()
 		}
-		if spec.TaskTemplate.RestartPolicy.Window != nil {
+		if spec.TaskTemplate.RestartPolicy.Window != nil && *spec.TaskTemplate.RestartPolicy.Window > 0 {
 			si.RestartPolicy.Window = spec.TaskTemplate.RestartPolicy.Window.String()
 		}
 	}
@@ -347,7 +351,9 @@ func NewResourceInfo(res *swarm.Resources) ResourceInfo {
 	ri := ResourceInfo{}
 	if res != nil {
 		ri.CPU = float64(res.NanoCPUs) / 1e9
-		ri.Memory = size.Size(res.MemoryBytes).String()
+		if res.MemoryBytes > 0 {
+			ri.Memory = size.Size(res.MemoryBytes).String()
+		}
 	}
 	return ri
 }
