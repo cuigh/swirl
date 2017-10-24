@@ -1,6 +1,6 @@
-[![Swirl](https://goreportcard.com/badge/cuigh/swirl)](https://goreportcard.com/report/cuigh/swirl)
-
 # SWIRL
+
+[![Swirl](https://goreportcard.com/badge/cuigh/swirl)](https://goreportcard.com/report/cuigh/swirl)
 
 Swirl is a web management tool for Docker, focused on swarm cluster.
 
@@ -12,6 +12,7 @@ Swirl is a web management tool for Docker, focused on swarm cluster.
 * LDAP authentication support
 * Full permission control based on RBAC model
 * Scale out as you want
+* Multiple language support
 * And more...
 
 ## Snapshots
@@ -55,7 +56,7 @@ All options can be set with `config/app.conf`.
     <swirl>
         <!-- optional -->
         <add key="docker_endpoint" value="tcp://docker-proxy:2375"/>
-        <!-- required, valid options: mongo -->
+        <!-- optional, valid options: mongo -->
         <add key="db_type" value="mongo"/>
         <!-- required, database connection string, must match with db.type option -->
         <add key="db_address" value="localhost:27017/swirl"/>
@@ -75,22 +76,27 @@ Only three main options can be set by environment variables for now.
 
 ### With swarm config
 
-Docker support mounting configuration file through swarm from v17.06.
+Docker support mounting configuration file through swarm from v17.06, so you can store your config in swarm and mount it to your program.
 
 ## Deployment
 
 ### Stand alone
 
-Just copy the swirl binary and config dir to the host, run it.
+Just copy the swirl binary and config/assets/views directories to the host, and run it.
 
 ```bash
-nohup swirl >swirl.log &
+./swirl
 ```
 
 ### Docker
 
 ```bash
-docker run -d -p 8001:8001 -v /var/run/docker.sock:/var/run/docker.sock --name=swirl cuigh/swirl
+docker run -d -p 8001:8001 \
+    --mount type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock \
+    -e DB_TYPE=mongo \
+    -e DB_ADDRESS=localhost:27017/swirl \
+    --name=swirl \
+    cuigh/swirl
 ```
 
 ### Docker swarm
@@ -99,6 +105,7 @@ docker run -d -p 8001:8001 -v /var/run/docker.sock:/var/run/docker.sock --name=s
 docker service create \
   --name=swirl \
   --publish=8001:8001/tcp \
+  --env DB_ADDRESS=localhost:27017/swirl \
   --constraint=node.role==manager \
   --mount=type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock \
   cuigh/swirl
@@ -106,7 +113,7 @@ docker service create \
 
 ## Build
 
-**Swirl** use `dep` as dependency management tool.
+**Swirl** use `dep` as dependency management tool(coming soon).
 
 ## License
 
