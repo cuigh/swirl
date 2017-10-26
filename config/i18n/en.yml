@@ -18,6 +18,7 @@ button.update: Update
 button.return: Return
 button.leave: Leave
 button.scale: Scale
+button.rollback: Rollback
 button.previous: Previous
 button.next: Next
 

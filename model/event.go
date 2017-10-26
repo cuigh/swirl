@@ -38,6 +38,7 @@ const (
 	EventActionDelete     EventAction = "Delete"
 	EventActionUpdate     EventAction = "Update"
 	EventActionScale      EventAction = "Scale"
+	EventActionRollback   EventAction = "Rollback"
 	EventActionDisconnect EventAction = "Disconnect"
 )
 

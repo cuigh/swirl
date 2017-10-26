@@ -56,6 +56,7 @@ var Perms = []PermGroup{
 			{Key: "service.delete", Text: "Delete"},
 			{Key: "service.update", Text: "Update"},
 			{Key: "service.scale", Text: "Scale"},
+			{Key: "service.rollback", Text: "Rollback"},
 		},
 	},
 	{

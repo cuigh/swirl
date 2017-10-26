@@ -18,6 +18,7 @@ button.update: 更新
 button.return: 返回
 button.leave: 离开
 button.scale: 调整
+button.rollback: 回退
 button.previous: 前一页
 button.next: 后一页
 

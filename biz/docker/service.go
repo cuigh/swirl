@@ -697,3 +697,28 @@ func ServiceCommand(name string) (cmd string, err error) {
 	cmd = b.String()
 	return
 }
+
+// ServiceRollback rollbacks a service.
+func ServiceRollback(name string) error {
+	return mgr.Do(func(ctx context.Context, cli *client.Client) (err error) {
+		service, _, err := cli.ServiceInspectWithRaw(ctx, name, types.ServiceInspectOptions{})
+		if err != nil {
+			return err
+		}
+
+		if service.PreviousSpec == nil {
+			return errors.New("can't rollback service, previous spec is not exists")
+		}
+
+		spec := *service.PreviousSpec
+		options := types.ServiceUpdateOptions{
+			RegistryAuthFrom: types.RegistryAuthFromPreviousSpec,
+			QueryRegistry:    false,
+		}
+		resp, err := cli.ServiceUpdate(context.Background(), name, service.Version, spec, options)
+		if err == nil && len(resp.Warnings) > 0 {
+			mgr.Logger().Warnf("service %s was rollbacked but got warnings: %v", name, resp.Warnings)
+		}
+		return err
+	})
+}

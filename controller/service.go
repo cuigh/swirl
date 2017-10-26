@@ -17,31 +17,33 @@ import (
 
 // ServiceController is a controller of docker service
 type ServiceController struct {
-	List   web.HandlerFunc `path:"/" name:"service.list" authorize:"!" desc:"service list page"`
-	Detail web.HandlerFunc `path:"/:name/detail" name:"service.detail" authorize:"!" desc:"service detail page"`
-	Raw    web.HandlerFunc `path:"/:name/raw" name:"service.raw" authorize:"!" desc:"service raw page"`
-	Logs   web.HandlerFunc `path:"/:name/logs" name:"service.logs" authorize:"!" desc:"service logs page"`
-	Delete web.HandlerFunc `path:"/delete" method:"post" name:"service.delete" authorize:"!" desc:"delete service"`
-	Scale  web.HandlerFunc `path:"/scale" method:"post" name:"service.scale" authorize:"!" desc:"scale service"`
-	New    web.HandlerFunc `path:"/new" name:"service.new" authorize:"!" desc:"new service page"`
-	Create web.HandlerFunc `path:"/new" method:"post" name:"service.create" authorize:"!" desc:"create service"`
-	Edit   web.HandlerFunc `path:"/:name/edit" name:"service.edit" authorize:"!" desc:"service edit page"`
-	Update web.HandlerFunc `path:"/:name/edit" method:"post" name:"service.update" authorize:"!" desc:"update service"`
+	List     web.HandlerFunc `path:"/" name:"service.list" authorize:"!" desc:"service list page"`
+	Detail   web.HandlerFunc `path:"/:name/detail" name:"service.detail" authorize:"!" desc:"service detail page"`
+	Raw      web.HandlerFunc `path:"/:name/raw" name:"service.raw" authorize:"!" desc:"service raw page"`
+	Logs     web.HandlerFunc `path:"/:name/logs" name:"service.logs" authorize:"!" desc:"service logs page"`
+	Delete   web.HandlerFunc `path:"/delete" method:"post" name:"service.delete" authorize:"!" desc:"delete service"`
+	Scale    web.HandlerFunc `path:"/scale" method:"post" name:"service.scale" authorize:"!" desc:"scale service"`
+	Rollback web.HandlerFunc `path:"/rollback" method:"post" name:"service.rollback" authorize:"!" desc:"rollback service"`
+	New      web.HandlerFunc `path:"/new" name:"service.new" authorize:"!" desc:"new service page"`
+	Create   web.HandlerFunc `path:"/new" method:"post" name:"service.create" authorize:"!" desc:"create service"`
+	Edit     web.HandlerFunc `path:"/:name/edit" name:"service.edit" authorize:"!" desc:"service edit page"`
+	Update   web.HandlerFunc `path:"/:name/edit" method:"post" name:"service.update" authorize:"!" desc:"update service"`
 }
 
 // Service creates an instance of ServiceController
 func Service() (c *ServiceController) {
 	return &ServiceController{
-		List:   serviceList,
-		Detail: serviceDetail,
-		Raw:    serviceRaw,
-		Logs:   serviceLogs,
-		Delete: serviceDelete,
-		New:    serviceNew,
-		Create: serviceCreate,
-		Edit:   serviceEdit,
-		Update: serviceUpdate,
-		Scale:  serviceScale,
+		List:     serviceList,
+		Detail:   serviceDetail,
+		Raw:      serviceRaw,
+		Logs:     serviceLogs,
+		Delete:   serviceDelete,
+		New:      serviceNew,
+		Create:   serviceCreate,
+		Edit:     serviceEdit,
+		Update:   serviceUpdate,
+		Scale:    serviceScale,
+		Rollback: serviceRollback,
 	}
 }
 
@@ -260,6 +262,15 @@ func serviceScale(ctx web.Context) error {
 	err = docker.ServiceScale(name, uint64(count))
 	if err == nil {
 		biz.Event.CreateService(model.EventActionScale, name, ctx.User())
+	}
+	return ajaxResult(ctx, err)
+}
+
+func serviceRollback(ctx web.Context) error {
+	name := ctx.F("name")
+	err := docker.ServiceRollback(name)
+	if err == nil {
+		biz.Event.CreateService(model.EventActionRollback, name, ctx.User())
 	}
 	return ajaxResult(ctx, err)
 }

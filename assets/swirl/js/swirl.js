@@ -1756,7 +1756,9 @@ var Swirl;
         class ListPage {
             constructor() {
                 this.table = new Table("#table-items");
-                this.table.on("delete-service", this.deleteService.bind(this)).on("scale-service", this.scaleService.bind(this));
+                this.table.on("delete-service", this.deleteService.bind(this))
+                    .on("scale-service", this.scaleService.bind(this))
+                    .on("rollback-service", this.rollbackService.bind(this));
                 $("#btn-delete").click(this.deleteServices.bind(this));
             }
             deleteService(e) {
@@ -1793,6 +1795,14 @@ var Swirl;
                     data.count = dlg.find("input[name=count]").val();
                     $ajax.post("scale", data).trigger(e.target).encoder("form").json(() => {
                         location.reload();
+                    });
+                });
+            }
+            rollbackService(e) {
+                let $btn = $(e.target).closest("button"), $tr = $btn.closest("tr"), name = $tr.find("td:eq(1)").text().trim();
+                Modal.confirm(`Are you sure to rollback service: <strong>${name}</strong>?`, "Rollback service", (dlg, e) => {
+                    $ajax.post("rollback", { name: name }).trigger(e.target).encoder("form").json(() => {
+                        dlg.close();
                     });
                 });
             }

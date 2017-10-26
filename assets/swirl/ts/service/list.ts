@@ -11,7 +11,9 @@ namespace Swirl.Service {
             this.table = new Table("#table-items");
 
             // bind events
-            this.table.on("delete-service", this.deleteService.bind(this)).on("scale-service", this.scaleService.bind(this));
+            this.table.on("delete-service", this.deleteService.bind(this))
+                .on("scale-service", this.scaleService.bind(this))
+                .on("rollback-service", this.rollbackService.bind(this));
             $("#btn-delete").click(this.deleteServices.bind(this));
         }
 
@@ -19,7 +21,7 @@ namespace Swirl.Service {
             let $tr = $(e.target).closest("tr");
             let name = $tr.find("td:eq(1)").text().trim();
             Modal.confirm(`Are you sure to remove service: <strong>${name}</strong>?`, "Delete service", (dlg, e) => {
-                $ajax.post("delete", { names: name }).trigger(e.target).encoder("form").json<AjaxResult>(() => {
+                $ajax.post("delete", {names: name}).trigger(e.target).encoder("form").json<AjaxResult>(() => {
                     $tr.remove();
                     dlg.close();
                 })
@@ -34,7 +36,7 @@ namespace Swirl.Service {
             }
 
             Modal.confirm(`Are you sure to remove ${names.length} services?`, "Delete services", (dlg, e) => {
-                $ajax.post("delete", { names: names.join(",") }).trigger(e.target).encoder("form").json<AjaxResult>(() => {
+                $ajax.post("delete", {names: names.join(",")}).trigger(e.target).encoder("form").json<AjaxResult>(() => {
                     this.table.selectedRows().remove();
                     dlg.close();
                 })
@@ -52,6 +54,17 @@ namespace Swirl.Service {
                 data.count = dlg.find("input[name=count]").val();
                 $ajax.post("scale", data).trigger(e.target).encoder("form").json<AjaxResult>(() => {
                     location.reload();
+                })
+            });
+        }
+
+        private rollbackService(e: JQueryEventObject) {
+            let $btn = $(e.target).closest("button"),
+                $tr = $btn.closest("tr"),
+                name = $tr.find("td:eq(1)").text().trim();
+            Modal.confirm(`Are you sure to rollback service: <strong>${name}</strong>?`, "Rollback service", (dlg, e) => {
+                $ajax.post("rollback", {name: name}).trigger(e.target).encoder("form").json<AjaxResult>(() => {
+                    dlg.close();
                 })
             });
         }

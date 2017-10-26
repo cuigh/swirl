@@ -86,6 +86,7 @@ type ServiceListInfo struct {
 	Actives   uint64
 	Replicas  uint64
 	UpdatedAt time.Time
+	Rollback  bool
 }
 
 func NewServiceListInfo(service swarm.Service, actives uint64) *ServiceListInfo {
@@ -94,6 +95,7 @@ func NewServiceListInfo(service swarm.Service, actives uint64) *ServiceListInfo 
 		Image:     normalizeImage(service.Spec.TaskTemplate.ContainerSpec.Image),
 		Actives:   actives,
 		UpdatedAt: service.UpdatedAt.Local(),
+		Rollback:  service.PreviousSpec != nil,
 	}
 	if service.Spec.Mode.Replicated != nil && service.Spec.Mode.Replicated.Replicas != nil {
 		info.Mode = "replicated"

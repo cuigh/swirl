@@ -48,7 +48,7 @@
         <th>{{ i18n("field.image") }}</th>
         <th width="145">Mode</th>
         <th>{{ i18n("field.updated-at") }}</th>
-        <th width="110">{{ i18n("field.action") }}</th>
+        <th width="140">{{ i18n("field.action") }}</th>
       </tr>
     </thead>
     <tbody>
@@ -71,6 +71,11 @@
           {{if .Mode == "replicated"}}
           <button type="button" class="button is-small is-info is-outlined tooltip is-tooltip-bottom" data-tooltip="{{ i18n("button.scale") }}" data-action="scale-service" data-replicas="{{.Replicas}}">
             <span class="icon"><i class="fa fa-arrows"></i></span>
+          </button>
+          {{end}}
+          {{if .Rollback }}
+          <button type="button" class="button is-small is-info is-outlined tooltip is-tooltip-bottom" data-tooltip="{{ i18n("button.rollback") }}" data-action="rollback-service">
+            <span class="icon"><i class="fa fa-history"></i></span>
           </button>
           {{end}}
           <button class="button is-small is-danger is-outlined tooltip is-tooltip-bottom" data-tooltip="{{ i18n("button.delete") }}" data-action="delete-service">
