@@ -1,8 +1,0 @@
-<profiles>
-    <profile>
-        <option key="debug" value="false"/>
-    </profile>
-    <profile name="dev">
-        <option key="debug" value="true"/>
-    </profile>
-</profiles>

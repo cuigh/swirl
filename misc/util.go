@@ -51,6 +51,9 @@ func Message(lang string) func(key string, args ...interface{}) string {
 	if err != nil {
 		panic(err)
 	}
+	if t == nil {
+		panic("can't find language files")
+	}
 
 	return func(key string, args ...interface{}) string {
 		if s := t.Format(key, args...); s != "" {

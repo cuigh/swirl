@@ -4,12 +4,11 @@ import (
 	"os"
 
 	"github.com/cuigh/auxo/config"
-	"github.com/cuigh/auxo/data"
 )
 
 const (
 	// Version is the version of Swirl
-	Version = "0.5.6"
+	Version = "0.6"
 )
 
 const (
@@ -25,16 +24,13 @@ var (
 )
 
 func init() {
-	options := config.App().GetSection("swirl")
-	DockerHost = loadOption(options, "docker_endpoint", envDockerEndpoint)
-	DBType = loadOption(options, "db_type", envDBType)
-	DBAddress = loadOption(options, "db_address", envDBAddress)
+	DockerHost = loadOption("swirl.docker_endpoint", envDockerEndpoint)
+	DBType = loadOption("swirl.db_type", envDBType)
+	DBAddress = loadOption("swirl.db_address", envDBAddress)
 }
 
-func loadOption(options data.Options, key, env string) (opt string) {
-	if options != nil {
-		opt = options.String(key)
-	}
+func loadOption(key, env string) (opt string) {
+	opt = config.GetString(key)
 	if opt == "" {
 		opt = os.Getenv(env)
 	}

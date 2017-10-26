@@ -35,7 +35,7 @@ func main() {
 	ws := web.Auto()
 
 	// set render/validator..
-	ws.Renderer = jet.New().SetDebug(config.App().Debug).
+	ws.Renderer = jet.New().SetDebug(config.GetBool("debug")).
 		AddFunc("time", misc.FormatTime(setting.TimeZone.Offset)).
 		AddFunc("i18n", misc.Message(setting.Language)).
 		AddFuncs(misc.Funcs).
