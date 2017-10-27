@@ -32,11 +32,11 @@ func Get() (Interface, error) {
 }
 
 func create() (d Interface, err error) {
-	switch misc.DBType {
+	switch misc.Options.DBType {
 	case "", "mongo":
-		return mongo.New(misc.DBAddress)
+		return mongo.New(misc.Options.DBAddress)
 	default:
-		err = errors.New("Unknown database type: " + misc.DBType)
+		err = errors.New("Unknown database type: " + misc.Options.DBType)
 	}
 	return
 }

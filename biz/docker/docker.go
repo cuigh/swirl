@@ -13,12 +13,9 @@ const (
 	apiVersion = "1.32"
 )
 
-var mgr = &manager{
-	host: misc.DockerHost,
-}
+var mgr = &manager{}
 
 type manager struct {
-	host   string
 	client *client.Client
 	locker sync.Mutex
 	logger *log.Logger
@@ -38,10 +35,10 @@ func (m *manager) Client() (ctx context.Context, cli *client.Client, err error) 
 		defer m.locker.Unlock()
 
 		if m.client == nil {
-			if m.host == "" {
+			if misc.Options.DockerEndpoint == "" {
 				m.client, err = client.NewEnvClient()
 			} else {
-				m.client, err = client.NewClient(m.host, apiVersion, nil, nil)
+				m.client, err = client.NewClient(misc.Options.DockerEndpoint, apiVersion, nil, nil)
 			}
 			if err != nil {
 				return

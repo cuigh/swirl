@@ -1,38 +1,32 @@
 package misc
 
 import (
-	"os"
-
 	"github.com/cuigh/auxo/config"
 )
 
 const (
-	// Version is the version of Swirl
-	Version = "0.6"
-)
-
-const (
+	keyDockerEndpoint = "swirl.docker_endpoint"
+	keyDBType         = "swirl.db_type"
+	keyDBAddress      = "swirl.db_address"
 	envDockerEndpoint = "DOCKER_ENDPOINT"
 	envDBType         = "DB_TYPE"
 	envDBAddress      = "DB_ADDRESS"
 )
 
-var (
-	DockerHost string
-	DBType     string
-	DBAddress  string
-)
+var Options = &struct {
+	DockerEndpoint string
+	DBType         string
+	DBAddress      string
+}{}
 
-func init() {
-	DockerHost = loadOption("swirl.docker_endpoint", envDockerEndpoint)
-	DBType = loadOption("swirl.db_type", envDBType)
-	DBAddress = loadOption("swirl.db_address", envDBAddress)
+func BindOptions() {
+	config.BindEnv(keyDockerEndpoint, envDockerEndpoint)
+	config.BindEnv(keyDBType, envDBType)
+	config.BindEnv(keyDBAddress, envDBAddress)
 }
 
-func loadOption(key, env string) (opt string) {
-	opt = config.GetString(key)
-	if opt == "" {
-		opt = os.Getenv(env)
-	}
-	return
+func LoadOptions() {
+	Options.DockerEndpoint = config.GetString(keyDockerEndpoint)
+	Options.DBType = config.GetString(keyDBType)
+	Options.DBAddress = config.GetString(keyDBAddress)
 }

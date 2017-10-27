@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/cuigh/auxo/app"
+	"github.com/cuigh/auxo/app/flag"
 	"github.com/cuigh/auxo/config"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/auxo/net/web/auth"
@@ -19,6 +20,20 @@ import (
 )
 
 func main() {
+	misc.BindOptions()
+
+	app.Name = "Swirl"
+	app.Version = "0.6"
+	app.Desc = "A web management UI for Docker, focused on swarm cluster"
+	app.Action = func(ctx *app.Context) {
+		misc.LoadOptions()
+		app.Run(server())
+	}
+	app.Register(flag.All)
+	app.Start()
+}
+
+func server() *web.Server {
 	setting, err := biz.Setting.Get()
 	if err != nil {
 		panic(fmt.Sprintf("Load setting failed: %v", err))
@@ -40,7 +55,7 @@ func main() {
 		AddFunc("i18n", misc.Message(setting.Language)).
 		AddFuncs(misc.Funcs).
 		AddVariable("language", setting.Language).
-		AddVariable("version", misc.Version).
+		AddVariable("version", app.Version).
 		AddVariable("go_version", runtime.Version())
 	//ws.Validator = valid.New()
 
@@ -78,5 +93,5 @@ func main() {
 	g.Handle("/system/setting", controller.Setting())
 	g.Handle("/system/event", controller.Event())
 
-	app.Run(ws)
+	return ws
 }
