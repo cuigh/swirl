@@ -5,7 +5,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/cuigh/auxo/data/set"
 	"github.com/cuigh/auxo/errors"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/auxo/util/cast"
@@ -13,6 +12,7 @@ import (
 	"github.com/cuigh/swirl/biz/docker"
 	"github.com/cuigh/swirl/misc"
 	"github.com/cuigh/swirl/model"
+	"mtime.com/auxo/data/set"
 )
 
 // ServiceController is a controller of docker service
@@ -56,8 +56,8 @@ func serviceList(ctx web.Context) error {
 	}
 
 	m := newPagerModel(ctx, totalCount, model.PageSize, page).
-		Add("Name", name).
-		Add("Services", services)
+		Set("Name", name).
+		Set("Services", services)
 	return ctx.Render("service/list", m)
 }
 
@@ -87,7 +87,7 @@ func serviceDetail(ctx web.Context) error {
 		return err
 	}
 
-	m := newModel(ctx).Add("Service", info).Add("Tasks", tasks).Add("Command", cmd)
+	m := newModel(ctx).Set("Service", info).Set("Tasks", tasks).Set("Command", cmd)
 	return ctx.Render("service/detail", m)
 }
 
@@ -103,7 +103,7 @@ func serviceRaw(ctx web.Context) error {
 		return err
 	}
 
-	m := newModel(ctx).Add("Service", name).Add("Raw", j)
+	m := newModel(ctx).Set("Service", name).Set("Raw", j)
 	return ctx.Render("service/raw", m)
 }
 
@@ -116,8 +116,8 @@ func serviceLogs(ctx web.Context) error {
 		return err
 	}
 
-	m := newModel(ctx).Add("Service", name).Add("Line", line).Add("Timestamps", timestamps).
-		Add("Stdout", stdout.String()).Add("Stderr", stderr.String())
+	m := newModel(ctx).Set("Service", name).Set("Line", line).Set("Timestamps", timestamps).
+		Set("Stdout", stdout.String()).Set("Stderr", stderr.String())
 	return ctx.Render("service/logs", m)
 }
 
@@ -177,9 +177,9 @@ func serviceNew(ctx web.Context) error {
 	}
 	checkedNetworks := set.FromSlice(service.Networks, func(i int) interface{} { return service.Networks[i] })
 
-	m := newModel(ctx).Add("Service", service).Add("Registries", registries).
-		Add("Networks", networks).Add("CheckedNetworks", checkedNetworks).
-		Add("Secrets", secrets).Add("Configs", configs)
+	m := newModel(ctx).Set("Service", service).Set("Registries", registries).
+		Set("Networks", networks).Set("CheckedNetworks", checkedNetworks).
+		Set("Secrets", secrets).Set("Configs", configs)
 	return ctx.Render("service/new", m)
 }
 
@@ -194,9 +194,9 @@ func serviceCreate(ctx web.Context) error {
 		var registry *model.Registry
 		registry, err = biz.Registry.Get(info.Registry)
 		if err != nil {
-			return errors.Wrap("Load registry info failed", err)
+			return errors.Wrap(err, "load registry info failed")
 		} else if registry == nil {
-			return errors.New("Can't load registry info")
+			return errors.New("can't load registry info")
 		}
 
 		info.Image = registry.URL + "/" + info.Image
@@ -232,9 +232,9 @@ func serviceEdit(ctx web.Context) error {
 	stack := service.Spec.Labels["com.docker.stack.namespace"]
 	checkedNetworks := set.FromSlice(service.Endpoint.VirtualIPs, func(i int) interface{} { return service.Endpoint.VirtualIPs[i].NetworkID })
 
-	m := newModel(ctx).Add("Service", model.NewServiceInfo(service)).Add("Stack", stack).
-		Add("Networks", networks).Add("CheckedNetworks", checkedNetworks).
-		Add("Secrets", secrets).Add("Configs", configs)
+	m := newModel(ctx).Set("Service", model.NewServiceInfo(service)).Set("Stack", stack).
+		Set("Networks", networks).Set("CheckedNetworks", checkedNetworks).
+		Set("Secrets", secrets).Set("Configs", configs)
 	return ctx.Render("service/edit", m)
 }
 

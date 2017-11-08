@@ -50,10 +50,10 @@ type User struct {
 
 type UserListArgs struct {
 	// admins, active, blocked
-	Filter    string `query:"filter"`
-	Query     string `query:"query"`
-	PageIndex int    `query:"page"`
-	PageSize  int    `query:"size"`
+	Filter    string `bind:"filter"`
+	Query     string `bind:"query"`
+	PageIndex int    `bind:"page"`
+	PageSize  int    `bind:"size"`
 }
 
 type Session struct {

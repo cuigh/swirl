@@ -288,9 +288,9 @@ func (b *userBiz) Identify(token string) (user web.User) {
 }
 
 // Authorize check permission of user
-func (b *userBiz) Authorize(user web.User, handler string) bool {
+func (b *userBiz) Authorize(user web.User, h web.HandlerInfo) bool {
 	if au, ok := user.(*model.AuthUser); ok {
-		return au.IsAllowed(handler)
+		return au.IsAllowed(h.Name())
 	}
 	return false
 }

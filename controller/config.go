@@ -41,8 +41,8 @@ func configList(ctx web.Context) error {
 	}
 
 	m := newPagerModel(ctx, totalCount, model.PageSize, page).
-		Add("Name", name).
-		Add("Configs", configs)
+		Set("Name", name).
+		Set("Configs", configs)
 	return ctx.Render("config/list", m)
 }
 
@@ -75,7 +75,7 @@ func configEdit(ctx web.Context) error {
 	if err != nil {
 		return err
 	}
-	m := newModel(ctx).Add("Config", cfg)
+	m := newModel(ctx).Set("Config", cfg)
 	return ctx.Render("config/edit", m)
 }
 

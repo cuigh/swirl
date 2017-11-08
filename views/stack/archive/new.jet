@@ -1,12 +1,12 @@
 {{ extends "../../_layouts/default" }}
 
 {{ block style() }}
-<link rel="stylesheet" href="/codemirror/codemirror.css?v=5.30">
+<link rel="stylesheet" href="/assets/codemirror/codemirror.css?v=5.30">
 {{ end }}
 
 {{ block script() }}
-<script src="/codemirror/codemirror.js?v=5.30"></script>
-<script src="/codemirror/mode/yaml.js?v=5.30"></script>
+<script src="/assets/codemirror/codemirror.js?v=5.30"></script>
+<script src="/assets/codemirror/mode/yaml.js?v=5.30"></script>
 <script>var editor = CodeMirror.fromTextArea(document.getElementById("txt-content"), {lineNumbers: true});</script>
 {{ end }}
 

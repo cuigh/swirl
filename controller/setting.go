@@ -26,7 +26,7 @@ func settingIndex(ctx web.Context) error {
 		return err
 	}
 
-	m := newModel(ctx).Add("Setting", setting)
+	m := newModel(ctx).Set("Setting", setting)
 	return ctx.Render("system/setting/index", m)
 }
 

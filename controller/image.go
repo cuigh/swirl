@@ -37,8 +37,8 @@ func imageList(ctx web.Context) error {
 	}
 
 	m := newPagerModel(ctx, totalCount, model.PageSize, page).
-		Add("Name", name).
-		Add("Images", images)
+		Set("Name", name).
+		Set("Images", images)
 	return ctx.Render("image/list", m)
 }
 
@@ -54,7 +54,7 @@ func imageDetail(ctx web.Context) error {
 		return err
 	}
 
-	m := newModel(ctx).Add("Image", image).Add("Histories", histories)
+	m := newModel(ctx).Set("Image", image).Set("Histories", histories)
 	return ctx.Render("image/detail", m)
 }
 
@@ -70,7 +70,7 @@ func imageRaw(ctx web.Context) error {
 		return err
 	}
 
-	m := newModel(ctx).Add("Image", image).Add("Raw", j)
+	m := newModel(ctx).Set("Image", image).Set("Raw", j)
 	return ctx.Render("image/raw", m)
 }
 

@@ -1,11 +1,11 @@
 {{ extends "../_layouts/default" }}
 
 {{ block style() }}
-<link rel="stylesheet" href="/highlight/highlight.css?v=9.12">
+<link rel="stylesheet" href="/assets/highlight/highlight.css?v=9.12">
 {{ end }}
 
 {{ block script() }}
-<script src="/highlight/highlight.pack.js?v=9.12"></script>
+<script src="/assets/highlight/highlight.pack.js?v=9.12"></script>
 <script>hljs.initHighlightingOnLoad();</script>
 {{ end }}
 

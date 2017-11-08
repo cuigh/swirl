@@ -12,12 +12,6 @@ import (
 )
 
 var Funcs = map[string]interface{}{
-	"limit": func(s string, length int) string {
-		if len(s) > length {
-			return s[:length] + "..."
-		}
-		return s
-	},
 	//"time": func(t time.Time) string {
 	//	return t.Local().Format("2006-01-02 15:04:05")
 	//},
@@ -40,9 +34,6 @@ var Funcs = map[string]interface{}{
 	},
 	"trimPrefix": func(s, prefix string) string {
 		return strings.TrimPrefix(s, prefix)
-	},
-	"slice": func(values ...interface{}) interface{} {
-		return values
 	},
 }
 

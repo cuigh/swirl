@@ -40,8 +40,8 @@ func taskList(ctx web.Context) error {
 	}
 
 	m := newPagerModel(ctx, totalCount, args.PageSize, args.PageIndex).
-		Add("Args", args).
-		Add("Tasks", tasks)
+		Set("Args", args).
+		Set("Tasks", tasks)
 	return ctx.Render("task/list", m)
 }
 
@@ -52,7 +52,7 @@ func taskDetail(ctx web.Context) error {
 		return err
 	}
 
-	m := newModel(ctx).Add("Task", task)
+	m := newModel(ctx).Set("Task", task)
 	return ctx.Render("task/detail", m)
 }
 
@@ -68,6 +68,6 @@ func taskRaw(ctx web.Context) error {
 		return err
 	}
 
-	m := newModel(ctx).Add("Task", task).Add("Raw", j)
+	m := newModel(ctx).Set("Task", task).Set("Raw", j)
 	return ctx.Render("task/raw", m)
 }

@@ -165,7 +165,7 @@ func StackRemove(name string) error {
 		}
 
 		if len(errs) > 0 {
-			return errors.Multi(errs...)
+			return errors.List(errs...)
 		}
 		return nil
 	})
@@ -264,7 +264,7 @@ func createNetworks(ctx context.Context, cli *client.Client, namespace compose.N
 
 		mgr.Logger().Infof("Creating network %s", name)
 		if _, err = cli.NetworkCreate(ctx, name, createOpts); err != nil {
-			return errors.Wrap("failed to create network "+internalName, err)
+			return errors.Wrap(err, "failed to create network "+internalName)
 		}
 	}
 	return nil
@@ -277,12 +277,12 @@ func createSecrets(ctx context.Context, cli *client.Client, secrets []swarm.Secr
 		case err == nil:
 			// secret already exists, then we update that
 			if err = cli.SecretUpdate(ctx, secret.ID, secret.Meta.Version, secretSpec); err != nil {
-				return errors.Wrap("failed to update secret "+secretSpec.Name, err)
+				return errors.Wrap(err, "failed to update secret "+secretSpec.Name)
 			}
 		case client.IsErrSecretNotFound(err):
 			// secret does not exist, then we create a new one.
 			if _, err = cli.SecretCreate(ctx, secretSpec); err != nil {
-				return errors.Wrap("failed to create secret "+secretSpec.Name, err)
+				return errors.Wrap(err, "failed to create secret "+secretSpec.Name)
 			}
 		default:
 			return err
@@ -298,12 +298,12 @@ func createConfigs(ctx context.Context, cli *client.Client, configs []swarm.Conf
 		case err == nil:
 			// config already exists, then we update that
 			if err = cli.ConfigUpdate(ctx, config.ID, config.Meta.Version, configSpec); err != nil {
-				errors.Wrap("failed to update config "+configSpec.Name, err)
+				errors.Wrap(err, "failed to update config "+configSpec.Name)
 			}
 		case client.IsErrConfigNotFound(err):
 			// config does not exist, then we create a new one.
 			if _, err = cli.ConfigCreate(ctx, configSpec); err != nil {
-				errors.Wrap("failed to create config "+configSpec.Name, err)
+				errors.Wrap(err, "failed to create config "+configSpec.Name)
 			}
 		default:
 			return err
@@ -377,7 +377,7 @@ func deployServices(
 				updateOpts,
 			)
 			if err != nil {
-				return errors.Wrap("failed to update service "+name, err)
+				return errors.Wrap(err, "failed to update service "+name)
 			}
 
 			for _, warning := range response.Warnings {
@@ -394,7 +394,7 @@ func deployServices(
 			//}
 
 			if _, err = cli.ServiceCreate(ctx, serviceSpec, createOpts); err != nil {
-				return errors.Wrap("failed to create service "+name, err)
+				return errors.Wrap(err, "failed to create service "+name)
 			}
 		}
 	}

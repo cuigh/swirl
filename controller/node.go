@@ -35,7 +35,7 @@ func nodeList(ctx web.Context) error {
 		return err
 	}
 
-	m := newModel(ctx).Add("Nodes", nodes)
+	m := newModel(ctx).Set("Nodes", nodes)
 	return ctx.Render("node/list", m)
 }
 
@@ -57,7 +57,7 @@ func nodeDetail(ctx web.Context) error {
 		return err
 	}
 
-	m := newModel(ctx).Add("Node", node).Add("Tasks", tasks)
+	m := newModel(ctx).Set("Node", node).Set("Tasks", tasks)
 	return ctx.Render("node/detail", m)
 }
 
@@ -73,7 +73,7 @@ func nodeRaw(ctx web.Context) error {
 		return err
 	}
 
-	m := newModel(ctx).Add("ID", id).Add("Node", node).Add("Raw", j)
+	m := newModel(ctx).Set("ID", id).Set("Node", node).Set("Raw", j)
 	return ctx.Render("node/raw", m)
 }
 
@@ -84,7 +84,7 @@ func nodeEdit(ctx web.Context) error {
 		return err
 	}
 
-	m := newModel(ctx).Add("Node", node)
+	m := newModel(ctx).Set("Node", node)
 	return ctx.Render("node/edit", m)
 }
 

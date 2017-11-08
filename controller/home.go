@@ -39,22 +39,22 @@ func homeIndex(ctx web.Context) (err error) {
 	if count, err = docker.NodeCount(); err != nil {
 		return
 	}
-	m.Add("NodeCount", count)
+	m.Set("NodeCount", count)
 
 	if count, err = docker.NetworkCount(); err != nil {
 		return
 	}
-	m.Add("NetworkCount", count)
+	m.Set("NetworkCount", count)
 
 	if count, err = docker.ServiceCount(); err != nil {
 		return
 	}
-	m.Add("ServiceCount", count)
+	m.Set("ServiceCount", count)
 
 	if count, err = docker.StackCount(); err != nil {
 		return
 	}
-	m.Add("StackCount", count)
+	m.Set("StackCount", count)
 
 	return ctx.Render("index", m)
 }

@@ -30,7 +30,7 @@ func registryList(ctx web.Context) error {
 		return err
 	}
 
-	m := newModel(ctx).Add("Registries", registries)
+	m := newModel(ctx).Set("Registries", registries)
 	return ctx.Render("registry/list", m)
 }
 

@@ -11,8 +11,8 @@ import (
 	"github.com/cuigh/auxo/app/flag"
 	"github.com/cuigh/auxo/config"
 	"github.com/cuigh/auxo/net/web"
-	"github.com/cuigh/auxo/net/web/auth"
-	"github.com/cuigh/auxo/net/web/middleware"
+	"github.com/cuigh/auxo/net/web/filter"
+	"github.com/cuigh/auxo/net/web/filter/auth"
 	"github.com/cuigh/auxo/net/web/renderer/jet"
 	"github.com/cuigh/swirl/biz"
 	"github.com/cuigh/swirl/controller"
@@ -23,7 +23,7 @@ func main() {
 	misc.BindOptions()
 
 	app.Name = "Swirl"
-	app.Version = "0.6"
+	app.Version = "0.6.1"
 	app.Desc = "A web management UI for Docker, focused on swarm cluster"
 	app.Action = func(ctx *app.Context) {
 		misc.LoadOptions()
@@ -49,7 +49,7 @@ func server() *web.Server {
 
 	ws := web.Auto()
 
-	// set render/validator..
+	// set render
 	ws.Renderer = jet.New().SetDebug(config.GetBool("debug")).
 		AddFunc("time", misc.FormatTime(setting.TimeZone.Offset)).
 		AddFunc("i18n", misc.Message(setting.Language)).
@@ -57,17 +57,20 @@ func server() *web.Server {
 		AddVariable("language", setting.Language).
 		AddVariable("version", app.Version).
 		AddVariable("go_version", runtime.Version())
-	//ws.Validator = valid.New()
 
 	// register global filters
-	ws.Filter(middleware.Recover())
+	ws.Use(filter.NewRecover())
 
 	// register static handlers
-	ws.Static("", filepath.Join(filepath.Dir(app.GetPath()), "assets"))
+	ws.Static("/assets", filepath.Join(filepath.Dir(app.GetPath()), "assets"))
 
 	// create biz group
-	form := auth.NewForm(biz.User.Identify, &auth.FormConfig{Timeout: time.Minute * 30, SlidingExpiration: true})
-	g := ws.Group("", form.Middleware, middleware.Authorize(biz.User.Authorize))
+	form := &auth.Form{
+		Identifier:        biz.User.Identify,
+		Timeout:           time.Minute * 30,
+		SlidingExpiration: true,
+	}
+	g := ws.Group("", form, filter.NewAuthorizer(biz.User.Authorize))
 
 	// register auth handlers
 	g.Post("/login", form.LoginJSON(biz.User.Login)).SetAuthorize(web.AuthAnonymous)

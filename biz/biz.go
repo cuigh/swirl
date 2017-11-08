@@ -8,7 +8,7 @@ import (
 func do(fn func(d dao.Interface)) {
 	d, err := dao.Get()
 	if err != nil {
-		panic(errors.Wrap("failed to load storage engine", err))
+		panic(errors.Wrap(err, "failed to load storage engine"))
 	}
 
 	fn(d)

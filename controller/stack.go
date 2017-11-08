@@ -44,7 +44,7 @@ func stackTaskList(ctx web.Context) error {
 		return err
 	}
 
-	m := newModel(ctx).Add("Stacks", stacks)
+	m := newModel(ctx).Set("Stacks", stacks)
 	return ctx.Render("stack/task/list", m)
 }
 
@@ -74,8 +74,8 @@ func stackArchiveList(ctx web.Context) error {
 	}
 
 	m := newPagerModel(ctx, totalCount, model.PageSize, args.PageIndex).
-		Add("Name", args.Name).
-		Add("Archives", archives)
+		Set("Name", args.Name).
+		Set("Archives", archives)
 	return ctx.Render("stack/archive/list", m)
 }
 
@@ -89,7 +89,7 @@ func stackArchiveDetail(ctx web.Context) error {
 		return web.ErrNotFound
 	}
 
-	m := newModel(ctx).Add("Archive", archive)
+	m := newModel(ctx).Set("Archive", archive)
 	return ctx.Render("stack/archive/detail", m)
 }
 
@@ -103,7 +103,7 @@ func stackArchiveEdit(ctx web.Context) error {
 		return web.ErrNotFound
 	}
 
-	m := newModel(ctx).Add("Archive", archive)
+	m := newModel(ctx).Set("Archive", archive)
 	return ctx.Render("stack/archive/edit", m)
 }
 

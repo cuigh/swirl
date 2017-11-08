@@ -6,7 +6,6 @@ import (
 	"math"
 	"sort"
 
-	"github.com/cuigh/auxo/util/choose"
 	"github.com/cuigh/swirl/misc"
 	"github.com/cuigh/swirl/model"
 	"github.com/docker/docker/api/types"
@@ -57,7 +56,11 @@ func TaskList(args *model.TaskListArgs) (infos []*model.TaskInfo, totalCount int
 			for _, t := range tasks {
 				if _, ok := nodes[t.NodeID]; !ok {
 					if n, _, e := cli.NodeInspectWithRaw(ctx, t.NodeID); e == nil {
-						nodes[t.NodeID] = choose.String(n.Spec.Name == "", n.Description.Hostname, n.Spec.Name)
+						if n.Spec.Name == "" {
+							nodes[t.NodeID] = n.Description.Hostname
+						} else {
+							nodes[t.NodeID] = n.Spec.Name
+						}
 					} else {
 						nodes[t.NodeID] = ""
 					}

@@ -44,8 +44,8 @@ func volumeList(ctx web.Context) error {
 	}
 
 	m := newPagerModel(ctx, totalCount, model.PageSize, page).
-		//Add("Name", name).
-		Add("Volumes", volumes)
+		//Set("Name", name).
+		Set("Volumes", volumes)
 	return ctx.Render("volume/list", m)
 }
 
@@ -93,7 +93,7 @@ func volumeDetail(ctx web.Context) error {
 	if err != nil {
 		return err
 	}
-	m := newModel(ctx).Add("Volume", volume)
+	m := newModel(ctx).Set("Volume", volume)
 	return ctx.Render("volume/detail", m)
 }
 
@@ -109,6 +109,6 @@ func volumeRaw(ctx web.Context) error {
 		return err
 	}
 
-	m := newModel(ctx).Add("Volume", name).Add("Raw", j)
+	m := newModel(ctx).Set("Volume", name).Set("Raw", j)
 	return ctx.Render("volume/raw", m)
 }

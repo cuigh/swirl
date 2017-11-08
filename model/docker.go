@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/cuigh/auxo/data/size"
+	"github.com/cuigh/auxo/byte/size"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/api/types/swarm"
@@ -487,12 +487,12 @@ type ConfigUpdateInfo struct {
 }
 
 type TaskListArgs struct {
-	Service   string `query:"service"`
-	Node      string `query:"node"`
-	Name      string `query:"name"`
-	State     string `query:"state"`
-	PageIndex int    `query:"page"`
-	PageSize  int    `query:"size"`
+	Service   string `bind:"service"`
+	Node      string `bind:"node"`
+	Name      string `bind:"name"`
+	State     string `bind:"state"`
+	PageIndex int    `bind:"page"`
+	PageSize  int    `bind:"size"`
 }
 
 type TaskInfo struct {
@@ -594,10 +594,10 @@ func NewImageListInfo(image types.ImageSummary) *ImageListInfo {
 
 type ContainerListArgs struct {
 	// created|restarting|running|removing|paused|exited|dead
-	Filter    string `query:"filter"`
-	Name      string `query:"name"`
-	PageIndex int    `query:"page"`
-	PageSize  int    `query:"size"`
+	Filter    string `bind:"filter"`
+	Name      string `bind:"name"`
+	PageIndex int    `bind:"page"`
+	PageSize  int    `bind:"size"`
 }
 
 type ContainerListInfo struct {

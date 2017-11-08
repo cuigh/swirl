@@ -40,8 +40,8 @@ func secretList(ctx web.Context) error {
 	}
 
 	m := newPagerModel(ctx, totalCount, model.PageSize, page).
-		Add("Name", name).
-		Add("Secrets", secrets)
+		Set("Name", name).
+		Set("Secrets", secrets)
 	return ctx.Render("secret/list", m)
 }
 
@@ -82,7 +82,7 @@ func secretEdit(ctx web.Context) error {
 	if err != nil {
 		return err
 	}
-	m := newModel(ctx).Add("Secret", secret)
+	m := newModel(ctx).Set("Secret", secret)
 	return ctx.Render("secret/edit", m)
 }
 

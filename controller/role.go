@@ -37,12 +37,12 @@ func roleIndex(ctx web.Context) error {
 		return err
 	}
 
-	m := newModel(ctx).Add("Roles", roles)
+	m := newModel(ctx).Set("Roles", roles)
 	return ctx.Render("system/role/list", m)
 }
 
 func roleNew(ctx web.Context) error {
-	m := newModel(ctx).Add("Perms", misc.Perms)
+	m := newModel(ctx).Set("Perms", misc.Perms)
 	return ctx.Render("system/role/new", m)
 }
 
@@ -75,7 +75,7 @@ func roleDetail(ctx web.Context) error {
 	for _, p := range role.Perms {
 		perms[p] = model.Placeholder
 	}
-	m := newModel(ctx).Add("Role", role).Add("Perms", misc.Perms).Add("CheckedPerms", perms)
+	m := newModel(ctx).Set("Role", role).Set("Perms", misc.Perms).Set("CheckedPerms", perms)
 	return ctx.Render("system/role/detail", m)
 }
 
@@ -93,7 +93,7 @@ func roleEdit(ctx web.Context) error {
 	for _, p := range role.Perms {
 		perms[p] = model.Placeholder
 	}
-	m := newModel(ctx).Add("Role", role).Add("Perms", misc.Perms).Add("CheckedPerms", perms)
+	m := newModel(ctx).Set("Role", role).Set("Perms", misc.Perms).Set("CheckedPerms", perms)
 	return ctx.Render("system/role/edit", m)
 }
 

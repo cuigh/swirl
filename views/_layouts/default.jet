@@ -6,9 +6,9 @@
     <meta name="keywords" content="swirl,docker,moby,swarm,docker-compose,docker-ui,docker-web-management">
     <meta name="description" content="{{ i18n("description") }}">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="/lyicon/css/lyicon.css">
-    <link rel="stylesheet" href="/bulma/bulma.css?v=0.5.3">
-    <link rel="stylesheet" href="/swirl/css/swirl.css?v={{ version }}">
+    <link rel="stylesheet" href="/assets/lyicon/css/lyicon.css">
+    <link rel="stylesheet" href="/assets/bulma/bulma.css?v=0.5.3">
+    <link rel="stylesheet" href="/assets/swirl/css/swirl.css?v={{ version }}">
     {{ block style() }}{{end}}
   </head>
   <body>
@@ -16,7 +16,7 @@
       <nav class="navbar">
         <div class="navbar-brand">
           <a class="navbar-item" href="/">
-            <img src="/swirl/img/logo.png" alt="logo" height="28">
+            <img src="/assets/swirl/img/logo.png" alt="logo" height="28">
           </a>
           <div class="navbar-burger" data-target="menu-top">
             <span></span>
@@ -99,8 +99,8 @@
         </div>
       </div>
     </footer>
-    <script src="/jquery/jquery-3.2.1.min.js"></script>
-    <script src="/swirl/js/swirl.js?v={{ version }}"></script>
+    <script src="/assets/jquery/jquery-3.2.1.min.js"></script>
+    <script src="/assets/swirl/js/swirl.js?v={{ version }}"></script>
     {{ block script() }}{{end}}
   </body>
 </html>

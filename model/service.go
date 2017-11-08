@@ -13,9 +13,9 @@ type Archive struct {
 }
 
 type ArchiveListArgs struct {
-	Name      string `query:"name"`
-	PageIndex int    `query:"page"`
-	PageSize  int    `query:"size"`
+	Name      string `bind:"name"`
+	PageIndex int    `bind:"page"`
+	PageSize  int    `bind:"size"`
 }
 
 type Template struct {
@@ -29,7 +29,7 @@ type Template struct {
 }
 
 type TemplateListArgs struct {
-	Name      string `query:"name"`
-	PageIndex int    `query:"page"`
-	PageSize  int    `query:"size"`
+	Name      string `bind:"name"`
+	PageIndex int    `bind:"page"`
+	PageSize  int    `bind:"size"`
 }

@@ -35,6 +35,6 @@ func eventList(ctx web.Context) error {
 	}
 
 	m := newPagerModel(ctx, totalCount, model.PageSize, args.PageIndex).
-		Add("Events", events).Add("Args", args)
+		Set("Events", events).Set("Args", args)
 	return ctx.Render("system/event/list", m)
 }

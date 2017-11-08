@@ -8,7 +8,6 @@ import (
 type EventType string
 
 const (
-	// swarm
 	EventTypeRegistry        EventType = "Registry"
 	EventTypeNode            EventType = "Node"
 	EventTypeNetwork         EventType = "Network"
@@ -19,10 +18,8 @@ const (
 	EventTypeSecret          EventType = "Secret"
 	EventTypeConfig          EventType = "Config"
 
-	// local
 	EventTypeVolume EventType = "Volume"
 
-	// system
 	EventTypeAuthentication EventType = "Authentication"
 	EventTypeRole           EventType = "Role"
 	EventTypeUser           EventType = "User"
@@ -32,8 +29,8 @@ const (
 type EventAction string
 
 const (
-	EventActionLogin      EventAction = "Login"
-	EventActionLogout     EventAction = "Logout"
+	EventActionLogin EventAction = "Login"
+	//EventActionLogout     EventAction = "Logout"
 	EventActionCreate     EventAction = "Create"
 	EventActionDelete     EventAction = "Delete"
 	EventActionUpdate     EventAction = "Update"
@@ -78,8 +75,8 @@ func (e *Event) URL(et EventType, code string) string {
 }
 
 type EventListArgs struct {
-	Type      string `query:"type"`
-	Name      string `query:"name"`
-	PageIndex int    `query:"page"`
-	PageSize  int    `query:"size"`
+	Type      string `bind:"type"`
+	Name      string `bind:"name"`
+	PageIndex int    `bind:"page"`
+	PageSize  int    `bind:"size"`
 }

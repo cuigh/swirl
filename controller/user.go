@@ -52,9 +52,9 @@ func userIndex(ctx web.Context) error {
 	}
 
 	m := newPagerModel(ctx, totalCount, model.PageSize, args.PageIndex).
-		Add("Query", args.Query).
-		Add("Filter", args.Filter).
-		Add("Users", users)
+		Set("Query", args.Query).
+		Set("Filter", args.Filter).
+		Set("Users", users)
 	return ctx.Render("system/user/list", m)
 }
 
@@ -64,7 +64,7 @@ func userNew(ctx web.Context) error {
 		return err
 	}
 
-	m := newModel(ctx).Add("Roles", roles)
+	m := newModel(ctx).Set("Roles", roles)
 	return ctx.Render("system/user/new", m)
 }
 
@@ -106,7 +106,7 @@ func userDetail(ctx web.Context) error {
 		}
 	}
 
-	m := newModel(ctx).Add("User", user).Add("Roles", roles)
+	m := newModel(ctx).Set("User", user).Set("Roles", roles)
 	return ctx.Render("system/user/detail", m)
 }
 
@@ -129,7 +129,7 @@ func userEdit(ctx web.Context) error {
 	for _, id := range user.Roles {
 		userRoles[id] = model.Placeholder
 	}
-	m := newModel(ctx).Add("User", user).Add("Roles", roles).Add("UserRoles", userRoles)
+	m := newModel(ctx).Set("User", user).Set("Roles", roles).Set("UserRoles", userRoles)
 	return ctx.Render("system/user/edit", m)
 }
 

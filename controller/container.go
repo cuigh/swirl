@@ -47,9 +47,9 @@ func containerList(ctx web.Context) error {
 	}
 
 	m := newPagerModel(ctx, totalCount, model.PageSize, args.PageIndex).
-		Add("Name", args.Name).
-		Add("Filter", args.Filter).
-		Add("Containers", containers)
+		Set("Name", args.Name).
+		Set("Filter", args.Filter).
+		Set("Containers", containers)
 	return ctx.Render("container/list", m)
 }
 
@@ -60,7 +60,7 @@ func containerDetail(ctx web.Context) error {
 		return err
 	}
 
-	m := newModel(ctx).Add("Container", container)
+	m := newModel(ctx).Set("Container", container)
 	return ctx.Render("container/detail", m)
 }
 
@@ -76,7 +76,7 @@ func containerRaw(ctx web.Context) error {
 		return err
 	}
 
-	m := newModel(ctx).Add("Container", container).Add("Raw", j)
+	m := newModel(ctx).Set("Container", container).Set("Raw", j)
 	return ctx.Render("container/raw", m)
 }
 
@@ -94,8 +94,8 @@ func containerLogs(ctx web.Context) error {
 		return err
 	}
 
-	m := newModel(ctx).Add("Container", container).Add("Line", line).Add("Timestamps", timestamps).
-		Add("Stdout", stdout.String()).Add("Stderr", stderr.String())
+	m := newModel(ctx).Set("Container", container).Set("Line", line).Set("Timestamps", timestamps).
+		Set("Stdout", stdout.String()).Set("Stderr", stderr.String())
 	return ctx.Render("container/logs", m)
 }
 

@@ -30,7 +30,7 @@ func profileIndex(ctx web.Context) error {
 		return err
 	}
 
-	m := newModel(ctx).Add("User", user)
+	m := newModel(ctx).Set("User", user)
 	return ctx.Render("profile/index", m)
 }
 

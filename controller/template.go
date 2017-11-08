@@ -3,7 +3,7 @@ package controller
 import (
 	"encoding/json"
 
-	"github.com/cuigh/auxo/data/set"
+	"github.com/cuigh/auxo/data"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/biz"
 	"github.com/cuigh/swirl/biz/docker"
@@ -49,8 +49,8 @@ func templateList(ctx web.Context) error {
 	}
 
 	m := newPagerModel(ctx, totalCount, model.PageSize, args.PageIndex).
-		Add("Name", args.Name).
-		Add("Templates", tpls)
+		Set("Name", args.Name).
+		Set("Templates", tpls)
 	return ctx.Render("service/template/list", m)
 }
 
@@ -72,9 +72,9 @@ func templateNew(ctx web.Context) error {
 	if err != nil {
 		return err
 	}
-	m := newModel(ctx).Add("Action", "New").Add("Service", service).Add("Registries", registries).
-		Add("Networks", networks).Add("CheckedNetworks", set.Set{}).
-		Add("Secrets", secrets).Add("Configs", configs)
+	m := newModel(ctx).Set("Action", "New").Set("Service", service).Set("Registries", registries).
+		Set("Networks", networks).Set("CheckedNetworks", data.Set{}).
+		Set("Secrets", secrets).Set("Configs", configs)
 	return ctx.Render("service/template/edit", m)
 }
 
@@ -140,11 +140,13 @@ func templateEdit(ctx web.Context) error {
 	if err != nil {
 		return err
 	}
-	checkedNetworks := set.FromSlice(service.Networks, func(i int) interface{} { return service.Networks[i] })
 
-	m := newModel(ctx).Add("Action", "Edit").Add("Service", service).Add("Registries", registries).
-		Add("Networks", networks).Add("CheckedNetworks", checkedNetworks).
-		Add("Secrets", secrets).Add("Configs", configs)
+	checkedNetworks := data.NewSet()
+	checkedNetworks.AddSlice(service.Networks, func(i int) interface{} { return service.Networks[i] })
+
+	m := newModel(ctx).Set("Action", "Edit").Set("Service", service).Set("Registries", registries).
+		Set("Networks", networks).Set("CheckedNetworks", checkedNetworks).
+		Set("Secrets", secrets).Set("Configs", configs)
 	return ctx.Render("service/template/edit", m)
 }
 

@@ -38,7 +38,7 @@ func networkList(ctx web.Context) error {
 		return err
 	}
 
-	m := newModel(ctx).Add("Networks", networks)
+	m := newModel(ctx).Set("Networks", networks)
 	return ctx.Render("network/list", m)
 }
 
@@ -85,7 +85,7 @@ func networkDetail(ctx web.Context) error {
 	if err != nil {
 		return err
 	}
-	m := newModel(ctx).Add("Network", network)
+	m := newModel(ctx).Set("Network", network)
 	return ctx.Render("network/detail", m)
 }
 
@@ -101,6 +101,6 @@ func networkRaw(ctx web.Context) error {
 		return err
 	}
 
-	m := newModel(ctx).Add("Network", name).Add("Raw", j)
+	m := newModel(ctx).Set("Network", name).Set("Raw", j)
 	return ctx.Render("network/raw", m)
 }
