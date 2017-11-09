@@ -45,7 +45,12 @@ func profileModifyInfo(ctx web.Context) error {
 }
 
 func profilePassword(ctx web.Context) error {
-	m := newModel(ctx)
+	user, err := biz.User.GetByID(ctx.User().ID())
+	if err != nil {
+		return err
+	}
+
+	m := newModel(ctx).Set("User", user)
 	return ctx.Render("profile/password", m)
 }
 

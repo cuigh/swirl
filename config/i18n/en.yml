@@ -169,3 +169,4 @@ profile.description: User profiles.
 profile.field.password.current: Current password
 profile.field.password.new: New password
 profile.field.password.confirm: Password confirmation
+profile.password.warning: You are a LDAP user, can not modify password here.

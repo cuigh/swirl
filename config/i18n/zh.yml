@@ -169,3 +169,4 @@ profile.description: 用户个人信息。
 profile.field.password.current: 当前密码
 profile.field.password.new: 新密码
 profile.field.password.confirm: 新密码确认
+profile.password.warning: 你是 LDAP 认证用户，不支持在这里修改密码。
