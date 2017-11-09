@@ -301,6 +301,9 @@ func ServiceUpdate(info *model.ServiceInfo) error {
 			}
 		}
 
+		// DNS
+		spec.TaskTemplate.ContainerSpec.DNSConfig = info.GetDNSConfig()
+
 		options := types.ServiceUpdateOptions{
 			RegistryAuthFrom: types.RegistryAuthFromSpec,
 			QueryRegistry:    false,
@@ -503,6 +506,9 @@ func ServiceCreate(info *model.ServiceInfo) error {
 				Options: info.LogDriver.Options.ToMap(),
 			}
 		}
+
+		// DNS
+		service.TaskTemplate.ContainerSpec.DNSConfig = info.GetDNSConfig()
 
 		opts := types.ServiceCreateOptions{EncodedRegistryAuth: info.RegistryAuth}
 		var resp types.ServiceCreateResponse

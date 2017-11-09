@@ -15,6 +15,7 @@ var Funcs = map[string]interface{}{
 	//"time": func(t time.Time) string {
 	//	return t.Local().Format("2006-01-02 15:04:05")
 	//},
+	"join": strings.Join,
 	"eq": func(v1, v2 interface{}) bool {
 		return fmt.Sprint(v1) == fmt.Sprint(v2)
 	},

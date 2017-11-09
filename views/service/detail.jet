@@ -178,6 +178,11 @@
             <span>Log driver</span>
           </a>
         </li>
+        <li>
+          <a>
+            <span>DNS</span>
+          </a>
+        </li>
       </ul>
     </div>
     <div id="tab-content" class="tabs-content has-no-top-border">
@@ -408,6 +413,24 @@
           </dd>
         </dl>
         {{end}}
+      </div>
+      <div style="display: none">
+        {{ if .Service.Spec.TaskTemplate.ContainerSpec.DNSConfig }}
+        <dl class="is-horizontal is-marginless">
+          {{ if .Service.Spec.TaskTemplate.ContainerSpec.DNSConfig.Nameservers }}
+          <dt class="has-text-left">Name servers</dt>
+          <dd>{{ join(.Service.Spec.TaskTemplate.ContainerSpec.DNSConfig.Nameservers, ",") }}</dd>
+          {{ end }}
+          {{ if .Service.Spec.TaskTemplate.ContainerSpec.DNSConfig.Search }}
+          <dt class="has-text-left">Search</dt>
+          <dd>{{ join(.Service.Spec.TaskTemplate.ContainerSpec.DNSConfig.Search, ",") }}</dd>
+          {{ end }}
+          {{ if .Service.Spec.TaskTemplate.ContainerSpec.DNSConfig.Options }}
+          <dt class="has-text-left">Options</dt>
+          <dd>{{ join(.Service.Spec.TaskTemplate.ContainerSpec.DNSConfig.Options, ",") }}</dd>
+          {{ end }}
+        </dl>
+        {{ end }}
       </div>
     </div>
 

@@ -98,6 +98,11 @@
         <span>Log driver</span>
       </a>
     </li>
+    <li>
+      <a>
+        <span>DNS</span>
+      </a>
+    </li>
   </ul>
 </div>
 <div id="tab-content" class="tabs-content has-no-top-border">
@@ -524,6 +529,22 @@
     <div class="field">
       <label class="label">Options</label>
       {{ yield options_table(name="log_driver.option", items=.Service.LogDriver.Options) }}
+    </div>
+  </div>
+  <div style="display: none">
+    <div class="field">
+      <label class="label">Name servers</label>
+      <div class="control">
+        <input name="dns.nameservers" class="input" value="{{ .Service.DNS.Nameservers }}" placeholder="e.g. 10.10.10.200,10.10.10.201">
+      </div>
+    </div>
+    <div class="field">
+      <label class="label">Search</label>
+      <input name="dns.search" class="input" value="{{ .Service.DNS.Search }}" placeholder="e.g. xxx.com,yyy.net">
+    </div>
+    <div class="field">
+      <label class="label">Options</label>
+      <input name="dns.options" class="input" value="{{ .Service.DNS.Options }}" placeholder="">
     </div>
   </div>
 </div>

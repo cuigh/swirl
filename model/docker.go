@@ -213,6 +213,11 @@ type ServiceInfo struct {
 		Limit   ResourceInfo `json:"limit"`
 		Reserve ResourceInfo `json:"reserve"`
 	} `json:"resource"`
+	DNS struct {
+		Nameservers string `json:"nameservers,omitempty"`
+		Search      string `json:"search,omitempty"`
+		Options     string `json:"options,omitempty"`
+	} `json:"dns"`
 }
 
 func NewServiceInfo(service swarm.Service) *ServiceInfo {
@@ -318,11 +323,35 @@ func NewServiceInfo(service swarm.Service) *ServiceInfo {
 		config := NewConfigInfo(c)
 		si.Configs = append(si.Configs, config)
 	}
+	if dns := spec.TaskTemplate.ContainerSpec.DNSConfig; dns != nil {
+		si.DNS.Nameservers = strings.Join(dns.Nameservers, ",")
+		si.DNS.Search = strings.Join(dns.Search, ",")
+		si.DNS.Options = strings.Join(dns.Options, ",")
+	}
 	return si
 }
 
+// TODO: finish this method
 func (si *ServiceInfo) ToServiceSpec() swarm.ServiceSpec {
 	return swarm.ServiceSpec{}
+}
+
+func (si *ServiceInfo) GetDNSConfig() *swarm.DNSConfig {
+	if si.DNS.Nameservers == "" && si.DNS.Search == "" && si.DNS.Options == "" {
+		return nil
+	}
+
+	c := &swarm.DNSConfig{}
+	if si.DNS.Nameservers != "" {
+		c.Nameservers = strings.Split(si.DNS.Nameservers, ",")
+	}
+	if si.DNS.Search != "" {
+		c.Search = strings.Split(si.DNS.Search, ",")
+	}
+	if si.DNS.Options != "" {
+		c.Options = strings.Split(si.DNS.Options, ",")
+	}
+	return c
 }
 
 type EndpointPort struct {
