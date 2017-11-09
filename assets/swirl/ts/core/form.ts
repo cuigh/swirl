@@ -77,7 +77,7 @@ namespace Swirl.Core {
          * Submit form by AJAX
          *
          * @param {string} url submit url
-         * @returns {Mtime.Net.AjaxPostRequest}
+         * @returns {Swirl.Core.AjaxPostRequest}
          *
          * @memberOf Form
          */

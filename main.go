@@ -29,7 +29,7 @@ func main() {
 		misc.LoadOptions()
 		app.Run(server())
 	}
-	app.Register(flag.All)
+	app.Flags.Register(flag.All)
 	app.Start()
 }
 

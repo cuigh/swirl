@@ -9,7 +9,7 @@
 {{ end }}
 
 {{ block radio(id, name, value, label, checked, disabled=false) }}
-<input id="{{id ? id : (name + "-" + value)}}" name="{{name}}" value="{{value}}" type="radio" class="is-radio"{{if checked == value}} checked{{end}}{{if disabled}} disabled{{end}}{{yield content}}>
+<input id="{{id ? id : (name + "-" + value)}}" name="{{name}}" value="{{value}}" type="radio" class="is-radio"{{if eq(checked, value)}} checked{{end}}{{if disabled}} disabled{{end}}{{yield content}}>
 <label for="{{id ? id : (name + "-" + value)}}">{{label}}</label>
 {{ end }}
 

@@ -14,6 +14,7 @@ var Setting = &settingBiz{}
 type settingBiz struct {
 }
 
+// Get returns settings of swirl. If not found, default settings will be returned.
 func (b *settingBiz) Get() (setting *model.Setting, err error) {
 	do(func(d dao.Interface) {
 		setting, err = d.SettingGet()

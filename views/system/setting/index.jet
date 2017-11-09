@@ -67,6 +67,68 @@
         </div>
         <div class="field is-horizontal">
           <div class="field-label is-normal">
+            <label class="label">Security</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              <div class="control">
+                {{ yield radio(id="ldap.security-none", name="ldap.security", value="0", label="None", checked=.Setting.LDAP.Security) content}} data-type="integer"{{end}}
+                {{ yield radio(id="ldap.security-tls", name="ldap.security", value="1", label="TLS", disabled=true) content}} data-type="integer"{{end}}
+                {{ yield radio(id="ldap.security-starttls", name="ldap.security", value="2", label="StartTLS", disabled=true) content}} data-type="integer"{{end}}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">Authentication</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              <div class="control">
+                {{ yield radio(id="ldap-auth-simple", name="ldap.auth", value="0", label="Simple", checked=.Setting.LDAP.Authentication) content}} data-type="integer"{{end}}
+                {{ yield radio(id="ldap-auth-bind", name="ldap.auth", value="1", label="Bind", checked=.Setting.LDAP.Authentication, disabled=true) content}} data-type="integer"{{end}}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="div-auth-simple" class="field is-horizontal"{{ if .Setting.LDAP.Authentication == 1 }} style="display: none" {{ end }}>
+          <div class="field-label is-normal">
+            <label class="label">User DN</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              <div class="control">
+                <input name="ldap.user_dn" value="{{ .Setting.LDAP.UserDN }}" class="input" type="text" placeholder="e.g. cn=%s,dc=xxx,dc=com">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="div-auth-bind" class="field is-horizontal"{{ if .Setting.LDAP.Authentication == 0 }} style="display: none" {{ end }}>
+          <div class="field-label is-normal">
+            <label class="label">Bind</label>
+          </div>
+          <div class="field-body">
+            <div class="field has-addons">
+              <p class="control">
+                <a class="button is-static">DN</a>
+              </p>
+              <div class="control is-expanded">
+                <input name="ldap.bind_dn" value="{{ .Setting.LDAP.BindDN }}" class="input" type="text" placeholder="e.g. cn=search,dc=xxx,dc=com">
+              </div>
+            </div>
+            <div class="field has-addons">
+              <p class="control">
+                <a class="button is-static">Password</a>
+              </p>
+              <div class="control is-expanded">
+                <input name="ldap.bind_pwd" value="{{ .Setting.LDAP.BindPassword }}" class="input" type="password" autocomplete="new-password" placeholder="Bind DN password">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
             <label class="label">Base DN</label>
           </div>
           <div class="field-body">
@@ -79,23 +141,35 @@
         </div>
         <div class="field is-horizontal">
           <div class="field-label is-normal">
-            <label class="label">Username attribute</label>
+            <label class="label">User filter</label>
           </div>
           <div class="field-body">
             <div class="field">
               <div class="control">
-                <input name="ldap.name_attr" value="{{ .Setting.LDAP.NameAttr }}" class="input" type="text" placeholder="e.g. displayName">
+                <input name="ldap.user_filter" value="{{ .Setting.LDAP.UserFilter }}" class="input" type="text" placeholder="e.g. (&(objectClass=organizationalPerson)(sAMAccountName=%s))">
               </div>
             </div>
           </div>
         </div>
+
         <div class="field is-horizontal">
           <div class="field-label is-normal">
-            <label class="label">Email attribute</label>
+            <label class="label">Attributes</label>
           </div>
           <div class="field-body">
-            <div class="field">
-              <div class="control">
+            <div class="field has-addons">
+              <p class="control">
+                <a class="button is-static">Username</a>
+              </p>
+              <div class="control is-expanded">
+                <input name="ldap.name_attr" value="{{ .Setting.LDAP.NameAttr }}" class="input" type="text" placeholder="e.g. displayName">
+              </div>
+            </div>
+            <div class="field has-addons">
+              <p class="control">
+                <a class="button is-static">Email</a>
+              </p>
+              <div class="control is-expanded">
                 <input name="ldap.email_attr" value="{{ .Setting.LDAP.EmailAttr }}" class="input" type="text" placeholder="e.g. mail">
               </div>
             </div>

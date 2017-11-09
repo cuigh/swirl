@@ -193,6 +193,7 @@ func (b *userBiz) loginInternal(user *model.User, pwd string) error {
 	return nil
 }
 
+// TODO: support tls and bind auth
 func (b *userBiz) loginLDAP(d dao.Interface, user *model.User, pwd string) error {
 	setting, err := Setting.Get()
 	if err != nil {
@@ -210,7 +211,9 @@ func (b *userBiz) loginLDAP(d dao.Interface, user *model.User, pwd string) error
 	defer l.Close()
 
 	// bind
-	err = l.Bind(user.LoginName, pwd)
+	//err = l.Bind(user.LoginName, pwd)
+	//err = l.Bind(setting.LDAP.BindDN, setting.LDAP.BindPassword)	// bind auth
+	err = l.Bind(fmt.Sprintf(setting.LDAP.UserDN, user.LoginName), pwd) // simple auth
 	if err != nil {
 		log.Get("user").Error("Login by LDAP failed: ", err)
 		return ErrIncorrectAuth
@@ -224,7 +227,7 @@ func (b *userBiz) loginLDAP(d dao.Interface, user *model.User, pwd string) error
 	// If user wasn't exist, we need create it
 	req := ldap.NewSearchRequest(
 		setting.LDAP.BaseDN, ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
-		fmt.Sprintf("(&(objectClass=organizationalPerson)(userPrincipalName=%s))", user.LoginName),
+		fmt.Sprintf(setting.LDAP.UserFilter, user.LoginName),
 		[]string{setting.LDAP.NameAttr, setting.LDAP.EmailAttr},
 		nil,
 	)
@@ -232,8 +235,10 @@ func (b *userBiz) loginLDAP(d dao.Interface, user *model.User, pwd string) error
 	if err != nil {
 		return err
 	}
-	if len(sr.Entries) == 0 {
+	if length := len(sr.Entries); length == 0 {
 		return ErrIncorrectAuth
+	} else if length > 1 {
+		return errors.New("Found more than one account when using LDAP authentication")
 	}
 
 	entry := sr.Entries[0]

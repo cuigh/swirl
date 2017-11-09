@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/cuigh/auxo/data"
 	"github.com/cuigh/auxo/errors"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/auxo/util/cast"
@@ -12,7 +13,6 @@ import (
 	"github.com/cuigh/swirl/biz/docker"
 	"github.com/cuigh/swirl/misc"
 	"github.com/cuigh/swirl/model"
-	"mtime.com/auxo/data/set"
 )
 
 // ServiceController is a controller of docker service
@@ -175,7 +175,11 @@ func serviceNew(ctx web.Context) error {
 	if err != nil {
 		return err
 	}
-	checkedNetworks := set.FromSlice(service.Networks, func(i int) interface{} { return service.Networks[i] })
+
+	checkedNetworks := data.NewSet()
+	checkedNetworks.AddSlice(service.Networks, func(i int) interface{} {
+		return service.Networks[i]
+	})
 
 	m := newModel(ctx).Set("Service", service).Set("Registries", registries).
 		Set("Networks", networks).Set("CheckedNetworks", checkedNetworks).
@@ -230,7 +234,8 @@ func serviceEdit(ctx web.Context) error {
 	}
 
 	stack := service.Spec.Labels["com.docker.stack.namespace"]
-	checkedNetworks := set.FromSlice(service.Endpoint.VirtualIPs, func(i int) interface{} { return service.Endpoint.VirtualIPs[i].NetworkID })
+	checkedNetworks := data.NewSet()
+	checkedNetworks.AddSlice(service.Endpoint.VirtualIPs, func(i int) interface{} { return service.Endpoint.VirtualIPs[i].NetworkID })
 
 	m := newModel(ctx).Set("Service", model.NewServiceInfo(service)).Set("Stack", stack).
 		Set("Networks", networks).Set("CheckedNetworks", checkedNetworks).

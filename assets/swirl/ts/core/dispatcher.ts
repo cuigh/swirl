@@ -12,7 +12,7 @@ namespace Swirl.Core {
         }
 
         /**
-         * 创建一个 Dispatcher 并绑定事件到页面元素上
+         * Create a Dispatcher instance
          *
          * @param elem
          * @param event
@@ -23,11 +23,11 @@ namespace Swirl.Core {
         }
 
         /**
-         * 注册动作事件
+         * Register event
          *
          * @param action
          * @param handler
-         * @returns {Mtime.Util.Dispatcher}
+         * @returns {Swirl.Core.Dispatcher}
          */
         on(action: string, handler: (e: JQueryEventObject) => any): Dispatcher {
             this.events[action] = handler;
@@ -35,10 +35,10 @@ namespace Swirl.Core {
         }
 
         /**
-         * 移除动作事件
+         * Unregister event
          *
          * @param action
-         * @returns {Mtime.Util.Dispatcher}
+         * @returns {Swirl.Core.Dispatcher}
          */
         off(action: string): Dispatcher {
             delete this.events[action];
@@ -46,11 +46,11 @@ namespace Swirl.Core {
         }
 
         /**
-         * 绑定事件到页面元素上
+         * Bind events to element
          *
          * @param elem
          * @param event
-         * @returns {Mtime.Util.Dispatcher}
+         * @returns {Swirl.Core.Dispatcher}
          */
         bind(elem: string | JQuery | Element | Document, event: string = "click"): Dispatcher {
             $(elem).on(event, this.handle.bind(this));
