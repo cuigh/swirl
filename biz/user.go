@@ -93,7 +93,7 @@ func (b *userBiz) UpdateInfo(user *model.User) (err error) {
 	return
 }
 
-func (b *userBiz) UpdatePassword(id, old_pwd, new_pwd string) (err error) {
+func (b *userBiz) UpdatePassword(id, oldPwd, newPwd string) (err error) {
 	do(func(d dao.Interface) {
 		var (
 			user      *model.User
@@ -105,12 +105,12 @@ func (b *userBiz) UpdatePassword(id, old_pwd, new_pwd string) (err error) {
 			return
 		}
 
-		if !password.Validate(user.Password, old_pwd, user.Salt) {
+		if !password.Validate(user.Password, oldPwd, user.Salt) {
 			err = errors.New("Current password is incorrect")
 			return
 		}
 
-		pwd, salt, err = password.Get(new_pwd)
+		pwd, salt, err = password.Get(newPwd)
 		if err != nil {
 			return
 		}
@@ -150,7 +150,7 @@ func (b *userBiz) Login(name, pwd string) (token string, err error) {
 				Type:      model.UserTypeLDAP,
 				LoginName: name,
 			}
-			err = b.loginLDAP(user, pwd)
+			err = b.loginLDAP(d, user, pwd)
 		} else {
 			if user.Status == model.UserStatusBlocked {
 				err = fmt.Errorf("user %s is blocked", name)
@@ -160,7 +160,7 @@ func (b *userBiz) Login(name, pwd string) (token string, err error) {
 			if user.Type == model.UserTypeInternal {
 				err = b.loginInternal(user, pwd)
 			} else {
-				err = b.loginLDAP(user, pwd)
+				err = b.loginLDAP(d, user, pwd)
 			}
 		}
 
@@ -193,7 +193,7 @@ func (b *userBiz) loginInternal(user *model.User, pwd string) error {
 	return nil
 }
 
-func (b *userBiz) loginLDAP(user *model.User, pwd string) error {
+func (b *userBiz) loginLDAP(d dao.Interface, user *model.User, pwd string) error {
 	setting, err := Setting.Get()
 	if err != nil {
 		return err
@@ -224,25 +224,22 @@ func (b *userBiz) loginLDAP(user *model.User, pwd string) error {
 	// If user wasn't exist, we need create it
 	req := ldap.NewSearchRequest(
 		setting.LDAP.BaseDN, ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
-		fmt.Sprintf("(&(objectClass=organizationalPerson)(%s=%s))", setting.LDAP.LoginAttr, user.LoginName),
-		[]string{"dn", setting.LDAP.EmailAttr, setting.LDAP.LoginAttr, setting.LDAP.NameAttr},
+		fmt.Sprintf("(&(objectClass=organizationalPerson)(userPrincipalName=%s))", user.LoginName),
+		[]string{setting.LDAP.NameAttr, setting.LDAP.EmailAttr},
 		nil,
 	)
-	searchResult, err := l.Search(req)
+	sr, err := l.Search(req)
 	if err != nil {
 		return err
 	}
-	if len(searchResult.Entries) == 0 {
+	if len(sr.Entries) == 0 {
 		return ErrIncorrectAuth
 	}
 
-	entry := searchResult.Entries[0]
+	entry := sr.Entries[0]
 	user.Email = entry.GetAttributeValue(setting.LDAP.EmailAttr)
 	user.Name = entry.GetAttributeValue(setting.LDAP.NameAttr)
-	if user.ID == "" {
-		return b.Create(user, nil)
-	}
-	return nil
+	return b.Create(user, nil)
 }
 
 // Identify authenticate user

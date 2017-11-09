@@ -79,18 +79,6 @@
         </div>
         <div class="field is-horizontal">
           <div class="field-label is-normal">
-            <label class="label">Login name attribute</label>
-          </div>
-          <div class="field-body">
-            <div class="field">
-              <div class="control">
-                <input name="ldap.login_attr" value="{{ .Setting.LDAP.LoginAttr }}" class="input" type="text" placeholder="e.g. cn">
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="field is-horizontal">
-          <div class="field-label is-normal">
             <label class="label">Username attribute</label>
           </div>
           <div class="field-body">

@@ -7,9 +7,8 @@ type Setting struct {
 		Enabled   bool   `bson:"enabled" json:"enabled,omitempty"`
 		Address   string `bson:"address" json:"address,omitempty"`
 		BaseDN    string `bson:"base_dn" json:"base_dn,omitempty"`
-		EmailAttr string `bson:"email_attr" json:"email_attr,omitempty"`
-		LoginAttr string `bson:"login_attr" json:"login_attr,omitempty"`
 		NameAttr  string `bson:"name_attr" json:"name_attr,omitempty"`
+		EmailAttr string `bson:"email_attr" json:"email_attr,omitempty"`
 	} `bson:"ldap" json:"ldap,omitempty"`
 	TimeZone struct {
 		Name   string `bson:"name" json:"name,omitempty"`     // Asia/Shanghai
