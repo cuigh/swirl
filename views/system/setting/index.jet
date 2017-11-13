@@ -112,8 +112,8 @@
             <div class="field">
               <div class="control">
                 {{ yield radio(id="ldap.security-none", name="ldap.security", value="0", label="None", checked=.Setting.LDAP.Security) content}} data-type="integer"{{end}}
-                {{ yield radio(id="ldap.security-tls", name="ldap.security", value="1", label="TLS", disabled=true) content}} data-type="integer"{{end}}
-                {{ yield radio(id="ldap.security-starttls", name="ldap.security", value="2", label="StartTLS", disabled=true) content}} data-type="integer"{{end}}
+                {{ yield radio(id="ldap.security-tls", name="ldap.security", value="1", label="TLS", checked=.Setting.LDAP.Security) content}} data-type="integer"{{end}}
+                {{ yield radio(id="ldap.security-starttls", name="ldap.security", value="2", label="StartTLS", checked=.Setting.LDAP.Security) content}} data-type="integer"{{end}}
               </div>
             </div>
           </div>

@@ -1,7 +1,9 @@
 package biz
 
 import (
+	"crypto/tls"
 	"fmt"
+	"net"
 	"time"
 
 	"github.com/cuigh/auxo/data/guid"
@@ -193,7 +195,6 @@ func (b *userBiz) loginInternal(user *model.User, pwd string) error {
 	return nil
 }
 
-// TODO: support tls
 func (b *userBiz) loginLDAP(d dao.Interface, user *model.User, pwd string) error {
 	setting, err := Setting.Get()
 	if err != nil {
@@ -204,7 +205,7 @@ func (b *userBiz) loginLDAP(d dao.Interface, user *model.User, pwd string) error
 		return ErrIncorrectAuth
 	}
 
-	l, err := ldap.Dial("tcp", setting.LDAP.Address)
+	l, err := b.ldapDial(setting)
 	if err != nil {
 		return err
 	}
@@ -231,6 +232,38 @@ func (b *userBiz) loginLDAP(d dao.Interface, user *model.User, pwd string) error
 	user.Email = entry.GetAttributeValue(setting.LDAP.EmailAttr)
 	user.Name = entry.GetAttributeValue(setting.LDAP.NameAttr)
 	return b.Create(user, nil)
+}
+
+func (b *userBiz) ldapDial(setting *model.Setting) (*ldap.Conn, error) {
+	host, _, err := net.SplitHostPort(setting.LDAP.Address)
+	if err != nil {
+		return nil, err
+	}
+
+	// TODO: support tls cert and verification
+	tc := &tls.Config{
+		ServerName:         host,
+		InsecureSkipVerify: true,
+		Certificates:       nil,
+	}
+
+	if setting.LDAP.Security == model.LDAPSecurityTLS {
+		return ldap.DialTLS("tcp", setting.LDAP.Address, tc)
+	}
+
+	conn, err := ldap.Dial("tcp", setting.LDAP.Address)
+	if err != nil {
+		return nil, err
+	}
+
+	if setting.LDAP.Security == model.LDAPSecurityStartTLS {
+		if err = conn.StartTLS(tc); err != nil {
+			conn.Close()
+			log.Get("user").Error("LDAP > Failed to switch to TLS: ", err)
+			return nil, err
+		}
+	}
+	return conn, nil
 }
 
 func (b *userBiz) ldapBind(setting *model.Setting, l *ldap.Conn, user *model.User, pwd string) (err error) {

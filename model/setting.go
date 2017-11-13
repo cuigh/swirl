@@ -2,14 +2,25 @@ package model
 
 import "time"
 
+const (
+	LDAPSecurityNone     = 0
+	LDAPSecurityTLS      = 1
+	LDAPSecurityStartTLS = 2
+)
+
+const (
+	LDAPAuthSimple = 0
+	LDAPAuthBind   = 1
+)
+
 // Setting represents the options of swirl.
 type Setting struct {
 	LDAP struct {
-		Enabled        bool   `bson:"enabled" json:"enabled,omitempty"`
-		Address        string `bson:"address" json:"address,omitempty"`
-		Security       int32  `bson:"security" json:"security,omitempty"`       // 0-None/1-TLS/2-StartTLS
-		TLSCert        string `bson:"tls_cert" json:"tls_cert,omitempty"`       // TLS cert
-		TLSVerify      bool   `bson:"tls_verify" json:"tls_verify,omitempty"`   // Verify cert
+		Enabled  bool   `bson:"enabled" json:"enabled,omitempty"`
+		Address  string `bson:"address" json:"address,omitempty"`
+		Security int32  `bson:"security" json:"security,omitempty"` // 0-None/1-TLS/2-StartTLS
+		//TLSCert        string `bson:"tls_cert" json:"tls_cert,omitempty"`       // TLS cert
+		//TLSVerify      bool   `bson:"tls_verify" json:"tls_verify,omitempty"`   // Verify cert
 		Authentication int32  `bson:"auth" json:"auth,omitempty"`               // 0-Simple/1-Bind
 		BindDN         string `bson:"bind_dn" json:"bind_dn,omitempty"`         // DN to bind with
 		BindPassword   string `bson:"bind_pwd" json:"bind_pwd,omitempty"`       // Bind DN password
