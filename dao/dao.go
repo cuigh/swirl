@@ -1,46 +1,18 @@
 package dao
 
 import (
-	"sync"
-
 	"github.com/cuigh/auxo/errors"
+	"github.com/cuigh/auxo/util/lazy"
 	"github.com/cuigh/swirl/dao/mongo"
 	"github.com/cuigh/swirl/misc"
 	"github.com/cuigh/swirl/model"
 )
 
 var (
-	iface  Interface
-	locker sync.Mutex
+	value = lazy.Value{New: create}
 )
 
-// Get return a dao instance according to DB_TYPE.
-func Get() (Interface, error) {
-	if iface == nil {
-		locker.Lock()
-		defer locker.Unlock()
-
-		if iface == nil {
-			d, err := create()
-			if err != nil {
-				return nil, err
-			}
-			iface = d
-		}
-	}
-	return iface, nil
-}
-
-func create() (d Interface, err error) {
-	switch misc.Options.DBType {
-	case "", "mongo":
-		return mongo.New(misc.Options.DBAddress)
-	default:
-		err = errors.New("Unknown database type: " + misc.Options.DBType)
-	}
-	return
-}
-
+// Interface is the interface that wraps all dao methods.
 type Interface interface {
 	RoleGet(id string) (*model.Role, error)
 	RoleList() (roles []*model.Role, err error)
@@ -86,4 +58,23 @@ type Interface interface {
 
 	SettingGet() (setting *model.Setting, err error)
 	SettingUpdate(setting *model.Setting) error
+}
+
+// Get return a dao instance according to DB_TYPE.
+func Get() (Interface, error) {
+	v, err := value.Get()
+	if err != nil {
+		return nil, err
+	}
+	return v.(Interface), nil
+}
+
+func create() (d interface{}, err error) {
+	switch misc.Options.DBType {
+	case "", "mongo":
+		return mongo.New(misc.Options.DBAddress)
+	default:
+		err = errors.New("Unknown database type: " + misc.Options.DBType)
+	}
+	return
 }

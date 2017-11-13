@@ -193,7 +193,7 @@ func (b *userBiz) loginInternal(user *model.User, pwd string) error {
 	return nil
 }
 
-// TODO: support tls and bind auth
+// TODO: support tls
 func (b *userBiz) loginLDAP(d dao.Interface, user *model.User, pwd string) error {
 	setting, err := Setting.Get()
 	if err != nil {
@@ -211,11 +211,9 @@ func (b *userBiz) loginLDAP(d dao.Interface, user *model.User, pwd string) error
 	defer l.Close()
 
 	// bind
-	//err = l.Bind(user.LoginName, pwd)
-	//err = l.Bind(setting.LDAP.BindDN, setting.LDAP.BindPassword)	// bind auth
-	err = l.Bind(fmt.Sprintf(setting.LDAP.UserDN, user.LoginName), pwd) // simple auth
+	err = b.ldapBind(setting, l, user, pwd)
 	if err != nil {
-		log.Get("user").Error("Login by LDAP failed: ", err)
+		log.Get("user").Error("LDAP > Failed to bind: ", err)
 		return ErrIncorrectAuth
 	}
 
@@ -225,26 +223,52 @@ func (b *userBiz) loginLDAP(d dao.Interface, user *model.User, pwd string) error
 	}
 
 	// If user wasn't exist, we need create it
-	req := ldap.NewSearchRequest(
-		setting.LDAP.BaseDN, ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
-		fmt.Sprintf(setting.LDAP.UserFilter, user.LoginName),
-		[]string{setting.LDAP.NameAttr, setting.LDAP.EmailAttr},
-		nil,
-	)
-	sr, err := l.Search(req)
+	entry, err := b.ldapSearchOne(setting, l, user.LoginName, setting.LDAP.NameAttr, setting.LDAP.EmailAttr)
 	if err != nil {
 		return err
 	}
-	if length := len(sr.Entries); length == 0 {
-		return ErrIncorrectAuth
-	} else if length > 1 {
-		return errors.New("Found more than one account when using LDAP authentication")
-	}
 
-	entry := sr.Entries[0]
 	user.Email = entry.GetAttributeValue(setting.LDAP.EmailAttr)
 	user.Name = entry.GetAttributeValue(setting.LDAP.NameAttr)
 	return b.Create(user, nil)
+}
+
+func (b *userBiz) ldapBind(setting *model.Setting, l *ldap.Conn, user *model.User, pwd string) (err error) {
+	if setting.LDAP.Authentication == 0 {
+		// simple auth
+		err = l.Bind(fmt.Sprintf(setting.LDAP.UserDN, user.LoginName), pwd)
+	} else {
+		// bind auth
+		err = l.Bind(setting.LDAP.BindDN, setting.LDAP.BindPassword)
+		if err == nil {
+			var entry *ldap.Entry
+			entry, err = b.ldapSearchOne(setting, l, user.LoginName, "cn")
+			if err == nil {
+				err = l.Bind(entry.DN, pwd)
+			}
+		}
+	}
+	return
+}
+
+func (b *userBiz) ldapSearchOne(setting *model.Setting, l *ldap.Conn, name string, attrs ...string) (entry *ldap.Entry, err error) {
+	filter := fmt.Sprintf(setting.LDAP.UserFilter, name)
+	req := ldap.NewSearchRequest(
+		setting.LDAP.BaseDN, ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
+		filter, attrs, nil,
+	)
+	sr, err := l.Search(req)
+	if err != nil {
+		return nil, err
+	}
+
+	if length := len(sr.Entries); length == 0 {
+		return nil, errors.New("User not found with filter: " + filter)
+	} else if length > 1 {
+		return nil, errors.New("Found more than one account when searching user with filter: " + filter)
+	}
+
+	return sr.Entries[0], nil
 }
 
 // Identify authenticate user

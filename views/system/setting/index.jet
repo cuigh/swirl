@@ -39,6 +39,45 @@
 <section class="section">
   <div class="container">
     <form method="post" data-form="ajax-json" data-message="The settings have been successfully modified">
+      <fieldset id="fs-zone">
+        <legend class="lead is-5 is-bordered">Time zone and language</legend>
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">Time zone</label>
+          </div>
+          <div class="field-body">
+            <div class="field has-addons">
+              <div class="control has-icons-left">
+                <input name="tz.name" value="{{ .Setting.TimeZone.Name }}" class="input" type="text" placeholder="Location name">
+                <div class="icon is-left">
+                  <i class="fa fa-globe"></i>
+                </div>
+              </div>
+              <div class="control">
+                <input name="tz.offset" value="{{ .Setting.TimeZone.Offset }}" class="input" type="text" placeholder="Offset in seconds" data-type="integer">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="field is-horizontal">
+          <div  class="field-label is-normal">
+            <label class="label">Language</label>
+          </div>
+          <div class="field-body">
+            <div class="control has-icons-left">
+              <div class="select">
+                <select name="lang">
+                  {{ yield option(value="en", label="English", selected=.Setting.Language) }}
+                  {{ yield option(value="zh", label="中文", selected=.Setting.Language) }}
+                </select>
+              </div>
+              <div class="icon is-left">
+                <i class="fa fa-language"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </fieldset>
       <fieldset id="fs-ldap">
         <legend class="lead is-5 is-bordered">LDAP</legend>
         <div class="field is-horizontal">
@@ -87,7 +126,7 @@
             <div class="field">
               <div class="control">
                 {{ yield radio(id="ldap-auth-simple", name="ldap.auth", value="0", label="Simple", checked=.Setting.LDAP.Authentication) content}} data-type="integer"{{end}}
-                {{ yield radio(id="ldap-auth-bind", name="ldap.auth", value="1", label="Bind", checked=.Setting.LDAP.Authentication, disabled=true) content}} data-type="integer"{{end}}
+                {{ yield radio(id="ldap-auth-bind", name="ldap.auth", value="1", label="Bind", checked=.Setting.LDAP.Authentication) content}} data-type="integer"{{end}}
               </div>
             </div>
           </div>
@@ -99,14 +138,14 @@
           <div class="field-body">
             <div class="field">
               <div class="control">
-                <input name="ldap.user_dn" value="{{ .Setting.LDAP.UserDN }}" class="input" type="text" placeholder="e.g. cn=%s,dc=xxx,dc=com">
+                <input name="ldap.user_dn" value="{{ .Setting.LDAP.UserDN }}" class="input" type="text" placeholder="User DN template for direct binding, e.g. cn=%s,dc=xxx,dc=com">
               </div>
             </div>
           </div>
         </div>
         <div id="div-auth-bind" class="field is-horizontal"{{ if .Setting.LDAP.Authentication == 0 }} style="display: none" {{ end }}>
           <div class="field-label is-normal">
-            <label class="label">Bind</label>
+            <label class="label">Bind account</label>
           </div>
           <div class="field-body">
             <div class="field has-addons">
@@ -134,7 +173,7 @@
           <div class="field-body">
             <div class="field">
               <div class="control">
-                <input name="ldap.base_dn" value="{{ .Setting.LDAP.BaseDN }}" class="input" type="text" placeholder="e.g. dc=xxx,dc=com">
+                <input name="ldap.base_dn" value="{{ .Setting.LDAP.BaseDN }}" class="input" type="text" placeholder="Base DN for searching user, e.g. dc=xxx,dc=com">
               </div>
             </div>
           </div>
@@ -171,45 +210,6 @@
               </p>
               <div class="control is-expanded">
                 <input name="ldap.email_attr" value="{{ .Setting.LDAP.EmailAttr }}" class="input" type="text" placeholder="e.g. mail">
-              </div>
-            </div>
-          </div>
-        </div>
-      </fieldset>
-      <fieldset id="fs-ldap">
-        <legend class="lead is-5 is-bordered">Time zone and language</legend>
-        <div class="field is-horizontal">
-          <div class="field-label is-normal">
-            <label class="label">Time zone</label>
-          </div>
-          <div class="field-body">
-            <div class="field has-addons">
-              <div class="control has-icons-left">
-                <input name="tz.name" value="{{ .Setting.TimeZone.Name }}" class="input" type="text" placeholder="Location name">
-                <div class="icon is-left">
-                  <i class="fa fa-globe"></i>
-                </div>
-              </div>
-              <div class="control">
-                <input name="tz.offset" value="{{ .Setting.TimeZone.Offset }}" class="input" type="text" placeholder="Offset in seconds" data-type="integer">
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="field is-horizontal">
-          <div  class="field-label is-normal">
-            <label class="label">Language</label>
-          </div>
-          <div class="field-body">
-            <div class="control has-icons-left">
-              <div class="select">
-                <select name="lang">
-                  {{ yield option(value="en", label="English", selected=.Setting.Language) }}
-                  {{ yield option(value="zh", label="中文", selected=.Setting.Language) }}
-                </select>
-              </div>
-              <div class="icon is-left">
-                <i class="fa fa-language"></i>
               </div>
             </div>
           </div>
