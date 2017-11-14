@@ -41,27 +41,29 @@ Swirl is a web management tool for Docker, focused on swarm cluster.
 
 ### With config file
 
-All options can be set with `config/app.conf`.
+All options can be set with `config/app.yml`.
 
-```xml
-<config>
-    <app>
-        <add key="name" value="swirl"/>
-    </app>
-    <web>
-        <add key="address" value=":8001"/>
-        <!-- default authorize mode, valid options: *(everyone)/?(login user)/!(authorized explicitly) -->
-        <add key="authorize_mode" value="?"/>
-    </web>
-    <swirl>
-        <!-- optional -->
-        <add key="docker_endpoint" value="tcp://docker-proxy:2375"/>
-        <!-- optional, valid options: mongo -->
-        <add key="db_type" value="mongo"/>
-        <!-- required, database connection string, must match with db.type option -->
-        <add key="db_address" value="localhost:27017/swirl"/>
-    </swirl>
-</config>
+```yaml
+name: swirl
+banner: false
+
+web:
+  address: ':8001'
+  authorize: '?'
+
+swirl:
+  db_type: mongo
+  db_address: localhost:27017/swirl
+#  docker_endpoint: tcp://docker-proxy:2375
+
+log:
+  loggers:
+  - level: info
+    writers: console
+  writers:
+  - name: console
+    type: console
+    layout: '[{L}]{T}: {M}{N}'
 ```
 
 ### With environment variables
