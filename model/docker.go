@@ -74,6 +74,19 @@ func (opts Options) ToMap() map[string]string {
 	return m
 }
 
+func (opts Options) Compress() Options {
+	if len(opts) > 0 {
+		var tmp Options
+		for _, opt := range opts {
+			if opt != nil {
+				tmp = append(tmp, opt)
+			}
+		}
+		return tmp
+	}
+	return opts
+}
+
 type StackListInfo struct {
 	Name     string
 	Services []string
@@ -334,6 +347,31 @@ func NewServiceInfo(service swarm.Service) *ServiceInfo {
 // TODO: finish this method
 func (si *ServiceInfo) ToServiceSpec() swarm.ServiceSpec {
 	return swarm.ServiceSpec{}
+}
+
+func (si *ServiceInfo) Normalize() {
+	si.Environments = si.Environments.Compress()
+	si.ServiceLabels = si.ServiceLabels.Compress()
+	si.ContainerLabels = si.ContainerLabels.Compress()
+	si.LogDriver.Options = si.LogDriver.Options.Compress()
+	if len(si.Configs) > 0 {
+		var tmp []ConfigInfo
+		for _, c := range si.Configs {
+			if c.ID != "" {
+				tmp = append(tmp, c)
+			}
+		}
+		si.Configs = tmp
+	}
+	if len(si.Secrets) > 0 {
+		var tmp []ConfigInfo
+		for _, c := range si.Secrets {
+			if c.ID != "" {
+				tmp = append(tmp, c)
+			}
+		}
+		si.Secrets = tmp
+	}
 }
 
 func (si *ServiceInfo) GetDNSConfig() *swarm.DNSConfig {

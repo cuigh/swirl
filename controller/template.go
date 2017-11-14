@@ -87,6 +87,7 @@ func templateCreate(ctx web.Context) error {
 			tpl     = &model.Template{Name: info.Name}
 		)
 
+		info.Normalize()
 		info.Name = ""
 		content, err = json.Marshal(info)
 		if err != nil {
@@ -113,6 +114,7 @@ func templateEdit(ctx web.Context) error {
 	if err != nil {
 		return err
 	}
+	service.Normalize()
 
 	service.Name = tpl.Name
 	if service.Registry != "" {
@@ -162,6 +164,7 @@ func templateUpdate(ctx web.Context) error {
 			}
 		)
 
+		info.Normalize()
 		info.Name = ""
 		content, err = json.Marshal(info)
 		if err != nil {
