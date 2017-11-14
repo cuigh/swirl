@@ -173,16 +173,18 @@ func stackArchiveNew(ctx web.Context) error {
 func stackArchiveCreate(ctx web.Context) error {
 	archive := &model.Archive{}
 	err := ctx.Bind(archive)
-	if err == nil {
-		// Validate format
-		_, err = compose.Parse(archive.Name, archive.Content)
-		if err != nil {
-			return err
-		}
-
-		archive.CreatedBy = ctx.User().ID()
-		archive.UpdatedBy = archive.CreatedBy
-		err = biz.Archive.Create(archive)
+	if err != nil {
+		return err
 	}
+
+	// Validate format
+	_, err = compose.Parse(archive.Name, archive.Content)
+	if err != nil {
+		return err
+	}
+
+	archive.CreatedBy = ctx.User().ID()
+	archive.UpdatedBy = archive.CreatedBy
+	err = biz.Archive.Create(archive)
 	return ajaxResult(ctx, err)
 }

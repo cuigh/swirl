@@ -338,6 +338,7 @@ var Swirl;
                 switch (this.options.encoder) {
                     case "none":
                         settings.contentType = false;
+                        settings.processData = false;
                         break;
                     case "json":
                         settings.contentType = "application/json; charset=UTF-8";
@@ -438,7 +439,7 @@ var Swirl;
         }
         class WidthRule extends LengthRule {
             getLength(value) {
-                var doubleByteChars = value.match(/[^\x00-\xff]/ig);
+                let doubleByteChars = value.match(/[^\x00-\xff]/ig);
                 return value.length + (doubleByteChars == null ? 0 : doubleByteChars.length);
             }
         }
@@ -1863,6 +1864,71 @@ var Swirl;
         }
         Setting.IndexPage = IndexPage;
     })(Setting = Swirl.Setting || (Swirl.Setting = {}));
+})(Swirl || (Swirl = {}));
+var Swirl;
+(function (Swirl) {
+    var Stack;
+    (function (Stack) {
+        var Archive;
+        (function (Archive) {
+            var Validator = Swirl.Core.Validator;
+            var Notification = Swirl.Core.Notification;
+            class ContentRequiredRule {
+                validate($form, $input, arg) {
+                    let el = $input[0];
+                    if ($("#type-" + arg).prop("checked")) {
+                        console.log(el.value);
+                        return { ok: el.checkValidity ? el.checkValidity() : true, error: el.validationMessage };
+                    }
+                    return { ok: true };
+                }
+            }
+            class EditPage {
+                constructor() {
+                    Validator.register("content", new ContentRequiredRule(), "");
+                    this.editor = CodeMirror.fromTextArea($("#txt-content")[0], { lineNumbers: true });
+                    $("#file-content").change(e => {
+                        let file = e.target;
+                        if (file.files.length > 0) {
+                            $('#filename').text(file.files[0].name);
+                        }
+                    });
+                    $("#type-input,#type-upload").click(e => {
+                        let type = $(e.target).val();
+                        $("#div-input").toggle(type == "input");
+                        $("#div-upload").toggle(type == "upload");
+                    });
+                    $("#btn-submit").click(this.submit.bind(this));
+                }
+                submit(e) {
+                    this.editor.save();
+                    let results = Validator.bind("#div-form").validate();
+                    if (results.length > 0) {
+                        return;
+                    }
+                    let data = new FormData();
+                    data.append('name', $("#name").val());
+                    if ($("#type-input").prop("checked")) {
+                        data.append('content', $('#txt-content').val());
+                    }
+                    else {
+                        let file = $('#file-content')[0];
+                        data.append('content', file.files[0]);
+                    }
+                    let url = $(e.target).data("url") || "";
+                    $ajax.post(url, data).encoder("none").trigger(e.target).json((r) => {
+                        if (r.success) {
+                            location.href = "/stack/archive/";
+                        }
+                        else {
+                            Notification.show("danger", `FAILED: ${r.message}`);
+                        }
+                    });
+                }
+            }
+            Archive.EditPage = EditPage;
+        })(Archive = Stack.Archive || (Stack.Archive = {}));
+    })(Stack = Swirl.Stack || (Swirl.Stack = {}));
 })(Swirl || (Swirl = {}));
 var Swirl;
 (function (Swirl) {

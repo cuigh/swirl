@@ -314,6 +314,7 @@ namespace Swirl.Core {
             switch (this.options.encoder) {
                 case "none":
                     settings.contentType = false;
+                    settings.processData = false;
                     break;
                 case "json":
                     settings.contentType = "application/json; charset=UTF-8";

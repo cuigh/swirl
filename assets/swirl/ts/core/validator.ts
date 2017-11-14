@@ -8,7 +8,7 @@ namespace Swirl.Core {
     type InputElement = HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement | HTMLButtonElement;
 
     /**
-     * 输入控件验证结果
+     * The result of validation.
      *
      * @interface ValidationResult
      */
@@ -32,7 +32,7 @@ namespace Swirl.Core {
     }
 
     /**
-     * HTML5 表单元素原生验证器
+     * HTML5 form element native validator
      *
      * @class NativeRule
      * @implements {ValidationRule}
@@ -45,7 +45,7 @@ namespace Swirl.Core {
     }
 
     /**
-     * 必填字段验证器
+     * Required validator
      *
      * @class RequiredRule
      * @implements {ValidationRule}
@@ -57,7 +57,7 @@ namespace Swirl.Core {
     }
 
     /**
-     * 必选字段验证器(用于 radio 和 checkbox), 示例: checked, checked(2), checked(1~2)
+     * Checked validator(for radio/checkbox), e.g. checked, checked(2), checked(1~2)
      *
      * @class CheckedRule
      * @implements {ValidationRule}
@@ -71,7 +71,7 @@ namespace Swirl.Core {
     }
 
     /**
-     * 电子邮箱验证器
+     * Email validator
      *
      * @class EmailValidator
      * @implements {ValidationRule}
@@ -85,7 +85,7 @@ namespace Swirl.Core {
     }
 
     /**
-     * HTTP/FTP 地址验证器
+     * HTTP/FTP URL validator
      *
      * @class UrlValidator
      * @implements {ValidationRule}
@@ -99,7 +99,7 @@ namespace Swirl.Core {
     }
 
     /**
-     * IPV4 地址验证器
+     * IPV4 address validator
      *
      * @class IPValidator
      * @implements {ValidationRule}
@@ -113,7 +113,7 @@ namespace Swirl.Core {
     }
 
     /**
-     * 字段匹配验证器(如密码)
+     * Match validator(e.g. password confirmation)
      *
      * @class MatchValidator
      * @implements {ValidationRule}
@@ -125,7 +125,7 @@ namespace Swirl.Core {
     }
 
     /**
-     * 字符串长度验证器
+     * String length validator.
      *
      * @class LengthValidator
      * @implements {ValidationRule}
@@ -155,14 +155,14 @@ namespace Swirl.Core {
     }
 
     /**
-     * 字符串宽度验证器(中文字符宽度为2)
+     * String width validator, the width of CJK characters is considered as 2.
      *
      * @class WidthValidator
      * @extends {LengthRule}
      */
     class WidthRule extends LengthRule {
         protected getLength(value: string): number {
-            var doubleByteChars = value.match(/[^\x00-\xff]/ig);
+            let doubleByteChars = value.match(/[^\x00-\xff]/ig);
             return value.length + (doubleByteChars == null ? 0 : doubleByteChars.length);
         }
     }
@@ -181,7 +181,7 @@ namespace Swirl.Core {
     }
 
     /**
-     * 正则表达式验证器
+     * Regex validator
      *
      * @class RegexValidator
      * @implements {ValidationRule}
@@ -195,7 +195,7 @@ namespace Swirl.Core {
     }
 
     /**
-     * 服务器端验证器
+     * Remote validator
      *
      * @class RemoteRule
      * @implements {ValidationRule}

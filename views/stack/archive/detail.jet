@@ -22,10 +22,10 @@
       <nav class="tabs is-boxed">
         <ul>
           <li>
-            <a href="/stack/task/">Tasks</a>
+            <a href="/stack/task/">{{ i18n("menu.stack.task") }}</a>
           </li>
           <li class="is-active">
-            <a href="/stack/archive/">Archives</a>
+            <a href="/stack/archive/">{{ i18n("menu.stack.archive") }}</a>
           </li>
         </ul>
       </nav>
@@ -36,9 +36,9 @@
 <div class="container">
   <nav class="breadcrumb has-succeeds-separator is-small is-marginless" aria-label="breadcrumbs">
     <ul>
-      <li><a href="/">Dashboard</a></li>
-      <li><a href="/stack/archive/">Archives</a></li>
-      <li class="is-active"><a>Detail</a></li>
+      <li><a href="/">{{ i18n("menu.dashboard") }}</a></li>
+      <li><a href="/stack/archive/">{{ i18n("menu.stack.archive") }}</a></li>
+      <li class="is-active"><a>{{ i18n("menu.detail") }}</a></li>
     </ul>
   </nav>
 </div>
@@ -55,8 +55,8 @@
 <nav class="navbar has-shadow">
   <div class="container">
     <div class="navbar-brand">
-      <a class="navbar-item is-tab is-active" href="/stack/archive/{{.Archive.ID}}/detail">Detail</a>
-      <a class="navbar-item is-tab" href="/stack/archive/{{.Archive.ID}}/edit">Edit</a>
+      <a class="navbar-item is-tab is-active" href="/stack/archive/{{.Archive.ID}}/detail">{{ i18n("menu.detail") }}</a>
+      <a class="navbar-item is-tab" href="/stack/archive/{{.Archive.ID}}/edit">{{ i18n("menu.edit") }}</a>
     </div>
   </div>
 </nav>
@@ -64,16 +64,16 @@
 <section class="section">
   <div class="container">
     <dl>
-      <dt>Created at</dt>
+      <dt>{{ i18n("field.created-at") }}</dt>
       <dd>{{ time(.Archive.CreatedAt) }}</dd>
-      <dt>Updated at</dt>
+      <dt>{{ i18n("field.updated-at") }}</dt>
       <dd>{{ time(.Archive.UpdatedAt) }}</dd>
       <dt>Content</dt>
       <dd class="content"><pre class="is-paddingless"><code class="yaml">{{ .Archive.Content }}</code></pre></dd>
     </dl>
     <a href="/stack/archive/" class="button is-primary">
       <span class="icon"><i class="fa fa-reply"></i></span>
-      <span>Return</span>
+      <span>{{ i18n("button.return") }}</span>
     </a>
   </div>
 </section>

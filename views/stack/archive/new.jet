@@ -1,4 +1,5 @@
 {{ extends "../../_layouts/default" }}
+{{ import "../../_modules/form" }}
 
 {{ block style() }}
 <link rel="stylesheet" href="/assets/codemirror/codemirror.css?v=5.30">
@@ -7,7 +8,7 @@
 {{ block script() }}
 <script src="/assets/codemirror/codemirror.js?v=5.30"></script>
 <script src="/assets/codemirror/mode/yaml.js?v=5.30"></script>
-<script>var editor = CodeMirror.fromTextArea(document.getElementById("txt-content"), {lineNumbers: true});</script>
+<script>$(() => new Swirl.Stack.Archive.EditPage())</script>
 {{ end }}
 
 {{ block body() }}
@@ -34,31 +35,50 @@
   </div>    
 </section>
 <section class="section">
-  <div class="container">
+  <div id="div-form" class="container">
     <h2 class="title">Create stack archive</h2>
     <hr>
-    <form method="post" data-form="ajax-json" data-url="/stack/archive/">
-      <div class="field">
-        <label class="label">{{ i18n("field.name") }}</label>
-        <div class="control">
-          <input name="name" class="input" type="text" placeholder="" data-v-rule="native;regex" data-v-arg-regex="^[a-z0-9_-]+$" data-v-msg-regex="Name can contain only letters, digits, '_' and '-'." required>
-        </div>
+    <div class="field">
+      <label class="label">{{ i18n("field.name") }}</label>
+      <div class="control">
+        <input id="name" name="name" class="input" type="text" placeholder="" data-v-rule="native;regex" data-v-arg-regex="^[a-z0-9_-]+$" data-v-msg-regex="Name can contain only letters, digits, '_' and '-'." required>
       </div>
-      <div class="field">
-        <label class="label">Content</label>
-        <div class="control">
-          <textarea id="txt-content" name="content" class="textarea" rows="20" placeholder="Compose file content" data-v-rule="native" required></textarea>
-        </div>
+    </div>
+    <div class="field">
+      <div class="control">
+        {{ yield radio(name="type", value="input", label="Input", checked="input") }}
+        {{ yield radio(name="type", value="upload", label="Upload") }}
       </div>
-      <div class="field is-grouped">
-        <div class="control">
-          <button type="submit" class="button is-primary">{{ i18n("button.submit") }}</button>
-        </div>
-        <div class="control">
-          <a href="/stack/archive/" class="button is-link">{{ i18n("button.cancel") }}</a>
-        </div>
+    </div>
+    <div id="div-input" class="field">
+      <label class="label">Content</label>
+      <div class="control">
+        <textarea id="txt-content" name="content" class="textarea" rows="20" placeholder="Compose file content" data-v-rule="content" data-v-arg-content="input" required></textarea>
       </div>
-    </form>
+    </div>
+    <div id="div-upload" class="field" style="display: none">
+      <label class="label">Content</label>
+      <div class="file has-name is-fullwidth">
+        <label class="file-label">
+          <input id="file-content" name="content" class="file-input" type="file" data-v-rule="content" data-v-arg-content="upload" required>
+          <span class="file-cta">
+            <span class="file-icon">
+              <i class="fa fa-upload"></i>
+            </span>
+            <span class="file-label">Choose a file…</span>
+          </span>
+          <span id="filename" class="file-name"></span>
+        </label>
+      </div>
+    </div>
+    <div class="field is-grouped">
+      <div class="control">
+        <button id="btn-submit" type="submit" class="button is-primary">{{ i18n("button.submit") }}</button>
+      </div>
+      <div class="control">
+        <a href="/stack/archive/" class="button is-link">{{ i18n("button.cancel") }}</a>
+      </div>
+    </div>
   </div>
 </section>
 {{ end }}
