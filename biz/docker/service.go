@@ -557,9 +557,9 @@ func ServiceLogs(name string, line int, timestamps bool) (stdout, stderr *bytes.
 	return
 }
 
-// todo: support auto wrapping
 // ServiceCommand returns the docker command line to create this service.
-func ServiceCommand(name string) (cmd string, err error) {
+func ServiceCommand(name string) (cmd string, err error) { // nolint: gocyclo
+	// todo: support auto wrapping
 	var (
 		ctx context.Context
 		cli *client.Client

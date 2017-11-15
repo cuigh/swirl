@@ -1,12 +1,46 @@
-[[constraint]]
-  name = "github.com/docker/docker"
-  source = "github.com/moby/moby"
-  branch = "master"
+required = ["github.com/docker/distribution"]
 
 [[constraint]]
-  name = "github.com/cuigh/auxo"
   branch = "master"
+  name = "github.com/cuigh/auxo"
+
+[[constraint]]
+  name = "github.com/docker/docker"
+  branch = "master"
+  source = "https://github.com/moby/moby.git"
+
+[[constraint]]
+  name = "github.com/docker/go-connections"
+  version = "0.3.0"
+
+[[constraint]]
+  name = "github.com/docker/go-units"
+  version = "0.3.2"
 
 [[constraint]]
   name = "github.com/go-ldap/ldap"
+  version = "2.5.0"
+
+[[constraint]]
+  name = "github.com/mattn/go-shellwords"
+  version = "1.0.3"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/mitchellh/mapstructure"
+
+[[constraint]]
+  name = "github.com/pkg/errors"
+  version = "0.8.0"
+
+[[constraint]]
+  branch = "v2"
+  name = "gopkg.in/mgo.v2"
+
+[[constraint]]
+  branch = "v2"
+  name = "gopkg.in/yaml.v2"
+
+[[constraint]]
+  name = "github.com/docker/distribution"
   branch = "master"

@@ -115,7 +115,12 @@ docker service create \
 
 ## Build
 
-**Swirl** use `dep` as dependency management tool(coming soon).
+**Swirl** use `dep` as dependency management tool. You can build **Swirl**
+
+```sh
+$ dep ensure
+$ go build
+```
 
 ## License
 

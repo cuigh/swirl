@@ -279,7 +279,7 @@ func createSecrets(ctx context.Context, cli *client.Client, secrets []swarm.Secr
 			if err = cli.SecretUpdate(ctx, secret.ID, secret.Meta.Version, secretSpec); err != nil {
 				return errors.Wrap(err, "failed to update secret "+secretSpec.Name)
 			}
-		case client.IsErrSecretNotFound(err):
+		case client.IsErrNotFound(err):
 			// secret does not exist, then we create a new one.
 			if _, err = cli.SecretCreate(ctx, secretSpec); err != nil {
 				return errors.Wrap(err, "failed to create secret "+secretSpec.Name)
@@ -300,7 +300,7 @@ func createConfigs(ctx context.Context, cli *client.Client, configs []swarm.Conf
 			if err = cli.ConfigUpdate(ctx, config.ID, config.Meta.Version, configSpec); err != nil {
 				errors.Wrap(err, "failed to update config "+configSpec.Name)
 			}
-		case client.IsErrConfigNotFound(err):
+		case client.IsErrNotFound(err):
 			// config does not exist, then we create a new one.
 			if _, err = cli.ConfigCreate(ctx, configSpec); err != nil {
 				errors.Wrap(err, "failed to create config "+configSpec.Name)
