@@ -36,7 +36,7 @@ func registryList(ctx web.Context) error {
 
 func registryCreate(ctx web.Context) error {
 	registry := &model.Registry{}
-	err := ctx.Bind(registry)
+	err := ctx.Bind(registry, true)
 	if err != nil {
 		return err
 	}
@@ -52,7 +52,7 @@ func registryDelete(ctx web.Context) error {
 
 func registryUpdate(ctx web.Context) error {
 	registry := &model.Registry{}
-	err := ctx.Bind(registry)
+	err := ctx.Bind(registry, true)
 	if err != nil {
 		return err
 	}

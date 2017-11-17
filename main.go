@@ -10,6 +10,7 @@ import (
 	"github.com/cuigh/auxo/app"
 	"github.com/cuigh/auxo/app/flag"
 	"github.com/cuigh/auxo/config"
+	"github.com/cuigh/auxo/data/valid"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/auxo/net/web/filter"
 	"github.com/cuigh/auxo/net/web/filter/auth"
@@ -50,6 +51,7 @@ func server() *web.Server {
 	ws := web.Auto()
 
 	// set render
+	ws.Validator = &valid.Validator{Tag: "valid"}
 	ws.Renderer = jet.New().SetDebug(config.GetBool("debug")).
 		AddFunc("time", misc.FormatTime(setting.TimeZone.Offset)).
 		AddFunc("i18n", misc.Message(setting.Language)).

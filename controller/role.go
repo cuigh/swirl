@@ -48,7 +48,7 @@ func roleNew(ctx web.Context) error {
 
 func roleCreate(ctx web.Context) error {
 	role := &model.Role{}
-	err := ctx.Bind(role)
+	err := ctx.Bind(role, true)
 	if err == nil {
 		err = biz.Role.Create(role, ctx.User())
 	}
@@ -99,7 +99,7 @@ func roleEdit(ctx web.Context) error {
 
 func roleUpdate(ctx web.Context) error {
 	role := &model.Role{}
-	err := ctx.Bind(role)
+	err := ctx.Bind(role, true)
 	if err == nil {
 		role.ID = ctx.P("id")
 		err = biz.Role.Update(role, ctx.User())

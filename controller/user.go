@@ -70,7 +70,7 @@ func userNew(ctx web.Context) error {
 
 func userCreate(ctx web.Context) error {
 	user := &model.User{}
-	err := ctx.Bind(user)
+	err := ctx.Bind(user, true)
 	if err == nil {
 		user.Type = model.UserTypeInternal
 		err = biz.User.Create(user, ctx.User())
@@ -135,7 +135,7 @@ func userEdit(ctx web.Context) error {
 
 func userUpdate(ctx web.Context) error {
 	user := &model.User{}
-	err := ctx.Bind(user)
+	err := ctx.Bind(user, true)
 	if err == nil {
 		err = biz.User.Update(user, ctx.User())
 	}

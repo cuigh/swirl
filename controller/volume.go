@@ -56,7 +56,7 @@ func volumeNew(ctx web.Context) error {
 
 func volumeCreate(ctx web.Context) error {
 	info := &model.VolumeCreateInfo{}
-	err := ctx.Bind(info)
+	err := ctx.Bind(info, true)
 	if err != nil {
 		return err
 	}

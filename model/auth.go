@@ -26,7 +26,7 @@ const (
 
 type Role struct {
 	ID          string    `bson:"_id" json:"id,omitempty"`
-	Name        string    `bson:"name" json:"name,omitempty"`
+	Name        string    `bson:"name" json:"name,omitempty" valid:"required"`
 	Description string    `bson:"desc" json:"desc,omitempty"`
 	Perms       []string  `bson:"perms" json:"perms,omitempty"`
 	CreatedAt   time.Time `bson:"created_at" json:"created_at,omitempty"`
@@ -35,11 +35,11 @@ type Role struct {
 
 type User struct {
 	ID        string     `bson:"_id" json:"id,omitempty"`
-	Name      string     `bson:"name" json:"name,omitempty"`
-	LoginName string     `bson:"login_name" json:"login_name,omitempty"`
+	Name      string     `bson:"name" json:"name,omitempty" valid:"required"`
+	LoginName string     `bson:"login_name" json:"login_name,omitempty" valid:"required"`
 	Password  string     `bson:"password" json:"password,omitempty"`
 	Salt      string     `bson:"salt" json:"salt,omitempty"`
-	Email     string     `bson:"email" json:"email,omitempty"`
+	Email     string     `bson:"email" json:"email,omitempty" valid:"required"`
 	Admin     bool       `bson:"admin" json:"admin,omitempty"`
 	Type      UserType   `bson:"type" json:"type,omitempty"`
 	Status    UserStatus `bson:"status" json:"status,omitempty"`

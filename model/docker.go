@@ -17,10 +17,10 @@ import (
 
 type Registry struct {
 	ID        string    `bson:"_id" json:"id,omitempty"`
-	Name      string    `bson:"name" json:"name,omitempty"`
-	URL       string    `bson:"url" json:"url,omitempty"`
-	Username  string    `bson:"username" json:"username,omitempty"`
-	Password  string    `bson:"password" json:"password,omitempty"`
+	Name      string    `bson:"name" json:"name,omitempty" valid:"required"`
+	URL       string    `bson:"url" json:"url,omitempty" valid:"required,url"`
+	Username  string    `bson:"username" json:"username,omitempty" valid:"required"`
+	Password  string    `bson:"password" json:"password,omitempty" valid:"required"`
 	CreatedAt time.Time `bson:"created_at" json:"created_at,omitempty"`
 	UpdatedAt time.Time `bson:"updated_at" json:"updated_at,omitempty"`
 }
@@ -639,7 +639,7 @@ type NetworkCreateInfo struct {
 }
 
 type VolumeCreateInfo struct {
-	Name         string  `json:"name"`
+	Name         string  `json:"name" valid:"required"`
 	Driver       string  `json:"driver"`
 	CustomDriver string  `json:"custom_driver"`
 	Options      Options `json:"options"`
