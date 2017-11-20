@@ -43,7 +43,7 @@ func (b *userBiz) Create(user *model.User, ctxUser web.User) (err error) {
 	user.CreatedAt = time.Now()
 	user.UpdatedAt = user.CreatedAt
 	if user.Type == model.UserTypeInternal {
-		user.Password, user.Salt, err = password.Get(user.Password)
+		user.Password, user.Salt, err = password.Generate(user.Password)
 		if err != nil {
 			return
 		}
@@ -112,7 +112,7 @@ func (b *userBiz) UpdatePassword(id, oldPwd, newPwd string) (err error) {
 			return
 		}
 
-		pwd, salt, err = password.Get(newPwd)
+		pwd, salt, err = password.Generate(newPwd)
 		if err != nil {
 			return
 		}

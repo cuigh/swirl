@@ -2,7 +2,9 @@ name: swirl
 banner: false
 
 web:
-  address: ':8001'
+#  mode: develop
+  entries:
+  - address: :8001
   authorize: '?'
 
 swirl:

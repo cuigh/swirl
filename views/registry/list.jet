@@ -138,7 +138,7 @@
       </section>
       <footer class="modal-card-foot">
         <button type="submit" class="button is-primary">{{ i18n("button.submit") }}</button>
-        <button type="button" class="button dismiss">{{ i18n("field.cancel") }}</button>
+        <button type="button" class="button dismiss">{{ i18n("button.cancel") }}</button>
       </footer>
     </form>    
   </div>

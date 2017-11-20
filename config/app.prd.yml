@@ -1,2 +1,5 @@
+web:
+  mode: release
+
 swirl:
   docker_endpoint: tcp://docker-proxy:2375

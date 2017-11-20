@@ -24,7 +24,7 @@ func main() {
 	misc.BindOptions()
 
 	app.Name = "Swirl"
-	app.Version = "0.6.2"
+	app.Version = "0.6.3"
 	app.Desc = "A web management UI for Docker, focused on swarm cluster"
 	app.Action = func(ctx *app.Context) {
 		misc.LoadOptions()
@@ -40,23 +40,23 @@ func server() *web.Server {
 		panic(fmt.Sprintf("Load setting failed: %v", err))
 	}
 
-	// customize error handler
-	web.DefaultErrorHandler.OnCode(http.StatusNotFound, func(ctx web.Context, err error) {
-		if ctx.IsAJAX() {
-			ctx.Status(http.StatusNotFound).HTML(http.StatusText(http.StatusNotFound))
-		} else {
-			ctx.Render("404", nil)
-		}
-	})
-	web.DefaultErrorHandler.OnCode(http.StatusForbidden, func(ctx web.Context, err error) {
-		if ctx.IsAJAX() {
-			ctx.Status(http.StatusForbidden).HTML("You do not have permission to perform this operation")
-		} else {
-			ctx.Render("403", nil)
-		}
-	})
-
 	ws := web.Auto()
+
+	// customize error handler
+	ws.ErrorHandler.OnCode(http.StatusNotFound, func(ctx web.Context, err error) {
+		if ctx.IsAJAX() {
+			ctx.Status(http.StatusNotFound).HTML(http.StatusText(http.StatusNotFound)) // nolint: gas
+		} else {
+			ctx.Status(http.StatusNotFound).Render("404", nil) // nolint: gas
+		}
+	})
+	ws.ErrorHandler.OnCode(http.StatusForbidden, func(ctx web.Context, err error) {
+		if ctx.IsAJAX() {
+			ctx.Status(http.StatusForbidden).HTML("You do not have permission to perform this operation") // nolint: gas
+		} else {
+			ctx.Status(http.StatusForbidden).Render("403", nil) // nolint: gas
+		}
+	})
 
 	// set render
 	ws.Validator = &valid.Validator{Tag: "valid"}
@@ -72,7 +72,7 @@ func server() *web.Server {
 	ws.Use(filter.NewRecover())
 
 	// register static handlers
-	ws.Static("/assets", filepath.Join(filepath.Dir(app.GetPath()), "assets"))
+	ws.Static("/assets", filepath.Join(filepath.Dir(app.Path()), "assets"))
 
 	// create biz group
 	form := &auth.Form{
