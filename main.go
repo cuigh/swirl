@@ -42,10 +42,18 @@ func server() *web.Server {
 
 	// customize error handler
 	web.DefaultErrorHandler.OnCode(http.StatusNotFound, func(ctx web.Context, err error) {
-		ctx.Redirect("/404")
+		if ctx.IsAJAX() {
+			ctx.Status(http.StatusNotFound).HTML(http.StatusText(http.StatusNotFound))
+		} else {
+			ctx.Render("404", nil)
+		}
 	})
 	web.DefaultErrorHandler.OnCode(http.StatusForbidden, func(ctx web.Context, err error) {
-		ctx.Redirect("/403")
+		if ctx.IsAJAX() {
+			ctx.Status(http.StatusForbidden).HTML("You do not have permission to perform this operation")
+		} else {
+			ctx.Render("403", nil)
+		}
 	})
 
 	ws := web.Auto()
