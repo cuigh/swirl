@@ -135,7 +135,7 @@ func userEdit(ctx web.Context) error {
 
 func userUpdate(ctx web.Context) error {
 	user := &model.User{}
-	err := ctx.Bind(user, true)
+	err := ctx.Bind(user)
 	if err == nil {
 		err = biz.User.Update(user, ctx.User())
 	}
