@@ -2,6 +2,7 @@ package docker
 
 import (
 	"context"
+	"os"
 	"sync"
 
 	"github.com/cuigh/auxo/log"
@@ -36,6 +37,7 @@ func (m *manager) Client() (ctx context.Context, cli *client.Client, err error) 
 
 		if m.client == nil {
 			if misc.Options.DockerEndpoint == "" {
+				os.Setenv("DOCKER_API_VERSION", apiVersion)
 				m.client, err = client.NewEnvClient()
 			} else {
 				m.client, err = client.NewClient(misc.Options.DockerEndpoint, apiVersion, nil, nil)
