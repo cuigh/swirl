@@ -3,6 +3,7 @@ package controller
 import (
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/biz"
+	"github.com/cuigh/swirl/misc"
 	"github.com/cuigh/swirl/model"
 )
 
@@ -26,7 +27,7 @@ func settingIndex(ctx web.Context) error {
 		return err
 	}
 
-	m := newModel(ctx).Set("Setting", setting)
+	m := newModel(ctx).Set("Setting", setting).Set("TimeZones", misc.TimeZones)
 	return ctx.Render("system/setting/index", m)
 }
 
@@ -34,6 +35,12 @@ func settingUpdate(ctx web.Context) error {
 	setting := &model.Setting{}
 	err := ctx.Bind(setting)
 	if err == nil {
+		for _, tz := range misc.TimeZones {
+			if tz.Name == setting.TimeZone.Name {
+				setting.TimeZone.Offset = tz.Offset
+				break
+			}
+		}
 		err = biz.Setting.Update(setting, ctx.User())
 	}
 	return ajaxResult(ctx, err)

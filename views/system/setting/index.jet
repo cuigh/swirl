@@ -48,13 +48,17 @@
           <div class="field-body">
             <div class="field has-addons">
               <div class="control has-icons-left">
-                <input name="tz.name" value="{{ .Setting.TimeZone.Name }}" class="input" type="text" placeholder="Location name">
+                <div class="select">
+                  <select name="tz.name">
+                    {{ offset := .Setting.TimeZone.Offset }}
+                    {{ range .TimeZones }}
+                    <option value="{{ .Name }}"{{ if offset == .Offset }} selected{{ end }}>{{ .Name }}</option>
+                    {{ end }}
+                  </select>
+                </div>
                 <div class="icon is-left">
                   <i class="fa fa-globe"></i>
                 </div>
-              </div>
-              <div class="control">
-                <input name="tz.offset" value="{{ .Setting.TimeZone.Offset }}" class="input" type="text" placeholder="Offset in seconds" data-type="integer">
               </div>
             </div>
           </div>
