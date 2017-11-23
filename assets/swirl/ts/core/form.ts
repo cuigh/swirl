@@ -233,16 +233,18 @@ namespace Swirl.Core {
                     entry.value = input.value;
             }
 
-            switch (dataType) {
-                case "integer":
-                    entry.value = parseInt(entry.value);
-                    break;
-                case "float":
-                    entry.value = parseFloat(entry.value);
-                    break;
-                case "bool":
-                    entry.value = (entry.value === "true") || (entry.value === "1");
-                    break;
+            if (entry.value != null) {
+                switch (dataType) {
+                    case "integer":
+                        entry.value = parseInt(entry.value);
+                        break;
+                    case "float":
+                        entry.value = parseFloat(entry.value);
+                        break;
+                    case "bool":
+                        entry.value = (entry.value === "true") || (entry.value === "1");
+                        break;
+                }
             }
             return entry;
         }
