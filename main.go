@@ -24,7 +24,7 @@ func main() {
 	misc.BindOptions()
 
 	app.Name = "Swirl"
-	app.Version = "0.6.3"
+	app.Version = "0.6.4"
 	app.Desc = "A web management UI for Docker, focused on swarm cluster"
 	app.Action = func(ctx *app.Context) {
 		misc.LoadOptions()
@@ -91,7 +91,7 @@ func server() *web.Server {
 	g.Handle("/profile", controller.Profile())
 	g.Handle("/registry", controller.Registry())
 	g.Handle("/node", controller.Node())
-	g.Handle("/service", controller.Service())
+	g.Handle("/service", controller.Service(), biz.Perm)
 	g.Handle("/service/template", controller.Template())
 	g.Handle("/stack", controller.Stack())
 	g.Handle("/network", controller.Network())

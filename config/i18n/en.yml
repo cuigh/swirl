@@ -12,6 +12,7 @@ button.confirm: Confirm
 button.delete: Delete
 button.prune: Prune
 button.new: New
+button.add: Add
 button.edit: Edit
 button.save: Save
 button.update: Update
@@ -42,6 +43,8 @@ field.image: Image
 field.address: Address
 field.driver: Driver
 field.scope: Scope
+field.role: Roles
+field.user: Users
 
 # menu
 menu.dashboard: Dashboard
@@ -73,6 +76,7 @@ menu.detail: Detail
 menu.raw: Raw
 menu.edit: Edit
 menu.log: Logs
+menu.perm: Permission
 
 # login page
 login.title: Sign in to Swirl

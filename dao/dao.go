@@ -56,6 +56,10 @@ type Interface interface {
 	EventCreate(event *model.Event) error
 	EventList(args *model.EventListArgs) (events []*model.Event, count int, err error)
 
+	PermGet(resType, resID string) (*model.Perm, error)
+	PermUpdate(perm *model.Perm) error
+	PermDelete(resType, resID string) error
+
 	SettingGet() (setting *model.Setting, err error)
 	SettingUpdate(setting *model.Setting) error
 }

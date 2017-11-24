@@ -65,6 +65,7 @@ type Session struct {
 
 type AuthUser struct {
 	user  *User
+	roles []*Role
 	perms map[string]struct{}
 }
 
@@ -74,6 +75,7 @@ func NewAuthUser(user *User, roles []*Role) *AuthUser {
 	}
 	u := &AuthUser{
 		user:  user,
+		roles: roles,
 		perms: make(map[string]struct{}),
 	}
 	for _, role := range roles {
@@ -98,6 +100,15 @@ func (u *AuthUser) Anonymous() bool {
 
 func (u *AuthUser) Admin() bool {
 	return u.user.Admin
+}
+
+func (u *AuthUser) IsInRole(roleID string) bool {
+	for _, role := range u.roles {
+		if role.ID == roleID {
+			return true
+		}
+	}
+	return false
 }
 
 func (u *AuthUser) IsAllowed(perm string) bool {

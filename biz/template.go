@@ -1,6 +1,7 @@
 package biz
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/cuigh/auxo/data/guid"
@@ -36,6 +37,34 @@ func (b *templateBiz) Create(tpl *model.Template, user web.User) (err error) {
 func (b *templateBiz) Get(id string) (tpl *model.Template, err error) {
 	do(func(d dao.Interface) {
 		tpl, err = d.TemplateGet(id)
+	})
+	return
+}
+
+func (b *templateBiz) FillInfo(id string, si *model.ServiceInfo) (err error) {
+	do(func(d dao.Interface) {
+		var (
+			tpl      *model.Template
+			registry *model.Registry
+		)
+
+		tpl, err = d.TemplateGet(id)
+		if err != nil || tpl == nil {
+			return
+		}
+
+		err = json.Unmarshal([]byte(tpl.Content), si)
+		if err != nil {
+			return
+		}
+
+		if si.Registry != "" {
+			registry, err = Registry.Get(si.Registry)
+			if err != nil {
+				return
+			}
+			si.RegistryURL = registry.URL
+		}
 	})
 	return
 }

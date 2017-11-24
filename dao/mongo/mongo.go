@@ -35,6 +35,9 @@ var (
 		"template": {
 			mgo.Index{Key: []string{"name"}, Unique: true},
 		},
+		"perm": {
+			mgo.Index{Key: []string{"res_type", "res_id"}, Unique: true},
+		},
 	}
 )
 

@@ -2,15 +2,24 @@ package model
 
 import "time"
 
+// LDAP security policy
 const (
 	LDAPSecurityNone     = 0
 	LDAPSecurityTLS      = 1
 	LDAPSecurityStartTLS = 2
 )
 
+// LDAP auth type
 const (
 	LDAPAuthSimple = 0
 	LDAPAuthBind   = 1
+)
+
+// Perm control scope
+const (
+	PermNone      = 0
+	PermWrite     = 1
+	PermReadWrite = 2
 )
 
 // Setting represents the options of swirl.
@@ -37,4 +46,13 @@ type Setting struct {
 	Language  string    `bson:"lang" json:"lang,omitempty"`
 	UpdatedBy string    `bson:"updated_by" json:"updated_by,omitempty"`
 	UpdatedAt time.Time `bson:"updated_at" json:"updated_at,omitempty"`
+}
+
+// Perm holds permissions of Docker resource.
+type Perm struct {
+	ResType string   `json:"res_type"`
+	ResID   string   `json:"res_id"`
+	Scope   int32    `json:"scope"`
+	Roles   []string `json:"roles"`
+	Users   []string `json:"users"`
 }

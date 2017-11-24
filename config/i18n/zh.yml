@@ -12,6 +12,7 @@ button.confirm: 确定
 button.delete: 删除
 button.prune: 清理
 button.new: 新建
+button.add: 添加
 button.edit: 编辑
 button.save: 保存
 button.update: 更新
@@ -42,6 +43,8 @@ field.image: 镜像
 field.address: 地址
 field.driver: 驱动
 field.scope: 范围
+field.role: 角色
+field.user: 用户
 
 # menu
 menu.dashboard: 仪表盘
@@ -73,6 +76,7 @@ menu.detail: 详情
 menu.raw: 原始
 menu.edit: 编辑
 menu.log: 日志
+menu.perm: 权限
 
 # login page
 login.title: 登录到 Swirl

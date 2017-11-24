@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"encoding/json"
 	"strconv"
 	"strings"
 
@@ -17,33 +16,37 @@ import (
 
 // ServiceController is a controller of docker service
 type ServiceController struct {
-	List     web.HandlerFunc `path:"/" name:"service.list" authorize:"!" desc:"service list page"`
-	Detail   web.HandlerFunc `path:"/:name/detail" name:"service.detail" authorize:"!" desc:"service detail page"`
-	Raw      web.HandlerFunc `path:"/:name/raw" name:"service.raw" authorize:"!" desc:"service raw page"`
-	Logs     web.HandlerFunc `path:"/:name/logs" name:"service.logs" authorize:"!" desc:"service logs page"`
-	Delete   web.HandlerFunc `path:"/delete" method:"post" name:"service.delete" authorize:"!" desc:"delete service"`
-	Scale    web.HandlerFunc `path:"/scale" method:"post" name:"service.scale" authorize:"!" desc:"scale service"`
-	Rollback web.HandlerFunc `path:"/rollback" method:"post" name:"service.rollback" authorize:"!" desc:"rollback service"`
-	New      web.HandlerFunc `path:"/new" name:"service.new" authorize:"!" desc:"new service page"`
-	Create   web.HandlerFunc `path:"/new" method:"post" name:"service.create" authorize:"!" desc:"create service"`
-	Edit     web.HandlerFunc `path:"/:name/edit" name:"service.edit" authorize:"!" desc:"service edit page"`
-	Update   web.HandlerFunc `path:"/:name/edit" method:"post" name:"service.update" authorize:"!" desc:"update service"`
+	List       web.HandlerFunc `path:"/" name:"service.list" authorize:"!" desc:"service list page"`
+	Detail     web.HandlerFunc `path:"/:name/detail" name:"service.detail" authorize:"!" perm:"read,service,name"`
+	Raw        web.HandlerFunc `path:"/:name/raw" name:"service.raw" authorize:"!" perm:"read,service,name"`
+	Logs       web.HandlerFunc `path:"/:name/logs" name:"service.logs" authorize:"!" perm:"read,service,name"`
+	Delete     web.HandlerFunc `path:"/:name/delete" method:"post" name:"service.delete" authorize:"!" perm:"write,service,name"`
+	Scale      web.HandlerFunc `path:"/:name/scale" method:"post" name:"service.scale" authorize:"!" perm:"write,service,name"`
+	Rollback   web.HandlerFunc `path:"/:name/rollback" method:"post" name:"service.rollback" authorize:"!" perm:"write,service,name"`
+	New        web.HandlerFunc `path:"/new" name:"service.new" authorize:"!" desc:"new service page"`
+	Create     web.HandlerFunc `path:"/new" method:"post" name:"service.create" authorize:"!" desc:"create service"`
+	Edit       web.HandlerFunc `path:"/:name/edit" name:"service.edit" authorize:"!" perm:"write,service,name"`
+	Update     web.HandlerFunc `path:"/:name/edit" method:"post" name:"service.update" authorize:"!" perm:"write,service,name"`
+	PermEdit   web.HandlerFunc `path:"/:name/perm" name:"service.perm.edit" authorize:"!" perm:"write,service,name"`
+	PermUpdate web.HandlerFunc `path:"/:name/perm" method:"post" name:"service.perm.update" authorize:"!" perm:"write,service,name"`
 }
 
 // Service creates an instance of ServiceController
 func Service() (c *ServiceController) {
 	return &ServiceController{
-		List:     serviceList,
-		Detail:   serviceDetail,
-		Raw:      serviceRaw,
-		Logs:     serviceLogs,
-		Delete:   serviceDelete,
-		New:      serviceNew,
-		Create:   serviceCreate,
-		Edit:     serviceEdit,
-		Update:   serviceUpdate,
-		Scale:    serviceScale,
-		Rollback: serviceRollback,
+		List:       serviceList,
+		Detail:     serviceDetail,
+		Raw:        serviceRaw,
+		Logs:       serviceLogs,
+		Delete:     serviceDelete,
+		New:        serviceNew,
+		Create:     serviceCreate,
+		Edit:       serviceEdit,
+		Update:     serviceUpdate,
+		Scale:      serviceScale,
+		Rollback:   serviceRollback,
+		PermEdit:   servicePermEdit,
+		PermUpdate: permUpdate("service", "name"),
 	}
 }
 
@@ -126,36 +129,19 @@ func serviceDelete(ctx web.Context) error {
 	for _, name := range names {
 		if err := docker.ServiceRemove(name); err != nil {
 			return ajaxResult(ctx, err)
-		} else {
-			biz.Event.CreateService(model.EventActionDelete, name, ctx.User())
 		}
+		biz.Event.CreateService(model.EventActionDelete, name, ctx.User())
 	}
 	return ajaxSuccess(ctx, nil)
 }
 
 func serviceNew(ctx web.Context) error {
-	service := &model.ServiceInfo{}
+	info := &model.ServiceInfo{}
 	tid := ctx.Q("template")
 	if tid != "" {
-		tpl, err := biz.Template.Get(tid)
+		err := biz.Template.FillInfo(tid, info)
 		if err != nil {
 			return err
-		}
-
-		if tpl != nil {
-			err = json.Unmarshal([]byte(tpl.Content), service)
-			if err != nil {
-				return err
-			}
-
-			if service.Registry != "" {
-				var registry *model.Registry
-				registry, err = biz.Registry.Get(service.Registry)
-				if err != nil {
-					return err
-				}
-				service.RegistryURL = registry.URL
-			}
 		}
 	}
 
@@ -177,11 +163,11 @@ func serviceNew(ctx web.Context) error {
 	}
 
 	checkedNetworks := data.NewSet()
-	checkedNetworks.AddSlice(service.Networks, func(i int) interface{} {
-		return service.Networks[i]
+	checkedNetworks.AddSlice(info.Networks, func(i int) interface{} {
+		return info.Networks[i]
 	})
 
-	m := newModel(ctx).Set("Service", service).Set("Registries", registries).
+	m := newModel(ctx).Set("Service", info).Set("Registries", registries).
 		Set("Networks", networks).Set("CheckedNetworks", checkedNetworks).
 		Set("Secrets", secrets).Set("Configs", configs)
 	return ctx.Render("service/new", m)
@@ -278,4 +264,10 @@ func serviceRollback(ctx web.Context) error {
 		biz.Event.CreateService(model.EventActionRollback, name, ctx.User())
 	}
 	return ajaxResult(ctx, err)
+}
+
+func servicePermEdit(ctx web.Context) error {
+	name := ctx.P("name")
+	m := newModel(ctx).Set("Name", name)
+	return permEdit(ctx, "service", name, "service/perm", m)
 }

@@ -18,6 +18,7 @@ type UserController struct {
 	Block   web.HandlerFunc `path:"/block" method:"post" name:"user.block" authorize:"!" desc:"block user"`
 	Unblock web.HandlerFunc `path:"/unblock" method:"post" name:"user.unblock" authorize:"!" desc:"unblock user"`
 	Delete  web.HandlerFunc `path:"/delete" method:"post" name:"user.delete" authorize:"!" desc:"delete user"`
+	Search  web.HandlerFunc `path:"/search" method:"post" name:"user.search" authorize:"?" desc:"search users"`
 }
 
 // User creates an instance of UserController
@@ -32,6 +33,7 @@ func User() (c *UserController) {
 		Block:   userBlock,
 		Unblock: userUnblock,
 		Delete:  userDelete,
+		Search:  userSearch,
 	}
 }
 
@@ -158,4 +160,30 @@ func userDelete(ctx web.Context) error {
 	id := ctx.F("id")
 	err := biz.User.Delete(id)
 	return ajaxResult(ctx, err)
+}
+
+func userSearch(ctx web.Context) error {
+	query := ctx.F("query")
+	args := &model.UserListArgs{
+		Query:     query,
+		PageIndex: 1,
+		PageSize:  10,
+	}
+	users, _, err := biz.User.List(args)
+	if err != nil {
+		return err
+	}
+
+	type User struct {
+		ID   string `json:"id"`
+		Name string `json:"name"`
+	}
+	list := make([]User, len(users))
+	for i, user := range users {
+		list[i] = User{
+			ID:   user.ID,
+			Name: user.Name,
+		}
+	}
+	return ctx.JSON(list)
 }

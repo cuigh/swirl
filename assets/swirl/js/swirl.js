@@ -1351,6 +1351,63 @@ var Swirl;
 })(Swirl || (Swirl = {}));
 var Swirl;
 (function (Swirl) {
+    var Perm;
+    (function (Perm) {
+        var Dispatcher = Swirl.Core.Dispatcher;
+        var Modal = Swirl.Core.Modal;
+        class EditPage {
+            constructor() {
+                $("#txt-query").keydown(this.searchUser);
+                $("#btn-add-user").click(this.addUser);
+                Dispatcher.bind("#div-users").on("delete-user", this.deleteUser.bind(this));
+            }
+            deleteUser(e) {
+                $(e.target).closest("div.control").remove();
+            }
+            searchUser(e) {
+                if (e.keyCode == 13) {
+                    let query = $.trim($(e.target).val());
+                    if (query.length == 0) {
+                        return;
+                    }
+                    $ajax.post("/system/user/search", { query: query }).encoder("form").json((users) => {
+                        let $panel = $("#nav-users");
+                        $panel.find("label.panel-block").remove();
+                        for (let user of users) {
+                            $panel.append(`<label class="panel-block">
+          <input type="checkbox" value="${user.id}" data-name="${user.name}"> ${user.name}
+        </label>`);
+                        }
+                    });
+                }
+            }
+            addUser() {
+                let users = {};
+                $("#div-users").find("input").each((i, e) => {
+                    users[$(e).val()] = true;
+                });
+                let $panel = $("#nav-users");
+                $panel.find("input:checked").each((i, e) => {
+                    let $el = $(e);
+                    if (users[$el.val()]) {
+                        return;
+                    }
+                    $("#div-users").append(`<div class="control">
+            <div class="tags has-addons">
+              <span class="tag is-info">${$el.data("name")}</span>
+              <a class="tag is-delete" data-action="delete-user"></a>
+              <input name="users[]" value="${$el.val()}" type="hidden">
+            </div>`);
+                });
+                Modal.close();
+                $panel.find("label.panel-block").remove();
+            }
+        }
+        Perm.EditPage = EditPage;
+    })(Perm = Swirl.Perm || (Swirl.Perm = {}));
+})(Swirl || (Swirl = {}));
+var Swirl;
+(function (Swirl) {
     var Registry;
     (function (Registry) {
         var Modal = Swirl.Core.Modal;
@@ -1762,27 +1819,13 @@ var Swirl;
                 this.table.on("delete-service", this.deleteService.bind(this))
                     .on("scale-service", this.scaleService.bind(this))
                     .on("rollback-service", this.rollbackService.bind(this));
-                $("#btn-delete").click(this.deleteServices.bind(this));
             }
             deleteService(e) {
                 let $tr = $(e.target).closest("tr");
-                let name = $tr.find("td:eq(1)").text().trim();
+                let name = $tr.find("td:eq(0)").text().trim();
                 Modal.confirm(`Are you sure to remove service: <strong>${name}</strong>?`, "Delete service", (dlg, e) => {
-                    $ajax.post("delete", { names: name }).trigger(e.target).encoder("form").json(() => {
+                    $ajax.post(`${name}/delete`, { names: name }).trigger(e.target).encoder("form").json(() => {
                         $tr.remove();
-                        dlg.close();
-                    });
-                });
-            }
-            deleteServices() {
-                let names = this.table.selectedKeys();
-                if (names.length == 0) {
-                    Modal.alert("Please select one or more items.");
-                    return;
-                }
-                Modal.confirm(`Are you sure to remove ${names.length} services?`, "Delete services", (dlg, e) => {
-                    $ajax.post("delete", { names: names.join(",") }).trigger(e.target).encoder("form").json(() => {
-                        this.table.selectedRows().remove();
                         dlg.close();
                     });
                 });
@@ -1791,20 +1834,20 @@ var Swirl;
                 let $btn = $(e.target).closest("button");
                 let $tr = $btn.closest("tr");
                 let data = {
-                    name: $tr.find("td:eq(1)").text().trim(),
+                    name: $tr.find("td:eq(0)").text().trim(),
                     count: $btn.data("replicas"),
                 };
                 Modal.confirm(`<input name="count" value="${data.count}" class="input" placeholder="Replicas">`, "Scale service", (dlg, e) => {
                     data.count = dlg.find("input[name=count]").val();
-                    $ajax.post("scale", data).trigger(e.target).encoder("form").json(() => {
+                    $ajax.post(`${data.name}/scale`, data).trigger(e.target).encoder("form").json(() => {
                         location.reload();
                     });
                 });
             }
             rollbackService(e) {
-                let $btn = $(e.target).closest("button"), $tr = $btn.closest("tr"), name = $tr.find("td:eq(1)").text().trim();
+                let $btn = $(e.target).closest("button"), $tr = $btn.closest("tr"), name = $tr.find("td:eq(0)").text().trim();
                 Modal.confirm(`Are you sure to rollback service: <strong>${name}</strong>?`, "Rollback service", (dlg, e) => {
-                    $ajax.post("rollback", { name: name }).trigger(e.target).encoder("form").json(() => {
+                    $ajax.post(`${name}/rollback`, { name: name }).trigger(e.target).encoder("form").json(() => {
                         dlg.close();
                     });
                 });

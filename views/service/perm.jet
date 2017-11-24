@@ -1,0 +1,104 @@
+{{ extends "_base" }}
+{{ import "../_modules/form" }}
+
+{{ block script() }}
+<script>$(() => new Swirl.Perm.EditPage())</script>
+{{ end }}
+
+{{ block body_content() }}
+<div class="container">
+  <nav class="breadcrumb has-succeeds-separator is-small is-marginless" aria-label="breadcrumbs">
+    <ul>
+      <li><a href="/">{{ i18n("menu.dashboard") }}</a></li>
+      <li><a href="/service/">{{ i18n("menu.service") }}</a></li>
+      <li class="is-active"><a>{{ i18n("menu.perm") }}</a></li>
+    </ul>
+  </nav>
+</div>
+<section class="hero is-small is-light">
+  <div class="hero-body">
+    <div class="container">
+      <h2 class="title is-2">{{ .Name }}</h2>
+    </div>
+  </div>
+</section>
+<nav class="navbar has-shadow">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item is-tab" href="/service/{{.Name}}/detail">{{ i18n("menu.detail") }}</a>
+      <a class="navbar-item is-tab" href="/service/{{.Name}}/raw">{{ i18n("menu.raw") }}</a>
+      <a class="navbar-item is-tab" href="/service/{{.Name}}/logs">{{ i18n("menu.log") }}</a>
+      <a class="navbar-item is-tab" href="/service/{{.Name}}/edit">{{ i18n("menu.edit") }}</a>
+      <a class="navbar-item is-tab is-active" href="/service/{{.Name}}/perm">{{ i18n("menu.perm") }}</a>
+    </div>
+  </div>
+</nav>
+<section class="section">
+  <div class="container">
+    <form method="post" data-form="ajax-json" data-url="/service/">
+      <div class="field">
+        <label class="label">{{ i18n("field.scope") }}</label>
+        <div class="field is-grouped is-grouped-multiline">
+          <div class="control">
+          {{ yield radio(name="scope", value=0, label="None", checked=.Perm.Scope) content }} data-type="integer"{{ end }}
+          {{ yield radio(name="scope", value=1, label="Write", checked=.Perm.Scope) content }} data-type="integer"{{ end }}
+          {{ yield radio(name="scope", value=2, label="Read & Write", checked=.Perm.Scope) content }} data-type="integer"{{ end }}
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">{{ i18n("field.role") }}</label>
+        <div class="control">
+          {{ roles := .CheckedRoles }}
+          {{range .Roles}}
+          {{ yield checkbox(name="roles", value=.ID, label=.Name, checked=isset(roles[.ID])) }}
+          {{end}}
+        </div>
+      </div>
+      <div class="field">
+        <label class="label" style="display: inline-block">{{ i18n("field.user") }}</label>
+        <button type="button" class="button is-small is-success is-outlined tooltip is-tooltip-bottom modal-trigger" data-tooltip="{{ i18n("button.add") }}" data-action="add-user" data-target="dlg-add-user">
+          <span class="icon"><i class="fa fa-plus"></i></span>
+        </button>
+        <div id="div-users" class="field is-grouped is-grouped-multiline">
+          {{range .Users}}
+          <div class="control">
+            <div class="tags has-addons">
+              <span class="tag is-info">{{ .Name }}</span>
+              <a class="tag is-delete" data-action="delete-user"></a>
+              <input name="users[]" value="{{ .ID }}" type="hidden">
+            </div>
+          </div>
+          {{end}}
+        </div>
+      </div>
+      {{ yield form_submit(url="/service/") }}
+    </form>
+  </div>
+</section>
+<div id="dlg-add-user" class="modal">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Add user</p>
+      <button class="delete"></button>
+    </header>
+    <section class="modal-card-body" style="max-height: 400px; overflow-y: auto">
+      <nav id="nav-users" class="panel">
+        <div class="panel-block">
+          <p class="control has-icons-left">
+            <input id="txt-query" class="input is-small" type="text" placeholder="Searching user...">
+            <span class="icon is-small is-left">
+              <i class="fa fa-search"></i>
+            </span>
+          </p>
+        </div>
+      </nav>
+    </section>
+    <footer class="modal-card-foot">
+      <button id="btn-add-user" type="button" class="button is-primary">{{ i18n("button.confirm") }}</button>
+      <button type="button" class="button dismiss">{{ i18n("button.cancel") }}</button>
+    </footer>
+  </div>
+</div>
+{{ end }}
