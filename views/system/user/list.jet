@@ -80,7 +80,7 @@
       <tbody>
         {{range .Users}}
         <tr data-id="{{.ID}}">
-          <td><a href="{{.LoginName}}/detail">{{.Name}}</a></td>
+          <td><a href="{{.LoginName}}/detail">{{.Name}}</a>{{ if .Admin }}<span class="icon has-text-danger tooltip" data-tooltip="Administrator"><i class="fa fa-flag"></i></span>{{ end }}</td>
           <td>{{.LoginName}}</td>
           <td>{{.Email}}</td>
           <td>{{.Type}}</td>
