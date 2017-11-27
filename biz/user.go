@@ -107,7 +107,7 @@ func (b *userBiz) UpdatePassword(id, oldPwd, newPwd string) (err error) {
 			return
 		}
 
-		if !password.Validate(user.Password, oldPwd, user.Salt) {
+		if !password.Validate(oldPwd, user.Password, user.Salt) {
 			err = errors.New("Current password is incorrect")
 			return
 		}
@@ -189,7 +189,7 @@ func (b *userBiz) Login(name, pwd string) (token string, err error) {
 }
 
 func (b *userBiz) loginInternal(user *model.User, pwd string) error {
-	if !password.Validate(user.Password, pwd, user.Salt) {
+	if !password.Validate(pwd, user.Password, user.Salt) {
 		return ErrIncorrectAuth
 	}
 	return nil
