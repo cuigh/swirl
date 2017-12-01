@@ -3,9 +3,9 @@ package biz
 import (
 	"time"
 
-	"github.com/cuigh/auxo/data/guid"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/dao"
+	"github.com/cuigh/swirl/misc"
 	"github.com/cuigh/swirl/model"
 )
 
@@ -15,7 +15,7 @@ type registryBiz struct {
 }
 
 func (b *registryBiz) Create(registry *model.Registry, user web.User) (err error) {
-	registry.ID = guid.New()
+	registry.ID = misc.NewID()
 	registry.CreatedAt = time.Now()
 	registry.UpdatedAt = registry.CreatedAt
 

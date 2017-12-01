@@ -3,7 +3,7 @@ package mongo
 import (
 	"time"
 
-	"github.com/cuigh/auxo/data/guid"
+	"github.com/cuigh/swirl/misc"
 	"github.com/cuigh/swirl/model"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -29,7 +29,7 @@ func (d *Dao) ArchiveList(args *model.ArchiveListArgs) (archives []*model.Archiv
 }
 
 func (d *Dao) ArchiveCreate(archive *model.Archive) (err error) {
-	archive.ID = guid.New()
+	archive.ID = misc.NewID()
 	archive.CreatedAt = time.Now()
 	archive.UpdatedAt = archive.CreatedAt
 

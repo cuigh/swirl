@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/cuigh/auxo/data/guid"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/dao"
+	"github.com/cuigh/swirl/misc"
 	"github.com/cuigh/swirl/model"
 )
 
@@ -25,7 +25,7 @@ func (b *templateBiz) List(args *model.TemplateListArgs) (tpls []*model.Template
 
 func (b *templateBiz) Create(tpl *model.Template, user web.User) (err error) {
 	do(func(d dao.Interface) {
-		tpl.ID = guid.New()
+		tpl.ID = misc.NewID()
 		err = d.TemplateCreate(tpl)
 		if err == nil {
 			Event.CreateServiceTemplate(model.EventActionCreate, tpl.ID, tpl.Name, user)

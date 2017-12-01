@@ -6,12 +6,12 @@ import (
 	"net"
 	"time"
 
-	"github.com/cuigh/auxo/data/guid"
 	"github.com/cuigh/auxo/errors"
 	"github.com/cuigh/auxo/log"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/auxo/security/password"
 	"github.com/cuigh/swirl/dao"
+	"github.com/cuigh/swirl/misc"
 	"github.com/cuigh/swirl/model"
 	"github.com/go-ldap/ldap"
 )
@@ -38,7 +38,7 @@ func (b *userBiz) GetByName(loginName string) (user *model.User, err error) {
 }
 
 func (b *userBiz) Create(user *model.User, ctxUser web.User) (err error) {
-	user.ID = guid.New()
+	user.ID = misc.NewID()
 	user.Status = model.UserStatusActive
 	user.CreatedAt = time.Now()
 	user.UpdatedAt = user.CreatedAt
@@ -172,7 +172,7 @@ func (b *userBiz) Login(name, pwd string) (token string, err error) {
 
 		session := &model.Session{
 			UserID:    user.ID,
-			Token:     guid.New(),
+			Token:     misc.NewID(),
 			UpdatedAt: time.Now(),
 		}
 		session.Expires = session.UpdatedAt.Add(time.Hour * 24)
@@ -353,20 +353,3 @@ func (b *userBiz) Authorize(user web.User, h web.HandlerInfo) bool {
 	}
 	return false
 }
-
-//
-//func (b *userBiz) Find(key string) string {
-//	b.locker.Lock()
-//	defer b.locker.Unlock()
-//
-//	return b.tickets[key]
-//}
-//
-//func (b *userBiz) setTicket(name string) (key string) {
-//	b.locker.Lock()
-//	defer b.locker.Unlock()
-//
-//	key = guid.New()
-//	b.tickets[key] = name
-//	return
-//}

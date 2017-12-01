@@ -3,9 +3,9 @@ package biz
 import (
 	"time"
 
-	"github.com/cuigh/auxo/data/guid"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/dao"
+	"github.com/cuigh/swirl/misc"
 	"github.com/cuigh/swirl/model"
 )
 
@@ -24,7 +24,7 @@ func (b *roleBiz) List() (roles []*model.Role, err error) {
 
 func (b *roleBiz) Create(role *model.Role, user web.User) (err error) {
 	do(func(d dao.Interface) {
-		role.ID = guid.New()
+		role.ID = misc.NewID()
 		role.CreatedAt = time.Now()
 		role.UpdatedAt = role.CreatedAt
 		err = d.RoleCreate(role)

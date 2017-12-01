@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/cuigh/auxo/data/guid"
 	"github.com/cuigh/auxo/util/i18n"
 )
 
@@ -33,6 +34,10 @@ var Funcs = map[string]interface{}{
 	"trimPrefix": func(s, prefix string) string {
 		return strings.TrimPrefix(s, prefix)
 	},
+}
+
+func NewID() string {
+	return guid.New().String()
 }
 
 func Message(lang string) func(key string, args ...interface{}) string {

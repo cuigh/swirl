@@ -3,10 +3,10 @@ package biz
 import (
 	"time"
 
-	"github.com/cuigh/auxo/data/guid"
 	"github.com/cuigh/auxo/log"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/dao"
+	"github.com/cuigh/swirl/misc"
 	"github.com/cuigh/swirl/model"
 )
 
@@ -17,7 +17,7 @@ type eventBiz struct {
 }
 
 func (b *eventBiz) Create(event *model.Event) {
-	event.ID = guid.New()
+	event.ID = misc.NewID()
 	event.Time = time.Now()
 
 	do(func(d dao.Interface) {
