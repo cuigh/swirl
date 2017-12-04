@@ -64,15 +64,12 @@ func NodeInspect(id string) (node swarm.Node, raw []byte, err error) {
 // NodeUpdate update a node.
 func NodeUpdate(id string, info *model.NodeUpdateInfo) error {
 	return mgr.Do(func(ctx context.Context, cli *client.Client) (err error) {
-		version := swarm.Version{
-			Index: info.Version,
-		}
 		spec := swarm.NodeSpec{
 			Role:         info.Role,
 			Availability: info.Availability,
 		}
 		spec.Name = info.Name
 		spec.Labels = info.Labels.ToMap()
-		return cli.NodeUpdate(ctx, id, version, spec)
+		return cli.NodeUpdate(ctx, id, version(info.Version), spec)
 	})
 }

@@ -308,7 +308,7 @@ func ServiceUpdate(info *model.ServiceInfo) error {
 			RegistryAuthFrom: types.RegistryAuthFromSpec,
 			QueryRegistry:    false,
 		}
-		resp, err := cli.ServiceUpdate(context.Background(), info.Name, service.Version, spec, options)
+		resp, err := cli.ServiceUpdate(context.Background(), info.Name, version(info.Version), spec, options)
 		if err == nil && len(resp.Warnings) > 0 {
 			mgr.Logger().Warnf("service %s was updated but got warnings: %v", info.Name, resp.Warnings)
 		}
@@ -720,6 +720,7 @@ func ServiceRollback(name string) error {
 		options := types.ServiceUpdateOptions{
 			RegistryAuthFrom: types.RegistryAuthFromPreviousSpec,
 			QueryRegistry:    false,
+			Rollback:         "previous",
 		}
 		resp, err := cli.ServiceUpdate(context.Background(), name, service.Version, spec, options)
 		if err == nil && len(resp.Warnings) > 0 {

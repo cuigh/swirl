@@ -9,7 +9,7 @@ import (
 	"github.com/cuigh/auxo/errors"
 	"github.com/cuigh/auxo/log"
 	"github.com/cuigh/auxo/net/web"
-	"github.com/cuigh/auxo/security/password"
+	"github.com/cuigh/auxo/security/passwd"
 	"github.com/cuigh/swirl/dao"
 	"github.com/cuigh/swirl/misc"
 	"github.com/cuigh/swirl/model"
@@ -43,7 +43,7 @@ func (b *userBiz) Create(user *model.User, ctxUser web.User) (err error) {
 	user.CreatedAt = time.Now()
 	user.UpdatedAt = user.CreatedAt
 	if user.Type == model.UserTypeInternal {
-		user.Password, user.Salt, err = password.Generate(user.Password)
+		user.Password, user.Salt, err = passwd.Generate(user.Password)
 		if err != nil {
 			return
 		}
@@ -107,12 +107,12 @@ func (b *userBiz) UpdatePassword(id, oldPwd, newPwd string) (err error) {
 			return
 		}
 
-		if !password.Validate(oldPwd, user.Password, user.Salt) {
+		if !passwd.Validate(oldPwd, user.Password, user.Salt) {
 			err = errors.New("Current password is incorrect")
 			return
 		}
 
-		pwd, salt, err = password.Generate(newPwd)
+		pwd, salt, err = passwd.Generate(newPwd)
 		if err != nil {
 			return
 		}
@@ -189,7 +189,7 @@ func (b *userBiz) Login(name, pwd string) (token string, err error) {
 }
 
 func (b *userBiz) loginInternal(user *model.User, pwd string) error {
-	if !password.Validate(pwd, user.Password, user.Salt) {
+	if !passwd.Validate(pwd, user.Password, user.Salt) {
 		return ErrIncorrectAuth
 	}
 	return nil

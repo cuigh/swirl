@@ -7,6 +7,7 @@ import (
 
 	"github.com/cuigh/auxo/log"
 	"github.com/cuigh/swirl/misc"
+	"github.com/docker/docker/api/types/swarm"
 	"github.com/docker/docker/client"
 )
 
@@ -60,4 +61,8 @@ func (m *manager) Logger() *log.Logger {
 		}
 	}
 	return m.logger
+}
+
+func version(v uint64) swarm.Version {
+	return swarm.Version{Index: v}
 }

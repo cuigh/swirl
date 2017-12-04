@@ -163,6 +163,7 @@ func NewServiceDetailInfo(service swarm.Service) *ServiceDetailInfo {
 
 type ServiceInfo struct {
 	Name            string       `json:"name"`
+	Version         uint64       `json:"version"`
 	Registry        string       `json:"registry"`
 	RegistryURL     string       `json:"-"`
 	RegistryAuth    string       `json:"-"`
@@ -236,7 +237,8 @@ type ServiceInfo struct {
 func NewServiceInfo(service swarm.Service) *ServiceInfo {
 	spec := service.Spec
 	si := &ServiceInfo{
-		Name: spec.Name,
+		Name:    spec.Name,
+		Version: service.Version.Index,
 		//Hostname:    spec.TaskTemplate.ContainerSpec.Hostname,
 		Image:           spec.TaskTemplate.ContainerSpec.Image,
 		Command:         strings.Join(spec.TaskTemplate.ContainerSpec.Command, " "),
@@ -549,7 +551,8 @@ type ConfigCreateInfo struct {
 }
 
 type ConfigUpdateInfo struct {
-	ID string `json:"id"`
+	ID      string `json:"id"`
+	Version uint64 `json:"version"`
 	ConfigCreateInfo
 }
 

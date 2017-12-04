@@ -36,6 +36,7 @@
 <section class="section">
   <div class="container">
     <form method="post" data-form="ajax-json" data-url="/service/">
+      <input name="version" value="{{ .Service.Version }}" type="hidden" data-type="integer">
       <div class="columns">
         <div class="column">
           <div class="field">

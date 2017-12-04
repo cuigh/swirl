@@ -60,7 +60,7 @@ func SecretUpdate(info *model.ConfigUpdateInfo) error {
 		//spec.Name = info.Name
 		//spec.Data = []byte(info.Data)
 		spec.Labels = info.Labels.ToMap()
-		return cli.SecretUpdate(ctx, info.ID, secret.Version, spec)
+		return cli.SecretUpdate(ctx, info.ID, version(info.Version), spec)
 	})
 }
 

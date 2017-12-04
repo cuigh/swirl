@@ -60,7 +60,7 @@ func ConfigUpdate(info *model.ConfigUpdateInfo) error {
 		//spec.Name = info.Name
 		//spec.Data = []byte(info.Data)
 		spec.Labels = info.Labels.ToMap()
-		return cli.ConfigUpdate(ctx, info.ID, cfg.Version, spec)
+		return cli.ConfigUpdate(ctx, info.ID, version(info.Version), spec)
 	})
 }
 
