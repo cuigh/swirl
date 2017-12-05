@@ -6,6 +6,7 @@ import (
 	"net"
 	"time"
 
+	"github.com/cuigh/auxo/cache"
 	"github.com/cuigh/auxo/errors"
 	"github.com/cuigh/auxo/log"
 	"github.com/cuigh/auxo/net/web"
@@ -306,6 +307,8 @@ func (b *userBiz) ldapSearchOne(setting *model.Setting, l *ldap.Conn, name strin
 
 // Identify authenticate user
 func (b *userBiz) Identify(token string) (user web.User) {
+	const cacheKey = "auth_user"
+
 	do(func(d dao.Interface) {
 		var (
 			roles []*model.Role
@@ -319,6 +322,15 @@ func (b *userBiz) Identify(token string) (user web.User) {
 		}
 		if session == nil || session.Expires.Before(time.Now()) {
 			return
+		}
+
+		value := cache.Get(cacheKey, session.UserID)
+		if !value.IsNil() {
+			user = &model.AuthUser{}
+			if err = value.Scan(user); err == nil {
+				return
+			}
+			log.Get("user").Warnf("Load auth user from cache failed: %v", err)
 		}
 
 		u, err := d.UserGetByID(session.UserID)
@@ -342,6 +354,7 @@ func (b *userBiz) Identify(token string) (user web.User) {
 			}
 		}
 		user = model.NewAuthUser(u, roles)
+		cache.Set(user, cacheKey, session.UserID)
 	})
 	return
 }

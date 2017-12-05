@@ -9,6 +9,7 @@ import (
 
 	"github.com/cuigh/auxo/app"
 	"github.com/cuigh/auxo/app/flag"
+	_ "github.com/cuigh/auxo/cache/memory"
 	"github.com/cuigh/auxo/config"
 	"github.com/cuigh/auxo/data/valid"
 	"github.com/cuigh/auxo/net/web"
