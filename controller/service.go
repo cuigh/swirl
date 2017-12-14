@@ -179,6 +179,7 @@ func serviceCreate(ctx web.Context) error {
 	if err != nil {
 		return err
 	}
+	info.Normalize()
 
 	if info.Registry != "" {
 		var registry *model.Registry
@@ -234,6 +235,7 @@ func serviceUpdate(ctx web.Context) error {
 	err := ctx.Bind(info)
 	if err == nil {
 		info.Name = ctx.P("name")
+		info.Normalize()
 		err = docker.ServiceUpdate(info)
 	}
 
