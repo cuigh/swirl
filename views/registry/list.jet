@@ -132,7 +132,7 @@
         <div class="field">
           <label class="label">{{ i18n("field.password") }}</label>
           <div class="control">
-            <input name="password" class="input" type="password" placeholder="Login password">
+            <input name="password" class="input" type="password" autocomplete="new-password" placeholder="Login password">
           </div>
         </div>                        
       </section>
