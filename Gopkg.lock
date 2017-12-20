@@ -20,16 +20,10 @@
   version = "v0.4.5"
 
 [[projects]]
-  name = "github.com/Sirupsen/logrus"
-  packages = ["."]
-  revision = "f006c2ac4710855cf0f916dd6b77acf6b048dc6e"
-  version = "v1.0.3"
-
-[[projects]]
   branch = "master"
   name = "github.com/cuigh/auxo"
-  packages = [".","app","app/flag","byte/size","config","data","data/guid","encoding/yaml","errors","ext/files","ext/reflects","ext/texts","ext/times","log","log/console","log/file","net/web","net/web/filter","net/web/filter/auth","net/web/renderer","net/web/renderer/jet","net/web/router","security","security/password","util/cast","util/debug","util/i18n"]
-  revision = "cd9aaaa6a0ad82e195a712b03555c948b993c14d"
+  packages = [".","app","app/flag","byte/size","cache","cache/memory","config","data","data/guid","data/valid","encoding/yaml","errors","ext/files","ext/reflects","ext/texts","ext/times","log","log/console","log/file","net/web","net/web/filter","net/web/filter/auth","net/web/renderer","net/web/renderer/jet","net/web/router","security","security/passwd","util/cast","util/debug","util/i18n","util/lazy"]
+  revision = "884fa635c732cc5a6f5e43f590e9393f7b789637"
 
 [[projects]]
   branch = "master"
@@ -69,18 +63,6 @@
   version = "v0.5"
 
 [[projects]]
-  name = "github.com/gorilla/context"
-  packages = ["."]
-  revision = "1ea25387ff6f684839d82767c1733ff4d4d15d0a"
-  version = "v1.1"
-
-[[projects]]
-  name = "github.com/gorilla/mux"
-  packages = ["."]
-  revision = "7f08801859139f86dfafd1c296e2cba9a80d292e"
-  version = "v1.6.0"
-
-[[projects]]
   name = "github.com/mattn/go-shellwords"
   packages = ["."]
   revision = "02e3cf038dcea8290e44424da473dd12be796a8a"
@@ -113,7 +95,7 @@
 [[projects]]
   branch = "master"
   name = "golang.org/x/crypto"
-  packages = ["acme","acme/autocert","ssh/terminal"]
+  packages = ["acme","acme/autocert"]
   revision = "9f005a07e0d31d45e6656d241bb5c0f2efd4bc94"
 
 [[projects]]
@@ -125,7 +107,7 @@
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
-  packages = ["unix","windows"]
+  packages = ["windows"]
   revision = "bf42f188b9bc6f2cf5b8ee5a912ef1aedd0eba4c"
 
 [[projects]]
@@ -149,6 +131,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "9b88c72e1df239e3431f07193b5f1ac5f6889418ac95af966cd58b2947a44596"
+  inputs-digest = "9e82a1ccbfaf6d829a674b5a0bbf05663612d9ea9f443534f3153bd37b7128fa"
   solver-name = "gps-cdcl"
   solver-version = 1
