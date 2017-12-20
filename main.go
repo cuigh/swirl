@@ -84,8 +84,8 @@ func server() *web.Server {
 	g := ws.Group("", form, filter.NewAuthorizer(biz.User.Authorize))
 
 	// register auth handlers
-	g.Post("/login", form.LoginJSON(biz.User.Login)).SetAuthorize(web.AuthAnonymous)
-	g.Get("/logout", form.Logout).SetAuthorize(web.AuthAuthenticated)
+	g.Post("/login", form.LoginJSON(biz.User.Login), web.WithName("login"), web.WithAuthorize(web.AuthAnonymous))
+	g.Get("/logout", form.Logout, web.WithName("logout"), web.WithAuthorize(web.AuthAuthenticated))
 
 	// register controllers
 	g.Handle("", controller.Home())
