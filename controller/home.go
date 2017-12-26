@@ -11,9 +11,9 @@ import (
 // HomeController is a basic controller of site
 type HomeController struct {
 	Index    web.HandlerFunc `path:"/" name:"index" authorize:"?" desc:"index page"`
-	Login    web.HandlerFunc `path:"/login" name:"login" authorize:"*" desc:"sign in page"`
-	InitGet  web.HandlerFunc `path:"/init" name:"init" authorize:"*" desc:"initialize page"`
-	InitPost web.HandlerFunc `path:"/init" method:"post" name:"init" authorize:"*" desc:"initialize system"`
+	Login    web.HandlerFunc `path:"/login" name:"login.view" authorize:"*" desc:"sign in page"`
+	InitGet  web.HandlerFunc `path:"/init" name:"init.view" authorize:"*" desc:"initialize page"`
+	InitPost web.HandlerFunc `path:"/init" name:"init" method:"post" authorize:"*" desc:"initialize system"`
 	Error403 web.HandlerFunc `path:"/403" name:"403" authorize:"?" desc:"403 page"`
 	Error404 web.HandlerFunc `path:"/404" name:"404" authorize:"*" desc:"404 page"`
 }
