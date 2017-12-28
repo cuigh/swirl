@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ language == "" ? "en" : language }}">
+<html class="has-navbar-fixed-top" lang="{{ language == "" ? "en" : language }}">
   <head>
     <title>Swirl</title>
     <meta charset="utf-8">
@@ -7,13 +7,13 @@
     <meta name="description" content="{{ i18n("description") }}">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="/assets/lyicon/css/lyicon.css">
-    <link rel="stylesheet" href="/assets/bulma/bulma.css?v=0.5.3">
+    <link rel="stylesheet" href="/assets/bulma/bulma.css?v=0.6.1">
     <link rel="stylesheet" href="/assets/swirl/css/swirl.css?v={{ version }}">
     {{ block style() }}{{end}}
   </head>
   <body>
     <div class="page-wrap">
-      <nav class="navbar">
+      <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
         <div class="navbar-brand">
           <a class="navbar-item" href="/">
             <img src="/assets/swirl/img/logo.png" alt="logo" height="28">

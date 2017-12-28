@@ -4,19 +4,19 @@
 {{ end }}
 
 {{ block checkbox(id, name, value, label, checked, disabled=false) }}
-<input id="{{id ? id : (name + "-" + value)}}"{{if name}} name="{{name}}[]"{{end}}{{if value}} value="{{value}}"{{end}} type="checkbox" class="is-checkbox"{{if checked}} checked{{end}}{{if disabled}} disabled{{end}}{{yield content}}>
+<input id="{{id ? id : (name + "-" + value)}}"{{if name}} name="{{name}}[]"{{end}}{{if value}} value="{{value}}"{{end}} type="checkbox" class="is-checkradio"{{if checked}} checked{{end}}{{if disabled}} disabled{{end}}{{yield content}}>
 <label for="{{id ? id : (name + "-" + value)}}">{{label}}</label>
 {{ end }}
 
 {{ block radio(id, name, value, label, checked, disabled=false) }}
-<input id="{{id ? id : (name + "-" + value)}}" name="{{name}}" value="{{value}}" type="radio" class="is-radio"{{if eq(checked, value)}} checked{{end}}{{if disabled}} disabled{{end}}{{yield content}}>
+<input id="{{id ? id : (name + "-" + value)}}" name="{{name}}" value="{{value}}" type="radio" class="is-checkradio"{{if eq(checked, value)}} checked{{end}}{{if disabled}} disabled{{end}}{{yield content}}>
 <label for="{{id ? id : (name + "-" + value)}}">{{label}}</label>
 {{ end }}
 
 {{ block radios(name, values, labels="", checked) }}
 {{ labels = eq(labels, "") ? values : labels }}
 {{ range i, v := values }}
-<input id="{{ name + "-" + v }}" name="{{name}}" value="{{v}}" type="radio" class="is-radio"{{ if eq(checked, v) }} checked{{end}}>
+<input id="{{ name + "-" + v }}" name="{{name}}" value="{{v}}" type="radio" class="is-checkradio"{{ if eq(checked, v) }} checked{{end}}>
 <label for="{{ name + "-" + v }}">{{ labels[i] }}</label>
 {{ end }}
 {{ end }}
