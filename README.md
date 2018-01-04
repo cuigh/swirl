@@ -113,6 +113,12 @@ docker service create \
   cuigh/swirl
 ```
 
+### Docker compose
+
+```bash
+docker stack deploy -c compose.yml swirl
+```
+
 ## Build
 
 **Swirl** use `dep` as dependency management tool. You can build **Swirl**

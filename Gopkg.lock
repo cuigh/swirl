@@ -23,7 +23,7 @@
   branch = "master"
   name = "github.com/cuigh/auxo"
   packages = [".","app","app/flag","byte/size","cache","cache/memory","config","data","data/guid","data/valid","encoding/yaml","errors","ext/files","ext/reflects","ext/texts","ext/times","log","log/console","log/file","net/web","net/web/filter","net/web/filter/auth","net/web/renderer","net/web/renderer/jet","net/web/router","security","security/passwd","util/cast","util/debug","util/i18n","util/lazy"]
-  revision = "884fa635c732cc5a6f5e43f590e9393f7b789637"
+  revision = "f599f84ec7ef56f01457d0fb0d8eeb9d8c100b43"
 
 [[projects]]
   branch = "master"

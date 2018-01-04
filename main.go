@@ -61,13 +61,13 @@ func server() *web.Server {
 
 	// set render
 	ws.Validator = &valid.Validator{Tag: "valid"}
-	ws.Renderer = jet.New().SetDebug(config.GetBool("debug")).
-		AddFunc("time", misc.FormatTime(setting.TimeZone.Offset)).
-		AddFunc("i18n", misc.Message(setting.Language)).
-		AddFuncs(misc.Funcs).
-		AddVariable("language", setting.Language).
-		AddVariable("version", app.Version).
-		AddVariable("go_version", runtime.Version())
+	ws.Renderer = jet.Must(jet.Debug(config.GetBool("debug")), jet.VarMap(misc.Funcs), jet.VarMap(map[string]interface{}{
+		"language":   setting.Language,
+		"version":    app.Version,
+		"go_version": runtime.Version(),
+		"time":       misc.FormatTime(setting.TimeZone.Offset),
+		"i18n":       misc.Message(setting.Language),
+	}))
 
 	// register global filters
 	ws.Use(filter.NewRecover())
