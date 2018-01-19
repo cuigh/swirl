@@ -58,7 +58,7 @@
             <span class="tag is-{{.Actives == 0 ? "danger" : (.Actives < .Replicas ? "warning" : "success")}}">{{.Actives}}/{{.Replicas}}</span>
           </div>
         </td>
-        <td>{{time(.UpdatedAt)}}</td>
+        <td>{{time(.UpdatedAt)}}{{ if .UpdateStatus }}<span class="icon {{ if .UpdateStatus == "completed" }}has-text-success{{ else if .UpdateStatus == "updating" }}has-text-warning{{ else }}has-text-danger{{ end }} tooltip" data-tooltip="{{.UpdateStatus}}"><i class="fa fa-circle"></i></span>{{ end }}</td>
         <td>
           <a href="{{.Name}}/edit" class="button is-small is-dark is-outlined tooltip is-tooltip-bottom" data-tooltip="{{ i18n("button.edit") }}">
             <span class="icon"><i class="fa fa-edit"></i></span>

@@ -93,13 +93,14 @@ type StackListInfo struct {
 }
 
 type ServiceListInfo struct {
-	Name      string
-	Image     string
-	Mode      string
-	Actives   uint64
-	Replicas  uint64
-	UpdatedAt time.Time
-	Rollback  bool
+	Name         string
+	Image        string
+	Mode         string
+	Actives      uint64
+	Replicas     uint64
+	Rollback     bool
+	UpdatedAt    time.Time
+	UpdateStatus string
 }
 
 func NewServiceListInfo(service swarm.Service, actives uint64) *ServiceListInfo {
@@ -109,6 +110,9 @@ func NewServiceListInfo(service swarm.Service, actives uint64) *ServiceListInfo 
 		Actives:   actives,
 		UpdatedAt: service.UpdatedAt.Local(),
 		Rollback:  service.PreviousSpec != nil,
+	}
+	if service.UpdateStatus != nil {
+		info.UpdateStatus = string(service.UpdateStatus.State)
 	}
 	if service.Spec.Mode.Replicated != nil && service.Spec.Mode.Replicated.Replicas != nil {
 		info.Mode = "replicated"

@@ -126,6 +126,7 @@ network.description: Networks are user-defined networks that containers can be a
 service.title: Service
 service.description: Services are the definitions of tasks to run on a swarm.
 service.edit.warning: "NOTE: This service belong to '%s' stack, usually you should modify original compose instead of updating it directly."
+service.field.update-status: "Update status"
 
 # service template pages
 service.template.title: Service Template

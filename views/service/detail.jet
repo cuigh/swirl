@@ -72,6 +72,10 @@
         <dd>{{ time(.Service.CreatedAt) }}</dd>
         <dt class="has-text-left">{{ i18n("field.updated-at") }}</dt>
         <dd>{{ time(.Service.UpdatedAt) }}</dd>
+        {{ if .Service.UpdateStatus }}
+        <dt class="has-text-left">{{ i18n("service.field.update-status") }}</dt>
+        <dd>{{ .Service.UpdateStatus.State }}({{ .Service.UpdateStatus.Message }})</dd>
+        {{ end }}
       </dl>
       </div>
     </div>
