@@ -2,7 +2,7 @@ package mongo
 
 import (
 	"github.com/cuigh/swirl/model"
-	"gopkg.in/mgo.v2/bson"
+	"github.com/globalsign/mgo/bson"
 )
 
 func (d *Dao) EventList(args *model.EventListArgs) (events []*model.Event, count int, err error) {

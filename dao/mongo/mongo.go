@@ -2,11 +2,10 @@ package mongo
 
 import (
 	"errors"
-
 	"time"
 
 	"github.com/cuigh/auxo/log"
-	"gopkg.in/mgo.v2"
+	"github.com/globalsign/mgo"
 )
 
 var (

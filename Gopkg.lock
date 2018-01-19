@@ -51,6 +51,12 @@
   version = "v0.3.2"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/globalsign/mgo"
+  packages = [".","bson","internal/json","internal/sasl","internal/scram"]
+  revision = "896bbb89d21253a28cd5a7f8b81fe091410cb94d"
+
+[[projects]]
   name = "github.com/go-ldap/ldap"
   packages = ["."]
   revision = "8168ee085ee43257585e50c6441aadf54ecb2c9f"
@@ -118,12 +124,6 @@
 
 [[projects]]
   branch = "v2"
-  name = "gopkg.in/mgo.v2"
-  packages = [".","bson","internal/json","internal/sasl","internal/scram"]
-  revision = "3f83fa5005286a7fe593b055f0d7771a7dce4655"
-
-[[projects]]
-  branch = "v2"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
   revision = "eb3733d160e74a9c7e442f435eb3bea458e1d19f"
@@ -131,6 +131,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "9e82a1ccbfaf6d829a674b5a0bbf05663612d9ea9f443534f3153bd37b7128fa"
+  inputs-digest = "2e2023629c134da8099f44e6d2719a5bc407d2b350e75f6f79a35ade95859ebd"
   solver-name = "gps-cdcl"
   solver-version = 1

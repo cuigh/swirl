@@ -2,8 +2,8 @@ package mongo
 
 import (
 	"github.com/cuigh/swirl/model"
-	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
+	"github.com/globalsign/mgo"
+	"github.com/globalsign/mgo/bson"
 )
 
 func (d *Dao) PermGet(resType, resID string) (p *model.Perm, err error) {
