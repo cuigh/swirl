@@ -6,7 +6,7 @@
     <nav class="level is-mobile">
       <div class="level-left">
         <div class="level-item has-text-centered">
-          <span class="icon is-huge"><i class="fa fa-{{icon}}"></i></span>
+          <span class="icon infobox"><i class="fas fa-{{icon}} fa-4x"></i></span>
         </div>
       </div>
       <div class="level-right">
@@ -38,13 +38,13 @@
       <p>
         <a id="btn-add" class="button is-primary" href="https://github.com/cuigh/swirl" target="_blank">
           <span class="icon">
-            <i class="fa fa-github"></i>
+            <i class="fab fa-github"></i>
           </span>
           <span>GitHub</span>
         </a>
         {*<a id="btn-add" class="button is-success" href="https://cuigh.tech/swirl" target="_blank">*}
           {*<span class="icon">*}
-            {*<i class="fa fa-book"></i>*}
+            {*<i class="fas fa-book"></i>*}
           {*</span>*}
           {*<span>Document</span>*}
         {*</a>*}
@@ -60,7 +60,7 @@
   <div class="columns">
     {{yield infobox(style="success", icon="cubes", text=i18n("dashboard.node"), url="/node/", count=.NodeCount)}}
     {{yield infobox(style="info", icon="globe", text=i18n("dashboard.network"), url="/network/", count=.NetworkCount)}}
-    {{yield infobox(style="danger", icon="ticket", text=i18n("dashboard.service"), url="/service/", count=.ServiceCount)}}
+    {{yield infobox(style="danger", icon="ticket-alt", text=i18n("dashboard.service"), url="/service/", count=.ServiceCount)}}
     {{yield infobox(style="primary", icon="server", text=i18n("dashboard.stack"), url="/stack/task/", count=.StackCount)}}
   </div>
   <hr>

@@ -54,7 +54,7 @@
         {{end}}
       </p>
       <p class="level-item">
-        <button id="btn-delete" class="button is-danger"><span class="icon"><i class="fa fa-remove"></i></span><span>{{ i18n("button.delete") }}</span></button>
+        <button id="btn-delete" class="button is-danger"><span class="icon"><i class="fas fa-times"></i></span><span>{{ i18n("button.delete") }}</span></button>
       </p>
     </div>
   </nav>

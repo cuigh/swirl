@@ -6,7 +6,7 @@
     <meta name="keywords" content="swirl,docker,moby,swarm,docker-compose,docker-ui,docker-web-management">
     <meta name="description" content="{{ i18n("description") }}">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="/assets/lyicon/css/lyicon.css">
+    <link rel="stylesheet" href="/assets/fontawesome/fa-svg-with-js.css?v=5.0.4">
     <link rel="stylesheet" href="/assets/bulma/bulma.css?v=0.6.1">
     <link rel="stylesheet" href="/assets/swirl/css/swirl.css?v={{ version }}">
     {{ block style() }}{{end}}
@@ -69,7 +69,7 @@
               <span>{{.ContextUser.Name()}}</span>
             </div>
             <div class="navbar-item has-dropdown is-hoverable is-narrow">
-              <div class="navbar-link is-narrow"><span class="icon"><i class="fa fa-user"></i></span></div>
+              <div class="navbar-link is-narrow"><span class="icon"><i class="fas fa-user"></i></span></div>
               <div class="navbar-dropdown is-right">
                 <a class="navbar-item" href="/profile/">{{ i18n("menu.profile") }}</a>
                 <a class="navbar-item" href="/profile/password">{{ i18n("menu.password") }}</a>
@@ -80,7 +80,7 @@
                 <p class="control">
                   <a class="button is-outlined tooltip is-tooltip-bottom" href="/logout" data-tooltip="{{ i18n("button.logout") }}">
                     <span class="icon">
-                      <i class="fa fa-sign-out"></i>
+                      <i class="fas fa-sign-out-alt"></i>
                     </span>
                   </a>
                 </p>
@@ -99,6 +99,7 @@
         </div>
       </div>
     </footer>
+    <script src="/assets/fontawesome/fontawesome-all.min.js?v=5.0.4"></script>
     <script src="/assets/jquery/jquery-3.2.1.min.js"></script>
     <script src="/assets/swirl/js/swirl.js?v={{ version }}"></script>
     {{ block script() }}{{end}}

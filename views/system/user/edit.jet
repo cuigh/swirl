@@ -42,7 +42,7 @@
             <div class="control has-icons-left">
               <input name="name" value="{{ .User.Name }}" class="input" placeholder="Name" data-v-rule="native" required>
               <span class="icon is-small is-left">
-                <i class="fa fa-user"></i>
+                <i class="fas fa-user"></i>
               </span>
             </div>
           </div>
@@ -53,7 +53,7 @@
             <div class="control has-icons-left">
               <input name="email" value="{{ .User.Email }}" class="input" placeholder="Email" data-v-rule="native" required>
               <span class="icon is-small is-left">
-                <i class="fa fa-envelope"></i>
+                <i class="fas fa-envelope"></i>
               </span>
             </div>
           </div>

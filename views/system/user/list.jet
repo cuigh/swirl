@@ -60,7 +60,7 @@
         <a href="?filter=blocked">Blocked</a>        
         {{end}}
       <p class="level-item">
-        <a href="new" class="button is-success"><span class="icon"><i class="fa fa-plus"></i></span><span>{{ i18n("button.new") }}</span></a>
+        <a href="new" class="button is-success"><span class="icon"><i class="fas fa-plus"></i></span><span>{{ i18n("button.new") }}</span></a>
       </p>
     </div>
   </nav>
@@ -80,7 +80,7 @@
       <tbody>
         {{range .Users}}
         <tr data-id="{{.ID}}">
-          <td><a href="{{.LoginName}}/detail">{{.Name}}</a>{{ if .Admin }}<span class="icon has-text-danger tooltip" data-tooltip="Administrator"><i class="fa fa-flag"></i></span>{{ end }}</td>
+          <td><a href="{{.LoginName}}/detail">{{.Name}}</a>{{ if .Admin }}<span class="icon has-text-danger tooltip" data-tooltip="Administrator"><i class="fas fa-flag"></i></span>{{ end }}</td>
           <td>{{.LoginName}}</td>
           <td>{{.Email}}</td>
           <td>{{.Type}}</td>

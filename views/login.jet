@@ -13,7 +13,7 @@
                 <p class="control has-icons-left">
                   <input name="name" class="input" type="text" placeholder="" data-v-rule="native" required>
                   <span class="icon is-small is-left">
-                    <i class="fa fa-user"></i>
+                    <i class="fas fa-user"></i>
                   </span>
                 </p>
               </div>
@@ -22,7 +22,7 @@
                 <p class="control has-icons-left">
                   <input name="password" class="input" type="password" data-v-rule="native" required>
                   <span class="icon is-small is-left">
-                    <i class="fa fa-lock"></i>
+                    <i class="fas fa-lock"></i>
                   </span>
                 </p>
               </div>

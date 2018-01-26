@@ -1044,7 +1044,7 @@ var Swirl;
             <td><input name="${this.name}s[${this.index}].value" class="input is-small" type="text"></td>
             <td>
               <a class="button is-small is-danger is-outlined" data-action="delete-${this.alias}">
-                <span class="icon is-small"><i class="fa fa-trash"></i></span>
+                <span class="icon is-small"><i class="fas fa-trash"></i></span>
               </a>            
             </td>
           </tr>`;
@@ -1639,7 +1639,7 @@ var Swirl;
               <td>
                 <a class="button is-small is-outlined is-danger" data-action="delete-mount">
                   <span class="icon is-small">
-                    <i class="fa fa-trash"></i>
+                    <i class="fas fa-trash"></i>
                   </span>
                 </a>
               </td>
@@ -1672,7 +1672,7 @@ var Swirl;
                 <td>
                   <a class="button is-small is-outlined is-danger" data-action="delete-endpoint-port">
                     <span class="icon is-small">
-                      <i class="fa fa-trash"></i>
+                      <i class="fas fa-trash"></i>
                     </span>
                   </a>
                 </td>
@@ -1699,7 +1699,7 @@ var Swirl;
                 <td>
                   <a class="button is-small is-outlined is-danger" data-action="delete-constraint">
                     <span class="icon is-small">
-                      <i class="fa fa-trash"></i>
+                      <i class="fas fa-trash"></i>
                     </span>
                   </a>
                 </td>
@@ -1715,7 +1715,7 @@ var Swirl;
                 <td>
                   <a class="button is-small is-outlined is-danger" data-action="delete-preference">
                     <span class="icon is-small">
-                      <i class="fa fa-trash"></i>
+                      <i class="fas fa-trash"></i>
                     </span>
                   </a>
                 </td>
@@ -1741,7 +1741,7 @@ var Swirl;
                 <td>
                   <a class="button is-small is-outlined is-danger" data-action="delete-${this.name}">
                     <span class="icon is-small">
-                      <i class="fa fa-remove"></i>
+                      <i class="fas fa-times"></i>
                     </span>
                   </a>
                 </td>

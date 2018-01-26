@@ -57,7 +57,7 @@
                   </select>
                 </div>
                 <div class="icon is-left">
-                  <i class="fa fa-globe"></i>
+                  <i class="fas fa-globe"></i>
                 </div>
               </div>
             </div>
@@ -76,7 +76,7 @@
                 </select>
               </div>
               <div class="icon is-left">
-                <i class="fa fa-language"></i>
+                <i class="fas fa-language"></i>
               </div>
             </div>
           </div>

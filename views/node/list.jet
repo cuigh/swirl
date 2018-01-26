@@ -44,7 +44,7 @@
           {{range .Nodes}}
           <tr>
             <td><a href="{{.ID}}/detail">{{.Name}}</a></td>
-            <td>{{.Role}}{{ if .Role == "manager" && .Leader }}<span class="icon has-text-danger tooltip" data-tooltip="Leader"><i class="fa fa-flag"></i></span>{{ end }}</td>
+            <td>{{.Role}}{{ if .Role == "manager" && .Leader }}<span class="icon has-text-danger tooltip" data-tooltip="Leader"><i class="fas fa-flag"></i></span>{{ end }}</td>
             <td>{{.Version}}</td>
             <td>{{.CPU}}</td>
             <td>{{printf("%.2f", .Memory)}} GB</td>

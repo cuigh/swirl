@@ -44,7 +44,7 @@
       <th width="48">
         <a class="button is-small is-success is-outlined" data-action="add-{{n}}">
           <span class="icon is-small">
-            <i class="fa fa-plus"></i>
+            <i class="fas fa-plus"></i>
           </span>
         </a>
       </th>
@@ -64,7 +64,7 @@
       <td>
         <a class="button is-small is-danger is-outlined" data-action="delete-{{n}}">
           <span class="icon is-small">
-            <i class="fa fa-trash"></i>
+            <i class="fas fa-trash"></i>
           </span>
         </a>
       </td>
@@ -86,7 +86,7 @@
       <th width="48">
         <a class="button is-small is-success is-outlined" data-action="add-{{n}}">
           <span class="icon is-small">
-            <i class="fa fa-plus"></i>
+            <i class="fas fa-plus"></i>
           </span>
         </a>
       </th>
@@ -105,7 +105,7 @@
       <td>
         <a class="button is-small is-danger is-outlined" data-action="delete-{{n}}">
           <span class="icon is-small">
-            <i class="fa fa-trash"></i>
+            <i class="fas fa-trash"></i>
           </span>
         </a>
       </td>

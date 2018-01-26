@@ -102,7 +102,7 @@
     {{end}}
 
     <a href="/network/" class="button is-primary">
-      <span class="icon"><i class="fa fa-reply"></i></span>
+      <span class="icon"><i class="fas fa-reply"></i></span>
       <span>{{ i18n("button.return") }}</span>
     </a>
   </div>

@@ -2,9 +2,9 @@ FROM golang:alpine AS build
 WORKDIR /go/src/github.com/cuigh/swirl/
 ADD . .
 #RUN dep ensure
-RUN go build
+RUN CGO_ENABLED=0 go build -ldflags "-s -w"
 
-FROM alpine:3.6
+FROM alpine:3.7
 MAINTAINER cuigh <noname@live.com>
 WORKDIR /app
 COPY --from=build /go/src/github.com/cuigh/swirl/swirl .

@@ -40,13 +40,13 @@
     <!-- Right side -->
     <div class="level-right">
       <p class="level-item">
-        <button id="btn-delete" class="button is-danger"><span class="icon"><i class="fa fa-remove"></i></span><span>{{ i18n("button.delete") }}</span></button>
+        <button id="btn-delete" class="button is-danger"><span class="icon"><i class="fas fa-times"></i></span><span>{{ i18n("button.delete") }}</span></button>
       </p>
       <p class="level-item">
-        <button id="btn-prune" class="button is-warning"><span class="icon"><i class="fa fa-times-circle"></i></span><span>{{ i18n("button.prune") }}</span></button>
+        <button id="btn-prune" class="button is-warning"><span class="icon"><i class="fas fa-times-circle"></i></span><span>{{ i18n("button.prune") }}</span></button>
       </p>
       <p class="level-item">
-        <a class="button is-success" href="new"><span class="icon"><i class="fa fa-plus"></i></span><span>{{ i18n("button.new") }}</span></a>
+        <a class="button is-success" href="new"><span class="icon"><i class="fas fa-plus"></i></span><span>{{ i18n("button.new") }}</span></a>
       </p>
     </div>
   </nav>

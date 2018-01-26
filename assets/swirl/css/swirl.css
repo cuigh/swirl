@@ -17,13 +17,10 @@ body {
     overflow-x: hidden;
 }
 
-.icon.is-huge {
-    height: 4rem;
-    width: 4rem;
-}
-
-.icon.is-huge .fa {
-    font-size: 70px;
+.icon.infobox {
+    margin-left: 1em;
+    /*height: 4rem;*/
+    /*width: 4rem;*/
 }
 
 .notification.is-top {

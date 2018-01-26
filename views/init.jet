@@ -14,7 +14,7 @@
                   <div class="control">
                     <a class="button is-static">
                       <span class="icon is-small is-left">
-                        <i class="fa fa-user"></i>
+                        <i class="fas fa-user"></i>
                       </span>
                     </a>
                   </div>                
@@ -29,7 +29,7 @@
                   <div class="control">
                     <a class="button is-static">
                       <span class="icon is-small is-left">
-                        <i class="fa fa-lock"></i>
+                        <i class="fas fa-lock"></i>
                       </span>
                     </a>
                   </div>
@@ -47,7 +47,7 @@
                   <div class="control">
                     <a class="button is-static">
                       <span class="icon is-small is-left">
-                        <i class="fa fa-user"></i>
+                        <i class="fas fa-user"></i>
                       </span>
                     </a>
                   </div>                
@@ -62,7 +62,7 @@
                   <div class="control">
                     <a class="button is-static">
                       <span class="icon is-small is-left">
-                        <i class="fa fa-envelope"></i>
+                        <i class="fas fa-envelope"></i>
                       </span>
                     </a>
                   </div>                

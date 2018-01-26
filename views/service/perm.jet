@@ -58,7 +58,7 @@
       <div class="field">
         <label class="label" style="display: inline-block">{{ i18n("field.user") }}</label>
         <button type="button" class="button is-small is-success is-outlined tooltip is-tooltip-bottom modal-trigger" data-tooltip="{{ i18n("button.add") }}" data-action="add-user" data-target="dlg-add-user">
-          <span class="icon"><i class="fa fa-plus"></i></span>
+          <span class="icon"><i class="fas fa-plus"></i></span>
         </button>
         <div id="div-users" class="field is-grouped is-grouped-multiline">
           {{range .Users}}
@@ -89,7 +89,7 @@
           <p class="control has-icons-left">
             <input id="txt-query" class="input is-small" type="text" placeholder="Searching user...">
             <span class="icon is-small is-left">
-              <i class="fa fa-search"></i>
+              <i class="fas fa-search"></i>
             </span>
           </p>
         </div>

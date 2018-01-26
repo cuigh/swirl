@@ -6,12 +6,13 @@
     <meta name="keywords" content="swirl,docker,moby,swarm,docker-compose,docker-ui,docker-web-management">
     <meta name="description" content="{{ i18n("description") }}">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="/assets/lyicon/css/lyicon.css">
+    <link rel="stylesheet" href="/assets/fontawesome/fa-svg-with-js.css?v=5.0.4">
     <link rel="stylesheet" href="/assets/bulma/bulma.css?v=0.6.1">
     <link rel="stylesheet" href="/assets/swirl/css/swirl.css?v={{ version }}">
   </head>
   <body>
     {{ yield body() }}
+    <script src="/assets/fontawesome/fontawesome-all.min.js?v=5.0.4"></script>
     <script src="/assets/jquery/jquery-3.2.1.min.js"></script>
     <script src="/assets/swirl/js/swirl.js?v={{ version }}"></script>
   </body>
