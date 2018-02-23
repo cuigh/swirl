@@ -91,6 +91,7 @@ var Perms = []PermGroup{
 			{Key: "task.list", Text: "View list"},
 			{Key: "task.detail", Text: "View detail"},
 			{Key: "task.raw", Text: "View raw"},
+			{Key: "task.logs", Text: "View logs"},
 		},
 	},
 	{
@@ -108,6 +109,7 @@ var Perms = []PermGroup{
 			{Key: "container.list", Text: "View list"},
 			{Key: "container.detail", Text: "View detail"},
 			{Key: "container.raw", Text: "View raw"},
+			{Key: "container.logs", Text: "View logs"},
 			{Key: "container.delete", Text: "Delete"},
 		},
 	},

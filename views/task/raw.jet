@@ -33,6 +33,7 @@
     <div class="navbar-brand">
       <a class="navbar-item is-tab" href="/task/{{.Task.ID}}/detail">{{ i18n("menu.detail") }}</a>
       <a class="navbar-item is-tab is-active" href="/task/{{.Task.ID}}/raw">{{ i18n("menu.raw") }}</a>
+      <a class="navbar-item is-tab" href="/task/{{.Task.ID}}/logs">{{ i18n("menu.log") }}</a>
     </div>
   </div>
 </nav>

@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/cuigh/auxo/net/web"
+	"github.com/cuigh/auxo/util/cast"
 	"github.com/cuigh/swirl/biz/docker"
 	"github.com/cuigh/swirl/misc"
 	"github.com/cuigh/swirl/model"
@@ -12,6 +13,7 @@ type TaskController struct {
 	List   web.HandlerFunc `path:"/" name:"task.list" authorize:"!" desc:"task list page"`
 	Detail web.HandlerFunc `path:"/:id/detail" name:"task.detail" authorize:"!" desc:"task detail page"`
 	Raw    web.HandlerFunc `path:"/:id/raw" name:"task.raw" authorize:"!" desc:"task raw page"`
+	Logs   web.HandlerFunc `path:"/:id/logs" name:"task.logs" authorize:"!" desc:"task logs page"`
 }
 
 // Task creates an instance of TaskController
@@ -20,6 +22,7 @@ func Task() (c *TaskController) {
 		List:   taskList,
 		Detail: taskDetail,
 		Raw:    taskRaw,
+		Logs:   taskLogs,
 	}
 }
 
@@ -70,4 +73,23 @@ func taskRaw(ctx web.Context) error {
 
 	m := newModel(ctx).Set("Task", task).Set("Raw", j)
 	return ctx.Render("task/raw", m)
+}
+
+func taskLogs(ctx web.Context) error {
+	id := ctx.P("id")
+	task, _, err := docker.TaskInspect(id)
+	if err != nil {
+		return err
+	}
+
+	line := cast.ToInt(ctx.Q("line"), 500)
+	timestamps := cast.ToBool(ctx.Q("timestamps"), false)
+	stdout, stderr, err := docker.TaskLogs(id, line, timestamps)
+	if err != nil {
+		return err
+	}
+
+	m := newModel(ctx).Set("Task", task).Set("Line", line).Set("Timestamps", timestamps).
+		Set("Stdout", stdout.String()).Set("Stderr", stderr.String())
+	return ctx.Render("task/logs", m)
 }
