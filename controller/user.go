@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"github.com/cuigh/auxo/data"
 	"github.com/cuigh/auxo/log"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/biz"
@@ -129,7 +130,7 @@ func userEdit(ctx web.Context) error {
 
 	userRoles := make(map[string]struct{})
 	for _, id := range user.Roles {
-		userRoles[id] = model.Placeholder
+		userRoles[id] = data.Empty
 	}
 	m := newModel(ctx).Set("User", user).Set("Roles", roles).Set("UserRoles", userRoles)
 	return ctx.Render("system/user/edit", m)

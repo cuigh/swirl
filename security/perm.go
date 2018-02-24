@@ -1,15 +1,49 @@
-package misc
+package security
 
+import (
+	"strings"
+
+	"github.com/cuigh/auxo/net/web"
+	"github.com/cuigh/swirl/biz"
+	"github.com/cuigh/swirl/model"
+)
+
+// Checker check permission of user
+func Checker(user web.User, h web.HandlerInfo) bool {
+	if au, ok := user.(*model.AuthUser); ok {
+		return au.IsAllowed(h.Name())
+	}
+	return false
+}
+
+// Permiter is a middleware for validate data permission.
+func Permiter(next web.HandlerFunc) web.HandlerFunc {
+	return func(ctx web.Context) error {
+		opt := ctx.Handler().Option("perm")
+		if opt != "" {
+			array := strings.Split(opt, ",")
+			err := biz.Perm.Check(ctx.User(), array[0], array[1], ctx.P(array[2]))
+			if err != nil {
+				return err
+			}
+		}
+		return next(ctx)
+	}
+}
+
+// Perm holds permission key and description.
 type Perm struct {
 	Key  string
 	Text string
 }
 
+// PermGroup holds information of a perm group.
 type PermGroup struct {
 	Name  string
 	Perms []Perm
 }
 
+// Perms holds all valid perm groups.
 var Perms = []PermGroup{
 	{
 		Name: "Registry",

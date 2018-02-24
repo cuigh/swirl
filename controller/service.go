@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/cuigh/auxo/data"
+	"github.com/cuigh/auxo/data/set"
 	"github.com/cuigh/auxo/errors"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/auxo/util/cast"
@@ -162,11 +162,7 @@ func serviceNew(ctx web.Context) error {
 		return err
 	}
 
-	checkedNetworks := data.NewSet()
-	checkedNetworks.AddSlice(info.Networks, func(i int) interface{} {
-		return info.Networks[i]
-	})
-
+	checkedNetworks := set.NewStringSet(info.Networks...)
 	m := newModel(ctx).Set("Service", info).Set("Registries", registries).
 		Set("Networks", networks).Set("CheckedNetworks", checkedNetworks).
 		Set("Secrets", secrets).Set("Configs", configs)
@@ -221,8 +217,8 @@ func serviceEdit(ctx web.Context) error {
 	}
 
 	stack := service.Spec.Labels["com.docker.stack.namespace"]
-	checkedNetworks := data.NewSet()
-	checkedNetworks.AddSlice(service.Endpoint.VirtualIPs, func(i int) interface{} { return service.Endpoint.VirtualIPs[i].NetworkID })
+	checkedNetworks := set.StringSet{}
+	checkedNetworks.AddSlice(service.Endpoint.VirtualIPs, func(i int) string { return service.Endpoint.VirtualIPs[i].NetworkID })
 
 	m := newModel(ctx).Set("Service", model.NewServiceInfo(service)).Set("Stack", stack).
 		Set("Networks", networks).Set("CheckedNetworks", checkedNetworks).

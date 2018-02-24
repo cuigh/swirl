@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/cuigh/auxo/data"
+	"github.com/cuigh/auxo/data/set"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/biz"
 	"github.com/cuigh/swirl/model"
@@ -21,11 +22,7 @@ func permEdit(ctx web.Context, resType, resID, tpl string, m data.Map) error {
 		return err
 	}
 
-	checkedRoles := data.Set{}
-	checkedRoles.AddSlice(perm.Roles, func(i int) interface{} {
-		return perm.Roles[i]
-	})
-
+	checkedRoles := set.NewStringSet(perm.Roles...)
 	var users []*model.User
 	for _, id := range perm.Users {
 		var user *model.User

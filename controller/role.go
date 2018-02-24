@@ -1,10 +1,11 @@
 package controller
 
 import (
+	"github.com/cuigh/auxo/data"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/biz"
-	"github.com/cuigh/swirl/misc"
 	"github.com/cuigh/swirl/model"
+	"github.com/cuigh/swirl/security"
 )
 
 // RoleController is a controller of user role
@@ -42,7 +43,7 @@ func roleIndex(ctx web.Context) error {
 }
 
 func roleNew(ctx web.Context) error {
-	m := newModel(ctx).Set("Perms", misc.Perms)
+	m := newModel(ctx).Set("Perms", security.Perms)
 	return ctx.Render("system/role/new", m)
 }
 
@@ -73,9 +74,9 @@ func roleDetail(ctx web.Context) error {
 
 	perms := make(map[string]struct{})
 	for _, p := range role.Perms {
-		perms[p] = model.Placeholder
+		perms[p] = data.Empty
 	}
-	m := newModel(ctx).Set("Role", role).Set("Perms", misc.Perms).Set("CheckedPerms", perms)
+	m := newModel(ctx).Set("Role", role).Set("Perms", security.Perms).Set("CheckedPerms", perms)
 	return ctx.Render("system/role/detail", m)
 }
 
@@ -91,9 +92,9 @@ func roleEdit(ctx web.Context) error {
 
 	perms := make(map[string]struct{})
 	for _, p := range role.Perms {
-		perms[p] = model.Placeholder
+		perms[p] = data.Empty
 	}
-	m := newModel(ctx).Set("Role", role).Set("Perms", misc.Perms).Set("CheckedPerms", perms)
+	m := newModel(ctx).Set("Role", role).Set("Perms", security.Perms).Set("CheckedPerms", perms)
 	return ctx.Render("system/role/edit", m)
 }
 

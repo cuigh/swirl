@@ -2,6 +2,8 @@ package model
 
 import (
 	"time"
+
+	"github.com/cuigh/auxo/data"
 )
 
 type UserType string
@@ -12,8 +14,6 @@ const (
 	// UserTypeLDAP is external user of LDAP
 	UserTypeLDAP UserType = "ldap"
 )
-
-var Placeholder = struct{}{}
 
 type UserStatus int32
 
@@ -80,7 +80,7 @@ func NewAuthUser(user *User, roles []*Role) *AuthUser {
 	}
 	for _, role := range roles {
 		for _, perm := range role.Perms {
-			u.perms[perm] = Placeholder
+			u.perms[perm] = data.Empty
 		}
 	}
 	return u

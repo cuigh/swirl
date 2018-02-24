@@ -3,7 +3,7 @@ package controller
 import (
 	"encoding/json"
 
-	"github.com/cuigh/auxo/data"
+	"github.com/cuigh/auxo/data/set"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/biz"
 	"github.com/cuigh/swirl/biz/docker"
@@ -73,7 +73,7 @@ func templateNew(ctx web.Context) error {
 		return err
 	}
 	m := newModel(ctx).Set("Action", "New").Set("Service", service).Set("Registries", registries).
-		Set("Networks", networks).Set("CheckedNetworks", data.Set{}).
+		Set("Networks", networks).Set("CheckedNetworks", set.StringSet{}).
 		Set("Secrets", secrets).Set("Configs", configs)
 	return ctx.Render("service/template/edit", m)
 }
@@ -143,9 +143,7 @@ func templateEdit(ctx web.Context) error {
 		return err
 	}
 
-	checkedNetworks := data.NewSet()
-	checkedNetworks.AddSlice(service.Networks, func(i int) interface{} { return service.Networks[i] })
-
+	checkedNetworks := set.NewStringSet(service.Networks...)
 	m := newModel(ctx).Set("Action", "Edit").Set("Service", service).Set("Registries", registries).
 		Set("Networks", networks).Set("CheckedNetworks", checkedNetworks).
 		Set("Secrets", secrets).Set("Configs", configs)

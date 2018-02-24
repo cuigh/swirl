@@ -22,25 +22,87 @@
 [[projects]]
   branch = "master"
   name = "github.com/cuigh/auxo"
-  packages = [".","app","app/flag","byte/size","cache","cache/memory","config","data","data/guid","data/valid","encoding/yaml","errors","ext/files","ext/reflects","ext/texts","ext/times","log","log/console","log/file","net/web","net/web/filter","net/web/filter/auth","net/web/renderer","net/web/renderer/jet","net/web/router","security","security/passwd","util/cast","util/debug","util/i18n","util/lazy"]
-  revision = "f599f84ec7ef56f01457d0fb0d8eeb9d8c100b43"
+  packages = [
+    ".",
+    "app",
+    "app/flag",
+    "byte/size",
+    "cache",
+    "cache/memory",
+    "config",
+    "data",
+    "data/guid",
+    "data/set",
+    "data/valid",
+    "encoding/yaml",
+    "errors",
+    "ext/files",
+    "ext/reflects",
+    "ext/texts",
+    "ext/times",
+    "log",
+    "log/console",
+    "log/file",
+    "net/web",
+    "net/web/filter",
+    "net/web/filter/auth",
+    "net/web/renderer",
+    "net/web/renderer/jet",
+    "net/web/router",
+    "security",
+    "security/certify",
+    "security/certify/ldap",
+    "security/passwd",
+    "util/cast",
+    "util/debug",
+    "util/i18n",
+    "util/lazy"
+  ]
+  revision = "ac7f3a5d4d43fd755008c87525a95698544843ec"
 
 [[projects]]
   branch = "master"
   name = "github.com/docker/distribution"
-  packages = [".","digestset","reference"]
+  packages = [
+    ".",
+    "digestset",
+    "reference"
+  ]
   revision = "e5b5e44386f7964a1f010a2b8b7687d073215bbb"
 
 [[projects]]
   branch = "master"
   name = "github.com/docker/docker"
-  packages = ["api","api/types","api/types/blkiodev","api/types/container","api/types/events","api/types/filters","api/types/image","api/types/mount","api/types/network","api/types/registry","api/types/strslice","api/types/swarm","api/types/swarm/runtime","api/types/time","api/types/versions","api/types/volume","client","pkg/stdcopy"]
+  packages = [
+    "api",
+    "api/types",
+    "api/types/blkiodev",
+    "api/types/container",
+    "api/types/events",
+    "api/types/filters",
+    "api/types/image",
+    "api/types/mount",
+    "api/types/network",
+    "api/types/registry",
+    "api/types/strslice",
+    "api/types/swarm",
+    "api/types/swarm/runtime",
+    "api/types/time",
+    "api/types/versions",
+    "api/types/volume",
+    "client",
+    "pkg/stdcopy"
+  ]
   revision = "f62aeae97791b4c2318791a9b621d7da4c17ac32"
   source = "https://github.com/moby/moby.git"
 
 [[projects]]
   name = "github.com/docker/go-connections"
-  packages = ["nat","sockets","tlsconfig"]
+  packages = [
+    "nat",
+    "sockets",
+    "tlsconfig"
+  ]
   revision = "3ede32e2033de7505e6500d6c868c2b9ed9f169d"
   version = "v0.3.0"
 
@@ -53,7 +115,13 @@
 [[projects]]
   branch = "master"
   name = "github.com/globalsign/mgo"
-  packages = [".","bson","internal/json","internal/sasl","internal/scram"]
+  packages = [
+    ".",
+    "bson",
+    "internal/json",
+    "internal/sasl",
+    "internal/scram"
+  ]
   revision = "896bbb89d21253a28cd5a7f8b81fe091410cb94d"
 
 [[projects]]
@@ -88,7 +156,10 @@
 
 [[projects]]
   name = "github.com/opencontainers/image-spec"
-  packages = ["specs-go","specs-go/v1"]
+  packages = [
+    "specs-go",
+    "specs-go/v1"
+  ]
   revision = "d60099175f88c47cd379c4738d158884749ed235"
   version = "v1.0.1"
 
@@ -101,13 +172,20 @@
 [[projects]]
   branch = "master"
   name = "golang.org/x/crypto"
-  packages = ["acme","acme/autocert"]
+  packages = [
+    "acme",
+    "acme/autocert"
+  ]
   revision = "9f005a07e0d31d45e6656d241bb5c0f2efd4bc94"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/net"
-  packages = ["context","context/ctxhttp","proxy"]
+  packages = [
+    "context",
+    "context/ctxhttp",
+    "proxy"
+  ]
   revision = "a337091b0525af65de94df2eb7e98bd9962dcbe2"
 
 [[projects]]
@@ -131,6 +209,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "2e2023629c134da8099f44e6d2719a5bc407d2b350e75f6f79a35ade95859ebd"
+  inputs-digest = "aae5ea1cf0fb5fd50cb9659fb0abe58fc9546231ec91f9df9148c5df3e3cc194"
   solver-name = "gps-cdcl"
   solver-version = 1

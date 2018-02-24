@@ -18,10 +18,6 @@ required = ["github.com/docker/distribution"]
   version = "0.3.2"
 
 [[constraint]]
-  name = "github.com/go-ldap/ldap"
-  version = "2.5.0"
-
-[[constraint]]
   name = "github.com/mattn/go-shellwords"
   version = "1.0.3"
 

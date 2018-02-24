@@ -2,7 +2,6 @@ package biz
 
 import (
 	"net/http"
-	"strings"
 
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/dao"
@@ -39,6 +38,7 @@ func (b *permBiz) Update(perm *model.Perm, user web.User) (err error) {
 	return
 }
 
+// nolint: gocyclo
 func (b *permBiz) Check(user web.User, scope string, resType, resID string) (err error) {
 	au := user.(*model.AuthUser)
 	if au.Admin() {
@@ -70,18 +70,4 @@ func (b *permBiz) Check(user web.User, scope string, resType, resID string) (err
 		err = ErrForbidden
 	})
 	return
-}
-
-func (b *permBiz) Apply(next web.HandlerFunc) web.HandlerFunc {
-	return func(ctx web.Context) error {
-		opt := ctx.Handler().Option("perm")
-		if opt != "" {
-			array := strings.Split(opt, ",")
-			err := b.Check(ctx.User(), array[0], array[1], ctx.P(array[2]))
-			if err != nil {
-				return err
-			}
-		}
-		return next(ctx)
-	}
 }

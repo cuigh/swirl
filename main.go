@@ -19,13 +19,14 @@ import (
 	"github.com/cuigh/swirl/biz"
 	"github.com/cuigh/swirl/controller"
 	"github.com/cuigh/swirl/misc"
+	"github.com/cuigh/swirl/security"
 )
 
 func main() {
 	misc.BindOptions()
 
 	app.Name = "Swirl"
-	app.Version = "0.6.7"
+	app.Version = "0.6.8"
 	app.Desc = "A web management UI for Docker, focused on swarm cluster"
 	app.Action = func(ctx *app.Context) {
 		misc.LoadOptions()
@@ -77,14 +78,14 @@ func server() *web.Server {
 
 	// create biz group
 	form := &auth.Form{
-		Identifier:        biz.User.Identify,
+		Identifier:        security.Identifier,
 		Timeout:           time.Minute * 30,
 		SlidingExpiration: true,
 	}
-	g := ws.Group("", form, filter.NewAuthorizer(biz.User.Authorize))
+	g := ws.Group("", form, filter.NewAuthorizer(security.Checker))
 
 	// register auth handlers
-	g.Post("/login", form.LoginJSON(biz.User.Login), web.WithName("login"), web.WithAuthorize(web.AuthAnonymous))
+	g.Post("/login", form.LoginJSON(security.Validator(setting)), web.WithName("login"), web.WithAuthorize(web.AuthAnonymous))
 	g.Get("/logout", form.Logout, web.WithName("logout"), web.WithAuthorize(web.AuthAuthenticated))
 
 	// register controllers
@@ -92,7 +93,7 @@ func server() *web.Server {
 	g.Handle("/profile", controller.Profile())
 	g.Handle("/registry", controller.Registry())
 	g.Handle("/node", controller.Node())
-	g.Handle("/service", controller.Service(), biz.Perm)
+	g.Handle("/service", controller.Service(), web.FilterFunc(security.Permiter))
 	g.Handle("/service/template", controller.Template())
 	g.Handle("/stack", controller.Stack())
 	g.Handle("/network", controller.Network())
