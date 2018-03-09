@@ -58,7 +58,7 @@
     "util/i18n",
     "util/lazy"
   ]
-  revision = "ac7f3a5d4d43fd755008c87525a95698544843ec"
+  revision = "772f5a654db9ee95a5dc851e9562253bc0b2f11d"
 
 [[projects]]
   branch = "master"
@@ -170,6 +170,21 @@
   version = "v0.8.0"
 
 [[projects]]
+  name = "github.com/prometheus/client_golang"
+  packages = [
+    "api",
+    "api/prometheus/v1"
+  ]
+  revision = "967789050ba94deca04a5e84cce8ad472ce313c1"
+  version = "v0.9.0-pre1"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/prometheus/common"
+  packages = ["model"]
+  revision = "6fb6fce6f8b75884b92e1889c150403fc0872c5e"
+
+[[projects]]
   branch = "master"
   name = "golang.org/x/crypto"
   packages = [
@@ -209,6 +224,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "aae5ea1cf0fb5fd50cb9659fb0abe58fc9546231ec91f9df9148c5df3e3cc194"
+  inputs-digest = "c829e2bd1f0dc356225caad79652e6732d0572e0e59580a5e6c5b6baab134755"
   solver-name = "gps-cdcl"
   solver-version = 1

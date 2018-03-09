@@ -77,6 +77,7 @@ menu.raw: 原始
 menu.edit: 编辑
 menu.log: 日志
 menu.perm: 权限
+menu.stats: 状态
 
 # login page
 login.title: 登录到 Swirl

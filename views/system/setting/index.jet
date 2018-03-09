@@ -219,11 +219,29 @@
           </div>
         </div>
       </fieldset>
+      <fieldset id="fs-metrics">
+        <legend class="lead is-5 is-bordered">Metrics</legend>
+        <div class="field is-horizontal">
+          <div  class="field-label is-normal">
+            <label class="label">Prometheus address</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              <div class="control">
+                <input name="metrics.prometheus" value="{{ .Setting.Metrics.Prometheus }}" class="input" type="text" placeholder="e.g. http://prometheus.xxx.com">
+              </div>
+            </div>
+          </div>
+        </div>
+      </fieldset>
       <hr>
       <div class="field">
         <p class="control">
           <button class="button is-primary" type="submit">{{ i18n("button.save") }}</button>
         </p>
+      </div>
+      <div class="notification is-info">
+        NOTICE: To activate modifications, you must restart swirl.
       </div>
     </form>
     </div>

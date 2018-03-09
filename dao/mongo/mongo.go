@@ -57,7 +57,7 @@ func (d *database) Run(cmd, result interface{}) error {
 }
 
 type Dao struct {
-	logger  *log.Logger
+	logger  log.Logger
 	session *mgo.Session
 }
 

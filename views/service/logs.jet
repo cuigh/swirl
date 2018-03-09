@@ -29,6 +29,7 @@
       <a class="navbar-item is-tab is-active" href="/service/{{.Service}}/logs">{{ i18n("menu.log") }}</a>
       <a class="navbar-item is-tab" href="/service/{{.Service}}/edit">{{ i18n("menu.edit") }}</a>
       <a class="navbar-item is-tab" href="/service/{{.Service}}/perm">{{ i18n("menu.perm") }}</a>
+      <a class="navbar-item is-tab" href="/service/{{.Service}}/stats">{{ i18n("menu.stats") }}</a>
     </div>
   </div>
 </nav>

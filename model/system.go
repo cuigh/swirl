@@ -43,7 +43,10 @@ type Setting struct {
 		Name   string `bson:"name" json:"name,omitempty"`     // Asia/Shanghai
 		Offset int32  `bson:"offset" json:"offset,omitempty"` // seconds east of UTC
 	} `bson:"tz" json:"tz,omitempty"`
-	Language  string    `bson:"lang" json:"lang,omitempty"`
+	Language string `bson:"lang" json:"lang,omitempty"`
+	Metrics  struct {
+		Prometheus string `bson:"prometheus" json:"prometheus"`
+	} `bson:"metrics" json:"metrics"`
 	UpdatedBy string    `bson:"updated_by" json:"updated_by,omitempty"`
 	UpdatedAt time.Time `bson:"updated_at" json:"updated_at,omitempty"`
 }

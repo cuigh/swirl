@@ -1,0 +1,108 @@
+{{ extends "_base" }}
+{{ import "../_modules/detail" }}
+{{ import "../_modules/form" }}
+
+{{ block script() }}
+<script src="/assets/chart/chart.bundle.min.js?v=2.7.2"></script>
+<script>$(() => new Swirl.Service.StatsPage())</script>
+{{ end }}
+
+{{ block body_content() }}
+<div class="container">
+  <nav class="breadcrumb has-succeeds-separator is-small is-marginless" aria-label="breadcrumbs">
+    <ul>
+      <li><a href="/">{{ i18n("menu.dashboard") }}</a></li>
+      <li><a href="/service/">{{ i18n("menu.service") }}</a></li>
+      <li class="is-active"><a>{{ i18n("menu.stats") }}</a></li>
+    </ul>
+  </nav>
+</div>
+
+<section class="hero is-small is-light">
+  <div class="hero-body">
+    <div class="container">
+      <h2 class="title is-2">
+        {{ .Service.Spec.Name }}
+      </h2>      
+    </div>
+  </div>
+</section>
+
+<nav class="navbar has-shadow">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item is-tab" href="/service/{{.Service.Spec.Name}}/detail">{{ i18n("menu.detail") }}</a>
+      <a class="navbar-item is-tab" href="/service/{{.Service.Spec.Name}}/raw">{{ i18n("menu.raw") }}</a>
+      <a class="navbar-item is-tab" href="/service/{{.Service.Spec.Name}}/logs">{{ i18n("menu.log") }}</a>
+      <a class="navbar-item is-tab" href="/service/{{.Service.Spec.Name}}/edit">{{ i18n("menu.edit") }}</a>
+      <a class="navbar-item is-tab" href="/service/{{.Service.Spec.Name}}/perm">{{ i18n("menu.perm") }}</a>
+      <a class="navbar-item is-tab is-active" href="/service/{{.Service.Spec.Name}}/stats">{{ i18n("menu.stats") }}</a>
+    </div>
+  </div>
+</nav>
+
+<section class="section">
+  <div class="container">
+    {{ if .Metrics }}
+    <nav class="level">
+      <form>
+        <div class="level-left">
+          <div class="level-item">
+            <div class="field has-addons">
+              <p class="control">
+                <a class="button is-static">Time</a>
+              </p>
+              <p class="control">
+                <div class="select">
+                  <select id="cb-time" name="time">
+                    {{ yield option(value="30m", label="Last 30 minutes", selected=.Time) }}
+                    {{ yield option(value="1h", label="Last 1 hour", selected=.Time) }}
+                    {{ yield option(value="3h", label="Last 3 hours", selected=.Time) }}
+                    {{ yield option(value="6h", label="Last 6 hours", selected=.Time) }}
+                    {{ yield option(value="12h", label="Last 12 hours", selected=.Time) }}
+                    {{ yield option(value="24h", label="Last 24 hours", selected=.Time) }}
+                  </select>
+                </div>
+              </p>
+            </div>
+          </div>
+          <div class="level-item">
+            <div class="field">
+              <input id="cb-refresh" name="refresh" value="true" type="checkbox" class="switch is-success is-rounded"{{if .Refresh}} checked{{end}}>
+              <label for="cb-refresh">Auto refresh</label>
+            </div>
+          </div>
+        </div>
+      </form>
+    </nav>
+
+    <div class="block">
+      <div class="block-header">
+        <p>CPU</p>
+      </div>
+      <div class="block-body is-bordered">
+        <canvas id="canvas-cpu"></canvas>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-header">
+        <p>Memory</p>
+      </div>
+      <div class="block-body is-bordered">
+        <canvas id="canvas-memory"></canvas>
+      </div>
+    </div>
+    {{ else }}
+    <div class="notification is-info">
+      NOTICE: To enable this feature, you must set <b>Metrics</b> option on <a href="/system/setting/">Setting</a> page first.
+    </div>
+    {{ end }}
+
+    <a href="/service/" class="button is-primary">
+      <span class="icon"><i class="fas fa-reply"></i></span>
+      <span>{{ i18n("button.return") }}</span>
+    </a>
+  </div>
+</section>
+{{ end }}

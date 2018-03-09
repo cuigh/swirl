@@ -9,6 +9,7 @@ Swirl is a web management tool for Docker, focused on swarm cluster.
 * Swarm components management
 * Image and container management
 * Compose management with deployment support
+* Service monitoring based on Prometheus
 * LDAP authentication support
 * Full permission control based on RBAC model
 * Scale out as you want

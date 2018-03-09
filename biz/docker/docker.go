@@ -20,7 +20,7 @@ var mgr = &manager{}
 type manager struct {
 	client *client.Client
 	locker sync.Mutex
-	logger *log.Logger
+	logger log.Logger
 }
 
 func (m *manager) Do(fn func(ctx context.Context, cli *client.Client) error) (err error) {
@@ -51,7 +51,7 @@ func (m *manager) Client() (ctx context.Context, cli *client.Client, err error) 
 	return context.TODO(), m.client, nil
 }
 
-func (m *manager) Logger() *log.Logger {
+func (m *manager) Logger() log.Logger {
 	if m.logger == nil {
 		m.locker.Lock()
 		defer m.locker.Unlock()

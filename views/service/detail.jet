@@ -30,6 +30,7 @@
       <a class="navbar-item is-tab" href="/service/{{.Service.Spec.Name}}/logs">{{ i18n("menu.log") }}</a>
       <a class="navbar-item is-tab" href="/service/{{.Service.Spec.Name}}/edit">{{ i18n("menu.edit") }}</a>
       <a class="navbar-item is-tab" href="/service/{{.Service.Spec.Name}}/perm">{{ i18n("menu.perm") }}</a>
+      <a class="navbar-item is-tab" href="/service/{{.Service.Spec.Name}}/stats">{{ i18n("menu.stats") }}</a>
     </div>
   </div>
 </nav>
