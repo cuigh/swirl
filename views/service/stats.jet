@@ -43,7 +43,7 @@
 
 <section class="section">
   <div class="container">
-    {{ if .Metrics }}
+    {{ if .Charts }}
     <nav class="level">
       <form>
         <div class="level-left">
@@ -75,24 +75,16 @@
         </div>
       </form>
     </nav>
-
+    {{ range .Charts }}
     <div class="block">
       <div class="block-header">
-        <p>CPU</p>
+        <p>{{ .Title }}</p>
       </div>
       <div class="block-body is-bordered">
-        <canvas id="canvas-cpu"></canvas>
+        <canvas id="canvas_{{ .Name }}"></canvas>
       </div>
     </div>
-
-    <div class="block">
-      <div class="block-header">
-        <p>Memory</p>
-      </div>
-      <div class="block-body is-bordered">
-        <canvas id="canvas-memory"></canvas>
-      </div>
-    </div>
+    {{ end }}
     {{ else }}
     <div class="notification is-info">
       NOTICE: To enable this feature, you must set <b>Metrics</b> option on <a href="/system/setting/">Setting</a> page first.

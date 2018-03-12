@@ -7,11 +7,7 @@ namespace Swirl.Service {
         labelX?: string;
         labelY?: string;
         tickY?: (value: number) => string;
-    }
-
-    class MetricData {
-        cpu?: Chart.ChartDataSets[];
-        memory?: Chart.ChartDataSets[];
+        // tooltipLabel?: (tooltipItem: Chart.ChartTooltipItem, data: Chart.ChartData) => string | string[];
     }
 
     class MetricChart {
@@ -27,7 +23,7 @@ namespace Swirl.Service {
             'rgb(201, 203, 207)',   // grey
         ];
 
-        constructor(elem: string | Element, opts: MetricChartOptions) {
+        constructor(elem: string | Element | JQuery, opts?: MetricChartOptions) {
             opts = $.extend(new MetricChartOptions(), opts);
             this.config = {
                 type: opts.type,
@@ -59,6 +55,11 @@ namespace Swirl.Service {
                         }],
                         yAxes: [{}]
                     },
+                    // tooltips: {
+                    //     callbacks: {
+                    //         label: opts.tooltipLabel,
+                    //     },
+                    // }
                 }
             };
             if (opts.labelX) {
@@ -101,8 +102,16 @@ namespace Swirl.Service {
     }
 
     export class StatsPage {
-        private cpu: MetricChart;
-        private memory: MetricChart;
+        private chartOptions: { [index: string]: MetricChartOptions } = {
+            "cpu": {tickY: (value: number): string => value + '%'},
+            "memory": {tickY: StatsPage.formatSize},
+            "network_in": {tickY: StatsPage.formatSize},
+            "network_out": {tickY: StatsPage.formatSize},
+            "threads": {},
+            "goroutines": {},
+            "gc_duration": {tickY: (value: number): string => value * 1000 + 'ms'},
+        };
+        private charts: { [index: string]: MetricChart } = {};
         private timer: number;
 
         constructor() {
@@ -121,15 +130,11 @@ namespace Swirl.Service {
                 }
             });
 
-            this.cpu = new MetricChart("#canvas-cpu", {
-                tickY: function (value: number): string {
-                    return value + '%';
-                },
-            });
-            this.memory = new MetricChart("#canvas-memory", {
-                tickY: function (value: number): string {
-                    return value < 1024 ? (value + 'M') : (value / 1024) + 'G';
-                },
+            $.each(this.chartOptions, (name, opt) => {
+                let $el = $("#canvas_" + name);
+                if ($el.length > 0) {
+                    this.charts[name] = new MetricChart($el, opt);
+                }
             });
             this.refreshData();
         }
@@ -143,14 +148,25 @@ namespace Swirl.Service {
 
         private loadData() {
             let time = $("#cb-time").val();
-            $ajax.get(`metrics`, {time: time}).json((d: MetricData) => {
-                if (d.cpu) {
-                    this.cpu.setData(d.cpu);
-                }
-                if (d.memory) {
-                    this.memory.setData(d.memory);
-                }
+            $ajax.get(`metrics`, {time: time}).json((d: {[index: string]: Chart.ChartDataSets[]}) => {
+                $.each(this.charts, (name: string, chart: MetricChart) => {
+                    if (d[name]) {
+                        chart.setData(d[name]);
+                    }
+                });
             });
+        }
+
+        private static formatSize(size: number): string {
+            if (size < 1024) { // 1K
+                return size.toString() + 'B';
+            } else if (size < 1048576) { // 1M
+                return (size / 1024).toFixed(2) + 'K';
+            } else if (size < 1073741824) { // 1G
+                return (size / 1048576).toFixed(2) + 'M';
+            } else {
+                return (size / 1073741824).toFixed(2) + 'G';
+            }
         }
     }
 }

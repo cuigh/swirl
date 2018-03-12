@@ -1,8 +1,6 @@
 package controller
 
 import (
-	"context"
-	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -10,16 +8,12 @@ import (
 	"github.com/cuigh/auxo/data"
 	"github.com/cuigh/auxo/data/set"
 	"github.com/cuigh/auxo/errors"
-	"github.com/cuigh/auxo/ext/times"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/auxo/util/cast"
 	"github.com/cuigh/swirl/biz"
 	"github.com/cuigh/swirl/biz/docker"
 	"github.com/cuigh/swirl/misc"
 	"github.com/cuigh/swirl/model"
-	"github.com/prometheus/client_golang/api"
-	prometheus "github.com/prometheus/client_golang/api/prometheus/v1"
-	pm "github.com/prometheus/common/model"
 )
 
 // ServiceController is a controller of docker service
@@ -299,112 +293,46 @@ func serviceStats(ctx web.Context) error {
 		return err
 	}
 
+	var charts []model.ChartInfo
+	if setting.Metrics.Prometheus != "" {
+		var categories []string
+		if label := service.Spec.Labels["swirl.metrics"]; label != "" {
+			categories = strings.Split(label, ",")
+		}
+		charts = biz.Metric.GetServiceCharts(name, categories)
+	}
+
 	period := cast.ToDuration(ctx.Q("time"), time.Hour)
 	refresh := cast.ToBool(ctx.Q("refresh"), true)
-	m := newModel(ctx).Set("Service", service).Set("Tasks", tasks).
-		Set("Time", period.String()).Set("Refresh", refresh).Set("Metrics", setting.Metrics.Prometheus != "")
+	m := newModel(ctx).Set("Service", service).Set("Tasks", tasks).Set("Time", period.String()).
+		Set("Refresh", refresh).Set("Charts", charts)
 	return ctx.Render("service/stats", m)
 }
 
-// nolint: gocyclo
 func serviceMetrics(ctx web.Context) error {
-	type chartPoint struct {
-		X int64   `json:"x"`
-		Y float64 `json:"y"`
-	}
-	type chartDataset struct {
-		Label string       `json:"label"`
-		Data  []chartPoint `json:"data"`
-	}
-
 	name := ctx.P("name")
+	service, _, err := docker.ServiceInspect(name)
+	if err != nil {
+		return err
+	}
+
+	var categories []string
+	if label := service.Spec.Labels["swirl.metrics"]; label != "" {
+		categories = strings.Split(label, ",")
+	}
+	charts := biz.Metric.GetServiceCharts(name, categories)
+
 	period := cast.ToDuration(ctx.Q("time"), time.Hour)
-	var step time.Duration
-	if period >= times.Day {
-		step = 10 * time.Minute
-	} else if period >= 12*time.Hour {
-		step = 5 * time.Minute
-	} else if period >= 6*time.Hour {
-		step = 3 * time.Minute
-	} else if period >= 3*time.Hour {
-		step = 2 * time.Minute
-	} else {
-		step = time.Minute
-	}
-
-	setting, err := biz.Setting.Get()
-	if err != nil {
-		return err
-	}
-
-	client, err := api.NewClient(api.Config{Address: setting.Metrics.Prometheus})
-	if err != nil {
-		return err
-	}
-	papi := prometheus.NewAPI(client)
-
-	// cpu
-	query := fmt.Sprintf(`rate(container_cpu_user_seconds_total{container_label_com_docker_swarm_service_name="%s"}[5m]) * 100`, name)
 	end := time.Now()
 	start := end.Add(-period)
-	value, err := papi.QueryRange(context.Background(), query, prometheus.Range{
-		Start: start,
-		End:   end,
-		Step:  step,
-	})
-	if err != nil {
-		return err
-	}
-	matrix := value.(pm.Matrix)
-	var cpuDatas []chartDataset
-	for _, stream := range matrix {
-		ds := chartDataset{
-			Label: string(stream.Metric["name"]),
-		}
-		for _, v := range stream.Values {
-			p := chartPoint{
-				X: int64(v.Timestamp),
-				Y: float64(v.Value),
-			}
-			ds.Data = append(ds.Data, p)
-		}
-		cpuDatas = append(cpuDatas, ds)
-	}
 
-	// memory
-	query = fmt.Sprintf(`container_memory_usage_bytes{container_label_com_docker_swarm_service_name="%s"}`, name)
-	value, err = papi.QueryRange(context.Background(), query, prometheus.Range{
-		Start: start,
-		End:   end,
-		Step:  step,
-	})
-	if err != nil {
-		return err
-	}
-	matrix = value.(pm.Matrix)
-	var memoryDatas []chartDataset
-	for _, stream := range matrix {
-		ds := chartDataset{
-			Label: string(stream.Metric["name"]),
+	m := data.Map{}
+	for _, c := range charts {
+		matrix, err := biz.Metric.GetMatrix(c.Query, c.Label, start, end)
+		if err != nil {
+			return err
 		}
-		for _, v := range stream.Values {
-			p := chartPoint{
-				X: int64(v.Timestamp),
-				Y: float64(v.Value) / 1024 / 1024,
-			}
-			ds.Data = append(ds.Data, p)
-		}
-		memoryDatas = append(memoryDatas, ds)
-	}
-
-	// start time
-	//query = fmt.Sprintf(`container_start_time_seconds{container_label_com_docker_swarm_service_name="%s"}`, name)
-	//value, err = papi.Query(context.Background(), query, end)
-	//scalar := value.(*pm.Scalar)
-
-	m := data.Map{
-		"cpu":    cpuDatas,
-		"memory": memoryDatas,
+		m[c.Name] = matrix
 	}
 	return ctx.JSON(m)
 }
