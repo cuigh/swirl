@@ -254,7 +254,7 @@ func serviceScale(ctx web.Context) error {
 		return err
 	}
 
-	err = docker.ServiceScale(name, uint64(count))
+	err = docker.ServiceScale(name, 0, uint64(count))
 	if err == nil {
 		biz.Event.CreateService(model.EventActionScale, name, ctx.User())
 	}

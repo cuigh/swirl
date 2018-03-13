@@ -88,6 +88,39 @@ func (b *metricBiz) GetMatrix(query, label string, start, end time.Time) (lines 
 	return
 }
 
+func (b *metricBiz) GetScalar(query string, t time.Time) (v float64, err error) {
+	api, err := b.getAPI()
+	if err != nil {
+		return 0, err
+	}
+
+	value, err := api.Query(context.Background(), query, t)
+	if err != nil {
+		return 0, err
+	}
+
+	scalar := value.(*pmodel.Scalar)
+	return float64(scalar.Value), nil
+}
+
+func (b *metricBiz) GetVector(query string, t time.Time) (values []float64, err error) {
+	api, err := b.getAPI()
+	if err != nil {
+		return nil, err
+	}
+
+	value, err := api.Query(context.Background(), query, t)
+	if err != nil {
+		return nil, err
+	}
+
+	vector := value.(pmodel.Vector)
+	for _, sample := range vector {
+		values = append(values, float64(sample.Value))
+	}
+	return
+}
+
 func (b *metricBiz) calcStep(period time.Duration) (step time.Duration) {
 	if period >= times.Day {
 		step = 20 * time.Minute

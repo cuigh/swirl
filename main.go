@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
+	"os"
 	"path/filepath"
 	"runtime"
 	"time"
@@ -12,6 +12,7 @@ import (
 	_ "github.com/cuigh/auxo/cache/memory"
 	"github.com/cuigh/auxo/config"
 	"github.com/cuigh/auxo/data/valid"
+	"github.com/cuigh/auxo/log"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/auxo/net/web/filter"
 	"github.com/cuigh/auxo/net/web/filter/auth"
@@ -19,6 +20,8 @@ import (
 	"github.com/cuigh/swirl/biz"
 	"github.com/cuigh/swirl/controller"
 	"github.com/cuigh/swirl/misc"
+	"github.com/cuigh/swirl/model"
+	"github.com/cuigh/swirl/scaler"
 	"github.com/cuigh/swirl/security"
 )
 
@@ -26,22 +29,25 @@ func main() {
 	misc.BindOptions()
 
 	app.Name = "Swirl"
-	app.Version = "0.7.0"
+	app.Version = "0.7.1"
 	app.Desc = "A web management UI for Docker, focused on swarm cluster"
 	app.Action = func(ctx *app.Context) {
 		misc.LoadOptions()
-		app.Run(server())
+
+		setting, err := biz.Setting.Get()
+		if err != nil {
+			log.Get(app.Name).Error("Load setting failed: ", err)
+			os.Exit(1)
+		}
+
+		scaler.Start()
+		app.Run(server(setting))
 	}
 	app.Flags.Register(flag.All)
 	app.Start()
 }
 
-func server() *web.Server {
-	setting, err := biz.Setting.Get()
-	if err != nil {
-		panic(fmt.Sprintf("Load setting failed: %v", err))
-	}
-
+func server(setting *model.Setting) *web.Server {
 	ws := web.Auto()
 
 	// customize error handler

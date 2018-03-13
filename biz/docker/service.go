@@ -96,6 +96,16 @@ func ServiceList(name string, pageIndex, pageSize int) (infos []*model.ServiceLi
 	return
 }
 
+// ServiceSearch search services with args.
+func ServiceSearch(args filters.Args) (services []swarm.Service, err error) { // nolint: gocyclo
+	err = mgr.Do(func(ctx context.Context, cli *client.Client) (err error) {
+		opts := types.ServiceListOptions{Filters: args}
+		services, err = cli.ServiceList(ctx, opts)
+		return
+	})
+	return
+}
+
 // ServiceCount return number of services.
 func ServiceCount() (count int, err error) {
 	err = mgr.Do(func(ctx context.Context, cli *client.Client) (err error) {
@@ -317,7 +327,7 @@ func ServiceUpdate(info *model.ServiceInfo) error { // nolint: gocyclo
 }
 
 // ServiceScale adjust replicas of a service.
-func ServiceScale(name string, count uint64) error {
+func ServiceScale(name string, version, count uint64) error {
 	return mgr.Do(func(ctx context.Context, cli *client.Client) (err error) {
 		service, _, err := cli.ServiceInspectWithRaw(ctx, name, types.ServiceInspectOptions{})
 		if err != nil {
@@ -334,7 +344,11 @@ func ServiceScale(name string, count uint64) error {
 			RegistryAuthFrom: types.RegistryAuthFromSpec,
 			QueryRegistry:    false,
 		}
-		resp, err := cli.ServiceUpdate(context.Background(), name, service.Version, spec, options)
+		ver := service.Version
+		if version > 0 {
+			ver = swarm.Version{Index: version}
+		}
+		resp, err := cli.ServiceUpdate(context.Background(), name, ver, spec, options)
 		if err == nil && len(resp.Warnings) > 0 {
 			mgr.Logger().Warnf("service %s was scaled but got warnings: %v", name, resp.Warnings)
 		}

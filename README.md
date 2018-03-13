@@ -2,7 +2,7 @@
 
 [![Swirl](https://goreportcard.com/badge/cuigh/swirl)](https://goreportcard.com/report/cuigh/swirl)
 
-Swirl is a web management tool for Docker, focused on swarm cluster.
+**Swirl** is a web management tool for Docker, focused on swarm cluster.
 
 ## Features
 
@@ -10,6 +10,7 @@ Swirl is a web management tool for Docker, focused on swarm cluster.
 * Image and container management
 * Compose management with deployment support
 * Service monitoring based on Prometheus
+* Service auto scaling
 * LDAP authentication support
 * Full permission control based on RBAC model
 * Scale out as you want
@@ -119,6 +120,15 @@ docker service create \
 ```bash
 docker stack deploy -c compose.yml swirl
 ```
+
+## Advanced features
+
+**Swirl** use service labels to support some features, the labels in the table below are currently supported.
+
+Name | Description | Examples
+--- | --- | ---
+swirl.scale | Service auto scaling | `swirl.scale=min=1,max=5,cpu=30:50`
+swirl.metrics | Add additional metrics to service stats page | `swirl.metrics=java`, `swirl.metrics=go`
 
 ## Build
 
