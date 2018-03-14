@@ -100,7 +100,7 @@
     </li>
     <li>
       <a>
-        <span>DNS</span>
+        <span>Host & DNS</span>
       </a>
     </li>
   </ul>
@@ -533,17 +533,25 @@
   </div>
   <div style="display: none">
     <div class="field">
-      <label class="label">Name servers</label>
+      <label class="label">Hostname</label>
+      <input name="hostname" class="input" value="{{ .Service.Hostname }}" placeholder="">
+    </div>
+    <div class="field">
+      <label class="label">Hosts</label>
+      <textarea name="hosts" class="textarea" placeholder="IP_address canonical_hostname [aliases...]">{{ .Service.Hosts }}</textarea>
+    </div>
+    <div class="field">
+      <label class="label">DNS name servers</label>
       <div class="control">
         <input name="dns.nameservers" class="input" value="{{ .Service.DNS.Nameservers }}" placeholder="e.g. 10.10.10.200,10.10.10.201">
       </div>
     </div>
     <div class="field">
-      <label class="label">Search</label>
+      <label class="label">DNS search</label>
       <input name="dns.search" class="input" value="{{ .Service.DNS.Search }}" placeholder="e.g. xxx.com,yyy.net">
     </div>
     <div class="field">
-      <label class="label">Options</label>
+      <label class="label">DNS options</label>
       <input name="dns.options" class="input" value="{{ .Service.DNS.Options }}" placeholder="">
     </div>
   </div>

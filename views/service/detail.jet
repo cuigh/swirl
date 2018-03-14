@@ -186,7 +186,7 @@
         </li>
         <li>
           <a>
-            <span>DNS</span>
+            <span>Host & DNS</span>
           </a>
         </li>
       </ul>
@@ -421,8 +421,18 @@
         {{end}}
       </div>
       <div style="display: none">
-        {{ if .Service.Spec.TaskTemplate.ContainerSpec.DNSConfig }}
         <dl class="is-horizontal is-marginless">
+          {{ if .Service.Spec.TaskTemplate.ContainerSpec.Hostname }}
+          <dt class="has-text-left">Hostname</dt>
+          <dd>{{ .Service.Spec.TaskTemplate.ContainerSpec.Hostname }}</dd>
+          {{ end }}
+          {{ if .Service.Spec.TaskTemplate.ContainerSpec.Hosts }}
+          <dt class="has-text-left">Hosts</dt>
+          {{ range .Service.Spec.TaskTemplate.ContainerSpec.Hosts }}
+          <dd>{{ . }}</dd>
+          {{ end }}
+          {{ end }}
+          {{ if .Service.Spec.TaskTemplate.ContainerSpec.DNSConfig }}
           {{ if .Service.Spec.TaskTemplate.ContainerSpec.DNSConfig.Nameservers }}
           <dt class="has-text-left">Name servers</dt>
           <dd>{{ join(.Service.Spec.TaskTemplate.ContainerSpec.DNSConfig.Nameservers, ",") }}</dd>
@@ -435,8 +445,8 @@
           <dt class="has-text-left">Options</dt>
           <dd>{{ join(.Service.Spec.TaskTemplate.ContainerSpec.DNSConfig.Options, ",") }}</dd>
           {{ end }}
+          {{ end }}
         </dl>
-        {{ end }}
       </div>
     </div>
 

@@ -311,7 +311,11 @@ func ServiceUpdate(info *model.ServiceInfo) error { // nolint: gocyclo
 			}
 		}
 
-		// DNS
+		// Host & DNS
+		spec.TaskTemplate.ContainerSpec.Hostname = info.Hostname
+		if info.Hosts != "" {
+			spec.TaskTemplate.ContainerSpec.Hosts = strings.Split(info.Hosts, "\n")
+		}
 		spec.TaskTemplate.ContainerSpec.DNSConfig = info.GetDNSConfig()
 
 		options := types.ServiceUpdateOptions{
@@ -521,7 +525,11 @@ func ServiceCreate(info *model.ServiceInfo) error { // nolint: gocyclo
 			}
 		}
 
-		// DNS
+		// Host & DNS
+		service.TaskTemplate.ContainerSpec.Hostname = info.Hostname
+		if info.Hosts != "" {
+			service.TaskTemplate.ContainerSpec.Hosts = strings.Split(info.Hosts, "\n")
+		}
 		service.TaskTemplate.ContainerSpec.DNSConfig = info.GetDNSConfig()
 
 		opts := types.ServiceCreateOptions{EncodedRegistryAuth: info.RegistryAuth}

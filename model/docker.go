@@ -236,6 +236,8 @@ type ServiceInfo struct {
 		Search      string `json:"search,omitempty"`
 		Options     string `json:"options,omitempty"`
 	} `json:"dns"`
+	Hostname string `json:"hostname"`
+	Hosts    string `json:"hosts"`
 }
 
 func NewServiceInfo(service swarm.Service) *ServiceInfo {
@@ -346,6 +348,10 @@ func NewServiceInfo(service swarm.Service) *ServiceInfo {
 		si.DNS.Nameservers = strings.Join(dns.Nameservers, ",")
 		si.DNS.Search = strings.Join(dns.Search, ",")
 		si.DNS.Options = strings.Join(dns.Options, ",")
+	}
+	si.Hostname = spec.TaskTemplate.ContainerSpec.Hostname
+	if len(spec.TaskTemplate.ContainerSpec.Hosts) > 0 {
+		si.Hosts = strings.Join(spec.TaskTemplate.ContainerSpec.Hosts, "\n")
 	}
 	return si
 }
