@@ -1,5 +1,6 @@
 # SWIRL
 
+[![Docker Pulls](https://img.shields.io/docker/pulls/cuigh/swirl.svg)](https://hub.docker.com/r/cuigh/swirl/)
 [![Swirl](https://goreportcard.com/badge/cuigh/swirl)](https://goreportcard.com/report/cuigh/swirl)
 
 **Swirl** is a web management tool for Docker, focused on swarm cluster.
