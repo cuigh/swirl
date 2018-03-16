@@ -120,3 +120,22 @@ func NetworkInspectRaw(name string) (raw []byte, err error) {
 	}
 	return
 }
+
+// NetworkNames return network names by id list.
+func NetworkNames(ids ...string) (names []string, err error) {
+	var (
+		ctx context.Context
+		cli *client.Client
+	)
+	if ctx, cli, err = mgr.Client(); err == nil {
+		for _, id := range ids {
+			var n types.NetworkResource
+			n, err = cli.NetworkInspect(ctx, id, types.NetworkInspectOptions{})
+			if err != nil {
+				break
+			}
+			names = append(names, n.Name)
+		}
+	}
+	return
+}

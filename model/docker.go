@@ -254,8 +254,8 @@ func NewServiceInfo(service swarm.Service) *ServiceInfo {
 		ServiceLabels:   NewOptions(spec.Labels),
 		ContainerLabels: NewOptions(spec.TaskTemplate.ContainerSpec.Labels),
 	}
-	for _, vip := range service.Endpoint.VirtualIPs {
-		si.Networks = append(si.Networks, vip.NetworkID)
+	for _, n := range service.Spec.TaskTemplate.Networks {
+		si.Networks = append(si.Networks, n.Target)
 	}
 	if spec.EndpointSpec != nil {
 		si.Endpoint.Mode = spec.EndpointSpec.Mode

@@ -222,11 +222,15 @@ func serviceEdit(ctx web.Context) error {
 		return err
 	}
 
-	stack := service.Spec.Labels["com.docker.stack.namespace"]
-	checkedNetworks := set.StringSet{}
-	checkedNetworks.AddSlice(service.Endpoint.VirtualIPs, func(i int) string { return service.Endpoint.VirtualIPs[i].NetworkID })
+	si := model.NewServiceInfo(service)
+	names, err := docker.NetworkNames(si.Networks...)
+	if err != nil {
+		return err
+	}
+	checkedNetworks := set.NewStringSet(names...)
 
-	m := newModel(ctx).Set("Service", model.NewServiceInfo(service)).Set("Stack", stack).
+	m := newModel(ctx).Set("Service", si).
+		Set("Stack", service.Spec.Labels["com.docker.stack.namespace"]).
 		Set("Networks", networks).Set("CheckedNetworks", checkedNetworks).
 		Set("Secrets", secrets).Set("Configs", configs)
 	return ctx.Render("service/edit", m)

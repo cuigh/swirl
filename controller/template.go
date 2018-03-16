@@ -100,6 +100,7 @@ func templateCreate(ctx web.Context) error {
 	return ajaxResult(ctx, err)
 }
 
+// nolint: gocyclo
 func templateEdit(ctx web.Context) error {
 	id := ctx.P("id")
 	tpl, err := biz.Template.Get(id)
@@ -143,7 +144,11 @@ func templateEdit(ctx web.Context) error {
 		return err
 	}
 
-	checkedNetworks := set.NewStringSet(service.Networks...)
+	names, err := docker.NetworkNames(service.Networks...)
+	if err != nil {
+		return err
+	}
+	checkedNetworks := set.NewStringSet(names...)
 	m := newModel(ctx).Set("Action", "Edit").Set("Service", service).Set("Registries", registries).
 		Set("Networks", networks).Set("CheckedNetworks", checkedNetworks).
 		Set("Secrets", secrets).Set("Configs", configs)
