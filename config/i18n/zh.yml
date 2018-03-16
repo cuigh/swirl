@@ -47,7 +47,7 @@ field.role: 角色
 field.user: 用户
 
 # menu
-menu.dashboard: 仪表盘
+menu.home: 首页
 menu.local: 单机
 menu.image: 镜像
 menu.container: 容器
@@ -85,12 +85,12 @@ login.name: 登录名
 login.password: 密码
 login.forgot-password: 忘记密码？
 
-# dashboard
-dashboard.node: 节点
-dashboard.network: 网络
-dashboard.service: 服务
-dashboard.stack: 编排
-dashboard.feature: 功能
+# home
+home.node: 节点
+home.network: 网络
+home.service: 服务
+home.stack: 编排
+home.feature: 功能
 
 # image pages
 image.title: 镜像

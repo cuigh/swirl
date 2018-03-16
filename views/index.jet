@@ -58,13 +58,13 @@
     WARNING: Swirl is running on basic mode now, some features are disabled. You can enable full features by configuring database.
   </div>
   <div class="columns">
-    {{yield infobox(style="success", icon="cubes", text=i18n("dashboard.node"), url="/node/", count=.NodeCount)}}
-    {{yield infobox(style="info", icon="globe", text=i18n("dashboard.network"), url="/network/", count=.NetworkCount)}}
-    {{yield infobox(style="danger", icon="ticket-alt", text=i18n("dashboard.service"), url="/service/", count=.ServiceCount)}}
-    {{yield infobox(style="primary", icon="server", text=i18n("dashboard.stack"), url="/stack/task/", count=.StackCount)}}
+    {{yield infobox(style="success", icon="cubes", text=i18n("home.node"), url="/node/", count=.NodeCount)}}
+    {{yield infobox(style="info", icon="globe", text=i18n("home.network"), url="/network/", count=.NetworkCount)}}
+    {{yield infobox(style="danger", icon="ticket-alt", text=i18n("home.service"), url="/service/", count=.ServiceCount)}}
+    {{yield infobox(style="primary", icon="server", text=i18n("home.stack"), url="/stack/task/", count=.StackCount)}}
   </div>
   <hr>
-  <h3 class="title is-5">{{ i18n("dashboard.feature") }}</h3>
+  <h3 class="title is-5">{{ i18n("home.feature") }}</h3>
   <div class="columns">
     <div class="column is-4">
       <div class="card is-fullwidth">

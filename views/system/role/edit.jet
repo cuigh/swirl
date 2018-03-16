@@ -9,7 +9,7 @@
 <div class="container">
   <nav class="breadcrumb has-succeeds-separator is-small is-marginless" aria-label="breadcrumbs">
     <ul>
-      <li><a href="/">{{ i18n("menu.dashboard") }}</a></li>
+      <li><a href="/">{{ i18n("menu.home") }}</a></li>
       <li><a href="/system/role/">{{ i18n("menu.role") }}</a></li>
       <li class="is-active"><a>{{ i18n("menu.edit") }}</a></li>
     </ul>

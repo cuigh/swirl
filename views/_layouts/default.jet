@@ -26,7 +26,7 @@
         </div>
         <div id="menu-top" class="navbar-menu">
           <div class="navbar-start">
-            <a class="navbar-item" href="/">{{ i18n("menu.dashboard") }}</a>
+            <a class="navbar-item" href="/">{{ i18n("menu.home") }}</a>
             <div class="navbar-item has-dropdown is-hoverable">
               <div class="navbar-link">{{ i18n("menu.local") }}</div>
               <div class="navbar-dropdown ">

@@ -47,7 +47,7 @@ field.role: Roles
 field.user: Users
 
 # menu
-menu.dashboard: Dashboard
+menu.home: Home
 menu.local: Local
 menu.image: Images
 menu.container: Containers
@@ -85,12 +85,12 @@ login.name: Login Name
 login.password: Password
 login.forgot-password: Forgot password?
 
-# dashboard
-dashboard.node: Nodes
-dashboard.network: Networks
-dashboard.service: Services
-dashboard.stack: Stacks
-dashboard.feature: Features
+# home
+home.node: Nodes
+home.network: Networks
+home.service: Services
+home.stack: Stacks
+home.feature: Features
 
 # image pages
 image.title: Image

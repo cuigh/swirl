@@ -20,9 +20,9 @@
 
 ## Snapshots
 
-### Dashboard
+### Home
 
-![Dashboard](docs/images/dashboard.png)
+![Home](docs/images/home.png)
 
 ### Service list
 

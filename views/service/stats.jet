@@ -11,7 +11,7 @@
 <div class="container">
   <nav class="breadcrumb has-succeeds-separator is-small is-marginless" aria-label="breadcrumbs">
     <ul>
-      <li><a href="/">{{ i18n("menu.dashboard") }}</a></li>
+      <li><a href="/">{{ i18n("menu.home") }}</a></li>
       <li><a href="/service/">{{ i18n("menu.service") }}</a></li>
       <li class="is-active"><a>{{ i18n("menu.stats") }}</a></li>
     </ul>
@@ -75,16 +75,20 @@
         </div>
       </form>
     </nav>
-    {{ range .Charts }}
-    <div class="block">
-      <div class="block-header">
-        <p>{{ .Title }}</p>
+    <div class="columns is-multiline">
+      {{ range .Charts }}
+      <div class="column is-12">
+        <div class="block">
+          <div class="block-header">
+            <p>{{ .Title }}</p>
+          </div>
+          <div class="block-body is-bordered">
+            <canvas id="canvas_{{ .Name }}"></canvas>
+          </div>
+        </div>
       </div>
-      <div class="block-body is-bordered">
-        <canvas id="canvas_{{ .Name }}"></canvas>
+      {{ end }}
       </div>
-    </div>
-    {{ end }}
     {{ else }}
     <div class="notification is-info">
       NOTICE: To enable this feature, you must set <b>Metrics</b> option on <a href="/system/setting/">Setting</a> page first.
