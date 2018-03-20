@@ -1,6 +1,8 @@
 package misc
 
 import (
+	"time"
+
 	"github.com/cuigh/auxo/config"
 )
 
@@ -8,9 +10,11 @@ const (
 	keyDockerEndpoint = "swirl.docker_endpoint"
 	keyDBType         = "swirl.db_type"
 	keyDBAddress      = "swirl.db_address"
+	keyAuthTimeout    = "swirl.auth_timeout"
 	envDockerEndpoint = "DOCKER_ENDPOINT"
 	envDBType         = "DB_TYPE"
 	envDBAddress      = "DB_ADDRESS"
+	envAuthTimeout    = "AUTH_TIMEOUT"
 )
 
 // TimeZones holds some commonly used time-zones.
@@ -45,20 +49,22 @@ var TimeZones = []struct {
 	{"GMT-12", -12 * 60 * 60},
 }
 
+// Options holds custom options of swirl.
 var Options = &struct {
 	DockerEndpoint string
 	DBType         string
 	DBAddress      string
-}{}
+	AuthTimeout    time.Duration
+}{
+	DBType:      "mongo",
+	DBAddress:   "localhost:27017/swirl",
+	AuthTimeout: 30 * time.Minute,
+}
 
+// BindOptions binds options to environment variables.
 func BindOptions() {
 	config.BindEnv(keyDockerEndpoint, envDockerEndpoint)
 	config.BindEnv(keyDBType, envDBType)
 	config.BindEnv(keyDBAddress, envDBAddress)
-}
-
-func LoadOptions() {
-	Options.DockerEndpoint = config.GetString(keyDockerEndpoint)
-	Options.DBType = config.GetString(keyDBType)
-	Options.DBAddress = config.GetString(keyDBAddress)
+	config.BindEnv(keyAuthTimeout, envAuthTimeout)
 }

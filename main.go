@@ -5,7 +5,6 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
-	"time"
 
 	"github.com/cuigh/auxo/app"
 	"github.com/cuigh/auxo/app/flag"
@@ -32,7 +31,11 @@ func main() {
 	app.Version = "0.7.1"
 	app.Desc = "A web management UI for Docker, focused on swarm cluster"
 	app.Action = func(ctx *app.Context) {
-		misc.LoadOptions()
+		err := config.UnmarshalOption("swirl", &misc.Options)
+		if err != nil {
+			log.Get(app.Name).Error("Load options failed: ", err)
+			os.Exit(1)
+		}
 
 		setting, err := biz.Setting.Get()
 		if err != nil {
@@ -85,7 +88,7 @@ func server(setting *model.Setting) *web.Server {
 	// create biz group
 	form := &auth.Form{
 		Identifier:        security.Identifier,
-		Timeout:           time.Minute * 30,
+		Timeout:           misc.Options.AuthTimeout,
 		SlidingExpiration: true,
 	}
 	g := ws.Group("", form, filter.NewAuthorizer(security.Checker))
