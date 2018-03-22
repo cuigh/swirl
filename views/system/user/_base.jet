@@ -24,6 +24,9 @@
           <li>
             <a href="/system/event/">{{ i18n("menu.event") }}</a>
           </li>
+          <li>
+            <a href="/system/chart/">{{ i18n("menu.chart") }}</a>
+          </li>
         </ul>
       </nav>
     </div>

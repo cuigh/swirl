@@ -62,6 +62,13 @@ type Interface interface {
 
 	SettingGet() (setting *model.Setting, err error)
 	SettingUpdate(setting *model.Setting) error
+
+	ChartGet(name string) (*model.Chart, error)
+	ChartBatch(names ...string) ([]*model.Chart, error)
+	ChartList() (charts []*model.Chart, err error)
+	ChartCreate(chart *model.Chart) error
+	ChartUpdate(chart *model.Chart) error
+	ChartDelete(name string) error
 }
 
 // Get return a dao instance according to DB_TYPE.

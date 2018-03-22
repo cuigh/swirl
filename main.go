@@ -116,6 +116,7 @@ func server(setting *model.Setting) *web.Server {
 	g.Handle("/system/role", controller.Role())
 	g.Handle("/system/setting", controller.Setting())
 	g.Handle("/system/event", controller.Event())
+	g.Handle("/system/chart", controller.Chart())
 
 	return ws
 }

@@ -45,6 +45,12 @@ field.driver: Driver
 field.scope: Scope
 field.role: Roles
 field.user: Users
+field.width: Width
+field.height: Height
+field.unit: Unit
+field.title: Title
+field.label: Label
+field.dashboard: Dashboard
 
 # menu
 menu.home: Home
@@ -69,6 +75,7 @@ menu.role: Roles
 menu.user: Users
 menu.setting: Settings
 menu.event: Events
+menu.chart: Charts
 menu.version: Version
 menu.profile: Profile
 menu.password: Password
@@ -90,7 +97,7 @@ home.node: Nodes
 home.network: Networks
 home.service: Services
 home.stack: Stacks
-home.feature: Features
+home.monitor: Monitors
 
 # image pages
 image.title: Image
@@ -168,6 +175,10 @@ setting.description: Manage Swirl system settings.
 # event pages
 event.title: Event
 event.description: Manage all user events.
+
+# chart pages
+chart.title: Chart
+chart.description: Manage all metric charts.
 
 # profile pages
 profile.title: Profile

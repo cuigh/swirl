@@ -45,6 +45,12 @@ field.driver: 驱动
 field.scope: 范围
 field.role: 角色
 field.user: 用户
+field.width: 宽度
+field.height: 高度
+field.unit: 单位
+field.title: 标题
+field.label: 标签
+field.dashboard: 仪表盘
 
 # menu
 menu.home: 首页
@@ -69,6 +75,7 @@ menu.role: 角色
 menu.user: 用户
 menu.setting: 设置
 menu.event: 事件
+menu.chart: 图表
 menu.version: 版本
 menu.profile: 资料
 menu.password: 密码
@@ -90,7 +97,7 @@ home.node: 节点
 home.network: 网络
 home.service: 服务
 home.stack: 编排
-home.feature: 功能
+home.monitor: 监控
 
 # image pages
 image.title: 镜像
@@ -168,6 +175,10 @@ setting.description: 管理 Swirl 系统设置。
 # event pages
 event.title: 事件
 event.description: 管理用户操作日志。
+
+# chart pages
+chart.title: 图表
+chart.description: 管理监控图表。
 
 # profile pages
 profile.title: 资料

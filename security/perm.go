@@ -221,4 +221,15 @@ var Perms = []PermGroup{
 			{Key: "event.list", Text: "View list"},
 		},
 	},
+	{
+		Name: "Chart",
+		Perms: []Perm{
+			{Key: "chart.list", Text: "View list"},
+			{Key: "chart.new", Text: "View new"},
+			{Key: "chart.edit", Text: "View edit"},
+			{Key: "chart.create", Text: "Create"},
+			{Key: "chart.delete", Text: "Delete"},
+			{Key: "chart.update", Text: "Update"},
+		},
+	},
 }

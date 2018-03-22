@@ -3,6 +3,7 @@ package biz
 import (
 	"context"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/cuigh/auxo/ext/times"
@@ -37,18 +38,18 @@ type metricBiz struct {
 }
 
 func (b *metricBiz) GetServiceCharts(service string, categories []string) (charts []model.ChartInfo) {
-	charts = append(charts, model.NewChartInfo("cpu", "CPU", "name", `rate(container_cpu_user_seconds_total{container_label_com_docker_swarm_service_name="%s"}[5m]) * 100`))
-	charts = append(charts, model.NewChartInfo("memory", "Memory", "name", `container_memory_usage_bytes{container_label_com_docker_swarm_service_name="%s"}`))
-	charts = append(charts, model.NewChartInfo("network_in", "Network Receive", "name", `sum(irate(container_network_receive_bytes_total{container_label_com_docker_swarm_service_name="%s"}[5m])) by(name)`))
-	charts = append(charts, model.NewChartInfo("network_out", "Network Send", "name", `sum(irate(container_network_transmit_bytes_total{container_label_com_docker_swarm_service_name="%s"}[5m])) by(name)`))
+	charts = append(charts, model.NewChartInfo("cpu", "CPU", "${name}", `rate(container_cpu_user_seconds_total{container_label_com_docker_swarm_service_name="%s"}[5m]) * 100`))
+	charts = append(charts, model.NewChartInfo("memory", "Memory", "${name}", `container_memory_usage_bytes{container_label_com_docker_swarm_service_name="%s"}`))
+	charts = append(charts, model.NewChartInfo("network_in", "Network Receive", "${name}", `sum(irate(container_network_receive_bytes_total{container_label_com_docker_swarm_service_name="%s"}[5m])) by(name)`))
+	charts = append(charts, model.NewChartInfo("network_out", "Network Send", "${name}", `sum(irate(container_network_transmit_bytes_total{container_label_com_docker_swarm_service_name="%s"}[5m])) by(name)`))
 	for _, c := range categories {
 		if c == "java" {
-			charts = append(charts, model.NewChartInfo("threads", "Threads", "instance", `jvm_threads_current{service="%s"}`))
-			charts = append(charts, model.NewChartInfo("gc_duration", "GC Duration", "instance", `rate(jvm_gc_collection_seconds_sum{service="%s"}[1m])`))
+			charts = append(charts, model.NewChartInfo("threads", "Threads", "${instance}", `jvm_threads_current{service="%s"}`))
+			charts = append(charts, model.NewChartInfo("gc_duration", "GC Duration", "${instance}", `rate(jvm_gc_collection_seconds_sum{service="%s"}[1m])`))
 		} else if c == "go" {
-			charts = append(charts, model.NewChartInfo("threads", "Threads", "instance", `go_threads{service="%s"}`))
-			charts = append(charts, model.NewChartInfo("goroutines", "Goroutines", "instance", `go_goroutines{service="%s"}`))
-			charts = append(charts, model.NewChartInfo("gc_duration", "GC Duration", "instance", `sum(go_gc_duration_seconds{service="%s"}) by (instance)`))
+			charts = append(charts, model.NewChartInfo("threads", "Threads", "${instance}", `go_threads{service="%s"}`))
+			charts = append(charts, model.NewChartInfo("goroutines", "Goroutines", "${instance}", `go_goroutines{service="%s"}`))
+			charts = append(charts, model.NewChartInfo("gc_duration", "GC Duration", "${instance}", `sum(go_gc_duration_seconds{service="%s"}) by (instance)`))
 		}
 	}
 	for i, c := range charts {
@@ -75,7 +76,7 @@ func (b *metricBiz) GetMatrix(query, label string, start, end time.Time) (lines 
 
 	matrix := value.(pmodel.Matrix)
 	for _, stream := range matrix {
-		line := model.ChartLine{Label: string(stream.Metric[pmodel.LabelName(label)])}
+		line := model.ChartLine{Label: b.formatLabel(label, stream.Metric)}
 		for _, v := range stream.Values {
 			p := model.ChartPoint{
 				X: int64(v.Timestamp),
@@ -103,20 +104,25 @@ func (b *metricBiz) GetScalar(query string, t time.Time) (v float64, err error) 
 	return float64(scalar.Value), nil
 }
 
-func (b *metricBiz) GetVector(query string, t time.Time) (values []float64, err error) {
-	api, err := b.getAPI()
+func (b *metricBiz) GetVector(query, label string, t time.Time) (cv model.ChartVector, err error) {
+	var api papi.API
+	api, err = b.getAPI()
 	if err != nil {
-		return nil, err
+		return
 	}
 
-	value, err := api.Query(context.Background(), query, t)
+	var value pmodel.Value
+	value, err = api.Query(context.Background(), query, t)
 	if err != nil {
-		return nil, err
+		return
 	}
 
 	vector := value.(pmodel.Vector)
 	for _, sample := range vector {
-		values = append(values, float64(sample.Value))
+		cv.Data = append(cv.Data, float64(sample.Value))
+		if label != "" {
+			cv.Labels = append(cv.Labels, b.formatLabel(label, sample.Metric))
+		}
 	}
 	return
 }
@@ -142,4 +148,13 @@ func (b *metricBiz) getAPI() (api papi.API, err error) {
 		return nil, err
 	}
 	return v.(papi.API), nil
+}
+
+func (b *metricBiz) formatLabel(label string, metric pmodel.Metric) string {
+	return os.Expand(label, func(key string) string {
+		if s := string(metric[pmodel.LabelName(key)]); s != "" {
+			return s
+		}
+		return "[" + key + "]"
+	})
 }

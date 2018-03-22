@@ -21,9 +21,7 @@
 <section class="hero is-small is-light">
   <div class="hero-body">
     <div class="container">
-      <h2 class="title is-2">
-        {{ .Service.Spec.Name }}
-      </h2>      
+      <h2 id="h2-service-name" class="title is-2">{{ .Service.Spec.Name }}</h2>
     </div>
   </div>
 </section>
@@ -74,21 +72,36 @@
           </div>
         </div>
       </form>
+      <div class="level-right">
+        <div class="level-item">
+          <button id="btn-add" class="button is-success"><span class="icon"><i class="fas fa-plus"></i></span><span>{{ i18n("button.add") }}</span></button>
+        </div>
+      </div>
     </nav>
-    <div class="columns is-multiline">
+    <div id="div-charts" class="columns is-multiline">
       {{ range .Charts }}
-      <div class="column is-12">
-        <div class="block">
-          <div class="block-header">
-            <p>{{ .Title }}</p>
-          </div>
-          <div class="block-body is-bordered">
+      <div class="column is-{{ .Width }}" data-chart-name="{{ .Name }}" data-chart-type="{{ .Type }}" data-chart-unit="{{ .Unit }}" data-chart-height="{{ .Height }}">
+        <div class="card">
+          <header class="card-header">
+            <p class="card-header-title">{{ .Title }}</p>
+            <a data-action="remove-chart" class="card-header-icon is-paddingless" aria-label="remove chart">
+              <span class="icon">
+                <i class="fas fa-times has-text-danger" aria-hidden="true"></i>
+              </span>
+            </a>
+            <a data-action="edit-options" class="card-header-icon" aria-label="edit options">
+              <span class="icon">
+                <i class="fas fa-ellipsis-h has-text-info" aria-hidden="true"></i>
+              </span>
+            </a>
+          </header>
+          <div class="card-content">
             <canvas id="canvas_{{ .Name }}"></canvas>
           </div>
         </div>
       </div>
       {{ end }}
-      </div>
+    </div>
     {{ else }}
     <div class="notification is-info">
       NOTICE: To enable this feature, you must set <b>Metrics</b> option on <a href="/system/setting/">Setting</a> page first.

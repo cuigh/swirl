@@ -188,7 +188,7 @@ namespace Swirl.Core {
      */
     class RegexRule implements ValidationRule {
         validate($form: JQuery, $input: JQuery, arg?: string): {ok: boolean, error?: string} {
-            let regex = new RegExp(arg, 'i');
+            let regex = new RegExp(arg);
             let value = $.trim($input.val());
             return {ok: !value || regex.test(value)};
         }

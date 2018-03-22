@@ -4,15 +4,15 @@
 <section class="hero is-dark">
   <div class="hero-body">
     <div class="container has-text-centered">
-      <h1 class="title is-2 is-uppercase">{{ i18n("role.title") }}</h1>
-      <h2 class="subtitle is-5">{{ i18n("role.description") }}</h2>
+      <h1 class="title is-2 is-uppercase">{{ i18n("chart.title") }}</h1>
+      <h2 class="subtitle is-5">{{ i18n("chart.description") }}</h2>
     </div>
   </div>
   <div class="hero-foot">
     <div class="container">
       <nav class="tabs is-boxed">
         <ul>
-          <li class="is-active">
+          <li>
             <a href="/system/role/">{{ i18n("menu.role") }}</a>
           </li>
           <li>
@@ -24,7 +24,7 @@
           <li>
             <a href="/system/event/">{{ i18n("menu.event") }}</a>
           </li>
-          <li>
+          <li class="is-active">
             <a href="/system/chart/">{{ i18n("menu.chart") }}</a>
           </li>
         </ul>

@@ -159,16 +159,16 @@ func checkArg(service string, arg data.Option) (scaleType, float64) {
 
 func cpuChecker(service string, low, high float64) (scaleType, float64) {
 	query := fmt.Sprintf(`avg(rate(container_cpu_user_seconds_total{container_label_com_docker_swarm_service_name="%s"}[5m]) * 100)`, service)
-	values, err := biz.Metric.GetVector(query, time.Now())
+	vector, err := biz.Metric.GetVector(query, "", time.Now())
 	if err != nil {
 		log.Get("scaler").Error("scaler > Failed to query metrics: ", err)
 		return scaleNone, 0
 	}
-	if len(values) == 0 {
+	if len(vector.Data) == 0 {
 		return scaleNone, 0
 	}
 
-	value := values[0]
+	value := vector.Data[0]
 	if value <= low {
 		return scaleDown, value
 	} else if value >= high {

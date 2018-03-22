@@ -55,6 +55,7 @@
                 <a class="navbar-item" href="/system/user/">{{ i18n("menu.user") }}</a>
                 <a class="navbar-item" href="/system/setting/">{{ i18n("menu.setting") }}</a>
                 <a class="navbar-item" href="/system/event/">{{ i18n("menu.event") }}</a>
+                <a class="navbar-item" href="/system/chart/">{{ i18n("menu.chart") }}</a>
                 <hr class="navbar-divider">
                 <div class="navbar-item">
                   <div class="navbar-content">

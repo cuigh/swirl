@@ -1,5 +1,10 @@
 {{ extends "_layouts/default" }}
 
+{{ block script() }}
+<script src="/assets/chart/chart.bundle.min.js?v=2.7.2"></script>
+<script>$(() => new Swirl.IndexPage())</script>
+{{ end }}
+
 {{ block infobox(style, icon, text, url, count) }}
 <div class="column">
   <div class="notification is-{{style}}">
@@ -28,7 +33,7 @@
 {{end}}
 
 {{ block body() }}
-<section class="hero is-primary is-medium is-bold">
+<section class="hero is-primary is-bold">
   <div class="hero-body">
     <div class="container has-text-centered">
       <h1 class="title is-2">
@@ -36,18 +41,12 @@
       </h1>
       <h2 class="subtitle is-5">{{ i18n("description") }}</h2>
       <p>
-        <a id="btn-add" class="button is-primary" href="https://github.com/cuigh/swirl" target="_blank">
+        <a class="button is-primary" href="https://github.com/cuigh/swirl" target="_blank">
           <span class="icon">
             <i class="fab fa-github"></i>
           </span>
           <span>GitHub</span>
         </a>
-        {*<a id="btn-add" class="button is-success" href="https://cuigh.tech/swirl" target="_blank">*}
-          {*<span class="icon">*}
-            {*<i class="fas fa-book"></i>*}
-          {*</span>*}
-          {*<span>Document</span>*}
-        {*</a>*}
       </p>
     </div>
   </div>
@@ -64,51 +63,48 @@
     {{yield infobox(style="primary", icon="server", text=i18n("home.stack"), url="/stack/task/", count=.StackCount)}}
   </div>
   <hr>
-  <h3 class="title is-5">{{ i18n("home.feature") }}</h3>
-  <div class="columns">
-    <div class="column is-4">
-      <div class="card is-fullwidth">
+  <nav class="level">
+    <div class="level-left">
+      <div class="level-item">
+        <p class="subtitle is-5">
+          <strong>{{ i18n("home.monitor") }}</strong>
+        </p>
+      </div>
+    </div>
+    <div class="level-right">
+      <div class="level-item">
+        <button id="btn-add" class="button is-success"><span class="icon"><i class="fas fa-plus"></i></span><span>{{ i18n("button.add") }}</span></button>
+      </div>
+    </div>
+  </nav>
+  <div id="div-charts" class="columns is-multiline">
+    {{ range .Charts }}
+    <div class="column is-{{ .Width }}" data-chart-name="{{ .Name }}" data-chart-type="{{ .Type }}" data-chart-unit="{{ .Unit }}" data-chart-height="{{ .Height }}">
+      <div class="card">
         <header class="card-header">
-          <h4 class="card-header-title"><strong>{{ i18n("menu.local") }}</strong></h4>
+          <p class="card-header-title">{{ .Title }}</p>
+          <a data-action="remove-chart" class="card-header-icon" aria-label="remove chart">
+            <span class="icon">
+              <i class="fas fa-times has-text-danger" aria-hidden="true"></i>
+            </span>
+          </a>
+          {*<a data-action="remove-chart" class="card-header-icon is-paddingless" aria-label="remove chart">*}
+            {*<span class="icon">*}
+              {*<i class="fas fa-times has-text-danger" aria-hidden="true"></i>*}
+            {*</span>*}
+          {*</a>*}
+          {*<a data-action="edit-options" class="card-header-icon" aria-label="edit options">*}
+            {*<span class="icon">*}
+              {*<i class="fas fa-ellipsis-h has-text-info" aria-hidden="true"></i>*}
+            {*</span>*}
+          {*</a>*}
         </header>
         <div class="card-content">
-          {{yield progress(title=i18n("menu.image"), percent=100)}}
-          {{yield progress(title=i18n("menu.container"), percent=80)}}
-          {{yield progress(title=i18n("menu.volume"), percent=100)}}
+          <canvas id="canvas_{{ .Name }}"></canvas>
         </div>
       </div>
     </div>
-    <div class="column is-4">
-      <div class="card is-fullwidth">
-        <header class="card-header">
-          <h4 class="card-header-title"><strong>{{ i18n("menu.swarm") }}</strong></h4>
-        </header>
-        <div class="card-content">
-          {{yield progress(title=i18n("menu.registry"), percent=100)}}
-          {{yield progress(title=i18n("menu.node"), percent=100)}}
-          {{yield progress(title=i18n("menu.network"), percent=100)}}
-          {{yield progress(title=i18n("menu.service"), percent=100)}}
-          {{yield progress(title=i18n("menu.stack"), percent=100)}}
-          {{yield progress(title=i18n("menu.task"), percent=100)}}
-          {{yield progress(title=i18n("menu.secret"), percent=100)}}
-          {{yield progress(title=i18n("menu.config"), percent=100)}}
-        </div>
-      </div>
-    </div>    
-    <div class="column is-4">
-      <div class="card is-fullwidth">
-        <header class="card-header">
-          <h4 class="card-header-title"><strong>{{ i18n("menu.system") }}</strong></h4>
-        </header>
-        <div class="card-content">
-          {{yield progress(title=i18n("menu.profile"), percent=100)}}
-          {{yield progress(title=i18n("menu.role"), percent=100)}}
-          {{yield progress(title=i18n("menu.user"), percent=100)}}
-          {{yield progress(title=i18n("menu.setting"), percent=100)}}
-          {{yield progress(title=i18n("menu.event"), percent=80)}}
-        </div>
-      </div>
-    </div>
+    {{ end }}
   </div>
 </section>
 {{ end }}

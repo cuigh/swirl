@@ -56,7 +56,8 @@
     "util/cast",
     "util/debug",
     "util/i18n",
-    "util/lazy"
+    "util/lazy",
+    "util/run"
   ]
   revision = "772f5a654db9ee95a5dc851e9562253bc0b2f11d"
 
@@ -224,6 +225,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "c829e2bd1f0dc356225caad79652e6732d0572e0e59580a5e6c5b6baab134755"
+  inputs-digest = "dea823c7646b8b71101e0443b1c0c36a723989261f733ad4cb44c6e9b0d3942d"
   solver-name = "gps-cdcl"
   solver-version = 1

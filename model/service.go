@@ -33,29 +33,3 @@ type TemplateListArgs struct {
 	PageIndex int    `bind:"page"`
 	PageSize  int    `bind:"size"`
 }
-
-type ChartPoint struct {
-	X int64   `json:"x"`
-	Y float64 `json:"y"`
-}
-
-type ChartLine struct {
-	Label string       `json:"label"`
-	Data  []ChartPoint `json:"data"`
-}
-
-type ChartInfo struct {
-	Name  string `json:"name"`
-	Title string `json:"title"`
-	Label string `json:"label"`
-	Query string `json:"query"`
-}
-
-func NewChartInfo(name, title, label, query string) ChartInfo {
-	return ChartInfo{
-		Name:  name,
-		Title: title,
-		Label: label,
-		Query: query,
-	}
-}

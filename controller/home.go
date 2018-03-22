@@ -32,8 +32,10 @@ func Home() (c *HomeController) {
 
 func homeIndex(ctx web.Context) (err error) {
 	var (
-		count int
-		m     = newModel(ctx)
+		count   int
+		setting *model.Setting
+		charts  []*model.Chart
+		m       = newModel(ctx)
 	)
 
 	if count, err = docker.NodeCount(); err != nil {
@@ -55,6 +57,15 @@ func homeIndex(ctx web.Context) (err error) {
 		return
 	}
 	m.Set("StackCount", count)
+
+	if setting, err = biz.Setting.Get(); err != nil {
+		return
+	}
+	charts, err = biz.Chart.Panel(setting.Dashboard.Home)
+	if err != nil {
+		return err
+	}
+	m.Set("Charts", charts)
 
 	return ctx.Render("index", m)
 }

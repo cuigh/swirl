@@ -1,0 +1,126 @@
+{{ extends "_base" }}
+{{ import "../../_modules/form" }}
+
+{{ block body_content() }}
+<section class="section">
+  <div class="container">
+    <h2 class="title">Create chart</h2>
+    <hr>
+    <form method="post" data-form="ajax-json" data-url="/system/chart/">
+      <div class="columns is-bottom-marginless">
+        <div class="column is-6">
+          <div class="field">
+            <label class="label">{{ i18n("field.name") }}</label>
+            <div class="control">
+              <input name="name" value="{{ .Chart.Name }}" class="input" placeholder="lower-case letters and underline only" data-v-rule="native;regex" data-v-arg-regex="[a-z_]+" data-v-msg-regex="Only lower-case letters and underline are allowed." required{{if .Chart.Name}} readonly{{ end }}>
+            </div>
+          </div>
+          <div class="field">
+            <label class="label">{{ i18n("field.title") }}</label>
+            <div class="control">
+              <input name="title" value="{{ .Chart.Title }}" class="input" placeholder="Title" data-v-rule="native" required>
+            </div>
+          </div>
+          <div class="field">
+            <label class="label">{{ i18n("field.label") }}</label>
+            <div class="control">
+              <input name="label" value="{{ .Chart.Label }}"  class="input" placeholder="Label for dataset, e.g. ${name}">
+            </div>
+          </div>
+        </div>
+        <div class="column is-6">
+          <div class="field">
+            <label class="label">{{ i18n("field.width") }}</label>
+            <div class="control">
+              <span class="select">
+                <select name="width" data-type="integer">
+                  {{ yield option(value="1", selected=.Chart.Width) }}
+                  {{ yield option(value="2", selected=.Chart.Width) }}
+                  {{ yield option(value="3", selected=.Chart.Width) }}
+                  {{ yield option(value="4", selected=.Chart.Width) }}
+                  {{ yield option(value="5", selected=.Chart.Width) }}
+                  {{ yield option(value="6", selected=.Chart.Width) }}
+                  {{ yield option(value="7", selected=.Chart.Width) }}
+                  {{ yield option(value="8", selected=.Chart.Width) }}
+                  {{ yield option(value="9", selected=.Chart.Width) }}
+                  {{ yield option(value="10", selected=.Chart.Width) }}
+                  {{ yield option(value="11", selected=.Chart.Width) }}
+                  {{ yield option(value="12", selected=.Chart.Width) }}
+                </select>
+              </span>
+            </div>
+          </div>
+          <div class="field">
+            <label class="label">{{ i18n("field.height") }}</label>
+            <div class="control">
+              <input name="height" value="{{ .Chart.Height }}"  class="input" placeholder="Height" data-type="integer" data-v-rule="native" required>
+            </div>
+          </div>
+          <div class="field">
+            <label class="label">{{ i18n("field.unit") }}</label>
+            <div class="control">
+              <span class="select">
+                <select name="unit">
+                  {{ yield option(value="", label="None", selected=.Chart.Unit) }}
+                  <optgroup label="Percent">
+                    {{ yield option(value="percent:100", label="0-100", selected=.Chart.Unit) }}
+                    {{ yield option(value="percent:1", label="0.0-1.0", selected=.Chart.Unit) }}
+                  </optgroup>
+                  <optgroup label="Time">
+                    {{ yield option(value="time:ns", label="Nanoseconds", selected=.Chart.Unit) }}
+                    {{ yield option(value="time:µs", label="Microseconds", selected=.Chart.Unit) }}
+                    {{ yield option(value="time:ms", label="Milliseconds", selected=.Chart.Unit) }}
+                    {{ yield option(value="time:s", label="Seconds", selected=.Chart.Unit) }}
+                    {{ yield option(value="time:m", label="Minutes", selected=.Chart.Unit) }}
+                    {{ yield option(value="time:h", label="Hours", selected=.Chart.Unit) }}
+                    {{ yield option(value="time:d", label="Days", selected=.Chart.Unit) }}
+                  </optgroup>
+                  <optgroup label="Size">
+                    {{ yield option(value="size:bits", label="Bits", selected=.Chart.Unit) }}
+                    {{ yield option(value="size:bytes", label="Bytes", selected=.Chart.Unit) }}
+                    {{ yield option(value="size:kilobytes", label="Kilobytes", selected=.Chart.Unit) }}
+                    {{ yield option(value="size:megabytes", label="Megabytes", selected=.Chart.Unit) }}
+                    {{ yield option(value="size:gigabytes", label="Gigabytes", selected=.Chart.Unit) }}
+                  </optgroup>
+                </select>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">Description</label>
+        <div class="control">
+          <input name="desc" value="{{ .Chart.Description }}" class="input" placeholder="Chart description">
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">Query expression</label>
+        <div class="control">
+          <input name="query" value="{{ .Chart.Query }}" class="input" placeholder="Prometheus query expression" data-v-rule="native" required>
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">{{ i18n("field.type") }}</label>
+        <div class="control">
+          {{ yield radio(name="type", value="line", label="Line", checked=.Chart.Type) }}
+          {{ yield radio(name="type", value="bar", label="Bar", checked=.Chart.Type) }}
+          {{ yield radio(name="type", value="pie", label="Pie", checked=.Chart.Type) }}
+          {*{{ yield radio(name="type", value="table", label="Table", checked=.Chart.Type) }}*}
+          {{ yield radio(name="type", value="value", label="Value", checked=.Chart.Type) }}
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">{{ i18n("field.dashboard") }}</label>
+        <div class="control">
+          {{ yield radio(name="dashboard", value="", label="Any", checked=.Chart.Dashboard) }}
+          {{ yield radio(name="dashboard", value="home", label="Home", checked=.Chart.Dashboard) }}
+          {{ yield radio(name="dashboard", value="service", label="Service", checked=.Chart.Dashboard) }}
+          {{ yield radio(name="dashboard", value="task", label="Task", checked=.Chart.Dashboard) }}
+        </div>
+      </div>
+      {{ yield form_submit(url="/system/chart/") }}
+    </form>
+  </div>
+</section>
+{{ end }}

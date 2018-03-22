@@ -171,6 +171,14 @@ dd {
     color: whitesmoke;
 }
 
+.card-header-title, .card-header-icon, .card-footer-item {
+    padding: 0.5rem 0.75rem;
+}
+
+.card-content {
+    padding: 0.75rem;
+}
+
 .block {
     font-size: 1rem;
 }
@@ -246,7 +254,7 @@ dd {
     font-family: monospace;
 }
 
-textarea.code{
+textarea.code {
     padding: 0.75em;
 }
 

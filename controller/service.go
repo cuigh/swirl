@@ -5,7 +5,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/cuigh/auxo/data"
 	"github.com/cuigh/auxo/data/set"
 	"github.com/cuigh/auxo/errors"
 	"github.com/cuigh/auxo/net/web"
@@ -32,7 +31,6 @@ type ServiceController struct {
 	PermEdit   web.HandlerFunc `path:"/:name/perm" name:"service.perm.edit" authorize:"!" perm:"write,service,name"`
 	PermUpdate web.HandlerFunc `path:"/:name/perm" method:"post" name:"service.perm.update" authorize:"!" perm:"write,service,name"`
 	Stats      web.HandlerFunc `path:"/:name/stats" name:"service.stats" authorize:"!" perm:"read,service,name"`
-	Metrics    web.HandlerFunc `path:"/:name/metrics" name:"service.metrics" authorize:"?"`
 }
 
 // Service creates an instance of ServiceController
@@ -52,7 +50,6 @@ func Service() (c *ServiceController) {
 		PermEdit:   servicePermEdit,
 		PermUpdate: permUpdate("service", "name"),
 		Stats:      serviceStats,
-		Metrics:    serviceMetrics,
 	}
 }
 
@@ -297,13 +294,9 @@ func serviceStats(ctx web.Context) error {
 		return err
 	}
 
-	var charts []model.ChartInfo
+	var charts []*model.Chart
 	if setting.Metrics.Prometheus != "" {
-		var categories []string
-		if label := service.Spec.Labels["swirl.metrics"]; label != "" {
-			categories = strings.Split(label, ",")
-		}
-		charts = biz.Metric.GetServiceCharts(name, categories)
+		charts, err = biz.Chart.GetServiceCharts(name)
 	}
 
 	period := cast.ToDuration(ctx.Q("time"), time.Hour)
@@ -311,32 +304,4 @@ func serviceStats(ctx web.Context) error {
 	m := newModel(ctx).Set("Service", service).Set("Tasks", tasks).Set("Time", period.String()).
 		Set("Refresh", refresh).Set("Charts", charts)
 	return ctx.Render("service/stats", m)
-}
-
-func serviceMetrics(ctx web.Context) error {
-	name := ctx.P("name")
-	service, _, err := docker.ServiceInspect(name)
-	if err != nil {
-		return err
-	}
-
-	var categories []string
-	if label := service.Spec.Labels["swirl.metrics"]; label != "" {
-		categories = strings.Split(label, ",")
-	}
-	charts := biz.Metric.GetServiceCharts(name, categories)
-
-	period := cast.ToDuration(ctx.Q("time"), time.Hour)
-	end := time.Now()
-	start := end.Add(-period)
-
-	m := data.Map{}
-	for _, c := range charts {
-		matrix, err := biz.Metric.GetMatrix(c.Query, c.Label, start, end)
-		if err != nil {
-			return err
-		}
-		m[c.Name] = matrix
-	}
-	return ctx.JSON(m)
 }
