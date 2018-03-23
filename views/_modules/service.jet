@@ -143,6 +143,7 @@
                 <select name="endpoint.ports[{{i}}].protocol">
                   {{ yield option(value="tcp", label="TCP", selected=p.Protocol) }}
                   {{ yield option(value="udp", label="UDP", selected=p.Protocol) }}
+                  {{ yield option(value="sctp", label="SCTP", selected=p.Protocol) }}
                 </select>
               </div>
             </td>
