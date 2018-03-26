@@ -176,6 +176,19 @@ var Swirl;
             }
         }
         Core.Tab = Tab;
+        class FilterBox {
+            constructor(elem, callback, timeout) {
+                this.$elem = $(elem);
+                this.$elem.keyup(() => {
+                    if (this.timer > 0) {
+                        clearTimeout(this.timer);
+                    }
+                    let text = this.$elem.val().toLowerCase();
+                    this.timer = setTimeout(() => callback(text), timeout || 500);
+                });
+            }
+        }
+        Core.FilterBox = FilterBox;
     })(Core = Swirl.Core || (Swirl.Core = {}));
 })(Swirl || (Swirl = {}));
 /*!
@@ -1105,6 +1118,461 @@ var Swirl;
 })(Swirl || (Swirl = {}));
 var Swirl;
 (function (Swirl) {
+    var Core;
+    (function (Core) {
+        class GraphOptions {
+            constructor() {
+                this.type = "line";
+                this.width = 12;
+                this.height = 150;
+            }
+        }
+        Core.GraphOptions = GraphOptions;
+        class Graph {
+            constructor(elem, opts) {
+                this.$elem = $(elem);
+                this.opts = $.extend(new GraphOptions(), opts);
+                this.name = this.$elem.data("chart-name");
+            }
+            getName() {
+                return this.name;
+            }
+            getElem() {
+                return this.$elem;
+            }
+            getOptions() {
+                return this.opts;
+            }
+        }
+        Core.Graph = Graph;
+        class ValueGraph extends Graph {
+            constructor(elem, opts) {
+                super(elem, opts);
+            }
+            setData(d) {
+            }
+            resize(w, h) {
+            }
+        }
+        Core.ValueGraph = ValueGraph;
+        class ComplexGraph extends Graph {
+            constructor(elem, opts) {
+                super(elem, opts);
+                if (!this.opts.colors) {
+                    this.opts.colors = ComplexGraph.defaultColors;
+                }
+                this.config = {
+                    type: opts.type,
+                    data: {},
+                    options: {
+                        responsive: false,
+                        maintainAspectRatio: false,
+                        animation: {
+                            duration: 0,
+                        },
+                    }
+                };
+                this.fillConfig();
+                this.ctx = $(elem).find("canvas").get(0).getContext('2d');
+                if (opts.height) {
+                    this.ctx.canvas.width = this.ctx.canvas.parentElement.offsetWidth;
+                    this.ctx.canvas.height = this.ctx.canvas.parentElement.offsetHeight;
+                }
+                this.chart = new Chart(this.ctx, this.config);
+            }
+            setData(d) {
+            }
+            resize(w, h) {
+                this.ctx.canvas.width = this.ctx.canvas.parentElement.offsetWidth;
+                this.ctx.canvas.height = this.ctx.canvas.parentElement.offsetHeight;
+                this.chart.resize();
+            }
+            fillConfig() {
+            }
+            static formatValue(value, unit) {
+                switch (unit) {
+                    case "percent:100":
+                        return value.toFixed(1) + "%";
+                    case "percent:1":
+                        return (value * 100).toFixed(1) + "%";
+                    case "time:s":
+                        if (value < 1) {
+                            return (value * 1000).toFixed(0) + 'ms';
+                        }
+                        else {
+                            return value.toFixed(2) + 's';
+                        }
+                    case "size:bytes":
+                        if (value < 1024) {
+                            return value.toString() + 'B';
+                        }
+                        else if (value < 1048576) {
+                            return (value / 1024).toFixed(2) + 'K';
+                        }
+                        else if (value < 1073741824) {
+                            return (value / 1048576).toFixed(2) + 'M';
+                        }
+                        else {
+                            return (value / 1073741824).toFixed(2) + 'G';
+                        }
+                    default:
+                        return value.toFixed(2);
+                }
+            }
+        }
+        ComplexGraph.defaultColors = [
+            'rgb(255, 99, 132)',
+            'rgb(75, 192, 192)',
+            'rgb(255, 159, 64)',
+            'rgb(54, 162, 235)',
+            'rgb(153, 102, 255)',
+            'rgb(255, 205, 86)',
+            'rgb(201, 203, 207)',
+        ];
+        Core.ComplexGraph = ComplexGraph;
+        class VectorGraph extends ComplexGraph {
+            fillConfig() {
+                this.config.options.legend = {
+                    position: "right"
+                };
+                this.config.options.tooltips = {
+                    callbacks: {
+                        label: (tooltipItem, data) => {
+                            let label = data.labels[tooltipItem.index] + ": ";
+                            let p = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+                            if (typeof p == "number") {
+                                label += ComplexGraph.formatValue(p, this.opts.unit);
+                            }
+                            return label;
+                        }
+                    },
+                };
+            }
+            setData(d) {
+                this.config.data.datasets = [{
+                        data: d.data,
+                        backgroundColor: this.opts.colors,
+                    }];
+                this.config.data.labels = d.labels;
+                this.chart.update();
+            }
+        }
+        Core.VectorGraph = VectorGraph;
+        class MatrixGraph extends ComplexGraph {
+            constructor(elem, opts) {
+                super(elem, opts);
+            }
+            fillConfig() {
+                this.config.options.scales = {
+                    xAxes: [{
+                            type: 'time',
+                            time: {
+                                unit: 'minute',
+                                tooltipFormat: 'YYYY/MM/DD HH:mm:ss',
+                                displayFormats: {
+                                    minute: 'HH:mm'
+                                }
+                            },
+                        }],
+                };
+                if (this.opts.unit) {
+                    this.config.options.scales.yAxes = [{
+                            ticks: {
+                                callback: (n) => ComplexGraph.formatValue(n, this.opts.unit),
+                            }
+                        }];
+                    this.config.options.tooltips = {
+                        callbacks: {
+                            label: (tooltipItem, data) => {
+                                let label = data.datasets[tooltipItem.datasetIndex].label + ": ";
+                                let p = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+                                label += ComplexGraph.formatValue(p.y, this.opts.unit);
+                                return label;
+                            }
+                        },
+                    };
+                }
+            }
+            setData(d) {
+                let datasets = (d);
+                datasets.forEach((ds, i) => {
+                    let color = (i < this.opts.colors.length) ? this.opts.colors[i] : this.opts.colors[0];
+                    ds.backgroundColor = Chart.helpers.color(color).alpha(0.3).rgbString();
+                    ds.borderColor = color;
+                    ds.borderWidth = 2;
+                    ds.pointRadius = 2;
+                });
+                this.config.data.datasets = d;
+                this.chart.update();
+            }
+        }
+        Core.MatrixGraph = MatrixGraph;
+        class GraphFactory {
+            static create(elem) {
+                let $elem = $(elem);
+                let opts = {
+                    type: $elem.data("chart-type"),
+                    unit: $elem.data("chart-unit"),
+                    width: $elem.data("chart-width"),
+                    height: $elem.data("chart-height"),
+                    colors: $elem.data("chart-colors"),
+                };
+                switch (opts.type) {
+                    case "value":
+                        return new ValueGraph($elem, opts);
+                    case "line":
+                    case "bar":
+                        return new MatrixGraph($elem, opts);
+                    case "pie":
+                        return new VectorGraph($elem, opts);
+                }
+                return null;
+            }
+        }
+        Core.GraphFactory = GraphFactory;
+        class GraphPanelOptions {
+            constructor() {
+                this.time = "30m";
+                this.refreshInterval = 15000;
+            }
+        }
+        Core.GraphPanelOptions = GraphPanelOptions;
+        class GraphPanel {
+            constructor(elem, opts) {
+                this.charts = [];
+                this.opts = $.extend(new GraphPanelOptions(), opts);
+                this.$panel = $(elem);
+                this.$panel.children().each((i, e) => {
+                    let g = GraphFactory.create(e);
+                    if (g != null) {
+                        this.charts.push(g);
+                    }
+                });
+                $(window).resize(e => {
+                    $.each(this.charts, (i, g) => {
+                        g.resize(0, 0);
+                    });
+                });
+                this.refreshData();
+            }
+            refreshData() {
+                this.loadData();
+                if (this.opts.refreshInterval > 0) {
+                    this.timer = setTimeout(this.refreshData.bind(this), this.opts.refreshInterval);
+                }
+            }
+            refresh() {
+                if (!this.timer) {
+                    this.loadData();
+                    if (this.opts.refreshInterval > 0) {
+                        this.timer = setTimeout(this.refreshData.bind(this), this.opts.refreshInterval);
+                    }
+                }
+            }
+            stop() {
+                clearTimeout(this.timer);
+                this.timer = 0;
+            }
+            setTime(time) {
+                this.opts.time = time;
+                this.loadData();
+            }
+            addGraph(c) {
+                for (let i = 0; i < this.charts.length; i++) {
+                    let chart = this.charts[i];
+                    if (chart.getName() === c.name) {
+                        return;
+                    }
+                }
+                let $chart = $(`<div class="column is-${c.width}" data-chart-name="${c.name}" data-chart-type="${c.type}" data-chart-unit="${c.unit}" data-chart-width="${c.width}" data-chart-height="${c.height}">
+      <div class="card">
+        <header class="card-header">
+          <p class="card-header-title">${c.title}</p>
+          <a data-action="remove-chart" class="card-header-icon" aria-label="remove chart">
+            <span class="icon">
+              <i class="fas fa-times has-text-danger" aria-hidden="true"></i>
+            </span>
+          </a>
+        </header>
+        <div class="card-content">
+          <div style="height: ${c.height}px">
+            <canvas id="canvas_${c.name}"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>`);
+                this.$panel.append($chart);
+                let g = GraphFactory.create($chart);
+                if (g != null) {
+                    this.charts.push(g);
+                }
+                this.loadData();
+            }
+            removeGraph(name) {
+                let index;
+                for (let i = 0; i < this.charts.length; i++) {
+                    let c = this.charts[i];
+                    if (c.getName() === name) {
+                        index = i;
+                        break;
+                    }
+                }
+                this.loadData();
+            }
+            save() {
+                let charts = this.charts.map(c => {
+                    return {
+                        name: c.getName(),
+                        width: c.getOptions().width,
+                        height: c.getOptions().height,
+                    };
+                });
+                let args = {
+                    name: this.opts.name,
+                    key: this.opts.key || '',
+                    charts: charts,
+                };
+                $ajax.post(`/system/chart/save_panel`, args).json((r) => {
+                    if (!r.success) {
+                        Core.Modal.alert(r.message);
+                    }
+                });
+            }
+            loadData() {
+                let args = {
+                    charts: this.charts.map(c => c.getName()).join(","),
+                    time: this.opts.time,
+                };
+                if (this.opts.key) {
+                    args.key = this.opts.key;
+                }
+                $ajax.get(`/system/chart/data`, args).json((d) => {
+                    $.each(this.charts, (i, g) => {
+                        if (d[g.getName()]) {
+                            g.setData(d[g.getName()]);
+                        }
+                    });
+                });
+            }
+        }
+        Core.GraphPanel = GraphPanel;
+    })(Core = Swirl.Core || (Swirl.Core = {}));
+})(Swirl || (Swirl = {}));
+var Swirl;
+(function (Swirl) {
+    var Modal = Swirl.Core.Modal;
+    var GraphPanel = Swirl.Core.GraphPanel;
+    var FilterBox = Swirl.Core.FilterBox;
+    class IndexPage {
+        constructor() {
+            this.fb = new FilterBox("#txt-query", this.filterCharts.bind(this));
+            this.panel = new GraphPanel("#div-charts", { name: "home" });
+            $("#btn-add").click(this.showAddDlg.bind(this));
+            $("#btn-add-chart").click(this.addChart.bind(this));
+            $("#btn-save").click(() => {
+                this.panel.save();
+            });
+        }
+        showAddDlg() {
+            let $panel = $("#nav-charts");
+            $panel.find("label.panel-block").remove();
+            $ajax.get(`/system/chart/query`, { dashboard: "home" }).json((charts) => {
+                for (let i = 0; i < charts.length; i++) {
+                    let c = charts[i];
+                    $panel.append(`<label class="panel-block">
+          <input type="checkbox" value="${c.name}" data-index="${i}">${c.name}: ${c.title}
+        </label>`);
+                }
+                this.charts = charts;
+                this.$charts = $panel.find("label.panel-block");
+            });
+            let dlg = new Modal("#dlg-add-chart");
+            dlg.show();
+        }
+        filterCharts(text) {
+            if (!text) {
+                this.$charts.show();
+                return;
+            }
+            this.$charts.each((i, elem) => {
+                let $elem = $(elem);
+                let texts = [
+                    this.charts[i].name.toLowerCase(),
+                    this.charts[i].title.toLowerCase(),
+                    this.charts[i].desc.toLowerCase(),
+                ];
+                for (let i = 0; i < texts.length; i++) {
+                    let index = texts[i].indexOf(text);
+                    if (index >= 0) {
+                        $elem.show();
+                        return;
+                    }
+                }
+                $elem.hide();
+            });
+        }
+        addChart() {
+            this.$charts.each((i, e) => {
+                if ($(e).find(":checked").length > 0) {
+                    let c = this.charts[i];
+                    this.panel.addGraph(c);
+                }
+            });
+            Modal.close();
+        }
+    }
+    Swirl.IndexPage = IndexPage;
+})(Swirl || (Swirl = {}));
+var Swirl;
+(function (Swirl) {
+    var Metric;
+    (function (Metric) {
+        var Modal = Swirl.Core.Modal;
+        var Dispatcher = Swirl.Core.Dispatcher;
+        var FilterBox = Swirl.Core.FilterBox;
+        class ListPage {
+            constructor() {
+                this.$charts = $("#div-charts").children();
+                this.fb = new FilterBox("#txt-query", this.filterCharts.bind(this));
+                Dispatcher.bind("#div-charts").on("delete-chart", this.deleteChart.bind(this));
+            }
+            deleteChart(e) {
+                let $container = $(e.target).closest("div.column");
+                let name = $container.data("name");
+                Modal.confirm(`Are you sure to delete chart: <strong>${name}</strong>?`, "Delete chart", (dlg, e) => {
+                    $ajax.post(name + "/delete").trigger(e.target).json(r => {
+                        $container.remove();
+                        dlg.close();
+                    });
+                });
+            }
+            filterCharts(text) {
+                if (!text) {
+                    this.$charts.show();
+                    return;
+                }
+                this.$charts.each((i, elem) => {
+                    let $elem = $(elem), texts = [
+                        $elem.data("name").toLowerCase(),
+                        $elem.data("title").toLowerCase(),
+                        $elem.data("desc").toLowerCase(),
+                    ];
+                    for (let i = 0; i < texts.length; i++) {
+                        let index = texts[i].indexOf(text);
+                        if (index >= 0) {
+                            $elem.show();
+                            return;
+                        }
+                    }
+                    $elem.hide();
+                });
+            }
+        }
+        Metric.ListPage = ListPage;
+    })(Metric = Swirl.Metric || (Swirl.Metric = {}));
+})(Swirl || (Swirl = {}));
+var Swirl;
+(function (Swirl) {
     var Config;
     (function (Config) {
         var Modal = Swirl.Core.Modal;
@@ -1858,270 +2326,6 @@ var Swirl;
 })(Swirl || (Swirl = {}));
 var Swirl;
 (function (Swirl) {
-    var Core;
-    (function (Core) {
-        class GraphOptions {
-            constructor() {
-                this.type = "line";
-                this.width = 12;
-                this.height = 50;
-            }
-        }
-        Core.GraphOptions = GraphOptions;
-        class Graph {
-            constructor(elem, opts) {
-                this.$elem = $(elem);
-                this.opts = $.extend(new GraphOptions(), opts);
-                this.name = this.$elem.data("chart-name");
-            }
-            getName() {
-                return this.name;
-            }
-        }
-        Core.Graph = Graph;
-        class ValueGraph extends Graph {
-            constructor(elem, opts) {
-                super(elem, opts);
-            }
-            setData(d) {
-            }
-            setSize(w, h) {
-            }
-        }
-        Core.ValueGraph = ValueGraph;
-        class ComplexGraph extends Graph {
-            constructor(elem, opts) {
-                super(elem, opts);
-                if (!this.opts.colors) {
-                    this.opts.colors = ComplexGraph.defaultColors;
-                }
-                this.config = {
-                    type: opts.type,
-                    data: {},
-                    options: {
-                        animation: {
-                            duration: 0,
-                        },
-                    }
-                };
-                this.fillConfig();
-                this.ctx = $(elem).find("canvas").get(0).getContext('2d');
-                if (opts.height) {
-                    this.ctx.canvas.height = opts.height;
-                }
-                this.chart = new Chart(this.ctx, this.config);
-            }
-            setData(d) {
-            }
-            setSize(w, h) {
-                this.ctx.canvas.height = h;
-                this.chart.update();
-            }
-            fillConfig() {
-            }
-            static formatValue(value, unit) {
-                switch (unit) {
-                    case "percent:100":
-                        return value.toFixed(1) + "%";
-                    case "percent:1":
-                        return (value * 100).toFixed(1) + "%";
-                    case "time:s":
-                        if (value < 1) {
-                            return (value * 1000).toFixed(0) + 'ms';
-                        }
-                        else {
-                            return value.toFixed(2) + 's';
-                        }
-                    case "size:bytes":
-                        if (value < 1024) {
-                            return value.toString() + 'B';
-                        }
-                        else if (value < 1048576) {
-                            return (value / 1024).toFixed(2) + 'K';
-                        }
-                        else if (value < 1073741824) {
-                            return (value / 1048576).toFixed(2) + 'M';
-                        }
-                        else {
-                            return (value / 1073741824).toFixed(2) + 'G';
-                        }
-                    default:
-                        return value.toFixed(2);
-                }
-            }
-        }
-        ComplexGraph.defaultColors = [
-            'rgb(255, 99, 132)',
-            'rgb(75, 192, 192)',
-            'rgb(255, 159, 64)',
-            'rgb(54, 162, 235)',
-            'rgb(153, 102, 255)',
-            'rgb(255, 205, 86)',
-            'rgb(201, 203, 207)',
-        ];
-        Core.ComplexGraph = ComplexGraph;
-        class VectorGraph extends ComplexGraph {
-            fillConfig() {
-                this.config.options.legend = {
-                    position: "right"
-                };
-                this.config.options.tooltips = {
-                    callbacks: {
-                        label: (tooltipItem, data) => {
-                            let label = data.labels[tooltipItem.index] + ": ";
-                            let p = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-                            if (typeof p == "number") {
-                                label += ComplexGraph.formatValue(p, this.opts.unit);
-                            }
-                            return label;
-                        }
-                    },
-                };
-            }
-            setData(d) {
-                this.config.data.datasets = [{
-                        data: d.data,
-                        backgroundColor: this.opts.colors,
-                    }];
-                this.config.data.labels = d.labels;
-                this.chart.update();
-            }
-        }
-        Core.VectorGraph = VectorGraph;
-        class MatrixGraph extends ComplexGraph {
-            constructor(elem, opts) {
-                super(elem, opts);
-            }
-            fillConfig() {
-                this.config.options.scales = {
-                    xAxes: [{
-                            type: 'time',
-                            time: {
-                                unit: 'minute',
-                                tooltipFormat: 'YYYY/MM/DD HH:mm:ss',
-                                displayFormats: {
-                                    minute: 'HH:mm'
-                                }
-                            },
-                        }],
-                };
-                if (this.opts.unit) {
-                    this.config.options.scales.yAxes = [{
-                            ticks: {
-                                callback: (n) => ComplexGraph.formatValue(n, this.opts.unit),
-                            }
-                        }];
-                    this.config.options.tooltips = {
-                        callbacks: {
-                            label: (tooltipItem, data) => {
-                                let label = data.datasets[tooltipItem.datasetIndex].label + ": ";
-                                let p = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-                                label += ComplexGraph.formatValue(p.y, this.opts.unit);
-                                return label;
-                            }
-                        },
-                    };
-                }
-            }
-            setData(d) {
-                let datasets = (d);
-                datasets.forEach((ds, i) => {
-                    let color = (i < this.opts.colors.length) ? this.opts.colors[i] : this.opts.colors[0];
-                    ds.backgroundColor = Chart.helpers.color(color).alpha(0.3).rgbString();
-                    ds.borderColor = color;
-                    ds.borderWidth = 2;
-                    ds.pointRadius = 2;
-                });
-                this.config.data.datasets = d;
-                this.chart.update();
-            }
-        }
-        Core.MatrixGraph = MatrixGraph;
-        class GraphFactory {
-            static create(elem) {
-                let $elem = $(elem);
-                let opts = {
-                    type: $elem.data("chart-type"),
-                    unit: $elem.data("chart-unit"),
-                    height: $elem.data("chart-height"),
-                    colors: $elem.data("chart-colors"),
-                };
-                switch (opts.type) {
-                    case "value":
-                        return new ValueGraph($elem, opts);
-                    case "line":
-                    case "bar":
-                        return new MatrixGraph($elem, opts);
-                    case "pie":
-                        return new VectorGraph($elem, opts);
-                }
-                return null;
-            }
-        }
-        Core.GraphFactory = GraphFactory;
-        class GraphPanelOptions {
-            constructor() {
-                this.time = "30m";
-                this.refreshInterval = 15000;
-            }
-        }
-        Core.GraphPanelOptions = GraphPanelOptions;
-        class GraphPanel {
-            constructor(elems, opts) {
-                this.charts = [];
-                this.opts = $.extend(new GraphPanelOptions(), opts);
-                $(elems).each((i, e) => {
-                    let g = GraphFactory.create(e);
-                    if (g != null) {
-                        this.charts.push(g);
-                    }
-                });
-                this.refreshData();
-            }
-            refreshData() {
-                this.loadData();
-                if (this.opts.refreshInterval > 0) {
-                    this.timer = setTimeout(this.refreshData.bind(this), this.opts.refreshInterval);
-                }
-            }
-            refresh() {
-                if (!this.timer) {
-                    this.loadData();
-                    if (this.opts.refreshInterval > 0) {
-                        this.timer = setTimeout(this.refreshData.bind(this), this.opts.refreshInterval);
-                    }
-                }
-            }
-            stop() {
-                clearTimeout(this.timer);
-                this.timer = 0;
-            }
-            setTime(time) {
-                this.opts.time = time;
-                this.loadData();
-            }
-            loadData() {
-                let args = {
-                    dashboard: this.opts.name,
-                    time: this.opts.time,
-                };
-                if (this.opts.id) {
-                    args.id = this.opts.id;
-                }
-                $ajax.get(`/system/chart/data`, args).json((d) => {
-                    $.each(this.charts, (i, g) => {
-                        if (d[g.getName()]) {
-                            g.setData(d[g.getName()]);
-                        }
-                    });
-                });
-            }
-        }
-        Core.GraphPanel = GraphPanel;
-    })(Core = Swirl.Core || (Swirl.Core = {}));
-})(Swirl || (Swirl = {}));
-var Swirl;
-(function (Swirl) {
     var Service;
     (function (Service) {
         var Modal = Swirl.Core.Modal;
@@ -2132,9 +2336,9 @@ var Swirl;
                 if ($cb_time.length == 0) {
                     return;
                 }
-                this.panel = new GraphPanel($("#div-charts").children("div"), {
+                this.panel = new GraphPanel("#div-charts", {
                     name: "service",
-                    id: $("#h2-service-name").text()
+                    key: $("#h2-service-name").text()
                 });
                 $("#btn-add").click(() => {
                     Modal.alert("Coming soon...");
@@ -2453,78 +2657,5 @@ var Swirl;
         }
         Volume.NewPage = NewPage;
     })(Volume = Swirl.Volume || (Swirl.Volume = {}));
-})(Swirl || (Swirl = {}));
-var Swirl;
-(function (Swirl) {
-    var Modal = Swirl.Core.Modal;
-    var GraphPanel = Swirl.Core.GraphPanel;
-    class IndexPage {
-        constructor() {
-            this.panel = new GraphPanel($("#div-charts").children("div"), { name: "home" });
-            $("#btn-add").click(() => {
-                Modal.alert("Coming soon...");
-            });
-        }
-    }
-    Swirl.IndexPage = IndexPage;
-})(Swirl || (Swirl = {}));
-var Swirl;
-(function (Swirl) {
-    var Metric;
-    (function (Metric) {
-        var Modal = Swirl.Core.Modal;
-        var Dispatcher = Swirl.Core.Dispatcher;
-        class FilterBox {
-            constructor(elem, callback, timeout) {
-                this.$elem = $(elem);
-                this.$elem.keyup(() => {
-                    if (this.timer > 0) {
-                        clearTimeout(this.timer);
-                    }
-                    let text = this.$elem.val().toLowerCase();
-                    this.timer = setTimeout(() => callback(text), timeout || 500);
-                });
-            }
-        }
-        class ListPage {
-            constructor() {
-                this.$charts = $("#div-charts").children();
-                this.fb = new FilterBox("#txt-query", this.filterCharts.bind(this));
-                Dispatcher.bind("#div-charts").on("delete-chart", this.deleteChart.bind(this));
-            }
-            deleteChart(e) {
-                let $container = $(e.target).closest("div.column");
-                let name = $container.data("name");
-                Modal.confirm(`Are you sure to delete chart: <strong>${name}</strong>?`, "Delete chart", (dlg, e) => {
-                    $ajax.post(name + "/delete").trigger(e.target).json(r => {
-                        $container.remove();
-                        dlg.close();
-                    });
-                });
-            }
-            filterCharts(text) {
-                if (!text) {
-                    this.$charts.show();
-                    return;
-                }
-                this.$charts.each((i, elem) => {
-                    let $elem = $(elem), texts = [
-                        $elem.data("name").toLowerCase(),
-                        $elem.data("title").toLowerCase(),
-                        $elem.data("desc").toLowerCase(),
-                    ];
-                    for (let i = 0; i < texts.length; i++) {
-                        let index = texts[i].indexOf(text);
-                        if (index >= 0) {
-                            $(elem).show();
-                            return;
-                        }
-                    }
-                    $(elem).hide();
-                });
-            }
-        }
-        Metric.ListPage = ListPage;
-    })(Metric = Swirl.Metric || (Swirl.Metric = {}));
 })(Swirl || (Swirl = {}));
 //# sourceMappingURL=swirl.js.map

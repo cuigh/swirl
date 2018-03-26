@@ -21,17 +21,18 @@ type Chart struct {
 	Options     data.Map `json:"options"`
 }
 
-func NewChart(name, title, label, query, unit string) *Chart {
+func NewChart(dashboard, name, title, label, query, unit string) *Chart {
 	return &Chart{
 		Name:        name,
 		Title:       title,
 		Description: title,
 		Label:       label,
 		Query:       query,
+		Dashboard:   dashboard,
 		Type:        "line",
 		Unit:        unit,
 		Width:       12,
-		Height:      50,
+		Height:      150,
 	}
 }
 

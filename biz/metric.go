@@ -2,7 +2,6 @@ package biz
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"time"
 
@@ -37,26 +36,26 @@ type metricBiz struct {
 	api lazy.Value
 }
 
-func (b *metricBiz) GetServiceCharts(service string, categories []string) (charts []model.ChartInfo) {
-	charts = append(charts, model.NewChartInfo("cpu", "CPU", "${name}", `rate(container_cpu_user_seconds_total{container_label_com_docker_swarm_service_name="%s"}[5m]) * 100`))
-	charts = append(charts, model.NewChartInfo("memory", "Memory", "${name}", `container_memory_usage_bytes{container_label_com_docker_swarm_service_name="%s"}`))
-	charts = append(charts, model.NewChartInfo("network_in", "Network Receive", "${name}", `sum(irate(container_network_receive_bytes_total{container_label_com_docker_swarm_service_name="%s"}[5m])) by(name)`))
-	charts = append(charts, model.NewChartInfo("network_out", "Network Send", "${name}", `sum(irate(container_network_transmit_bytes_total{container_label_com_docker_swarm_service_name="%s"}[5m])) by(name)`))
-	for _, c := range categories {
-		if c == "java" {
-			charts = append(charts, model.NewChartInfo("threads", "Threads", "${instance}", `jvm_threads_current{service="%s"}`))
-			charts = append(charts, model.NewChartInfo("gc_duration", "GC Duration", "${instance}", `rate(jvm_gc_collection_seconds_sum{service="%s"}[1m])`))
-		} else if c == "go" {
-			charts = append(charts, model.NewChartInfo("threads", "Threads", "${instance}", `go_threads{service="%s"}`))
-			charts = append(charts, model.NewChartInfo("goroutines", "Goroutines", "${instance}", `go_goroutines{service="%s"}`))
-			charts = append(charts, model.NewChartInfo("gc_duration", "GC Duration", "${instance}", `sum(go_gc_duration_seconds{service="%s"}) by (instance)`))
-		}
-	}
-	for i, c := range charts {
-		charts[i].Query = fmt.Sprintf(c.Query, service)
-	}
-	return
-}
+// func (b *metricBiz) GetServiceCharts(service string, categories []string) (charts []model.ChartInfo) {
+// 	charts = append(charts, model.NewChartInfo("cpu", "CPU", "${name}", `rate(container_cpu_user_seconds_total{container_label_com_docker_swarm_service_name="%s"}[5m]) * 100`))
+// 	charts = append(charts, model.NewChartInfo("memory", "Memory", "${name}", `container_memory_usage_bytes{container_label_com_docker_swarm_service_name="%s"}`))
+// 	charts = append(charts, model.NewChartInfo("network_in", "Network Receive", "${name}", `sum(irate(container_network_receive_bytes_total{container_label_com_docker_swarm_service_name="%s"}[5m])) by(name)`))
+// 	charts = append(charts, model.NewChartInfo("network_out", "Network Send", "${name}", `sum(irate(container_network_transmit_bytes_total{container_label_com_docker_swarm_service_name="%s"}[5m])) by(name)`))
+// 	for _, c := range categories {
+// 		if c == "java" {
+// 			charts = append(charts, model.NewChartInfo("threads", "Threads", "${instance}", `jvm_threads_current{service="%s"}`))
+// 			charts = append(charts, model.NewChartInfo("gc_duration", "GC Duration", "${instance}", `rate(jvm_gc_collection_seconds_sum{service="%s"}[1m])`))
+// 		} else if c == "go" {
+// 			charts = append(charts, model.NewChartInfo("threads", "Threads", "${instance}", `go_threads{service="%s"}`))
+// 			charts = append(charts, model.NewChartInfo("goroutines", "Goroutines", "${instance}", `go_goroutines{service="%s"}`))
+// 			charts = append(charts, model.NewChartInfo("gc_duration", "GC Duration", "${instance}", `sum(go_gc_duration_seconds{service="%s"}) by (instance)`))
+// 		}
+// 	}
+// 	for i, c := range charts {
+// 		charts[i].Query = fmt.Sprintf(c.Query, service)
+// 	}
+// 	return
+// }
 
 func (b *metricBiz) GetMatrix(query, label string, start, end time.Time) (lines []model.ChartLine, err error) {
 	api, err := b.getAPI()

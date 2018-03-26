@@ -13,9 +13,9 @@ namespace Swirl.Service {
                 return;
             }
 
-            this.panel = new GraphPanel($("#div-charts").children("div"), {
+            this.panel = new GraphPanel("#div-charts", {
                 name: "service",
-                id: $("#h2-service-name").text()
+                key: $("#h2-service-name").text()
             });
 
             $("#btn-add").click(() => {

@@ -3,22 +3,7 @@ namespace Swirl.Metric {
     import Modal = Swirl.Core.Modal;
     import AjaxResult = Swirl.Core.AjaxResult;
     import Dispatcher = Swirl.Core.Dispatcher;
-
-    class FilterBox {
-        private $elem: JQuery;
-        private timer: number;
-
-        constructor(elem: string | Element | JQuery, callback: (text: string) => void, timeout?: number) {
-            this.$elem = $(elem);
-            this.$elem.keyup(() => {
-                if (this.timer > 0) {
-                    clearTimeout(this.timer);
-                }
-                let text: string = this.$elem.val().toLowerCase();
-                this.timer = setTimeout(() => callback(text), timeout || 500);
-            });
-        }
-    }
+    import FilterBox = Swirl.Core.FilterBox;
 
     export class ListPage {
         private fb: FilterBox;
@@ -59,11 +44,11 @@ namespace Swirl.Metric {
                 for (let i = 0; i<texts.length; i++) {
                     let index = texts[i].indexOf(text);
                     if (index >= 0) {
-                        $(elem).show();
+                        $elem.show();
                         return;
                     }
                 }
-                $(elem).hide();
+                $elem.hide();
             })
         }
     }

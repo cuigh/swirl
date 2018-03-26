@@ -3,7 +3,7 @@ namespace Swirl.Core {
         type?: string = "line";
         unit?: string;
         width?: number = 12;
-        height?: number = 50;
+        height?: number = 150;
         colors?: string[];
     }
 
@@ -22,7 +22,15 @@ namespace Swirl.Core {
             return this.name;
         }
 
-        abstract setSize(w: number, h: number): void;
+        getElem(): JQuery {
+            return this.$elem;
+        }
+
+        getOptions(): GraphOptions {
+            return this.opts;
+        }
+
+        abstract resize(w: number, h: number): void;
 
         abstract setData(d: any): void;
     }
@@ -40,7 +48,7 @@ namespace Swirl.Core {
         setData(d: any): void {
         }
 
-        setSize(w: number, h: number): void {
+        resize(w: number, h: number): void {
         }
     }
 
@@ -69,6 +77,8 @@ namespace Swirl.Core {
                 type: opts.type,
                 data: {},
                 options: {
+                    responsive: false,
+                    maintainAspectRatio: false,
                     // title: {
                     //     // display: true,
                     //     text: opts.title || 'NONE'
@@ -106,7 +116,8 @@ namespace Swirl.Core {
 
             this.ctx = (<HTMLCanvasElement>$(elem).find("canvas").get(0)).getContext('2d');
             if (opts.height) {
-                this.ctx.canvas.height = opts.height;
+                this.ctx.canvas.width = this.ctx.canvas.parentElement.offsetWidth;
+                this.ctx.canvas.height = this.ctx.canvas.parentElement.offsetHeight;
             }
             this.chart = new Chart(this.ctx, this.config);
         }
@@ -114,9 +125,12 @@ namespace Swirl.Core {
         setData(d: any): void {
         }
 
-        setSize(w: number, h: number): void {
-            this.ctx.canvas.height = h;
-            this.chart.update();
+        resize(w: number, h: number): void {
+            // this.ctx.canvas.style.width = this.ctx.canvas.parentElement.offsetWidth + "px";
+            // this.ctx.canvas.style.height = this.ctx.canvas.parentElement.offsetWidth + "px";
+            this.ctx.canvas.width = this.ctx.canvas.parentElement.offsetWidth;
+            this.ctx.canvas.height = this.ctx.canvas.parentElement.offsetHeight;
+            this.chart.resize();
         }
 
         protected fillConfig() {
@@ -266,6 +280,7 @@ namespace Swirl.Core {
             let opts: GraphOptions = {
                 type: $elem.data("chart-type"),
                 unit: $elem.data("chart-unit"),
+                width: $elem.data("chart-width"),
                 height: $elem.data("chart-height"),
                 colors: $elem.data("chart-colors"),
             };
@@ -284,24 +299,31 @@ namespace Swirl.Core {
 
     export class GraphPanelOptions {
         name: string;
-        id?: string;
+        key?: string;
         time?: string = "30m";
         refreshInterval?: number = 15000;   // ms
     }
 
     export class GraphPanel {
+        private $panel: JQuery;
         private opts: GraphPanelOptions;
         private charts: Graph[] = [];
         private timer: number;
 
-        constructor(elems: string | Element | JQuery, opts?: GraphPanelOptions) {
+        constructor(elem: string | Element | JQuery, opts?: GraphPanelOptions) {
             this.opts = $.extend(new GraphPanelOptions(), opts);
-
-            $(elems).each((i, e) => {
+            this.$panel = $(elem);
+            this.$panel.children().each((i, e) => {
                 let g = GraphFactory.create(e);
                 if (g != null) {
                     this.charts.push(g);
                 }
+            });
+
+            $(window).resize(e => {
+                $.each(this.charts, (i: number, g: Graph) => {
+                    g.resize(0, 0);
+                });
             });
 
             this.refreshData();
@@ -333,13 +355,83 @@ namespace Swirl.Core {
             this.loadData();
         }
 
+        addGraph(c: any) {
+            for (let i =0; i< this.charts.length; i++) {
+                let chart = this.charts[i];
+                if (chart.getName() === c.name) {
+                    // chart already added.
+                    return;
+                }
+            }
+
+            let $chart = $(`<div class="column is-${c.width}" data-chart-name="${c.name}" data-chart-type="${c.type}" data-chart-unit="${c.unit}" data-chart-width="${c.width}" data-chart-height="${c.height}">
+      <div class="card">
+        <header class="card-header">
+          <p class="card-header-title">${c.title}</p>
+          <a data-action="remove-chart" class="card-header-icon" aria-label="remove chart">
+            <span class="icon">
+              <i class="fas fa-times has-text-danger" aria-hidden="true"></i>
+            </span>
+          </a>
+        </header>
+        <div class="card-content">
+          <div style="height: ${c.height}px">
+            <canvas id="canvas_${c.name}"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>`);
+            this.$panel.append($chart);
+
+            let g = GraphFactory.create($chart);
+            if (g != null) {
+                this.charts.push(g);
+            }
+
+            this.loadData();
+        }
+
+        removeGraph(name: string) {
+            // todo:
+            let index:number;
+            for (let i =0; i< this.charts.length; i++) {
+                let c = this.charts[i];
+                if (c.getName() === name) {
+                    index = i;
+                    break;
+                }
+            }
+            this.loadData();
+        }
+
+        save() {
+            let charts = this.charts.map(c => {
+                return {
+                    name: c.getName(),
+                    width: c.getOptions().width,
+                    height: c.getOptions().height,
+                    // colors: ,
+                }
+            });
+            let args = {
+                name: this.opts.name,
+                key: this.opts.key || '',
+                charts: charts,
+            };
+            $ajax.post(`/system/chart/save_panel`, args).json<AjaxResult>((r: AjaxResult) => {
+                if (!r.success) {
+                    Modal.alert(r.message);
+                }
+            });
+        }
+
         private loadData() {
             let args: any = {
-                dashboard: this.opts.name,
+                charts: this.charts.map(c => c.getName()).join(","),
                 time: this.opts.time,
             };
-            if (this.opts.id) {
-                args.id = this.opts.id;
+            if (this.opts.key) {
+                args.key = this.opts.key;
             }
             $ajax.get(`/system/chart/data`, args).json((d: { [index: string]: Chart.ChartDataSets[] }) => {
                 $.each(this.charts, (i: number, g: Graph) => {

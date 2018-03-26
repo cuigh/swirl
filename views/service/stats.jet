@@ -76,11 +76,14 @@
         <div class="level-item">
           <button id="btn-add" class="button is-success"><span class="icon"><i class="fas fa-plus"></i></span><span>{{ i18n("button.add") }}</span></button>
         </div>
+        <div class="level-item">
+          <button id="btn-save" class="button is-info"><span class="icon"><i class="fas fa-save"></i></span><span>{{ i18n("button.save") }}</span></button>
+        </div>
       </div>
     </nav>
     <div id="div-charts" class="columns is-multiline">
       {{ range .Charts }}
-      <div class="column is-{{ .Width }}" data-chart-name="{{ .Name }}" data-chart-type="{{ .Type }}" data-chart-unit="{{ .Unit }}" data-chart-height="{{ .Height }}">
+      <div class="column is-{{ .Width }}" data-chart-name="{{ .Name }}" data-chart-type="{{ .Type }}" data-chart-unit="{{ .Unit }}" data-chart-width="{{ .Width }}" data-chart-height="{{ .Height }}">
         <div class="card">
           <header class="card-header">
             <p class="card-header-title">{{ .Title }}</p>
@@ -96,7 +99,9 @@
             </a>
           </header>
           <div class="card-content">
-            <canvas id="canvas_{{ .Name }}"></canvas>
+            <div style="height: {{ .Height }}px">
+              <canvas id="canvas_{{ .Name }}"></canvas>
+            </div>
           </div>
         </div>
       </div>

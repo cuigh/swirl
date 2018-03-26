@@ -62,6 +62,7 @@ type Interface interface {
 
 	SettingGet() (setting *model.Setting, err error)
 	SettingUpdate(setting *model.Setting) error
+	UpdateDashboard(name string, dashboard *model.ChartPanel) error
 
 	ChartGet(name string) (*model.Chart, error)
 	ChartBatch(names ...string) ([]*model.Chart, error)
