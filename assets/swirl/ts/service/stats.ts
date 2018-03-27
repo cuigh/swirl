@@ -21,6 +21,9 @@ namespace Swirl.Service {
             $("#btn-add").click(() => {
                 Modal.alert("Coming soon...");
             });
+            $("#btn-save").click(() => {
+                Modal.alert("Coming soon...");
+            });
             $cb_time.change(e => {
                 this.panel.setTime($(e.target).val());
             });

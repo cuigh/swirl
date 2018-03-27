@@ -4,6 +4,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/cuigh/auxo/data"
 	"github.com/cuigh/auxo/errors"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/auxo/util/cast"
@@ -13,29 +14,29 @@ import (
 
 // ChartController is a controller of metric chart.
 type ChartController struct {
-	List      web.HandlerFunc `path:"/" name:"chart.list" authorize:"!" desc:"chart list page"`
-	Query     web.HandlerFunc `path:"/query" name:"chart.query" authorize:"?" desc:"chart query"`
-	New       web.HandlerFunc `path:"/new" name:"chart.new" authorize:"!" desc:"new chart page"`
-	Create    web.HandlerFunc `path:"/new" method:"post" name:"chart.create" authorize:"!" desc:"create chart"`
-	Edit      web.HandlerFunc `path:"/:name/edit" name:"chart.edit" authorize:"!" desc:"edit chart page"`
-	Delete    web.HandlerFunc `path:"/:name/delete" method:"post" name:"chart.delete" authorize:"!" desc:"delete chart"`
-	Update    web.HandlerFunc `path:"/:name/edit" method:"post" name:"chart.update" authorize:"!" desc:"update chart"`
-	Data      web.HandlerFunc `path:"/data" name:"chart.data" authorize:"?" desc:"fetch chart datas"`
-	SavePanel web.HandlerFunc `path:"/save_panel" method:"post" name:"chart.save_panel" authorize:"!" desc:"save panel"`
+	List          web.HandlerFunc `path:"/" name:"chart.list" authorize:"!" desc:"chart list page"`
+	Query         web.HandlerFunc `path:"/query" name:"chart.query" authorize:"?" desc:"chart query"`
+	New           web.HandlerFunc `path:"/new" name:"chart.new" authorize:"!" desc:"new chart page"`
+	Create        web.HandlerFunc `path:"/new" method:"post" name:"chart.create" authorize:"!" desc:"create chart"`
+	Edit          web.HandlerFunc `path:"/:name/edit" name:"chart.edit" authorize:"!" desc:"edit chart page"`
+	Delete        web.HandlerFunc `path:"/:name/delete" method:"post" name:"chart.delete" authorize:"!" desc:"delete chart"`
+	Update        web.HandlerFunc `path:"/:name/edit" method:"post" name:"chart.update" authorize:"!" desc:"update chart"`
+	Data          web.HandlerFunc `path:"/data" name:"chart.data" authorize:"?" desc:"fetch chart datas"`
+	SaveDashboard web.HandlerFunc `path:"/save_dashboard" method:"post" name:"chart.save_dashboard" authorize:"!" desc:"save dashboard"`
 }
 
 // Chart creates an instance of RoleController
 func Chart() (c *ChartController) {
 	return &ChartController{
-		List:      chartList,
-		Query:     chartQuery,
-		New:       chartNew,
-		Create:    chartCreate,
-		Edit:      chartEdit,
-		Update:    chartUpdate,
-		Delete:    chartDelete,
-		Data:      chartData,
-		SavePanel: chartSavePanel,
+		List:          chartList,
+		Query:         chartQuery,
+		New:           chartNew,
+		Create:        chartCreate,
+		Edit:          chartEdit,
+		Update:        chartUpdate,
+		Delete:        chartDelete,
+		Data:          chartData,
+		SaveDashboard: chartSaveDashboard,
 	}
 }
 
@@ -115,31 +116,30 @@ func chartDelete(ctx web.Context) error {
 
 func chartData(ctx web.Context) error {
 	period := cast.ToDuration(ctx.Q("time"), time.Hour)
-	charts := strings.Split(ctx.Q("charts"), ",")
-	key := ctx.Q("key")
-	datas, err := biz.Chart.FetchDatas(key, charts, period)
-	if err != nil {
-		return err
+	if v := ctx.Q("charts"); v != "" {
+		names := strings.Split(v, ",")
+		key := ctx.Q("key")
+		datas, err := biz.Chart.FetchDatas(key, names, period)
+		if err != nil {
+			return err
+		}
+		return ctx.JSON(datas)
 	}
-	return ctx.JSON(datas)
+	return ctx.JSON(data.Map{})
 }
 
-func chartSavePanel(ctx web.Context) error {
-	data := struct {
-		Name string `json:"name"`
-		Key  string `json:"key"`
-		model.ChartPanel
-	}{}
-	err := ctx.Bind(&data)
+func chartSaveDashboard(ctx web.Context) error {
+	dashboard := &model.ChartDashboard{}
+	err := ctx.Bind(dashboard)
 	if err != nil {
 		return err
 	}
 
-	switch data.Name {
+	switch dashboard.Name {
 	case "home":
-		err = biz.Setting.UpdateDashboard(data.Name, &data.ChartPanel, ctx.User())
+		err = biz.Chart.UpdateDashboard(dashboard, ctx.User())
 	default:
-		err = errors.New("unknown dashboard: " + data.Name)
+		err = errors.New("unknown dashboard: " + dashboard.Name)
 	}
 	return ajaxResult(ctx, err)
 }

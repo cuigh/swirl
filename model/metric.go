@@ -43,13 +43,20 @@ type ChartItem struct {
 	Colors []string `json:"colors"`
 }
 
-type ChartPanel struct {
-	Refresh bool        `json:"refresh"`
-	Period  int32       `json:"period"` // minutes
-	Charts  []ChartItem `json:"charts"`
+type ChartDashboard struct {
+	Name            string      `json:"name"`
+	Key             string      `json:"key"`
+	Period          int32       `json:"period"`           // minutes
+	RefreshInterval int32       `json:"refresh_interval"` // seconds, 0 means disabled.
+	Charts          []ChartItem `json:"charts"`
 }
 
-//type ChartPanel []ChartItem
+func (cd *ChartDashboard) ID() string {
+	if cd.Key == "" {
+		return cd.Name
+	}
+	return cd.Name + ":" + cd.Key
+}
 
 type ChartPoint struct {
 	X int64   `json:"x"`

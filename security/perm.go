@@ -230,6 +230,7 @@ var Perms = []PermGroup{
 			{Key: "chart.create", Text: "Create"},
 			{Key: "chart.delete", Text: "Delete"},
 			{Key: "chart.update", Text: "Update"},
+			{Key: "chart.save_dashboard", Text: "Save dashboard"},
 		},
 	},
 }

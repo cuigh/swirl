@@ -47,9 +47,6 @@ type Setting struct {
 	Metrics  struct {
 		Prometheus string `bson:"prometheus" json:"prometheus"`
 	} `bson:"metrics" json:"metrics"`
-	Dashboard struct {
-		Home ChartPanel `bson:"home" json:"home"`
-	} `bson:"dashboard" json:"dashboard"`
 	UpdatedBy string    `bson:"updated_by" json:"updated_by,omitempty"`
 	UpdatedAt time.Time `bson:"updated_at" json:"updated_at,omitempty"`
 }

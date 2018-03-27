@@ -99,20 +99,34 @@ func (b *chartBiz) GetServiceCharts(name string) (charts []*model.Chart, err err
 	return
 }
 
-// nolint: gocyclo
-func (b *chartBiz) Panel(panel model.ChartPanel) (charts []*model.Chart, err error) {
+func (b *chartBiz) GetDashboard(name, key string) (dashboard *model.ChartDashboard, err error) {
 	do(func(d dao.Interface) {
-		if len(panel.Charts) == 0 {
+		dashboard, err = d.DashboardGet(name, key)
+	})
+	return
+}
+
+func (b *chartBiz) UpdateDashboard(dashboard *model.ChartDashboard, user web.User) (err error) {
+	do(func(d dao.Interface) {
+		err = d.DashboardUpdate(dashboard)
+	})
+	return
+}
+
+// nolint: gocyclo
+func (b *chartBiz) GetDashboardCharts(dashboard *model.ChartDashboard) (charts []*model.Chart, err error) {
+	do(func(d dao.Interface) {
+		if len(dashboard.Charts) == 0 {
 			return
 		}
 
-		names := make([]string, len(panel.Charts))
-		for i, c := range panel.Charts {
+		names := make([]string, len(dashboard.Charts))
+		for i, c := range dashboard.Charts {
 			names[i] = c.Name
 		}
 
 		var cs []*model.Chart
-		cs, err = d.ChartBatch(names...)
+		cs, err = b.getCharts(names)
 		if err != nil {
 			return
 		}
@@ -122,7 +136,7 @@ func (b *chartBiz) Panel(panel model.ChartPanel) (charts []*model.Chart, err err
 			for _, c := range cs {
 				m[c.Name] = c
 			}
-			for _, c := range panel.Charts {
+			for _, c := range dashboard.Charts {
 				if chart := m[c.Name]; chart != nil {
 					if c.Width > 0 {
 						chart.Width = c.Width

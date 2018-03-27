@@ -1348,6 +1348,13 @@ var Swirl;
                         this.charts.push(g);
                     }
                 });
+                Core.Dispatcher.bind(this.$panel).on("remove-chart", e => {
+                    let name = $(e.target).closest("div.column").data("chart-name");
+                    Core.Modal.confirm(`Are you sure to delete chart: <strong>${name}</strong>?`, "Delete chart", dlg => {
+                        this.removeGraph(name);
+                        dlg.close();
+                    });
+                });
                 $(window).resize(e => {
                     $.each(this.charts, (i, g) => {
                         g.resize(0, 0);
@@ -1409,7 +1416,7 @@ var Swirl;
                 this.loadData();
             }
             removeGraph(name) {
-                let index;
+                let index = -1;
                 for (let i = 0; i < this.charts.length; i++) {
                     let c = this.charts[i];
                     if (c.getName() === name) {
@@ -1417,7 +1424,13 @@ var Swirl;
                         break;
                     }
                 }
-                this.loadData();
+                if (index >= 0) {
+                    console.info(this.charts.length);
+                    let $elem = this.charts[index].getElem();
+                    this.charts.splice(index, 1);
+                    $elem.remove();
+                    console.info(this.charts.length);
+                }
             }
             save() {
                 let charts = this.charts.map(c => {
@@ -1432,9 +1445,12 @@ var Swirl;
                     key: this.opts.key || '',
                     charts: charts,
                 };
-                $ajax.post(`/system/chart/save_panel`, args).json((r) => {
-                    if (!r.success) {
-                        Core.Modal.alert(r.message);
+                $ajax.post(`/system/chart/save_dashboard`, args).json((r) => {
+                    if (r.success) {
+                        Core.Notification.show("success", "Successfully saved.");
+                    }
+                    else {
+                        Core.Notification.show("danger", r.message);
                     }
                 });
             }
@@ -2341,6 +2357,9 @@ var Swirl;
                     key: $("#h2-service-name").text()
                 });
                 $("#btn-add").click(() => {
+                    Modal.alert("Coming soon...");
+                });
+                $("#btn-save").click(() => {
                     Modal.alert("Coming soon...");
                 });
                 $cb_time.change(e => {

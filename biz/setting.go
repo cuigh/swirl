@@ -33,13 +33,3 @@ func (b *settingBiz) Update(setting *model.Setting, user web.User) (err error) {
 	})
 	return
 }
-
-func (b *settingBiz) UpdateDashboard(name string, dashboard *model.ChartPanel, user web.User) (err error) {
-	do(func(d dao.Interface) {
-		err = d.UpdateDashboard(name, dashboard)
-		if err == nil {
-			Event.CreateSetting(model.EventActionUpdate, user)
-		}
-	})
-	return
-}

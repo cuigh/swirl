@@ -320,6 +320,13 @@ namespace Swirl.Core {
                 }
             });
 
+            Dispatcher.bind(this.$panel).on("remove-chart", e => {
+                let name = $(e.target).closest("div.column").data("chart-name");
+                Modal.confirm(`Are you sure to delete chart: <strong>${name}</strong>?`, "Delete chart", dlg => {
+                    this.removeGraph(name);
+                    dlg.close();
+                });
+            });
             $(window).resize(e => {
                 $.each(this.charts, (i: number, g: Graph) => {
                     g.resize(0, 0);
@@ -356,7 +363,7 @@ namespace Swirl.Core {
         }
 
         addGraph(c: any) {
-            for (let i =0; i< this.charts.length; i++) {
+            for (let i = 0; i < this.charts.length; i++) {
                 let chart = this.charts[i];
                 if (chart.getName() === c.name) {
                     // chart already added.
@@ -393,15 +400,22 @@ namespace Swirl.Core {
 
         removeGraph(name: string) {
             // todo:
-            let index:number;
-            for (let i =0; i< this.charts.length; i++) {
+            let index = -1;
+            for (let i = 0; i < this.charts.length; i++) {
                 let c = this.charts[i];
                 if (c.getName() === name) {
                     index = i;
                     break;
                 }
             }
-            this.loadData();
+
+            if (index >= 0) {
+                console.info(this.charts.length);
+                let $elem = this.charts[index].getElem();
+                this.charts.splice(index, 1);
+                $elem.remove();
+                console.info(this.charts.length);
+            }
         }
 
         save() {
@@ -418,9 +432,11 @@ namespace Swirl.Core {
                 key: this.opts.key || '',
                 charts: charts,
             };
-            $ajax.post(`/system/chart/save_panel`, args).json<AjaxResult>((r: AjaxResult) => {
-                if (!r.success) {
-                    Modal.alert(r.message);
+            $ajax.post(`/system/chart/save_dashboard`, args).json<AjaxResult>((r: AjaxResult) => {
+                if (r.success) {
+                    Notification.show("success", "Successfully saved.");
+                } else {
+                    Notification.show("danger", r.message);
                 }
             });
         }

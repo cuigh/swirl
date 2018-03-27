@@ -28,17 +28,3 @@ func (d *Dao) SettingUpdate(setting *model.Setting) (err error) {
 	})
 	return
 }
-
-func (d *Dao) UpdateDashboard(name string, dashboard *model.ChartPanel) (err error) {
-	d.do(func(db *database) {
-		update := bson.M{
-			"$set": bson.M{
-				"dashboard": bson.M{
-					name: dashboard,
-				},
-			},
-		}
-		err = db.C("setting").UpdateId(settingID, update)
-	})
-	return
-}

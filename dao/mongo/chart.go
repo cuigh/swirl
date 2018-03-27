@@ -63,3 +63,29 @@ func (d *Dao) ChartDelete(name string) (err error) {
 	})
 	return
 }
+
+func (d *Dao) DashboardGet(name, key string) (dashboard *model.ChartDashboard, err error) {
+	d.do(func(db *database) {
+		dashboard = &model.ChartDashboard{
+			Name: name,
+			Key:  key,
+		}
+		err = db.C("dashboard").FindId(dashboard.ID()).One(dashboard)
+		if err == mgo.ErrNotFound {
+			dashboard, err = nil, nil
+		} else if err != nil {
+			dashboard = nil
+		}
+	})
+	return
+}
+
+func (d *Dao) DashboardUpdate(dashboard *model.ChartDashboard) (err error) {
+	d.do(func(db *database) {
+		update := bson.M{
+			"$set": dashboard,
+		}
+		_, err = db.C("dashboard").UpsertId(dashboard.ID(), update)
+	})
+	return
+}
