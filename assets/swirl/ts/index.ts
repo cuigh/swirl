@@ -1,23 +1,23 @@
 ///<reference path="core/core.ts" />
-///<reference path="core/graph.ts" />
+///<reference path="core/chart.ts" />
 namespace Swirl {
     import Modal = Swirl.Core.Modal;
-    import GraphPanel = Swirl.Core.GraphPanel;
     import FilterBox = Swirl.Core.FilterBox;
+    import ChartDashboard = Swirl.Core.ChartDashboard;
 
     export class IndexPage {
-        private panel: GraphPanel;
+        private dashboard: ChartDashboard;
         private fb: FilterBox;
         private charts: any;
         private $charts: JQuery;
 
         constructor() {
             this.fb = new FilterBox("#txt-query", this.filterCharts.bind(this));
-            this.panel = new GraphPanel("#div-charts", {name: "home"});
+            this.dashboard = new ChartDashboard("#div-charts", window.charts, {name: "home"});
             $("#btn-add").click(this.showAddDlg.bind(this));
             $("#btn-add-chart").click(this.addChart.bind(this));
             $("#btn-save").click(() => {
-                this.panel.save();
+                this.dashboard.save();
             });
         }
 
@@ -69,7 +69,7 @@ namespace Swirl {
             this.$charts.each((i, e) => {
                 if ($(e).find(":checked").length > 0) {
                     let c = this.charts[i];
-                    this.panel.addGraph(c);
+                    this.dashboard.addGraph(c);
                 }
             });
             Modal.close();

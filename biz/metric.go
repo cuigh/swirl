@@ -57,7 +57,7 @@ type metricBiz struct {
 // 	return
 // }
 
-func (b *metricBiz) GetMatrix(query, label string, start, end time.Time) (lines []model.ChartLine, err error) {
+func (b *metricBiz) GetMatrix(query, legend string, start, end time.Time) (data *model.ChartMatrixData, err error) {
 	api, err := b.getAPI()
 	if err != nil {
 		return nil, err
@@ -73,9 +73,11 @@ func (b *metricBiz) GetMatrix(query, label string, start, end time.Time) (lines 
 		return nil, err
 	}
 
+	data = &model.ChartMatrixData{}
 	matrix := value.(pmodel.Matrix)
 	for _, stream := range matrix {
-		line := model.ChartLine{Label: b.formatLabel(label, stream.Metric)}
+		data.Legend = append(data.Legend, b.formatLabel(legend, stream.Metric))
+		line := model.ChartLine{Name: b.formatLabel(legend, stream.Metric)}
 		for _, v := range stream.Values {
 			p := model.ChartPoint{
 				X: int64(v.Timestamp),
@@ -83,7 +85,7 @@ func (b *metricBiz) GetMatrix(query, label string, start, end time.Time) (lines 
 			}
 			line.Data = append(line.Data, p)
 		}
-		lines = append(lines, line)
+		data.Series = append(data.Series, line)
 	}
 	return
 }
@@ -99,11 +101,16 @@ func (b *metricBiz) GetScalar(query string, t time.Time) (v float64, err error) 
 		return 0, err
 	}
 
-	scalar := value.(*pmodel.Scalar)
-	return float64(scalar.Value), nil
+	//scalar := value.(*pmodel.Scalar)
+	vector := value.(pmodel.Vector)
+	if len(vector) > 0 {
+		sample := vector[0]
+		return float64(sample.Value), nil
+	}
+	return 0, nil
 }
 
-func (b *metricBiz) GetVector(query, label string, t time.Time) (cv model.ChartVector, err error) {
+func (b *metricBiz) GetVector(query, label string, t time.Time) (data *model.ChartVectorData, err error) {
 	var api papi.API
 	api, err = b.getAPI()
 	if err != nil {
@@ -116,12 +123,15 @@ func (b *metricBiz) GetVector(query, label string, t time.Time) (cv model.ChartV
 		return
 	}
 
+	data = &model.ChartVectorData{}
 	vector := value.(pmodel.Vector)
 	for _, sample := range vector {
-		cv.Data = append(cv.Data, float64(sample.Value))
-		if label != "" {
-			cv.Labels = append(cv.Labels, b.formatLabel(label, sample.Metric))
+		cv := model.ChartValue{
+			Name:  b.formatLabel(label, sample.Metric),
+			Value: float64(sample.Value),
 		}
+		data.Data = append(data.Data, cv)
+		data.Legend = append(data.Legend, cv.Name)
 	}
 	return
 }

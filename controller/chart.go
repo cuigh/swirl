@@ -69,7 +69,7 @@ func chartQuery(ctx web.Context) error {
 func chartNew(ctx web.Context) error {
 	m := newModel(ctx).Set("Chart", &model.Chart{
 		Width:     12,
-		Height:    150,
+		Height:    200,
 		Type:      "line",
 		Dashboard: "service",
 	})
@@ -115,7 +115,7 @@ func chartDelete(ctx web.Context) error {
 }
 
 func chartData(ctx web.Context) error {
-	period := cast.ToDuration(ctx.Q("time"), time.Hour)
+	period := time.Duration(cast.ToInt64(ctx.Q("period"), 60)) * time.Minute
 	if v := ctx.Q("charts"); v != "" {
 		names := strings.Split(v, ",")
 		key := ctx.Q("key")

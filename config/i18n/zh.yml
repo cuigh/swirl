@@ -49,7 +49,8 @@ field.width: 宽度
 field.height: 高度
 field.unit: 单位
 field.title: 标题
-field.label: 标签
+field.legend: 图例
+field.desc: 描述
 field.dashboard: 仪表盘
 
 # menu

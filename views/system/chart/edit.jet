@@ -22,9 +22,9 @@
             </div>
           </div>
           <div class="field">
-            <label class="label">{{ i18n("field.label") }}</label>
+            <label class="label">{{ i18n("field.legend") }}</label>
             <div class="control">
-              <input name="label" value="{{ .Chart.Label }}"  class="input" placeholder="Label for dataset, e.g. ${name}">
+              <input name="legend" value="{{ .Chart.Legend }}"  class="input" placeholder="Legend expression for dataset, e.g. ${name}">
             </div>
           </div>
         </div>
@@ -53,7 +53,7 @@
           <div class="field">
             <label class="label">{{ i18n("field.height") }}</label>
             <div class="control">
-              <input name="height" value="{{ .Chart.Height }}"  class="input" placeholder="Height" data-type="integer" data-v-rule="native" required>
+              <input name="height" value="{{ .Chart.Height }}"  class="input" placeholder="Height in pixel" data-type="integer" data-v-rule="native" required>
             </div>
           </div>
           <div class="field">
@@ -89,7 +89,7 @@
         </div>
       </div>
       <div class="field">
-        <label class="label">Description</label>
+        <label class="label">{{ i18n("field.desc") }}</label>
         <div class="control">
           <input name="desc" value="{{ .Chart.Description }}" class="input" placeholder="Chart description">
         </div>
@@ -106,8 +106,8 @@
           {{ yield radio(name="type", value="line", label="Line", checked=.Chart.Type) }}
           {{ yield radio(name="type", value="bar", label="Bar", checked=.Chart.Type) }}
           {{ yield radio(name="type", value="pie", label="Pie", checked=.Chart.Type) }}
+          {{ yield radio(name="type", value="gauge", label="Gauge", checked=.Chart.Type) }}
           {*{{ yield radio(name="type", value="table", label="Table", checked=.Chart.Type) }}*}
-          {{ yield radio(name="type", value="value", label="Value", checked=.Chart.Type) }}
         </div>
       </div>
       <div class="field">
@@ -116,7 +116,7 @@
           {{ yield radio(name="dashboard", value="", label="Any", checked=.Chart.Dashboard) }}
           {{ yield radio(name="dashboard", value="home", label="Home", checked=.Chart.Dashboard) }}
           {{ yield radio(name="dashboard", value="service", label="Service", checked=.Chart.Dashboard) }}
-          {{ yield radio(name="dashboard", value="task", label="Task", checked=.Chart.Dashboard) }}
+          {*{{ yield radio(name="dashboard", value="task", label="Task", checked=.Chart.Dashboard) }}*}
         </div>
       </div>
       {{ yield form_submit(url="/system/chart/") }}

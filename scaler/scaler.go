@@ -168,11 +168,11 @@ func cpuChecker(service string, low, high float64) (scaleType, float64) {
 		return scaleNone, 0
 	}
 
-	value := vector.Data[0]
-	if value <= low {
-		return scaleDown, value
-	} else if value >= high {
-		return scaleUp, value
+	cv := vector.Data[0]
+	if cv.Value <= low {
+		return scaleDown, cv.Value
+	} else if cv.Value >= high {
+		return scaleUp, cv.Value
 	}
 	return scaleNone, 0
 }

@@ -1,11 +1,11 @@
 ///<reference path="../core/core.ts" />
-///<reference path="../core/graph.ts" />
+///<reference path="../core/chart.ts" />
 namespace Swirl.Service {
     import Modal = Swirl.Core.Modal;
-    import GraphPanel = Swirl.Core.GraphPanel;
+    import ChartDashboard = Swirl.Core.ChartDashboard;
 
     export class StatsPage {
-        private panel: GraphPanel;
+        private dashboard: ChartDashboard;
 
         constructor() {
             let $cb_time = $("#cb-time");
@@ -13,7 +13,7 @@ namespace Swirl.Service {
                 return;
             }
 
-            this.panel = new GraphPanel("#div-charts", {
+            this.dashboard = new ChartDashboard("#div-charts", window.charts, {
                 name: "service",
                 key: $("#h2-service-name").text()
             });
@@ -25,13 +25,13 @@ namespace Swirl.Service {
                 Modal.alert("Coming soon...");
             });
             $cb_time.change(e => {
-                this.panel.setTime($(e.target).val());
+                this.dashboard.setPeriod($(e.target).val());
             });
             $("#cb-refresh").change(e => {
                 if ($(e.target).prop("checked")) {
-                    this.panel.refresh();
+                    this.dashboard.refresh();
                 } else {
-                    this.panel.stop();
+                    this.dashboard.stop();
                 }
             });
         }

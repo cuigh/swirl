@@ -144,9 +144,9 @@ func (b *chartBiz) GetDashboardCharts(dashboard *model.ChartDashboard) (charts [
 					if c.Height > 0 {
 						chart.Height = c.Height
 					}
-					if len(c.Colors) > 0 {
-						chart.Colors = c.Colors
-					}
+					//if len(c.Colors) > 0 {
+					//	chart.Colors = c.Colors
+					//}
 					charts = append(charts, chart)
 				}
 			}
@@ -172,20 +172,29 @@ func (b *chartBiz) FetchDatas(key string, names []string, period time.Duration) 
 
 		switch chart.Type {
 		case "line", "bar":
-			m, err := Metric.GetMatrix(query, chart.Label, start, end)
+			d, err := Metric.GetMatrix(query, chart.Legend, start, end)
 			if err != nil {
 				log.Get("metric").Error(err, query)
 			} else {
-				datas[chart.Name] = m
+				datas[chart.Name] = d
 			}
-		case "pie", "table":
-			m, err := Metric.GetVector(query, chart.Label, end)
+		case "pie":
+			d, err := Metric.GetVector(query, chart.Legend, end)
 			if err != nil {
 				log.Get("metric").Error(err, query)
 			} else {
-				datas[chart.Name] = m
+				datas[chart.Name] = d
 			}
-		case "value":
+		case "gauge":
+			d, err := Metric.GetScalar(query, end)
+			if err != nil {
+				log.Get("metric").Error(err, query)
+			} else {
+				datas[chart.Name] = &model.ChartValue{
+					//Name:  "",
+					Value: d,
+				}
+			}
 		}
 	}
 	return datas, nil

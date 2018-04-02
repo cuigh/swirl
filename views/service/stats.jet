@@ -3,7 +3,8 @@
 {{ import "../_modules/form" }}
 
 {{ block script() }}
-<script src="/assets/chart/chart.bundle.min.js?v=2.7.2"></script>
+<script>var charts = {{ writeJson(.Charts) }};</script>
+<script src="/assets/echarts/echarts.min.js?v=4.0.4"></script>
 <script>$(() => new Swirl.Service.StatsPage())</script>
 {{ end }}
 
@@ -53,12 +54,12 @@
               <p class="control">
                 <div class="select">
                   <select id="cb-time" name="time">
-                    {{ yield option(value="30m", label="Last 30 minutes", selected=.Time) }}
-                    {{ yield option(value="1h", label="Last 1 hour", selected=.Time) }}
-                    {{ yield option(value="3h", label="Last 3 hours", selected=.Time) }}
-                    {{ yield option(value="6h", label="Last 6 hours", selected=.Time) }}
-                    {{ yield option(value="12h", label="Last 12 hours", selected=.Time) }}
-                    {{ yield option(value="24h", label="Last 24 hours", selected=.Time) }}
+                    {{ yield option(value="30", label="Last 30 minutes", selected=.Time) }}
+                    {{ yield option(value="60", label="Last 1 hour", selected=.Time) }}
+                    {{ yield option(value="180", label="Last 3 hours", selected=.Time) }}
+                    {{ yield option(value="360", label="Last 6 hours", selected=.Time) }}
+                    {{ yield option(value="720", label="Last 12 hours", selected=.Time) }}
+                    {{ yield option(value="1440", label="Last 24 hours", selected=.Time) }}
                   </select>
                 </div>
               </p>
@@ -82,30 +83,6 @@
       </div>
     </nav>
     <div id="div-charts" class="columns is-multiline">
-      {{ range .Charts }}
-      <div class="column is-{{ .Width }}" data-chart-name="{{ .Name }}" data-chart-type="{{ .Type }}" data-chart-unit="{{ .Unit }}" data-chart-width="{{ .Width }}" data-chart-height="{{ .Height }}">
-        <div class="card">
-          <header class="card-header">
-            <p class="card-header-title">{{ .Title }}</p>
-            <a data-action="remove-chart" class="card-header-icon" aria-label="remove chart">
-              <span class="icon">
-                <i class="fas fa-times has-text-danger" aria-hidden="true"></i>
-              </span>
-            </a>
-            {*<a data-action="edit-options" class="card-header-icon" aria-label="edit options">*}
-              {*<span class="icon">*}
-                {*<i class="fas fa-ellipsis-h has-text-info" aria-hidden="true"></i>*}
-              {*</span>*}
-            {*</a>*}
-          </header>
-          <div class="card-content">
-            <div style="height: {{ .Height }}px">
-              <canvas id="canvas_{{ .Name }}"></canvas>
-            </div>
-          </div>
-        </div>
-      </div>
-      {{ end }}
     </div>
     {{ else }}
     <div class="notification is-info">
