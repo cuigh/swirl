@@ -71,13 +71,14 @@ log:
 
 ### With environment variables
 
-Only three main options can be set by environment variables for now.
+Only these options can be set by environment variables for now.
 
-| Name            | Value                                           |
-| --------------- | ------------------------------------------------|
-| DB_TYPE         | mongo                                           |
-| DB_ADDRESS      | localhost:27017/swirl                           |
-| DOCKER_ENDPOINT | tcp://docker-proxy:2375                         |
+| Name            | Value                        |
+| --------------- | -----------------------------|
+| DB_TYPE         | mongo                        |
+| DB_ADDRESS      | localhost:27017/swirl        |
+| DOCKER_ENDPOINT | tcp://docker-proxy:2375      |
+| AUTH_TIMEOUT    | 4h                           |
 
 ### With swarm config
 
@@ -129,7 +130,6 @@ docker stack deploy -c compose.yml swirl
 Name | Description | Examples
 --- | --- | ---
 swirl.scale | Service auto scaling | `swirl.scale=min=1,max=5,cpu=30:50`
-swirl.metrics | Add additional metrics to service stats page | `swirl.metrics=java`, `swirl.metrics=go`
 
 ## Build
 
