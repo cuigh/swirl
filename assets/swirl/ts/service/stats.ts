@@ -18,12 +18,12 @@ namespace Swirl.Service {
                 key: $("#h2-service-name").text()
             });
 
-            $("#btn-add").click(() => {
-                Modal.alert("Coming soon...");
-            });
-            $("#btn-save").click(() => {
-                Modal.alert("Coming soon...");
-            });
+            // $("#btn-add").click(() => {
+            //     Modal.alert("Coming soon...");
+            // });
+            // $("#btn-save").click(() => {
+            //     Modal.alert("Coming soon...");
+            // });
             $cb_time.change(e => {
                 this.dashboard.setPeriod($(e.target).val());
             });

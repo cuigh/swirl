@@ -116,7 +116,7 @@ func (b *chartBiz) UpdateDashboard(dashboard *model.ChartDashboard, user web.Use
 // nolint: gocyclo
 func (b *chartBiz) GetDashboardCharts(dashboard *model.ChartDashboard) (charts []*model.Chart, err error) {
 	do(func(d dao.Interface) {
-		if len(dashboard.Charts) == 0 {
+		if dashboard == nil || len(dashboard.Charts) == 0 {
 			return
 		}
 

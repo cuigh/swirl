@@ -96,4 +96,30 @@
     </a>
   </div>
 </section>
+
+<div id="dlg-add-chart" class="modal">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Add chart</p>
+      <button class="delete"></button>
+    </header>
+    <section class="modal-card-body" style="max-height: 400px; overflow-y: auto">
+      <nav id="nav-charts" class="panel">
+        <div class="panel-block">
+          <p class="control has-icons-left">
+            <input id="txt-query" class="input is-small" type="text" placeholder="Searching chart...">
+            <span class="icon is-small is-left">
+              <i class="fas fa-search"></i>
+            </span>
+          </p>
+        </div>
+      </nav>
+    </section>
+    <footer class="modal-card-foot">
+      <button id="btn-add-chart" type="button" class="button is-primary">{{ i18n("button.confirm") }}</button>
+      <button type="button" class="button dismiss">{{ i18n("button.cancel") }}</button>
+    </footer>
+  </div>
+</div>
 {{ end }}

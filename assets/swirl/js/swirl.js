@@ -1375,6 +1375,7 @@ var Swirl;
                 this.charts = [];
                 this.opts = $.extend(new ChartDashboardOptions(), opts);
                 this.$panel = $(elem);
+                this.dlg = new ChartDialog(this);
                 charts.forEach(opts => this.createGraph(opts));
                 Core.Dispatcher.bind(this.$panel).on("remove-chart", e => {
                     let name = $(e.target).closest("div.column").data("name");
@@ -1467,6 +1468,9 @@ var Swirl;
                     }
                 });
             }
+            getOptions() {
+                return this.opts;
+            }
             loadData() {
                 let args = {
                     charts: this.charts.map(c => c.getOptions().name).join(","),
@@ -1485,69 +1489,72 @@ var Swirl;
             }
         }
         Core.ChartDashboard = ChartDashboard;
+        class ChartDialog {
+            constructor(dashboard) {
+                this.dashboard = dashboard;
+                this.fb = new Core.FilterBox("#txt-query", this.filterCharts.bind(this));
+                $("#btn-add").click(this.showAddDlg.bind(this));
+                $("#btn-add-chart").click(this.addChart.bind(this));
+                $("#btn-save").click(() => {
+                    this.dashboard.save();
+                });
+            }
+            showAddDlg() {
+                let $panel = $("#nav-charts");
+                $panel.find("label.panel-block").remove();
+                $ajax.get(`/system/chart/query`, { dashboard: this.dashboard.getOptions().name }).json((charts) => {
+                    for (let i = 0; i < charts.length; i++) {
+                        let c = charts[i];
+                        $panel.append(`<label class="panel-block">
+          <input type="checkbox" value="${c.name}" data-index="${i}">${c.name}: ${c.title}
+        </label>`);
+                    }
+                    this.charts = charts;
+                    this.$charts = $panel.find("label.panel-block");
+                });
+                let dlg = new Core.Modal("#dlg-add-chart");
+                dlg.show();
+            }
+            filterCharts(text) {
+                if (!text) {
+                    this.$charts.show();
+                    return;
+                }
+                this.$charts.each((i, elem) => {
+                    let $elem = $(elem);
+                    let texts = [
+                        this.charts[i].name.toLowerCase(),
+                        this.charts[i].title.toLowerCase(),
+                        this.charts[i].desc.toLowerCase(),
+                    ];
+                    for (let i = 0; i < texts.length; i++) {
+                        let index = texts[i].indexOf(text);
+                        if (index >= 0) {
+                            $elem.show();
+                            return;
+                        }
+                    }
+                    $elem.hide();
+                });
+            }
+            addChart() {
+                this.$charts.each((i, e) => {
+                    if ($(e).find(":checked").length > 0) {
+                        let c = this.charts[i];
+                        this.dashboard.addGraph(c);
+                    }
+                });
+                Core.Modal.close();
+            }
+        }
     })(Core = Swirl.Core || (Swirl.Core = {}));
 })(Swirl || (Swirl = {}));
 var Swirl;
 (function (Swirl) {
-    var Modal = Swirl.Core.Modal;
-    var FilterBox = Swirl.Core.FilterBox;
     var ChartDashboard = Swirl.Core.ChartDashboard;
     class IndexPage {
         constructor() {
-            this.fb = new FilterBox("#txt-query", this.filterCharts.bind(this));
             this.dashboard = new ChartDashboard("#div-charts", window.charts, { name: "home" });
-            $("#btn-add").click(this.showAddDlg.bind(this));
-            $("#btn-add-chart").click(this.addChart.bind(this));
-            $("#btn-save").click(() => {
-                this.dashboard.save();
-            });
-        }
-        showAddDlg() {
-            let $panel = $("#nav-charts");
-            $panel.find("label.panel-block").remove();
-            $ajax.get(`/system/chart/query`, { dashboard: "home" }).json((charts) => {
-                for (let i = 0; i < charts.length; i++) {
-                    let c = charts[i];
-                    $panel.append(`<label class="panel-block">
-          <input type="checkbox" value="${c.name}" data-index="${i}">${c.name}: ${c.title}
-        </label>`);
-                }
-                this.charts = charts;
-                this.$charts = $panel.find("label.panel-block");
-            });
-            let dlg = new Modal("#dlg-add-chart");
-            dlg.show();
-        }
-        filterCharts(text) {
-            if (!text) {
-                this.$charts.show();
-                return;
-            }
-            this.$charts.each((i, elem) => {
-                let $elem = $(elem);
-                let texts = [
-                    this.charts[i].name.toLowerCase(),
-                    this.charts[i].title.toLowerCase(),
-                    this.charts[i].desc.toLowerCase(),
-                ];
-                for (let i = 0; i < texts.length; i++) {
-                    let index = texts[i].indexOf(text);
-                    if (index >= 0) {
-                        $elem.show();
-                        return;
-                    }
-                }
-                $elem.hide();
-            });
-        }
-        addChart() {
-            this.$charts.each((i, e) => {
-                if ($(e).find(":checked").length > 0) {
-                    let c = this.charts[i];
-                    this.dashboard.addGraph(c);
-                }
-            });
-            Modal.close();
         }
     }
     Swirl.IndexPage = IndexPage;
@@ -2357,7 +2364,6 @@ var Swirl;
 (function (Swirl) {
     var Service;
     (function (Service) {
-        var Modal = Swirl.Core.Modal;
         var ChartDashboard = Swirl.Core.ChartDashboard;
         class StatsPage {
             constructor() {
@@ -2368,12 +2374,6 @@ var Swirl;
                 this.dashboard = new ChartDashboard("#div-charts", window.charts, {
                     name: "service",
                     key: $("#h2-service-name").text()
-                });
-                $("#btn-add").click(() => {
-                    Modal.alert("Coming soon...");
-                });
-                $("#btn-save").click(() => {
-                    Modal.alert("Coming soon...");
                 });
                 $cb_time.change(e => {
                     this.dashboard.setPeriod($(e.target).val());

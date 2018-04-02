@@ -28,7 +28,7 @@ func main() {
 	misc.BindOptions()
 
 	app.Name = "Swirl"
-	app.Version = "0.7.1"
+	app.Version = "0.7.2"
 	app.Desc = "A web management UI for Docker, focused on swarm cluster"
 	app.Action = func(ctx *app.Context) {
 		err := config.UnmarshalOption("swirl", &misc.Options)

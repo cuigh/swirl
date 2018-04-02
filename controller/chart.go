@@ -136,7 +136,7 @@ func chartSaveDashboard(ctx web.Context) error {
 	}
 
 	switch dashboard.Name {
-	case "home":
+	case "home", "service":
 		err = biz.Chart.UpdateDashboard(dashboard, ctx.User())
 	default:
 		err = errors.New("unknown dashboard: " + dashboard.Name)

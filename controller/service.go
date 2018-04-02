@@ -296,7 +296,15 @@ func serviceStats(ctx web.Context) error {
 
 	var charts []*model.Chart
 	if setting.Metrics.Prometheus != "" {
-		charts, err = biz.Chart.GetServiceCharts(name)
+		var dashboard *model.ChartDashboard
+		if dashboard, err = biz.Chart.GetDashboard("service", name); err != nil {
+			return err
+		}
+		if dashboard == nil {
+			charts, err = biz.Chart.GetServiceCharts(name)
+		} else {
+			charts, err = biz.Chart.GetDashboardCharts(dashboard)
+		}
 	}
 
 	period := cast.ToDuration(ctx.Q("time"), time.Hour)
