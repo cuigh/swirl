@@ -80,10 +80,14 @@
       </form>
       <div class="level-right">
         <div class="level-item">
-          <button id="btn-add" class="button is-success"><span class="icon"><i class="fas fa-plus"></i></span><span>{{ i18n("button.add") }}</span></button>
-        </div>
-        <div class="level-item">
-          <button id="btn-save" class="button is-info"><span class="icon"><i class="fas fa-save"></i></span><span>{{ i18n("button.save") }}</span></button>
+          <div class="buttons has-addons">
+            <button id="btn-add" class="button">
+              <span class="icon"><i class="fas fa-plus"></i></span><span>{{ i18n("button.add") }}</span>
+            </button>
+            <button id="btn-save" class="button">
+              <span class="icon"><i class="fas fa-save"></i></span><span>{{ i18n("button.save") }}</span>
+            </button>
+          </div>
         </div>
       </div>
     </nav>
