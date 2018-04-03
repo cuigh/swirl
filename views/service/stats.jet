@@ -43,7 +43,7 @@
 <section class="section">
   <div class="container">
     {{ if .Charts }}
-    <nav class="level">
+    <nav class="level is-mobile">
       <form>
         <div class="level-left">
           <div class="level-item">

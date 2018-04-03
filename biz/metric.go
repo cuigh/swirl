@@ -138,15 +138,15 @@ func (b *metricBiz) GetVector(query, label string, t time.Time) (data *model.Cha
 
 func (b *metricBiz) calcStep(period time.Duration) (step time.Duration) {
 	if period >= times.Day {
-		step = 20 * time.Minute
+		step = 8 * time.Minute
 	} else if period >= 12*time.Hour {
-		step = 10 * time.Minute
+		step = 4 * time.Minute
 	} else if period >= 6*time.Hour {
-		step = 5 * time.Minute
+		step = 2 * time.Minute
 	} else if period >= 3*time.Hour {
-		step = 3 * time.Minute
-	} else {
 		step = time.Minute
+	} else {
+		step = 30 * time.Second
 	}
 	return
 }

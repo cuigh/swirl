@@ -1161,16 +1161,21 @@ var Swirl;
                     },
                     xAxis: {
                         type: 'time',
+                        splitNumber: 10,
                         splitLine: { show: false },
                     },
                     yAxis: {
                         type: 'value',
-                        boundaryGap: [0, '100%'],
-                        splitLine: { show: false },
+                        splitLine: {
+                            lineStyle: {
+                                type: "dashed",
+                            },
+                        },
                         axisLabel: {
                             formatter: this.formatValue.bind(this),
                         },
                     },
+                    color: this.getColors(),
                 };
                 this.config(opt);
                 this.chart = echarts.init(this.$elem.find("div.card-content").get(0));
@@ -1215,6 +1220,39 @@ var Swirl;
                         }
                     default:
                         return value.toFixed(2);
+                }
+            }
+            getColors() {
+                let colors = [
+                    '#00d1b2',
+                    '#209cee',
+                    '#3272dc',
+                    '#23d160',
+                    '#ffdd57',
+                    '#ff3860',
+                    '#363636',
+                    '#c23531',
+                    '#2f4554',
+                    '#61a0a8',
+                    '#d48265',
+                    '#91c7ae',
+                    '#749f83',
+                    '#ca8622',
+                    '#bda29a',
+                    '#6e7074',
+                    '#546570',
+                    '#c4ccd3',
+                ];
+                this.shuffle(colors);
+                return colors;
+            }
+            shuffle(a) {
+                let len = a.length;
+                for (let i = 0; i < len - 1; i++) {
+                    let index = Math.floor(Math.random() * (len - i));
+                    let temp = a[index];
+                    a[index] = a[len - i - 1];
+                    a[len - i - 1] = temp;
                 }
             }
         }
@@ -1335,10 +1373,28 @@ var Swirl;
                             return html;
                         },
                     },
+                    yAxis: {
+                        max: 'dataMax',
+                    },
                 });
             }
             setData(d) {
-                d.series.forEach((s) => s.type = this.opts.type);
+                if (!d.series) {
+                    return;
+                }
+                d.series.forEach((s) => {
+                    s.type = this.opts.type;
+                    s.areaStyle = {
+                        opacity: 0.3,
+                    };
+                    s.smooth = true;
+                    s.showSymbol = false;
+                    s.lineStyle = {
+                        normal: {
+                            width: 1,
+                        }
+                    };
+                });
                 this.chart.setOption({
                     legend: {
                         data: d.legend,

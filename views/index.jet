@@ -64,7 +64,7 @@
     {{yield infobox(style="primary", icon="server", text=i18n("home.stack"), url="/stack/task/", count=.StackCount)}}
   </div>
   <hr>
-  <nav class="level">
+  <nav class="level is-mobile">
     <div class="level-left">
       <div class="level-item">
         <p class="subtitle is-5">
