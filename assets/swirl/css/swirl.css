@@ -171,8 +171,14 @@ dd {
     color: whitesmoke;
 }
 
+.card-header-title {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
 .card-header-title, .card-header-icon, .card-footer-item {
-    padding: 0.5rem 0.75rem;
+    padding: 0.5rem 0.5rem;
 }
 
 .card-content {
@@ -262,4 +268,9 @@ textarea.code {
     font-size: 0.8em;
     border: 1px solid #ddd;
     height: 450px !important;
+}
+
+.drag {
+    cursor: move;
+    padding: 0.5rem 0.25rem;
 }

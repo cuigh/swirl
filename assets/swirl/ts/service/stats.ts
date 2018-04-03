@@ -1,7 +1,6 @@
 ///<reference path="../core/core.ts" />
 ///<reference path="../core/chart.ts" />
 namespace Swirl.Service {
-    import Modal = Swirl.Core.Modal;
     import ChartDashboard = Swirl.Core.ChartDashboard;
 
     export class StatsPage {
@@ -17,13 +16,9 @@ namespace Swirl.Service {
                 name: "service",
                 key: $("#h2-service-name").text()
             });
+            dragula([$('#div-charts').get(0)]);
 
-            // $("#btn-add").click(() => {
-            //     Modal.alert("Coming soon...");
-            // });
-            // $("#btn-save").click(() => {
-            //     Modal.alert("Coming soon...");
-            // });
+            // bind events
             $cb_time.change(e => {
                 this.dashboard.setPeriod($(e.target).val());
             });

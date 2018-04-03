@@ -2,9 +2,14 @@
 {{ import "../_modules/detail" }}
 {{ import "../_modules/form" }}
 
+{{ block style() }}
+<link rel="stylesheet" href="/assets/dragula/dragula.min.css?v=2.7.2">
+{{ end }}
+
 {{ block script() }}
 <script>var charts = {{ writeJson(.Charts) }};</script>
 <script src="/assets/echarts/echarts.min.js?v=4.0.4"></script>
+<script src="/assets/dragula/dragula.min.js?v=2.7.2"></script>
 <script>$(() => new Swirl.Service.StatsPage())</script>
 {{ end }}
 

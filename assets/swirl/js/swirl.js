@@ -1137,12 +1137,17 @@ var Swirl;
                 this.$elem = $(`<div class="column is-${this.opts.width}" data-name="${this.opts.name}">
       <div class="card">
         <header class="card-header">
-          <p class="card-header-title">${this.opts.title}</p>
+          <a class="card-header-icon drag">
+            <span class="icon">
+              <i class="fas fa-bars has-text-grey-light" aria-hidden="true"></i>
+            </span>
+          </a>        
+          <p class="card-header-title is-paddingless">${this.opts.title}</p>
           <a data-action="remove-chart" class="card-header-icon" aria-label="remove chart">
             <span class="icon">
               <i class="fas fa-times has-text-danger" aria-hidden="true"></i>
             </span>
-          </a>
+          </a>         
         </header>
         <div class="card-content" style="height: ${this.opts.height}px"></div>
       </div>
@@ -1503,12 +1508,20 @@ var Swirl;
                 }
             }
             save() {
-                let charts = this.charts.map(c => {
-                    return {
-                        name: c.getOptions().name,
-                        width: c.getOptions().width,
-                        height: c.getOptions().height,
-                    };
+                let charts = [];
+                this.$panel.children().each((index, elem) => {
+                    let name = $(elem).data("name");
+                    for (let i = 0; i < this.charts.length; i++) {
+                        let c = this.charts[i];
+                        if (c.getOptions().name === name) {
+                            charts.push({
+                                name: c.getOptions().name,
+                                width: c.getOptions().width,
+                                height: c.getOptions().height,
+                            });
+                            break;
+                        }
+                    }
                 });
                 let args = {
                     name: this.opts.name,
@@ -1611,6 +1624,11 @@ var Swirl;
     class IndexPage {
         constructor() {
             this.dashboard = new ChartDashboard("#div-charts", window.charts, { name: "home" });
+            dragula([$('#div-charts').get(0)], {
+                moves: function (el, container, handle) {
+                    return $(handle).closest('a.drag').length > 0;
+                }
+            });
         }
     }
     Swirl.IndexPage = IndexPage;
@@ -2431,6 +2449,7 @@ var Swirl;
                     name: "service",
                     key: $("#h2-service-name").text()
                 });
+                dragula([$('#div-charts').get(0)]);
                 $cb_time.change(e => {
                     this.dashboard.setPeriod($(e.target).val());
                 });
