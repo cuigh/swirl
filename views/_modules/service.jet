@@ -25,7 +25,7 @@
   <div class="control">
     {{ set := .CheckedNetworks }}
     {{range .Networks}}
-    {{ yield checkbox(name="networks", value=.ID, label=.Name, checked=set.Contains(.Name)) }}
+    {{ yield checkbox(name="networks", value=.Name, label=.Name, checked=set.Contains(.Name)) }}
     {{end}}
   </div>
 </div>
