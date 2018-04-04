@@ -57,8 +57,9 @@
         {{if .Filter == "blocked"}}
         <strong>Blocked</strong>
         {{else}}
-        <a href="?filter=blocked">Blocked</a>        
+        <a href="?filter=blocked">Blocked</a>
         {{end}}
+      </p>
       <p class="level-item">
         <a href="new" class="button is-success"><span class="icon"><i class="fas fa-plus"></i></span><span>{{ i18n("button.new") }}</span></a>
       </p>

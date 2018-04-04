@@ -3,6 +3,7 @@ package biz
 import (
 	"time"
 
+	"github.com/cuigh/auxo/app"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/dao"
 	"github.com/cuigh/swirl/model"
@@ -24,6 +25,7 @@ func (b *settingBiz) Get() (setting *model.Setting, err error) {
 
 func (b *settingBiz) Update(setting *model.Setting, user web.User) (err error) {
 	do(func(d dao.Interface) {
+		setting.Version = app.Version
 		setting.UpdatedBy = user.ID()
 		setting.UpdatedAt = time.Now()
 		err = d.SettingUpdate(setting)

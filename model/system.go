@@ -2,19 +2,6 @@ package model
 
 import "time"
 
-// LDAP security policy
-const (
-	LDAPSecurityNone     = 0
-	LDAPSecurityTLS      = 1
-	LDAPSecurityStartTLS = 2
-)
-
-// LDAP auth type
-const (
-	LDAPAuthSimple = 0
-	LDAPAuthBind   = 1
-)
-
 // Perm control scope
 const (
 	PermNone      = 0
@@ -24,7 +11,8 @@ const (
 
 // Setting represents the options of swirl.
 type Setting struct {
-	LDAP struct {
+	Version string
+	LDAP    struct {
 		Enabled  bool   `bson:"enabled" json:"enabled,omitempty"`
 		Address  string `bson:"address" json:"address,omitempty"`
 		Security int32  `bson:"security" json:"security,omitempty"` // 0-None/1-TLS/2-StartTLS
