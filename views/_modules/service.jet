@@ -22,10 +22,12 @@
 {{ block form_network() }}
 <div class="field">
   <label class="label">Network</label>
-  <div class="control">
+  <div class="control columns is-mobile is-multiline is-tight">
     {{ set := .CheckedNetworks }}
     {{range .Networks}}
+    <div class="column is-one-third-desktop is-half-tablet is-half-mobile">
     {{ yield checkbox(name="networks", value=.Name, label=.Name, checked=set.Contains(.Name)) }}
+    </div>
     {{end}}
   </div>
 </div>
