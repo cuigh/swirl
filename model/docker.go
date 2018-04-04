@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -57,6 +58,9 @@ func NewOptions(m map[string]string) Options {
 	for k, v := range m {
 		opts = append(opts, &Option{Name: k, Value: v})
 	}
+	sort.Slice(opts, func(i, j int) bool {
+		return opts[i].Name < opts[j].Name
+	})
 	return opts
 }
 
