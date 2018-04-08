@@ -29,6 +29,9 @@
       <p class="level-item">
         <a href="new" class="button is-success"><span class="icon"><i class="fas fa-plus"></i></span><span>{{ i18n("button.new") }}</span></a>
       </p>
+      <p class="level-item">
+        <button id="btn-import" class="button is-info"><span class="icon"><i class="fas fa-level-down-alt"></i></span><span>{{ i18n("button.import") }}</span></button>
+      </p>
     </div>
   </nav>
     <div id="div-charts" class="columns is-multiline">
@@ -70,7 +73,7 @@
             </article>
           </div>
           <footer class="card-footer">
-            {*<a class="card-footer-item">View</a>*}
+            <a data-action="export-chart" class="card-footer-item">Export</a>
             <a href="{{ .Name }}/edit" class="card-footer-item">Edit</a>
             <a data-action="delete-chart" class="card-footer-item">Delete</a>
           </footer>

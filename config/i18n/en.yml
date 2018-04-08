@@ -22,6 +22,7 @@ button.scale: Scale
 button.rollback: Rollback
 button.previous: Previous
 button.next: Next
+button.import: Import
 
 # field
 field.name: Name

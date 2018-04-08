@@ -18,6 +18,7 @@ type ChartController struct {
 	Query         web.HandlerFunc `path:"/query" name:"chart.query" authorize:"?" desc:"chart query"`
 	New           web.HandlerFunc `path:"/new" name:"chart.new" authorize:"!" desc:"new chart page"`
 	Create        web.HandlerFunc `path:"/new" method:"post" name:"chart.create" authorize:"!" desc:"create chart"`
+	Detail        web.HandlerFunc `path:"/:name/detail" name:"chart.detail" authorize:"?" desc:"chart detail"`
 	Edit          web.HandlerFunc `path:"/:name/edit" name:"chart.edit" authorize:"!" desc:"edit chart page"`
 	Delete        web.HandlerFunc `path:"/:name/delete" method:"post" name:"chart.delete" authorize:"!" desc:"delete chart"`
 	Update        web.HandlerFunc `path:"/:name/edit" method:"post" name:"chart.update" authorize:"!" desc:"update chart"`
@@ -32,6 +33,7 @@ func Chart() (c *ChartController) {
 		Query:         chartQuery,
 		New:           chartNew,
 		Create:        chartCreate,
+		Detail:        chartDetail,
 		Edit:          chartEdit,
 		Update:        chartUpdate,
 		Delete:        chartDelete,
@@ -48,6 +50,16 @@ func chartList(ctx web.Context) error {
 
 	m := newModel(ctx).Set("Charts", charts)
 	return ctx.Render("system/chart/list", m)
+}
+
+func chartDetail(ctx web.Context) error {
+	name := ctx.P("name")
+	chart, err := biz.Chart.Get(name)
+	if err != nil {
+		return err
+	}
+
+	return ctx.JSON(chart, "  ")
 }
 
 func chartQuery(ctx web.Context) error {

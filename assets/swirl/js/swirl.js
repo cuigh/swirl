@@ -1644,7 +1644,10 @@ var Swirl;
             constructor() {
                 this.$charts = $("#div-charts").children();
                 this.fb = new FilterBox("#txt-query", this.filterCharts.bind(this));
-                Dispatcher.bind("#div-charts").on("delete-chart", this.deleteChart.bind(this));
+                $("#btn-import").click(this.importChart);
+                Dispatcher.bind("#div-charts")
+                    .on("export-chart", this.exportChart.bind(this))
+                    .on("delete-chart", this.deleteChart.bind(this));
             }
             deleteChart(e) {
                 let $container = $(e.target).closest("div.column");
@@ -1675,6 +1678,31 @@ var Swirl;
                         }
                     }
                     $elem.hide();
+                });
+            }
+            exportChart(e) {
+                let $container = $(e.target).closest("div.column");
+                let name = $container.data("name");
+                $ajax.get(name + "/detail").text(r => {
+                    Modal.alert(`<textarea class="textarea" rows="8" readonly>${r}</textarea>`, "Export chart");
+                });
+            }
+            importChart(e) {
+                Modal.confirm(`<textarea class="textarea" rows="8"></textarea>`, "Import chart", (dlg, e) => {
+                    try {
+                        let chart = JSON.parse(dlg.find('textarea').val());
+                        $ajax.post("new", chart).trigger(e.target).json(r => {
+                            if (r.success) {
+                                location.reload();
+                            }
+                            else {
+                                dlg.error(r.message);
+                            }
+                        });
+                    }
+                    catch (e) {
+                        dlg.error(e);
+                    }
                 });
             }
         }

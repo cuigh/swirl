@@ -14,7 +14,10 @@ namespace Swirl.Metric {
             this.fb = new FilterBox("#txt-query", this.filterCharts.bind(this));
 
             // bind events
-            Dispatcher.bind("#div-charts").on("delete-chart", this.deleteChart.bind(this));
+            $("#btn-import").click(this.importChart);
+            Dispatcher.bind("#div-charts")
+                .on("export-chart", this.exportChart.bind(this))
+                .on("delete-chart", this.deleteChart.bind(this));
         }
 
         private deleteChart(e: JQueryEventObject) {
@@ -24,7 +27,7 @@ namespace Swirl.Metric {
                 $ajax.post(name + "/delete").trigger(e.target).json<AjaxResult>(r => {
                     $container.remove();
                     dlg.close();
-                })
+                });
             });
         }
 
@@ -41,7 +44,7 @@ namespace Swirl.Metric {
                         $elem.data("title").toLowerCase(),
                         $elem.data("desc").toLowerCase(),
                     ];
-                for (let i = 0; i<texts.length; i++) {
+                for (let i = 0; i < texts.length; i++) {
                     let index = texts[i].indexOf(text);
                     if (index >= 0) {
                         $elem.show();
@@ -50,6 +53,31 @@ namespace Swirl.Metric {
                 }
                 $elem.hide();
             })
+        }
+
+        private exportChart(e: JQueryEventObject) {
+            let $container = $(e.target).closest("div.column");
+            let name = $container.data("name");
+            $ajax.get(name + "/detail").text(r => {
+                Modal.alert(`<textarea class="textarea" rows="8" readonly>${r}</textarea>`, "Export chart");
+            });
+        }
+
+        private importChart(e: JQueryEventObject) {
+            Modal.confirm(`<textarea class="textarea" rows="8"></textarea>`, "Import chart", (dlg, e) => {
+                try {
+                    let chart = JSON.parse(dlg.find('textarea').val());
+                    $ajax.post("new", chart).trigger(e.target).json<AjaxResult>(r => {
+                        if (r.success) {
+                            location.reload();
+                        } else {
+                            dlg.error(r.message);
+                        }
+                    });
+                } catch (e) {
+                    dlg.error(e);
+                }
+            });
         }
     }
 }
