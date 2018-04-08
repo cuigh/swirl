@@ -28,13 +28,13 @@
 
 ![Service list](docs/images/service-list.png)
 
-### Compose list
+### Service stats
 
-![Compose list](docs/images/compose-list.png)
+![Service stats](docs/images/service-stats.png)
 
-### Role editing
+### Stack list
 
-![Role editing](docs/images/role-edit.png)
+![Stack list](docs/images/stack-list.png)
 
 ### Settings
 
