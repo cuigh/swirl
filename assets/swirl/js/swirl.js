@@ -1229,24 +1229,16 @@ var Swirl;
             }
             getColors() {
                 let colors = [
-                    '#00d1b2',
-                    '#209cee',
-                    '#3272dc',
-                    '#23d160',
-                    '#ffdd57',
-                    '#ff3860',
-                    '#363636',
-                    '#c23531',
-                    '#2f4554',
-                    '#61a0a8',
-                    '#d48265',
-                    '#91c7ae',
-                    '#749f83',
-                    '#ca8622',
-                    '#bda29a',
-                    '#6e7074',
-                    '#546570',
-                    '#c4ccd3',
+                    '#45aaf2',
+                    '#6574cd',
+                    '#a55eea',
+                    '#f66d9b',
+                    '#cd201f',
+                    '#fd9644',
+                    '#f1c40f',
+                    '#7bd235',
+                    '#5eba00',
+                    '#2bcbba',
                 ];
                 this.shuffle(colors);
                 return colors;
@@ -1341,7 +1333,7 @@ var Swirl;
                     series: [{
                             type: this.opts.type,
                             radius: '80%',
-                            center: ['45%', '50%'],
+                            center: ['40%', '50%'],
                         }],
                 });
             }
@@ -1366,7 +1358,7 @@ var Swirl;
                     grid: {
                         left: 60,
                         top: 30,
-                        right: 30,
+                        right: 20,
                         bottom: 30,
                     },
                     tooltip: {
