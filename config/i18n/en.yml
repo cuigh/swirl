@@ -24,6 +24,8 @@ button.restart: Restart
 button.previous: Previous
 button.next: Next
 button.import: Import
+button.export: Export
+button.more: More
 
 # field
 field.name: Name

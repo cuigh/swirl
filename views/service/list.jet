@@ -65,7 +65,7 @@
           <div class="dropdown is-hoverable is-right">
             <div class="dropdown-trigger">
               <button class="button is-small" aria-haspopup="true" aria-controls="dropdown-menu-{{ .Name }}">
-                <span>More</span>
+                <span>{{ i18n("button.more") }}</span>
                 <span class="icon is-small">
                   <i class="fas fa-angle-down" aria-hidden="true"></i>
                   {*<i class="fas fa-ellipsis-v" aria-hidden="true"></i>*}

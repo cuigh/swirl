@@ -19,13 +19,13 @@
       <div class="columns">
         <div class="column">
           <div class="field">
-            <label class="label">Name</label>
+            <label class="label">{{ i18n("field.name") }}</label>
             <div class="control">
               <input name="name" value="{{ .Service.Name }}" class="input" type="text" placeholder="" data-v-rule="native" required>
             </div>
           </div>
           <div class="field">
-            <label class="label">Image</label>
+            <label class="label">{{ i18n("field.image") }}</label>
             <div class="field has-addons is-marginless">
               <div class="control">
                 <span class="select">

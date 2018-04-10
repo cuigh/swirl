@@ -24,6 +24,8 @@ button.restart: 重启
 button.previous: 前一页
 button.next: 后一页
 button.import: 导入
+button.export: 导出
+button.more: 更多
 
 # field
 field.name: 名称

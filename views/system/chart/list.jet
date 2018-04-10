@@ -73,9 +73,9 @@
             </article>
           </div>
           <footer class="card-footer">
-            <a data-action="export-chart" class="card-footer-item">Export</a>
-            <a href="{{ .Name }}/edit" class="card-footer-item">Edit</a>
-            <a data-action="delete-chart" class="card-footer-item">Delete</a>
+            <a data-action="export-chart" class="card-footer-item">{{ i18n("button.export") }}</a>
+            <a href="{{ .Name }}/edit" class="card-footer-item">{{ i18n("button.edit") }}</a>
+            <a data-action="delete-chart" class="card-footer-item">{{ i18n("button.delete") }}</a>
           </footer>
         </div>
       </div>

@@ -41,7 +41,7 @@
       <div class="columns">
         <div class="column">
           <div class="field">
-            <label class="label">Image</label>
+            <label class="label">{{ i18n("field.image") }}</label>
             <div class="control is-expanded">
               <input name="image" value="{{ .Service.Image }}" class="input" placeholder="" data-v-rule="native" required>
             </div>
