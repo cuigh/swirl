@@ -1203,6 +1203,12 @@ var Swirl;
                         return value.toFixed(1) + "%";
                     case "percent:1":
                         return (value * 100).toFixed(1) + "%";
+                    case "time:ns":
+                        return value + 'ns';
+                    case "time:µs":
+                        return value.toFixed(2) + 'µs';
+                    case "time:ms":
+                        return value.toFixed(2) + 'ms';
                     case "time:s":
                         if (value < 1) {
                             return (value * 1000).toFixed(0) + 'ms';
@@ -1210,6 +1216,14 @@ var Swirl;
                         else {
                             return value.toFixed(2) + 's';
                         }
+                    case "time:m":
+                        return value.toFixed(2) + 'm';
+                    case "time:h":
+                        return value.toFixed(2) + 'h';
+                    case "time:d":
+                        return value.toFixed(2) + 'd';
+                    case "size:bits":
+                        value = value / 8;
                     case "size:bytes":
                         if (value < 1024) {
                             return value.toString() + 'B';
@@ -1223,6 +1237,12 @@ var Swirl;
                         else {
                             return (value / 1073741824).toFixed(2) + 'G';
                         }
+                    case "size:kilobytes":
+                        return value.toFixed(2) + 'K';
+                    case "size:megabytes":
+                        return value.toFixed(2) + 'M';
+                    case "size:gigabytes":
+                        return value.toFixed(2) + 'G';
                     default:
                         return value.toFixed(2);
                 }
