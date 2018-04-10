@@ -160,7 +160,7 @@
             <td>
               <a class="button is-small is-outlined is-danger" data-action="delete-endpoint-port">
                 <span class="icon is-small">
-                  <i class="fas fa-trash"></i>
+                  <i class="far fa-trash-alt"></i>
                 </span>
               </a>
             </td>
@@ -221,7 +221,7 @@
           <td>
             <a class="button is-small is-outlined is-danger" data-action="delete-mount">
               <span class="icon is-small">
-                <i class="fas fa-trash"></i>
+                <i class="far fa-trash-alt"></i>
               </span>
             </a>
           </td>
@@ -261,7 +261,7 @@
             <td>
               <a class="button is-small is-outlined is-danger" data-action="delete-secret">
                 <span class="icon is-small">
-                  <i class="fas fa-trash"></i>
+                  <i class="far fa-trash-alt"></i>
                 </span>
               </a>
             </td>
@@ -301,7 +301,7 @@
             <td>
               <a class="button is-small is-outlined is-danger" data-action="delete-config">
                 <span class="icon is-small">
-                  <i class="fas fa-trash"></i>
+                  <i class="far fa-trash-alt"></i>
                 </span>
               </a>
             </td>
@@ -386,7 +386,7 @@
             <td>
               <a class="button is-small is-outlined is-danger" data-action="delete-constraint">
                 <span class="icon is-small">
-                  <i class="fas fa-trash"></i>
+                  <i class="far fa-trash-alt"></i>
                 </span>
               </a>
             </td>
@@ -419,7 +419,7 @@
             <td>
               <a class="button is-small is-outlined is-danger" data-action="delete-preference">
                 <span class="icon is-small">
-                  <i class="fas fa-trash"></i>
+                  <i class="far fa-trash-alt"></i>
                 </span>
               </a>
             </td>

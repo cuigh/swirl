@@ -63,7 +63,7 @@ namespace Swirl.Service {
               <td>
                 <a class="button is-small is-outlined is-danger" data-action="delete-mount">
                   <span class="icon is-small">
-                    <i class="fas fa-trash"></i>
+                    <i class="far fa-trash-alt"></i>
                   </span>
                 </a>
               </td>
@@ -97,7 +97,7 @@ namespace Swirl.Service {
                 <td>
                   <a class="button is-small is-outlined is-danger" data-action="delete-endpoint-port">
                     <span class="icon is-small">
-                      <i class="fas fa-trash"></i>
+                      <i class="far fa-trash-alt"></i>
                     </span>
                   </a>
                 </td>
@@ -125,7 +125,7 @@ namespace Swirl.Service {
                 <td>
                   <a class="button is-small is-outlined is-danger" data-action="delete-constraint">
                     <span class="icon is-small">
-                      <i class="fas fa-trash"></i>
+                      <i class="far fa-trash-alt"></i>
                     </span>
                   </a>
                 </td>
@@ -142,7 +142,7 @@ namespace Swirl.Service {
                 <td>
                   <a class="button is-small is-outlined is-danger" data-action="delete-preference">
                     <span class="icon is-small">
-                      <i class="fas fa-trash"></i>
+                      <i class="far fa-trash-alt"></i>
                     </span>
                   </a>
                 </td>
@@ -176,7 +176,7 @@ namespace Swirl.Service {
                 <td>
                   <a class="button is-small is-outlined is-danger" data-action="delete-${this.name}">
                     <span class="icon is-small">
-                      <i class="fas fa-trash"></i>
+                      <i class="far fa-trash-alt"></i>
                     </span>
                   </a>
                 </td>

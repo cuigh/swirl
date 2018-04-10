@@ -108,7 +108,7 @@ namespace Swirl.Core {
             <td><input name="${this.name}s[${this.index}].value" class="input is-small" type="text"></td>
             <td>
               <a class="button is-small is-danger is-outlined" data-action="delete-${this.alias}">
-                <span class="icon is-small"><i class="fas fa-trash"></i></span>
+                <span class="icon is-small"><i class="far fa-trash-alt"></i></span>
               </a>            
             </td>
           </tr>`;

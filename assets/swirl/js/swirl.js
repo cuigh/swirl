@@ -1057,7 +1057,7 @@ var Swirl;
             <td><input name="${this.name}s[${this.index}].value" class="input is-small" type="text"></td>
             <td>
               <a class="button is-small is-danger is-outlined" data-action="delete-${this.alias}">
-                <span class="icon is-small"><i class="fas fa-trash"></i></span>
+                <span class="icon is-small"><i class="far fa-trash-alt"></i></span>
               </a>            
             </td>
           </tr>`;
@@ -1145,7 +1145,7 @@ var Swirl;
           <p class="card-header-title is-paddingless">${this.opts.title}</p>
           <a data-action="remove-chart" class="card-header-icon" aria-label="remove chart">
             <span class="icon">
-              <i class="fas fa-trash has-text-danger" aria-hidden="true"></i>
+              <i class="far fa-trash-alt has-text-danger" aria-hidden="true"></i>
             </span>
           </a>         
         </header>
@@ -1244,7 +1244,7 @@ var Swirl;
                     case "size:gigabytes":
                         return value.toFixed(2) + 'G';
                     default:
-                        return value.toFixed(2);
+                        return value % 1 === 0 ? value.toString() : value.toFixed(2);
                 }
             }
             getColors() {
@@ -2257,7 +2257,7 @@ var Swirl;
               <td>
                 <a class="button is-small is-outlined is-danger" data-action="delete-mount">
                   <span class="icon is-small">
-                    <i class="fas fa-trash"></i>
+                    <i class="far fa-trash-alt"></i>
                   </span>
                 </a>
               </td>
@@ -2290,7 +2290,7 @@ var Swirl;
                 <td>
                   <a class="button is-small is-outlined is-danger" data-action="delete-endpoint-port">
                     <span class="icon is-small">
-                      <i class="fas fa-trash"></i>
+                      <i class="far fa-trash-alt"></i>
                     </span>
                   </a>
                 </td>
@@ -2317,7 +2317,7 @@ var Swirl;
                 <td>
                   <a class="button is-small is-outlined is-danger" data-action="delete-constraint">
                     <span class="icon is-small">
-                      <i class="fas fa-trash"></i>
+                      <i class="far fa-trash-alt"></i>
                     </span>
                   </a>
                 </td>
@@ -2333,7 +2333,7 @@ var Swirl;
                 <td>
                   <a class="button is-small is-outlined is-danger" data-action="delete-preference">
                     <span class="icon is-small">
-                      <i class="fas fa-trash"></i>
+                      <i class="far fa-trash-alt"></i>
                     </span>
                   </a>
                 </td>
@@ -2359,7 +2359,7 @@ var Swirl;
                 <td>
                   <a class="button is-small is-outlined is-danger" data-action="delete-${this.name}">
                     <span class="icon is-small">
-                      <i class="fas fa-trash"></i>
+                      <i class="far fa-trash-alt"></i>
                     </span>
                   </a>
                 </td>

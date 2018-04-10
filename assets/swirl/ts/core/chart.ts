@@ -31,7 +31,7 @@ namespace Swirl.Core {
           <p class="card-header-title is-paddingless">${this.opts.title}</p>
           <a data-action="remove-chart" class="card-header-icon" aria-label="remove chart">
             <span class="icon">
-              <i class="fas fa-trash has-text-danger" aria-hidden="true"></i>
+              <i class="far fa-trash-alt has-text-danger" aria-hidden="true"></i>
             </span>
           </a>         
         </header>
@@ -141,7 +141,7 @@ namespace Swirl.Core {
                 case "size:gigabytes":
                     return value.toFixed(2) + 'G';
                 default:
-                    return value.toFixed(2);
+                    return value % 1 === 0 ? value.toString() : value.toFixed(2);
             }
         }
 

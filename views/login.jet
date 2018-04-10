@@ -13,7 +13,7 @@
                 <p class="control has-icons-left">
                   <input name="name" class="input" type="text" placeholder="" data-v-rule="native" required>
                   <span class="icon is-small is-left">
-                    <i class="fas fa-user"></i>
+                    <i class="far fa-user"></i>
                   </span>
                 </p>
               </div>
