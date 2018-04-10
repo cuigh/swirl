@@ -340,19 +340,15 @@ func ServiceScale(name string, version, count uint64) error {
 
 		spec := service.Spec
 		if spec.Mode.Replicated == nil {
-			return errors.New("the mode of service isn't replicated")
+			return errors.New("scale can only be used with replicated mode")
 		}
 		spec.Mode.Replicated.Replicas = &count
 
-		options := types.ServiceUpdateOptions{
-			RegistryAuthFrom: types.RegistryAuthFromSpec,
-			QueryRegistry:    false,
-		}
 		ver := service.Version
 		if version > 0 {
 			ver = swarm.Version{Index: version}
 		}
-		resp, err := cli.ServiceUpdate(context.Background(), name, ver, spec, options)
+		resp, err := cli.ServiceUpdate(context.Background(), name, ver, spec, types.ServiceUpdateOptions{})
 		if err == nil && len(resp.Warnings) > 0 {
 			mgr.Logger().Warnf("service %s was scaled but got warnings: %v", name, resp.Warnings)
 		}
@@ -734,19 +730,29 @@ func ServiceRollback(name string) error {
 			return err
 		}
 
-		if service.PreviousSpec == nil {
-			return errors.New("can't rollback service, previous spec is not exists")
-		}
-
-		spec := *service.PreviousSpec
 		options := types.ServiceUpdateOptions{
-			RegistryAuthFrom: types.RegistryAuthFromPreviousSpec,
-			QueryRegistry:    false,
-			Rollback:         "previous",
+			Rollback: "previous",
 		}
-		resp, err := cli.ServiceUpdate(context.Background(), name, service.Version, spec, options)
+		resp, err := cli.ServiceUpdate(context.Background(), name, service.Version, service.Spec, options)
 		if err == nil && len(resp.Warnings) > 0 {
 			mgr.Logger().Warnf("service %s was rollbacked but got warnings: %v", name, resp.Warnings)
+		}
+		return err
+	})
+}
+
+// ServiceRestart force to refresh a service.
+func ServiceRestart(name string) error {
+	return mgr.Do(func(ctx context.Context, cli *client.Client) (err error) {
+		service, _, err := cli.ServiceInspectWithRaw(ctx, name, types.ServiceInspectOptions{})
+		if err != nil {
+			return err
+		}
+
+		service.Spec.TaskTemplate.ForceUpdate++
+		resp, err := cli.ServiceUpdate(context.Background(), name, service.Version, service.Spec, types.ServiceUpdateOptions{})
+		if err == nil && len(resp.Warnings) > 0 {
+			mgr.Logger().Warnf("service %s was restarted but got warnings: %v", name, resp.Warnings)
 		}
 		return err
 	})

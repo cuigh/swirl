@@ -31,7 +31,7 @@ namespace Swirl.Core {
           <p class="card-header-title is-paddingless">${this.opts.title}</p>
           <a data-action="remove-chart" class="card-header-icon" aria-label="remove chart">
             <span class="icon">
-              <i class="fas fa-times has-text-danger" aria-hidden="true"></i>
+              <i class="fas fa-trash has-text-danger" aria-hidden="true"></i>
             </span>
           </a>         
         </header>

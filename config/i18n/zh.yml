@@ -20,6 +20,7 @@ button.return: 返回
 button.leave: 离开
 button.scale: 调整
 button.rollback: 回退
+button.restart: 重启
 button.previous: 前一页
 button.next: 后一页
 button.import: 导入

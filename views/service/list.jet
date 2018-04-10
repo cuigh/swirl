@@ -44,7 +44,7 @@
         <th>{{ i18n("field.image") }}</th>
         <th width="145">Mode</th>
         <th>{{ i18n("field.updated-at") }}</th>
-        <th width="140">{{ i18n("field.action") }}</th>
+        <th width="190">{{ i18n("field.action") }}</th>
       </tr>
     </thead>
     <tbody>
@@ -60,22 +60,28 @@
         </td>
         <td>{{time(.UpdatedAt)}}{{ if .UpdateStatus }}<span class="icon {{ if .UpdateStatus == "completed" }}has-text-success{{ else if .UpdateStatus == "updating" }}has-text-warning{{ else }}has-text-danger{{ end }} tooltip" data-tooltip="{{.UpdateStatus}}"><i class="fas fa-circle"></i></span>{{ end }}</td>
         <td>
-          <a href="{{.Name}}/edit" class="button is-small is-dark is-outlined tooltip is-tooltip-bottom" data-tooltip="{{ i18n("button.edit") }}">
-            <span class="icon"><i class="fas fa-edit"></i></span>
-          </a>
-          {{if .Mode == "replicated"}}
-          <button type="button" class="button is-small is-info is-outlined tooltip is-tooltip-bottom" data-tooltip="{{ i18n("button.scale") }}" data-action="scale-service" data-replicas="{{.Replicas}}">
-            <span class="icon"><i class="fas fa-arrows-alt"></i></span>
-          </button>
-          {{end}}
-          {{if .Rollback }}
-          <button type="button" class="button is-small is-info is-outlined tooltip is-tooltip-bottom" data-tooltip="{{ i18n("button.rollback") }}" data-action="rollback-service">
-            <span class="icon"><i class="fas fa-history"></i></span>
-          </button>
-          {{end}}
-          <button class="button is-small is-danger is-outlined tooltip is-tooltip-bottom" data-tooltip="{{ i18n("button.delete") }}" data-action="delete-service">
-            <span class="icon"><i class="fas fa-times"></i></span>
-          </button>
+          <a href="{{.Name}}/edit" class="button is-small is-dark is-outlined">{{ i18n("button.edit") }}</a>
+          <button class="button is-small is-danger is-outlined" data-action="delete-service">{{ i18n("button.delete") }}</button>
+          <div class="dropdown is-hoverable is-right">
+            <div class="dropdown-trigger">
+              <button class="button is-small" aria-haspopup="true" aria-controls="dropdown-menu-{{ .Name }}">
+                <span>More</span>
+                <span class="icon is-small">
+                  <i class="fas fa-angle-down" aria-hidden="true"></i>
+                  {*<i class="fas fa-ellipsis-v" aria-hidden="true"></i>*}
+                </span>
+              </button>
+            </div>
+            <div class="dropdown-menu" id="dropdown-menu-{{ .Name }}" role="menu">
+              <div class="dropdown-content">
+                {{if .Mode == "replicated" }}<a class="dropdown-item" data-action="scale-service" data-replicas="{{.Replicas}}">{{ i18n("button.scale") }}</a>{{end}}
+                {{if .Rollback }}<a class="dropdown-item" data-action="rollback-service">{{ i18n("button.rollback") }}</a>{{end}}
+                <a class="dropdown-item" data-action="restart-service">{{ i18n("button.restart") }}</a>
+                {*<a class="dropdown-item has-text-danger" data-action="delete-service">{{ i18n("button.delete") }}</a>*}
+              </div>
+            </div>
+          </div>
+
         </td>
       </tr>          
       {{end}}

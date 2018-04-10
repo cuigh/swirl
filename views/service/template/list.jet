@@ -59,7 +59,7 @@
             <span class="icon"><i class="fas fa-edit"></i></span>
           </a>
           <button class="button is-small is-danger is-outlined tooltip is-tooltip-bottom" data-tooltip="{{ i18n("button.delete") }}" data-action="delete-template">
-            <span class="icon"><i class="fas fa-times"></i></span>
+            <span class="icon"><i class="fas fa-trash"></i></span>
           </button>
         </td>
       </tr>

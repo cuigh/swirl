@@ -24,6 +24,7 @@ type ServiceController struct {
 	Delete     web.HandlerFunc `path:"/:name/delete" method:"post" name:"service.delete" authorize:"!" perm:"write,service,name"`
 	Scale      web.HandlerFunc `path:"/:name/scale" method:"post" name:"service.scale" authorize:"!" perm:"write,service,name"`
 	Rollback   web.HandlerFunc `path:"/:name/rollback" method:"post" name:"service.rollback" authorize:"!" perm:"write,service,name"`
+	Restart    web.HandlerFunc `path:"/:name/restart" method:"post" name:"service.restart" authorize:"!" perm:"write,service,name"`
 	New        web.HandlerFunc `path:"/new" name:"service.new" authorize:"!" desc:"new service page"`
 	Create     web.HandlerFunc `path:"/new" method:"post" name:"service.create" authorize:"!" desc:"create service"`
 	Edit       web.HandlerFunc `path:"/:name/edit" name:"service.edit" authorize:"!" perm:"write,service,name"`
@@ -47,6 +48,7 @@ func Service() (c *ServiceController) {
 		Update:     serviceUpdate,
 		Scale:      serviceScale,
 		Rollback:   serviceRollback,
+		Restart:    serviceRestart,
 		PermEdit:   servicePermEdit,
 		PermUpdate: permUpdate("service", "name"),
 		Stats:      serviceStats,
@@ -267,6 +269,15 @@ func serviceRollback(ctx web.Context) error {
 	err := docker.ServiceRollback(name)
 	if err == nil {
 		biz.Event.CreateService(model.EventActionRollback, name, ctx.User())
+	}
+	return ajaxResult(ctx, err)
+}
+
+func serviceRestart(ctx web.Context) error {
+	name := ctx.F("name")
+	err := docker.ServiceRestart(name)
+	if err == nil {
+		biz.Event.CreateService(model.EventActionRestart, name, ctx.User())
 	}
 	return ajaxResult(ctx, err)
 }

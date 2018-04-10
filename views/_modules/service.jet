@@ -261,7 +261,7 @@
             <td>
               <a class="button is-small is-outlined is-danger" data-action="delete-secret">
                 <span class="icon is-small">
-                  <i class="fas fa-times"></i>
+                  <i class="fas fa-trash"></i>
                 </span>
               </a>
             </td>
@@ -301,7 +301,7 @@
             <td>
               <a class="button is-small is-outlined is-danger" data-action="delete-config">
                 <span class="icon is-small">
-                  <i class="fas fa-times"></i>
+                  <i class="fas fa-trash"></i>
                 </span>
               </a>
             </td>

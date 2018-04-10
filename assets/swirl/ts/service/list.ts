@@ -13,7 +13,8 @@ namespace Swirl.Service {
             // bind events
             this.table.on("delete-service", this.deleteService.bind(this))
                 .on("scale-service", this.scaleService.bind(this))
-                .on("rollback-service", this.rollbackService.bind(this));
+                .on("rollback-service", this.rollbackService.bind(this))
+                .on("restart-service", this.restartService.bind(this));
         }
 
         private deleteService(e: JQueryEventObject) {
@@ -28,26 +29,35 @@ namespace Swirl.Service {
         }
 
         private scaleService(e: JQueryEventObject) {
-            let $btn = $(e.target).closest("button");
-            let $tr = $btn.closest("tr");
+            let $target = $(e.target),
+                $tr = $target.closest("tr");
             let data = {
                 name: $tr.find("td:eq(0)").text().trim(),
-                count: $btn.data("replicas"),
+                count: $target.data("replicas"),
             };
-            Modal.confirm(`<input name="count" value="${data.count}" class="input" placeholder="Replicas">`, "Scale service", (dlg, e) => {
+            Modal.confirm(`<input name="count" value="${data.count}" class="input" placeholder="Replicas">`, "Scale service", dlg => {
                 data.count = dlg.find("input[name=count]").val();
-                $ajax.post(`${data.name}/scale`, data).trigger(e.target).encoder("form").json<AjaxResult>(() => {
+                $ajax.post(`${data.name}/scale`, data).encoder("form").json<AjaxResult>(() => {
                     location.reload();
                 })
             });
         }
 
         private rollbackService(e: JQueryEventObject) {
-            let $btn = $(e.target).closest("button"),
-                $tr = $btn.closest("tr"),
+            let $tr = $(e.target).closest("tr"),
                 name = $tr.find("td:eq(0)").text().trim();
-            Modal.confirm(`Are you sure to rollback service: <strong>${name}</strong>?`, "Rollback service", (dlg, e) => {
-                $ajax.post(`${name}/rollback`, {name: name}).trigger(e.target).encoder("form").json<AjaxResult>(() => {
+            Modal.confirm(`Are you sure to rollback service: <strong>${name}</strong>?`, "Rollback service", dlg => {
+                $ajax.post(`${name}/rollback`, {name: name}).encoder("form").json<AjaxResult>(() => {
+                    dlg.close();
+                })
+            });
+        }
+
+        private restartService(e: JQueryEventObject) {
+            let $tr = $(e.target).closest("tr"),
+                name = $tr.find("td:eq(0)").text().trim();
+            Modal.confirm(`Are you sure to restart service: <strong>${name}</strong>?`, "Restart service", dlg => {
+                $ajax.post(`${name}/restart`, {name: name}).encoder("form").json<AjaxResult>(() => {
                     dlg.close();
                 })
             });

@@ -1145,7 +1145,7 @@ var Swirl;
           <p class="card-header-title is-paddingless">${this.opts.title}</p>
           <a data-action="remove-chart" class="card-header-icon" aria-label="remove chart">
             <span class="icon">
-              <i class="fas fa-times has-text-danger" aria-hidden="true"></i>
+              <i class="fas fa-trash has-text-danger" aria-hidden="true"></i>
             </span>
           </a>         
         </header>
@@ -2339,7 +2339,7 @@ var Swirl;
                 <td>
                   <a class="button is-small is-outlined is-danger" data-action="delete-${this.name}">
                     <span class="icon is-small">
-                      <i class="fas fa-times"></i>
+                      <i class="fas fa-trash"></i>
                     </span>
                   </a>
                 </td>
@@ -2416,7 +2416,8 @@ var Swirl;
                 this.table = new Table("#table-items");
                 this.table.on("delete-service", this.deleteService.bind(this))
                     .on("scale-service", this.scaleService.bind(this))
-                    .on("rollback-service", this.rollbackService.bind(this));
+                    .on("rollback-service", this.rollbackService.bind(this))
+                    .on("restart-service", this.restartService.bind(this));
             }
             deleteService(e) {
                 let $tr = $(e.target).closest("tr");
@@ -2429,23 +2430,30 @@ var Swirl;
                 });
             }
             scaleService(e) {
-                let $btn = $(e.target).closest("button");
-                let $tr = $btn.closest("tr");
+                let $target = $(e.target), $tr = $target.closest("tr");
                 let data = {
                     name: $tr.find("td:eq(0)").text().trim(),
-                    count: $btn.data("replicas"),
+                    count: $target.data("replicas"),
                 };
-                Modal.confirm(`<input name="count" value="${data.count}" class="input" placeholder="Replicas">`, "Scale service", (dlg, e) => {
+                Modal.confirm(`<input name="count" value="${data.count}" class="input" placeholder="Replicas">`, "Scale service", dlg => {
                     data.count = dlg.find("input[name=count]").val();
-                    $ajax.post(`${data.name}/scale`, data).trigger(e.target).encoder("form").json(() => {
+                    $ajax.post(`${data.name}/scale`, data).encoder("form").json(() => {
                         location.reload();
                     });
                 });
             }
             rollbackService(e) {
-                let $btn = $(e.target).closest("button"), $tr = $btn.closest("tr"), name = $tr.find("td:eq(0)").text().trim();
-                Modal.confirm(`Are you sure to rollback service: <strong>${name}</strong>?`, "Rollback service", (dlg, e) => {
-                    $ajax.post(`${name}/rollback`, { name: name }).trigger(e.target).encoder("form").json(() => {
+                let $tr = $(e.target).closest("tr"), name = $tr.find("td:eq(0)").text().trim();
+                Modal.confirm(`Are you sure to rollback service: <strong>${name}</strong>?`, "Rollback service", dlg => {
+                    $ajax.post(`${name}/rollback`, { name: name }).encoder("form").json(() => {
+                        dlg.close();
+                    });
+                });
+            }
+            restartService(e) {
+                let $tr = $(e.target).closest("tr"), name = $tr.find("td:eq(0)").text().trim();
+                Modal.confirm(`Are you sure to restart service: <strong>${name}</strong>?`, "Restart service", dlg => {
+                    $ajax.post(`${name}/restart`, { name: name }).encoder("form").json(() => {
                         dlg.close();
                     });
                 });

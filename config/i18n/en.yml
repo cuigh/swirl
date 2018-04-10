@@ -20,6 +20,7 @@ button.return: Return
 button.leave: Leave
 button.scale: Scale
 button.rollback: Rollback
+button.restart: Restart
 button.previous: Previous
 button.next: Next
 button.import: Import
@@ -71,7 +72,7 @@ menu.stack.task: Tasks
 menu.stack.archive: Archives
 menu.task: Tasks
 menu.secret: Secrets
-menu.config: Config
+menu.config: Configs
 menu.system: System
 menu.role: Roles
 menu.user: Users

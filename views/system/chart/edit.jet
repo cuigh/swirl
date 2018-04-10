@@ -12,7 +12,7 @@
           <div class="field">
             <label class="label">{{ i18n("field.name") }}</label>
             <div class="control">
-              <input name="name" value="{{ .Chart.Name }}" class="input" placeholder="lower-case letters and underline only" data-v-rule="native;regex" data-v-arg-regex="[a-z_]+" data-v-msg-regex="Only lower-case letters and underline are allowed." required{{if .Chart.Name}} readonly{{ end }}>
+              <input name="name" value="{{ .Chart.Name }}" class="input" placeholder="Only lower-case letters and underscores are allowed" data-v-rule="native;regex" data-v-arg-regex="[a-z_]+" data-v-msg-regex="Only lower-case letters and underline are allowed." required{{if .Chart.Name}} readonly{{ end }}>
             </div>
           </div>
           <div class="field">
@@ -97,7 +97,7 @@
       <div class="field">
         <label class="label">Query expression</label>
         <div class="control">
-          <input name="query" value="{{ .Chart.Query }}" class="input" placeholder="Prometheus query expression" data-v-rule="native" required>
+          <input name="query" value="{{ .Chart.Query }}" class="input" placeholder="Prometheus query expression, for service dashboard, you can use '${service}' variable" data-v-rule="native" required>
         </div>
       </div>
       <div class="field">
