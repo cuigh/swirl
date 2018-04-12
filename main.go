@@ -83,6 +83,7 @@ func server(setting *model.Setting) *web.Server {
 	ws.Use(filter.NewRecover())
 
 	// register static handlers
+	ws.File("/favicon.ico", filepath.Join(filepath.Dir(app.Path()), "assets/swirl/img/favicon.ico"))
 	ws.Static("/assets", filepath.Join(filepath.Dir(app.Path()), "assets"))
 
 	// create biz group
