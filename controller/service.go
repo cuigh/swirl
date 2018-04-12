@@ -311,10 +311,15 @@ func serviceStats(ctx web.Context) error {
 		if dashboard, err = biz.Chart.GetDashboard("service", name); err != nil {
 			return err
 		}
+
 		if dashboard == nil {
 			charts, err = biz.Chart.GetServiceCharts(name)
 		} else {
 			charts, err = biz.Chart.GetDashboardCharts(dashboard)
+		}
+
+		if err != nil {
+			return err
 		}
 	}
 
