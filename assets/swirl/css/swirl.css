@@ -19,8 +19,6 @@ body {
 
 .icon.infobox {
     margin-left: 1em;
-    /*height: 4rem;*/
-    /*width: 4rem;*/
 }
 
 .notification.is-top {
@@ -171,6 +169,13 @@ dd {
     color: whitesmoke;
 }
 
+.card, .box {
+    -webkit-box-shadow: none !important;
+    box-shadow: none !important;
+    border: 1px solid rgba(0, 40, 100, 0.12);
+    border-radius: 5px;
+}
+
 .card-header-title {
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -183,6 +188,10 @@ dd {
 
 .card-content {
     padding: 0.75rem;
+}
+
+.level.is-mobile .level-item:last-child {
+    margin-right: 0;
 }
 
 .block {

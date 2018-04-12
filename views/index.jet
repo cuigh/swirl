@@ -13,18 +13,18 @@
 
 {{ block infobox(style, icon, text, url, count) }}
 <div class="column">
-  <div class="notification is-{{style}}">
+  <div class="box">
     <nav class="level is-mobile">
       <div class="level-left">
         <div class="level-item has-text-centered">
-          <span class="icon infobox"><i class="fas fa-{{icon}} fa-4x"></i></span>
+          <span class="icon infobox has-text-grey"><i class="fas fa-{{icon}} fa-4x"></i></span>
         </div>
       </div>
       <div class="level-right">
         <div class="level-item has-text-centered">
           <div>
             <p class="heading">{{text}}</p>
-            <p class="title"><a href="{{url}}" style="text-decoration: none; color: white">{{count}}</a></p>
+            <p class="title"><a href="{{url}}">{{count}}</a></p>
           </div>
         </div>
       </div>
@@ -48,7 +48,7 @@
       </h1>
       <h2 class="subtitle is-5">{{ i18n("description") }}</h2>
       <p>
-        <a class="button is-primary" href="https://github.com/cuigh/swirl" target="_blank">
+        <a class="button is-primary is-rounded" href="https://github.com/cuigh/swirl" target="_blank">
           <span class="icon">
             <i class="fab fa-github"></i>
           </span>
