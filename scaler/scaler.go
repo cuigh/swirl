@@ -66,28 +66,34 @@ func tryScale(service *swarm.Service, opts data.Options) {
 		return
 	}
 
-	// ignore services that have been updated in 3 minutes
-	if service.UpdatedAt.Add(3 * time.Minute).After(time.Now()) {
-		return
-	}
-
 	var (
-		min    = uint64(2)
-		max    = uint64(5)
-		policy = policyAny
+		min    uint64 = 2
+		max    uint64 = 8
+		step   uint64 = 2
+		window        = 3 * time.Minute
+		policy        = policyAny
 		args   data.Options
 	)
 	for _, opt := range opts {
 		switch opt.Name {
 		case "min":
-			min = cast.ToUint64(opt.Value, 1)
+			min = cast.ToUint64(opt.Value, min)
 		case "max":
-			max = cast.ToUint64(opt.Value, 2)
+			max = cast.ToUint64(opt.Value, max)
+		case "step":
+			step = cast.ToUint64(opt.Value, step)
+		case "window":
+			window = cast.ToDuration(opt.Value, window)
 		case "policy":
 			policy = policyType(opt.Value)
 		default:
 			args = append(args, opt)
 		}
+	}
+
+	// ignore services that have been updated in window period.
+	if service.UpdatedAt.Add(window).After(time.Now()) {
+		return
 	}
 
 	result := check(service, policy, args)
@@ -98,12 +104,12 @@ func tryScale(service *swarm.Service, opts data.Options) {
 	replicas := *service.Spec.Mode.Replicated.Replicas
 	if result.Type == scaleUp {
 		if replicas < max {
-			docker.ServiceScale(service.Spec.Name, service.Version.Index, replicas+1)
+			docker.ServiceScale(service.Spec.Name, service.Version.Index, replicas+step)
 			log.Get("scaler").Infof("scaler > Service '%s' scaled up for: %v", service.Spec.Name, result.Reasons)
 		}
 	} else if result.Type == scaleDown {
 		if replicas > min {
-			docker.ServiceScale(service.Spec.Name, service.Version.Index, replicas-1)
+			docker.ServiceScale(service.Spec.Name, service.Version.Index, replicas-step)
 			log.Get("scaler").Infof("scaler > Service '%s' scaled down for: %v", service.Spec.Name, result.Reasons)
 		}
 	}
@@ -158,7 +164,7 @@ func checkArg(service string, arg data.Option) (scaleType, float64) {
 }
 
 func cpuChecker(service string, low, high float64) (scaleType, float64) {
-	query := fmt.Sprintf(`avg(rate(container_cpu_user_seconds_total{container_label_com_docker_swarm_service_name="%s"}[5m]) * 100)`, service)
+	query := fmt.Sprintf(`avg(rate(container_cpu_user_seconds_total{container_label_com_docker_swarm_service_name="%s"}[1m]) * 100)`, service)
 	vector, err := biz.Metric.GetVector(query, "", time.Now())
 	if err != nil {
 		log.Get("scaler").Error("scaler > Failed to query metrics: ", err)
