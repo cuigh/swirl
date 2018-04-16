@@ -1553,6 +1553,9 @@ var Swirl;
                 return this.opts;
             }
             loadData() {
+                if (this.charts.length == 0) {
+                    return;
+                }
                 let args = {
                     charts: this.charts.map(c => c.getOptions().name).join(","),
                     period: this.opts.period,
@@ -1636,6 +1639,9 @@ var Swirl;
     class IndexPage {
         constructor() {
             this.dashboard = new ChartDashboard("#div-charts", window.charts, { name: "home" });
+            $("#cb-time").change(e => {
+                this.dashboard.setPeriod($(e.target).val());
+            });
             dragula([$('#div-charts').get(0)], {
                 moves: function (el, container, handle) {
                     return $(handle).closest('a.drag').length > 0;

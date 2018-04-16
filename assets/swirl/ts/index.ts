@@ -8,6 +8,9 @@ namespace Swirl {
 
         constructor() {
             this.dashboard = new ChartDashboard("#div-charts", window.charts, {name: "home"});
+            $("#cb-time").change(e => {
+                this.dashboard.setPeriod($(e.target).val());
+            });
             dragula([$('#div-charts').get(0)], {
                 moves: function (el, container, handle): boolean {
                     return $(handle).closest('a.drag').length > 0;

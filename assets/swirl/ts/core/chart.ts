@@ -498,6 +498,10 @@ namespace Swirl.Core {
         }
 
         private loadData() {
+            if (this.charts.length == 0) {
+                return
+            }
+
             let args: any = {
                 charts: this.charts.map(c => c.getOptions().name).join(","),
                 period: this.opts.period,

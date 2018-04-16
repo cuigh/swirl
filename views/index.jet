@@ -1,4 +1,5 @@
 {{ extends "_layouts/default" }}
+{{ import "_modules/form" }}
 
 {{ block style() }}
 <link rel="stylesheet" href="/assets/dragula/dragula.min.css?v=2.7.2">
@@ -79,6 +80,25 @@
           <p class="subtitle is-5">
             <strong>{{ i18n("home.monitor") }}</strong>
           </p>
+        </div>
+        <div class="level-item">
+          <div class="field has-addons">
+            <p class="control">
+              <a class="button is-static">Time</a>
+            </p>
+            <p class="control">
+              <div class="select">
+                <select id="cb-time">
+                  <option value="30" selected>Last 30 minutes</option>
+                  <option value="60">Last 1 hour</option>
+                  <option value="180">Last 3 hours</option>
+                  <option value="360">Last 6 hours</option>
+                  <option value="720">Last 12 hours</option>
+                  <option value="1440">Last 24 hours</option>
+                </select>
+              </div>
+            </p>
+          </div>
         </div>
       </div>
       <div class="level-right">
