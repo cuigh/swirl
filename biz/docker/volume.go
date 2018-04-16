@@ -13,7 +13,7 @@ import (
 )
 
 // VolumeList return volumes on the host.
-func VolumeList(pageIndex, pageSize int) (volumes []*types.Volume, totalCount int, err error) {
+func VolumeList(name string, pageIndex, pageSize int) (volumes []*types.Volume, totalCount int, err error) {
 	var (
 		ctx  context.Context
 		cli  *client.Client
@@ -26,9 +26,11 @@ func VolumeList(pageIndex, pageSize int) (volumes []*types.Volume, totalCount in
 	}
 
 	f := filters.NewArgs()
-	f.Add("dangling", "true")
+	//f.Add("dangling", "true")
 	//f.Add("driver", "xx")
-	//f.Add("name", "xx")
+	if name != "" {
+		f.Add("name", name)
+	}
 	resp, err = cli.VolumeList(ctx, f)
 	if err != nil {
 		return

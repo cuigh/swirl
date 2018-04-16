@@ -5,7 +5,7 @@ ADD . .
 RUN CGO_ENABLED=0 go build -ldflags "-s -w"
 
 FROM alpine:3.7
-MAINTAINER cuigh <noname@live.com>
+LABEL maintainer="cuigh <noname@live.com>"
 WORKDIR /app
 COPY --from=build /go/src/github.com/cuigh/swirl/swirl .
 COPY --from=build /go/src/github.com/cuigh/swirl/config ./config/

@@ -23,7 +23,7 @@
         <form>
           <div class="field has-addons">
             <p class="control">
-              <input name="name" value="" class="input" placeholder="Search by name">
+              <input name="name" value="{{ .Name }}" class="input" placeholder="Search by name">
             </p>
             <p class="control">
               <button class="button is-primary">{{ i18n("button.search") }}</button>

@@ -36,15 +36,15 @@ func Volume() (c *VolumeController) {
 }
 
 func volumeList(ctx web.Context) error {
-	//name := ctx.Q("name")
+	name := ctx.Q("name")
 	page := cast.ToInt(ctx.Q("page"), 1)
-	volumes, totalCount, err := docker.VolumeList(page, model.PageSize)
+	volumes, totalCount, err := docker.VolumeList(name, page, model.PageSize)
 	if err != nil {
 		return err
 	}
 
 	m := newPagerModel(ctx, totalCount, model.PageSize, page).
-		//Set("Name", name).
+		Set("Name", name).
 		Set("Volumes", volumes)
 	return ctx.Render("volume/list", m)
 }
