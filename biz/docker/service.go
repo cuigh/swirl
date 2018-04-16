@@ -32,14 +32,20 @@ func ServiceList(name string, pageIndex, pageSize int) (infos []*model.ServiceLi
 		)
 
 		// acquire services
-		opts := types.ServiceListOptions{}
-		if name != "" {
-			opts.Filters = filters.NewArgs()
-			opts.Filters.Add("name", name)
-		}
-		services, err = cli.ServiceList(ctx, opts)
+		services, err = cli.ServiceList(ctx, types.ServiceListOptions{})
 		if err != nil {
 			return
+		}
+		if name != "" {
+			j := 0
+			name = strings.ToLower(name)
+			for i, l := 0, len(services); i < l; i++ {
+				if strings.Contains(strings.ToLower(services[i].Spec.Name), name) {
+					services[j] = services[i]
+					j++
+				}
+			}
+			services = services[:j]
 		}
 		sort.Slice(services, func(i, j int) bool {
 			return services[i].Spec.Name < services[j].Spec.Name
