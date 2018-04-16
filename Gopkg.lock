@@ -59,7 +59,7 @@
     "util/lazy",
     "util/run"
   ]
-  revision = "deff34e94017f36eff536fb9be5bcf3a2456fc42"
+  revision = "92f7532da4ac19d55266a770847167bb9fb5130f"
 
 [[projects]]
   branch = "master"
@@ -69,7 +69,7 @@
     "digestset",
     "reference"
   ]
-  revision = "23bef416bdd6dcff90083288c284367cf6af955e"
+  revision = "83389a148052d74ac602f5f1d62f86ff2f3c4aa5"
 
 [[projects]]
   branch = "master"
@@ -94,7 +94,7 @@
     "client",
     "pkg/stdcopy"
   ]
-  revision = "57c504799d979caa706142e6f5dc4be4a5b1e3e2"
+  revision = "ea579a6194525ce3b98eba04f74de19a106bf918"
   source = "https://github.com/moby/moby.git"
 
 [[projects]]
@@ -110,8 +110,8 @@
 [[projects]]
   name = "github.com/docker/go-units"
   packages = ["."]
-  revision = "0dadbb0345b35ec7ef35e228dabb8de89a65bf52"
-  version = "v0.3.2"
+  revision = "47565b4f722fb6ceae66b95f853feed578a4a51c"
+  version = "v0.3.3"
 
 [[projects]]
   branch = "master"
@@ -123,7 +123,7 @@
     "internal/sasl",
     "internal/scram"
   ]
-  revision = "baa28fcb8e7d5dfab92026c0920cb6c9ae72faa2"
+  revision = "f76e4f9da92ecd56e3be26f5ba92580af1ef97b4"
 
 [[projects]]
   name = "github.com/go-ldap/ldap"
@@ -183,7 +183,7 @@
   branch = "master"
   name = "github.com/prometheus/common"
   packages = ["model"]
-  revision = "e4aa40a9169a88835b849a6efb71e05dc04b88f0"
+  revision = "d0f7cd64bda49e08b22ae8a730aa57aa0db125d6"
 
 [[projects]]
   branch = "master"
@@ -192,7 +192,7 @@
     "acme",
     "acme/autocert"
   ]
-  revision = "88942b9c40a4c9d203b82b3731787b672d6e809b"
+  revision = "d6449816ce06963d9d136eee5a56fca5b0616e7e"
 
 [[projects]]
   branch = "master"
@@ -200,15 +200,16 @@
   packages = [
     "context",
     "context/ctxhttp",
+    "internal/socks",
     "proxy"
   ]
-  revision = "6078986fec03a1dcc236c34816c71b0e05018fda"
+  revision = "500e7a4f953ddaf55d316b4d3adc516aa0379622"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["windows"]
-  revision = "91ee8cde435411ca3f1cd365e8f20131aed4d0a1"
+  revision = "2f57af4873d00d535c5c9028850aa2152e6a5566"
 
 [[projects]]
   name = "gopkg.in/asn1-ber.v1"
@@ -219,8 +220,8 @@
 [[projects]]
   name = "gopkg.in/yaml.v2"
   packages = ["."]
-  revision = "7f97868eec74b32b0982dd158a51a446d1da7eb5"
-  version = "v2.1.1"
+  revision = "5420a8b6744d3b0345ab293f6fcba19c978f1183"
+  version = "v2.2.1"
 
 [solve-meta]
   analyzer-name = "dep"
