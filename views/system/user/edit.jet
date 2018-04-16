@@ -70,7 +70,7 @@
         </div>
       </div>
       <div class="field">
-        <label class="label">Roles</label>
+        <label class="label">{{ i18n("field.role") }}</label>
         <div class="control">
           {{ roles := .UserRoles }}
           {{range .Roles}}

@@ -18,14 +18,14 @@
           <li>
             <a href="/system/user/">{{ i18n("menu.user") }}</a>
           </li>
+          <li class="is-active">
+            <a href="/system/chart/">{{ i18n("menu.chart") }}</a>
+          </li>
           <li>
             <a href="/system/setting/">{{ i18n("menu.setting") }}</a>
           </li>
           <li>
             <a href="/system/event/">{{ i18n("menu.event") }}</a>
-          </li>
-          <li class="is-active">
-            <a href="/system/chart/">{{ i18n("menu.chart") }}</a>
           </li>
         </ul>
       </nav>

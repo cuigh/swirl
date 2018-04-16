@@ -48,7 +48,7 @@
       <dt class="has-text-left">{{ i18n("field.updated-at") }}</dt>
       <dd>{{ time(.User.UpdatedAt) }}</dd>
       {{if .Roles}}
-      <dt class="has-text-left">Roles</dt>
+      <dt class="has-text-left">{{ i18n("field.role") }}</dt>
       <dd>
         <div class="tags">
         {{ roles := .Roles }}
