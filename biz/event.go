@@ -89,23 +89,11 @@ func (b *eventBiz) CreateVolume(action model.EventAction, name string, user web.
 	b.Create(event)
 }
 
-func (b *eventBiz) CreateStackTask(action model.EventAction, name string, user web.User) {
+func (b *eventBiz) CreateStack(action model.EventAction, name string, user web.User) {
 	event := &model.Event{
-		Type:     model.EventTypeStackTask,
+		Type:     model.EventTypeStack,
 		Action:   action,
 		Code:     name,
-		Name:     name,
-		UserID:   user.ID(),
-		Username: user.Name(),
-	}
-	b.Create(event)
-}
-
-func (b *eventBiz) CreateStackArchive(action model.EventAction, id, name string, user web.User) {
-	event := &model.Event{
-		Type:     model.EventTypeStackArchive,
-		Action:   action,
-		Code:     id,
 		Name:     name,
 		UserID:   user.ID(),
 		Username: user.Name(),

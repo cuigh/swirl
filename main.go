@@ -43,6 +43,8 @@ func main() {
 			os.Exit(1)
 		}
 
+		biz.Stack.Migrate()
+
 		scaler.Start()
 		app.Run(server(setting))
 	}

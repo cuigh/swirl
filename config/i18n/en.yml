@@ -10,6 +10,7 @@ button.submit: Submit
 button.cancel: Cancel
 button.confirm: Confirm
 button.delete: Delete
+button.remove: Remove
 button.prune: Prune
 button.new: New
 button.add: Add
@@ -150,6 +151,7 @@ service.template.button.create: Create service
 stack.title: Stack
 stack.description: A stack is a logical grouping of related services that are usually deployed together and require each other to work as intended.
 stack.button.deploy: Deploy
+stack.button.shutdown: Shutdown
 
 # task pages
 task.title: Task

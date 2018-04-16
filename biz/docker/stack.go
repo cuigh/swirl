@@ -18,7 +18,7 @@ import (
 const stackLabel = "com.docker.stack.namespace"
 
 // StackList return all stacks.
-func StackList() (stacks []*model.StackListInfo, err error) {
+func StackList() (stacks []*model.Stack, err error) {
 	err = mgr.Do(func(ctx context.Context, cli *client.Client) (err error) {
 		var services []swarm.Service
 		opts := types.ServiceListOptions{
@@ -30,7 +30,7 @@ func StackList() (stacks []*model.StackListInfo, err error) {
 			return
 		}
 
-		m := make(map[string]*model.StackListInfo)
+		m := make(map[string]*model.Stack)
 		for _, service := range services {
 			labels := service.Spec.Labels
 			name, ok := labels[stackLabel]
@@ -42,7 +42,7 @@ func StackList() (stacks []*model.StackListInfo, err error) {
 			if stack, ok := m[name]; ok {
 				stack.Services = append(stack.Services, service.Spec.Name)
 			} else {
-				m[name] = &model.StackListInfo{
+				m[name] = &model.Stack{
 					Name:     name,
 					Services: []string{service.Spec.Name},
 				}
@@ -125,7 +125,8 @@ func StackRemove(name string) error {
 		}
 
 		if len(services)+len(networks)+len(secrets)+len(configs) == 0 {
-			return fmt.Errorf("nothing found in stack: %s", name)
+			//return fmt.Errorf("nothing found in stack: %s", name)
+			return nil
 		}
 
 		// Remove services

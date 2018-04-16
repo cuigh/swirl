@@ -2813,4 +2813,111 @@ var Swirl;
         Volume.NewPage = NewPage;
     })(Volume = Swirl.Volume || (Swirl.Volume = {}));
 })(Swirl || (Swirl = {}));
+var Swirl;
+(function (Swirl) {
+    var Stack;
+    (function (Stack) {
+        var Validator = Swirl.Core.Validator;
+        var Notification = Swirl.Core.Notification;
+        class ContentRequiredRule {
+            validate($form, $input, arg) {
+                let el = $input[0];
+                if ($("#type-" + arg).prop("checked")) {
+                    console.log(el.value);
+                    return { ok: el.checkValidity ? el.checkValidity() : true, error: el.validationMessage };
+                }
+                return { ok: true };
+            }
+        }
+        class EditPage {
+            constructor() {
+                Validator.register("content", new ContentRequiredRule(), "");
+                this.editor = CodeMirror.fromTextArea($("#txt-content")[0], { lineNumbers: true });
+                $("#file-content").change(e => {
+                    let file = e.target;
+                    if (file.files.length > 0) {
+                        $('#filename').text(file.files[0].name);
+                    }
+                });
+                $("#type-input,#type-upload").click(e => {
+                    let type = $(e.target).val();
+                    $("#div-input").toggle(type == "input");
+                    $("#div-upload").toggle(type == "upload");
+                });
+                $("#btn-submit").click(this.submit.bind(this));
+            }
+            submit(e) {
+                this.editor.save();
+                let results = Validator.bind("#div-form").validate();
+                if (results.length > 0) {
+                    return;
+                }
+                let data = new FormData();
+                data.append('name', $("#name").val());
+                if ($("#type-input").prop("checked")) {
+                    data.append('content', $('#txt-content').val());
+                }
+                else {
+                    let file = $('#file-content')[0];
+                    data.append('content', file.files[0]);
+                }
+                let url = $(e.target).data("url") || "";
+                $ajax.post(url, data).encoder("none").trigger(e.target).json((r) => {
+                    if (r.success) {
+                        location.href = "/stack/";
+                    }
+                    else {
+                        Notification.show("danger", `FAILED: ${r.message}`);
+                    }
+                });
+            }
+        }
+        Stack.EditPage = EditPage;
+    })(Stack = Swirl.Stack || (Swirl.Stack = {}));
+})(Swirl || (Swirl = {}));
+var Swirl;
+(function (Swirl) {
+    var Stack;
+    (function (Stack) {
+        var Modal = Swirl.Core.Modal;
+        var Dispatcher = Swirl.Core.Dispatcher;
+        class ListPage {
+            constructor() {
+                let dispatcher = Dispatcher.bind("#table-items");
+                dispatcher.on("deploy-stack", this.deployStack.bind(this));
+                dispatcher.on("shutdown-stack", this.shutdownStack.bind(this));
+                dispatcher.on("delete-stack", this.deleteStack.bind(this));
+            }
+            deployStack(e) {
+                let $tr = $(e.target).closest("tr");
+                let name = $tr.find("td:first").text().trim();
+                Modal.confirm(`Are you sure to deploy stack: <strong>${name}</strong>?`, "Deploy stack", (dlg, e) => {
+                    $ajax.post(`${name}/deploy`).trigger(e.target).json(r => {
+                        location.reload();
+                    });
+                });
+            }
+            shutdownStack(e) {
+                let $tr = $(e.target).closest("tr");
+                let name = $tr.find("td:first").text().trim();
+                Modal.confirm(`Are you sure to shutdown stack: <strong>${name}</strong>?`, "Shutdown stack", (dlg, e) => {
+                    $ajax.post(`${name}/shutdown`).trigger(e.target).json(r => {
+                        location.reload();
+                    });
+                });
+            }
+            deleteStack(e) {
+                let $tr = $(e.target).closest("tr");
+                let name = $tr.find("td:first").text().trim();
+                Modal.confirm(`Are you sure to remove archive: <strong>${name}</strong>?`, "Delete stack", (dlg, e) => {
+                    $ajax.post(`${name}/delete`).trigger(e.target).json(r => {
+                        $tr.remove();
+                        dlg.close();
+                    });
+                });
+            }
+        }
+        Stack.ListPage = ListPage;
+    })(Stack = Swirl.Stack || (Swirl.Stack = {}));
+})(Swirl || (Swirl = {}));
 //# sourceMappingURL=swirl.js.map

@@ -1,5 +1,5 @@
-{{ extends "../../_layouts/default" }}
-{{ import "../../_modules/form" }}
+{{ extends "../_layouts/default" }}
+{{ import "../_modules/form" }}
 
 {{ block style() }}
 <link rel="stylesheet" href="/assets/codemirror/codemirror.css?v=5.30">
@@ -8,7 +8,7 @@
 {{ block script() }}
 <script src="/assets/codemirror/codemirror.js?v=5.30"></script>
 <script src="/assets/codemirror/mode/yaml.js?v=5.30"></script>
-<script>$(() => new Swirl.Stack.Archive.EditPage())</script>
+<script>$(() => new Swirl.Stack.EditPage())</script>
 {{ end }}
 
 {{ block body() }}
@@ -19,20 +19,6 @@
       <h2 class="subtitle is-5">{{ i18n("stack.description") }}</h2>
     </div>
   </div>
-  <div class="hero-foot">
-    <div class="container">
-      <nav class="tabs is-boxed">
-        <ul>
-          <li>
-            <a href="/stack/task/">{{ i18n("menu.stack.task") }}</a>
-          </li>
-          <li class="is-active">
-            <a href="/stack/archive/">{{ i18n("menu.stack.archive") }}</a>
-          </li>
-        </ul>
-      </nav>
-    </div>
-  </div>    
 </section>
 <section class="section">
   <div id="div-form" class="container">
@@ -76,7 +62,7 @@
         <button id="btn-submit" type="submit" class="button is-primary">{{ i18n("button.submit") }}</button>
       </div>
       <div class="control">
-        <a href="/stack/archive/" class="button is-link">{{ i18n("button.cancel") }}</a>
+        <a href="/stack/" class="button is-link">{{ i18n("button.cancel") }}</a>
       </div>
     </div>
   </div>

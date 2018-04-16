@@ -47,6 +47,14 @@ type Interface interface {
 	ArchiveUpdate(archive *model.Archive) error
 	ArchiveDelete(id string) error
 
+	StackList() (stacks []*model.Stack, err error)
+	StackGet(name string) (*model.Stack, error)
+	StackCreate(stack *model.Stack) error
+	StackUpdate(stack *model.Stack) error
+	StackDelete(name string) error
+	// StackMigrate migrates stacks from old archive collection. This method will removed after v0.8.
+	StackMigrate()
+
 	TemplateList(args *model.TemplateListArgs) (tpls []*model.Template, count int, err error)
 	TemplateGet(id string) (*model.Template, error)
 	TemplateCreate(tpl *model.Template) error

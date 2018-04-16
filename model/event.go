@@ -13,17 +13,14 @@ const (
 	EventTypeNetwork         EventType = "Network"
 	EventTypeService         EventType = "Service"
 	EventTypeServiceTemplate EventType = "Service Template"
-	EventTypeStackTask       EventType = "Stack Task"
-	EventTypeStackArchive    EventType = "Stack Archive"
+	EventTypeStack           EventType = "Stack"
 	EventTypeSecret          EventType = "Secret"
 	EventTypeConfig          EventType = "Config"
-
-	EventTypeVolume EventType = "Volume"
-
-	EventTypeAuthentication EventType = "Authentication"
-	EventTypeRole           EventType = "Role"
-	EventTypeUser           EventType = "User"
-	EventTypeSetting        EventType = "Setting"
+	EventTypeVolume          EventType = "Volume"
+	EventTypeAuthentication  EventType = "Authentication"
+	EventTypeRole            EventType = "Role"
+	EventTypeUser            EventType = "User"
+	EventTypeSetting         EventType = "Setting"
 )
 
 type EventAction string
@@ -38,6 +35,8 @@ const (
 	EventActionRollback   EventAction = "Rollback"
 	EventActionRestart    EventAction = "Restart"
 	EventActionDisconnect EventAction = "Disconnect"
+	EventActionDeploy     EventAction = "Deploy"
+	EventActionShutdown   EventAction = "Shutdown"
 )
 
 type Event struct {
@@ -61,8 +60,8 @@ func (e *Event) URL(et EventType, code string) string {
 		return fmt.Sprintf("/network/%s/detail", code)
 	case EventTypeService:
 		return fmt.Sprintf("/service/%s/detail", code)
-	case EventTypeStackArchive:
-		return fmt.Sprintf("/stack/archive/%s/detail", code)
+	case EventTypeStack:
+		return fmt.Sprintf("/stack/%s/detail", code)
 	case EventTypeVolume:
 		return fmt.Sprintf("/volume/%s/detail", code)
 	case EventTypeRole:

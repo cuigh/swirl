@@ -1,5 +1,5 @@
-{{ extends "../../_layouts/default" }}
-{{ import "../../_modules/form" }}
+{{ extends "../_layouts/default" }}
+{{ import "../_modules/form" }}
 
 {{ block style() }}
 <link rel="stylesheet" href="/assets/codemirror/codemirror.css?v=5.30">
@@ -8,7 +8,7 @@
 {{ block script() }}
 <script src="/assets/codemirror/codemirror.js?v=5.30"></script>
 <script src="/assets/codemirror/mode/yaml.js?v=5.30"></script>
-<script>$(() => new Swirl.Stack.Archive.EditPage())</script>
+<script>$(() => new Swirl.Stack.EditPage())</script>
 {{ end }}
 
 {{ block body() }}
@@ -19,27 +19,13 @@
       <h2 class="subtitle is-5">{{ i18n("stack.description") }}</h2>
     </div>
   </div>
-  <div class="hero-foot">
-    <div class="container">
-      <nav class="tabs is-boxed">
-        <ul>
-          <li>
-            <a href="/stack/task/">{{ i18n("menu.stack.task") }}</a>
-          </li>
-          <li class="is-active">
-            <a href="/stack/archive/">{{ i18n("menu.stack.archive") }}</a>
-          </li>
-        </ul>
-      </nav>
-    </div>
-  </div>
 </section>
 
 <div class="container">
   <nav class="breadcrumb has-succeeds-separator is-small is-marginless" aria-label="breadcrumbs">
     <ul>
       <li><a href="/">{{ i18n("menu.home") }}</a></li>
-      <li><a href="/stack/archive/">{{ i18n("menu.stack.archive") }}</a></li>
+      <li><a href="/stack/">{{ i18n("menu.stack") }}</a></li>
       <li class="is-active"><a>{{ i18n("menu.edit") }}</a></li>
     </ul>
   </nav>
@@ -49,7 +35,7 @@
   <div class="hero-body">
     <div class="container">
       <h2 class="title is-2">
-        {{ .Archive.Name }}
+        {{ .Stack.Name }}
       </h2>
     </div>
   </div>
@@ -58,8 +44,8 @@
 <nav class="navbar has-shadow">
   <div class="container">
     <div class="navbar-brand">
-      <a class="navbar-item is-tab" href="/stack/archive/{{.Archive.ID}}/detail">{{ i18n("menu.detail") }}</a>
-      <a class="navbar-item is-tab is-active" href="/stack/archive/{{.Archive.ID}}/edit">{{ i18n("menu.edit") }}</a>
+      <a class="navbar-item is-tab" href="/stack/{{.Stack.Name}}/detail">{{ i18n("menu.detail") }}</a>
+      <a class="navbar-item is-tab is-active" href="/stack/{{.Stack.Name}}/edit">{{ i18n("menu.edit") }}</a>
     </div>
   </div>
 </nav>
@@ -69,7 +55,7 @@
     <div class="field">
       <label class="label">{{ i18n("field.name") }}</label>
       <div class="control">
-        <input id="name" name="name" class="input" value="{{ .Archive.Name }}" type="text" placeholder="" data-v-rule="native;regex" data-v-arg-regex="^[a-z0-9_-]+$" data-v-msg-regex="Name can contain only letters, digits, '_' and '-'." required>
+        <input id="name" name="name" class="input" value="{{ .Stack.Name }}" type="text" placeholder="" data-v-rule="native;regex" data-v-arg-regex="^[a-z0-9_-]+$" data-v-msg-regex="Name can contain only letters, digits, '_' and '-'." required>
       </div>
     </div>
     <div class="field">
@@ -81,7 +67,7 @@
     <div id="div-input" class="field">
       <label class="label">Content</label>
       <div class="control">
-        <textarea id="txt-content" name="content" class="textarea" rows="20" placeholder="Compose file content" data-v-rule="content" data-v-arg-content="input" required>{{ .Archive.Content }}</textarea>
+        <textarea id="txt-content" name="content" class="textarea" rows="20" placeholder="Compose file content" data-v-rule="content" data-v-arg-content="input" required>{{ .Stack.Content }}</textarea>
       </div>
     </div>
     <div id="div-upload" class="field" style="display: none">
@@ -104,7 +90,7 @@
         <button id="btn-submit" type="submit" class="button is-primary" data-url="update">{{ i18n("button.submit") }}</button>
       </div>
       <div class="control">
-        <a href="/stack/archive/" class="button is-link">{{ i18n("button.cancel") }}</a>
+        <a href="/stack/" class="button is-link">{{ i18n("button.cancel") }}</a>
       </div>
     </div>
   </div>

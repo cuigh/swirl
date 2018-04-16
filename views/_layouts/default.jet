@@ -43,7 +43,7 @@
                 <a class="navbar-item" href="/network/">{{ i18n("menu.network") }}</a>
                 <a class="navbar-item" href="/service/">{{ i18n("menu.service") }}</a>
                 <a class="navbar-item" href="/task/">{{ i18n("menu.task") }}</a>
-                <a class="navbar-item" href="/stack/task/">{{ i18n("menu.stack") }}</a>
+                <a class="navbar-item" href="/stack/">{{ i18n("menu.stack") }}</a>
                 <a class="navbar-item" href="/secret/">{{ i18n("menu.secret") }}</a>
                 <a class="navbar-item" href="/config/">{{ i18n("menu.config") }}</a>
               </div>

@@ -1,4 +1,4 @@
-{{ extends "../../_layouts/default" }}
+{{ extends "../_layouts/default" }}
 
 {{ block style() }}
 <link rel="stylesheet" href="/assets/highlight/highlight.css?v=9.12">
@@ -17,27 +17,13 @@
       <h2 class="subtitle is-5">{{ i18n("stack.description") }}</h2>
     </div>
   </div>
-  <div class="hero-foot">
-    <div class="container">
-      <nav class="tabs is-boxed">
-        <ul>
-          <li>
-            <a href="/stack/task/">{{ i18n("menu.stack.task") }}</a>
-          </li>
-          <li class="is-active">
-            <a href="/stack/archive/">{{ i18n("menu.stack.archive") }}</a>
-          </li>
-        </ul>
-      </nav>
-    </div>
-  </div>
 </section>
 
 <div class="container">
   <nav class="breadcrumb has-succeeds-separator is-small is-marginless" aria-label="breadcrumbs">
     <ul>
       <li><a href="/">{{ i18n("menu.home") }}</a></li>
-      <li><a href="/stack/archive/">{{ i18n("menu.stack.archive") }}</a></li>
+      <li><a href="/stack/">{{ i18n("menu.stack") }}</a></li>
       <li class="is-active"><a>{{ i18n("menu.detail") }}</a></li>
     </ul>
   </nav>
@@ -46,7 +32,7 @@
   <div class="hero-body">
     <div class="container">
       <h2 class="title is-2">
-        {{ .Archive.Name }}
+        {{ .Stack.Name }}
       </h2>
     </div>
   </div>
@@ -55,8 +41,8 @@
 <nav class="navbar has-shadow">
   <div class="container">
     <div class="navbar-brand">
-      <a class="navbar-item is-tab is-active" href="/stack/archive/{{.Archive.ID}}/detail">{{ i18n("menu.detail") }}</a>
-      <a class="navbar-item is-tab" href="/stack/archive/{{.Archive.ID}}/edit">{{ i18n("menu.edit") }}</a>
+      <a class="navbar-item is-tab is-active" href="/stack/{{.Stack.Name}}/detail">{{ i18n("menu.detail") }}</a>
+      <a class="navbar-item is-tab" href="/stack/{{.Stack.Name}}/edit">{{ i18n("menu.edit") }}</a>
     </div>
   </div>
 </nav>
@@ -65,13 +51,13 @@
   <div class="container">
     <dl>
       <dt>{{ i18n("field.created-at") }}</dt>
-      <dd>{{ time(.Archive.CreatedAt) }}</dd>
+      <dd>{{ time(.Stack.CreatedAt) }}</dd>
       <dt>{{ i18n("field.updated-at") }}</dt>
-      <dd>{{ time(.Archive.UpdatedAt) }}</dd>
+      <dd>{{ time(.Stack.UpdatedAt) }}</dd>
       <dt>Content</dt>
-      <dd class="content"><pre class="is-paddingless"><code class="yaml">{{ .Archive.Content }}</code></pre></dd>
+      <dd class="content"><pre class="is-paddingless"><code class="yaml">{{ .Stack.Content }}</code></pre></dd>
     </dl>
-    <a href="/stack/archive/" class="button is-primary">
+    <a href="/stack/" class="button is-primary">
       <span class="icon"><i class="fas fa-reply"></i></span>
       <span>{{ i18n("button.return") }}</span>
     </a>

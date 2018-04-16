@@ -10,136 +10,126 @@ import (
 
 // StackController is a controller of docker stack(compose)
 type StackController struct {
-	TaskList      web.HandlerFunc `path:"/task/" name:"stack.task.list" authorize:"!" desc:"stack task list page"`
-	TaskDelete    web.HandlerFunc `path:"/task/delete" method:"post" name:"stack.task.delete" authorize:"!" desc:"delete stack task"`
-	ArchiveList   web.HandlerFunc `path:"/archive/" name:"stack.archive.list" authorize:"!" desc:"stack archive list page"`
-	ArchiveDetail web.HandlerFunc `path:"/archive/:id/detail" name:"stack.archive.detail" authorize:"!" desc:"stack archive detail page"`
-	ArchiveEdit   web.HandlerFunc `path:"/archive/:id/edit" name:"stack.archive.edit" authorize:"!" desc:"stack archive edit page"`
-	ArchiveUpdate web.HandlerFunc `path:"/archive/:id/update" method:"post" name:"stack.archive.update" authorize:"!" desc:"update stack archive"`
-	ArchiveDelete web.HandlerFunc `path:"/archive/delete" method:"post" name:"stack.archive.delete" authorize:"!" desc:"delete stack archive"`
-	ArchiveDeploy web.HandlerFunc `path:"/archive/deploy" method:"post" name:"stack.archive.deploy" authorize:"!" desc:"deploy stack archive"`
-	ArchiveNew    web.HandlerFunc `path:"/archive/new" name:"stack.archive.new" authorize:"!" desc:"new stack.archive page"`
-	ArchiveCreate web.HandlerFunc `path:"/archive/new" method:"post" name:"stack.archive.create" authorize:"!" desc:"create stack.archive"`
+	List     web.HandlerFunc `path:"/" name:"stack.list" authorize:"!" desc:"stack list page"`
+	New      web.HandlerFunc `path:"/new" name:"stack.new" authorize:"!" desc:"new stack page"`
+	Create   web.HandlerFunc `path:"/new" method:"post" name:"stack.create" authorize:"!" desc:"create stack"`
+	Detail   web.HandlerFunc `path:"/:name/detail" name:"stack.detail" authorize:"!" desc:"stack detail page"`
+	Edit     web.HandlerFunc `path:"/:name/edit" name:"stack.edit" authorize:"!" desc:"stack edit page"`
+	Update   web.HandlerFunc `path:"/:name/update" method:"post" name:"stack.update" authorize:"!" desc:"update stack"`
+	Deploy   web.HandlerFunc `path:"/:name/deploy" method:"post" name:"stack.deploy" authorize:"!" desc:"deploy stack"`
+	Shutdown web.HandlerFunc `path:"/:name/shutdown" method:"post" name:"stack.shutdown" authorize:"!" desc:"shutdown stack"`
+	Delete   web.HandlerFunc `path:"/:name/delete" method:"post" name:"stack.delete" authorize:"!" desc:"delete stack"`
 }
 
 // Stack creates an instance of StackController
 func Stack() (c *StackController) {
 	return &StackController{
-		TaskList:      stackTaskList,
-		TaskDelete:    stackTaskDelete,
-		ArchiveList:   stackArchiveList,
-		ArchiveDetail: stackArchiveDetail,
-		ArchiveEdit:   stackArchiveEdit,
-		ArchiveUpdate: stackArchiveUpdate,
-		ArchiveDelete: stackArchiveDelete,
-		ArchiveDeploy: stackArchiveDeploy,
-		ArchiveNew:    stackArchiveNew,
-		ArchiveCreate: stackArchiveCreate,
+		List:     stackList,
+		New:      stackNew,
+		Create:   stackCreate,
+		Detail:   stackDetail,
+		Edit:     stackEdit,
+		Update:   stackUpdate,
+		Deploy:   stackDeploy,
+		Shutdown: stackShutdown,
+		Delete:   stackDelete,
 	}
 }
 
-func stackTaskList(ctx web.Context) error {
-	stacks, err := docker.StackList()
-	if err != nil {
-		return err
-	}
-
-	m := newModel(ctx).Set("Stacks", stacks)
-	return ctx.Render("stack/task/list", m)
-}
-
-func stackTaskDelete(ctx web.Context) error {
-	name := ctx.F("name")
-	err := docker.StackRemove(name)
-	if err == nil {
-		biz.Event.CreateStackTask(model.EventActionDelete, name, ctx.User())
-	}
-	return ajaxResult(ctx, err)
-}
-
-func stackArchiveList(ctx web.Context) error {
-	args := &model.ArchiveListArgs{}
+func stackList(ctx web.Context) error {
+	args := &model.StackListArgs{}
 	err := ctx.Bind(args)
 	if err != nil {
 		return err
 	}
-	args.PageSize = model.PageSize
-	if args.PageIndex == 0 {
-		args.PageIndex = 1
-	}
 
-	archives, totalCount, err := biz.Archive.List(args)
+	stacks, err := biz.Stack.List(args)
 	if err != nil {
 		return err
 	}
 
-	m := newPagerModel(ctx, totalCount, model.PageSize, args.PageIndex).
+	m := newModel(ctx).Set("Stacks", stacks).
 		Set("Name", args.Name).
-		Set("Archives", archives)
-	return ctx.Render("stack/archive/list", m)
+		Set("Filter", args.Filter)
+	return ctx.Render("stack/list", m)
 }
 
-func stackArchiveDetail(ctx web.Context) error {
-	id := ctx.P("id")
-	archive, err := biz.Archive.Get(id)
+func stackNew(ctx web.Context) error {
+	m := newModel(ctx)
+	return ctx.Render("stack/new", m)
+}
+
+func stackCreate(ctx web.Context) error {
+	stack := &model.Stack{}
+	err := ctx.Bind(stack)
 	if err != nil {
 		return err
 	}
-	if archive == nil {
-		return web.ErrNotFound
-	}
 
-	m := newModel(ctx).Set("Archive", archive)
-	return ctx.Render("stack/archive/detail", m)
-}
-
-func stackArchiveEdit(ctx web.Context) error {
-	id := ctx.P("id")
-	archive, err := biz.Archive.Get(id)
+	// Validate format
+	_, err = compose.Parse(stack.Name, stack.Content)
 	if err != nil {
 		return err
 	}
-	if archive == nil {
+
+	stack.CreatedBy = ctx.User().ID()
+	stack.UpdatedBy = stack.CreatedBy
+	err = biz.Stack.Create(stack, ctx.User())
+	return ajaxResult(ctx, err)
+}
+
+func stackDetail(ctx web.Context) error {
+	name := ctx.P("name")
+	stack, err := biz.Stack.Get(name)
+	if err != nil {
+		return err
+	}
+	if stack == nil {
 		return web.ErrNotFound
 	}
 
-	m := newModel(ctx).Set("Archive", archive)
-	return ctx.Render("stack/archive/edit", m)
+	m := newModel(ctx).Set("Stack", stack)
+	return ctx.Render("stack/detail", m)
 }
 
-func stackArchiveUpdate(ctx web.Context) error {
-	archive := &model.Archive{}
-	err := ctx.Bind(archive)
+func stackEdit(ctx web.Context) error {
+	name := ctx.P("name")
+	stack, err := biz.Stack.Get(name)
+	if err != nil {
+		return err
+	}
+	if stack == nil {
+		return web.ErrNotFound
+	}
+
+	m := newModel(ctx).Set("Stack", stack)
+	return ctx.Render("stack/edit", m)
+}
+
+func stackUpdate(ctx web.Context) error {
+	stack := &model.Stack{}
+	err := ctx.Bind(stack)
 	if err == nil {
 		// Validate format
-		_, err = compose.Parse(archive.Name, archive.Content)
+		_, err = compose.Parse(stack.Name, stack.Content)
 		if err != nil {
 			return err
 		}
 
-		archive.UpdatedBy = ctx.User().ID()
-		err = biz.Archive.Update(archive)
-	}
-	if err == nil {
-		biz.Event.CreateStackArchive(model.EventActionUpdate, archive.ID, archive.Name, ctx.User())
+		stack.UpdatedBy = ctx.User().ID()
+		err = biz.Stack.Update(stack, ctx.User())
 	}
 	return ajaxResult(ctx, err)
 }
 
-func stackArchiveDelete(ctx web.Context) error {
-	id := ctx.F("id")
-	err := biz.Archive.Delete(id, ctx.User())
-	return ajaxResult(ctx, err)
-}
-
-func stackArchiveDeploy(ctx web.Context) error {
-	id := ctx.F("id")
-	archive, err := biz.Archive.Get(id)
+func stackDeploy(ctx web.Context) error {
+	name := ctx.P("name")
+	stack, err := biz.Stack.Get(name)
 	if err != nil {
 		return err
 	}
 
-	cfg, err := compose.Parse(archive.Name, archive.Content)
+	cfg, err := compose.Parse(stack.Name, stack.Content)
 	if err != nil {
 		return err
 	}
@@ -161,30 +151,27 @@ func stackArchiveDeploy(ctx web.Context) error {
 		}
 	}
 
-	err = docker.StackDeploy(archive.Name, archive.Content, authes)
+	err = docker.StackDeploy(stack.Name, stack.Content, authes)
+	if err == nil {
+		biz.Event.CreateStack(model.EventActionDeploy, name, ctx.User())
+	}
 	return ajaxResult(ctx, err)
 }
 
-func stackArchiveNew(ctx web.Context) error {
-	m := newModel(ctx)
-	return ctx.Render("stack/archive/new", m)
+func stackShutdown(ctx web.Context) error {
+	name := ctx.P("name")
+	err := docker.StackRemove(name)
+	if err == nil {
+		biz.Event.CreateStack(model.EventActionShutdown, name, ctx.User())
+	}
+	return ajaxResult(ctx, err)
 }
 
-func stackArchiveCreate(ctx web.Context) error {
-	archive := &model.Archive{}
-	err := ctx.Bind(archive)
-	if err != nil {
-		return err
+func stackDelete(ctx web.Context) error {
+	name := ctx.P("name")
+	err := docker.StackRemove(name)
+	if err == nil {
+		err = biz.Stack.Delete(name, ctx.User())
 	}
-
-	// Validate format
-	_, err = compose.Parse(archive.Name, archive.Content)
-	if err != nil {
-		return err
-	}
-
-	archive.CreatedBy = ctx.User().ID()
-	archive.UpdatedBy = archive.CreatedBy
-	err = biz.Archive.Create(archive)
 	return ajaxResult(ctx, err)
 }

@@ -23,9 +23,6 @@ var (
 		"session": {
 			mgo.Index{Key: []string{"token"}, Unique: true},
 		},
-		"archive": {
-			mgo.Index{Key: []string{"name"}, Unique: true},
-		},
 		"event": {
 			mgo.Index{Key: []string{"type"}},
 			mgo.Index{Key: []string{"name"}},

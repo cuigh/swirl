@@ -10,6 +10,7 @@ button.submit: 提交
 button.cancel: 取消
 button.confirm: 确定
 button.delete: 删除
+button.remove: 移除
 button.prune: 清理
 button.new: 新建
 button.add: 添加
@@ -149,7 +150,8 @@ service.template.button.create: 创建服务
 # stack pages
 stack.title: 编排
 stack.description: 编排是相关服务的一个逻辑分组，这些服务通常互相依赖，需要一块部署。
-stack.button.deploy: 部署
+stack.button.deploy: 发布
+stack.button.shutdown: 发布
 
 # task pages
 task.title: 任务

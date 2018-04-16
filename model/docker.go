@@ -91,11 +91,6 @@ func (opts Options) Compress() Options {
 	return opts
 }
 
-type StackListInfo struct {
-	Name     string
-	Services []string
-}
-
 type ServiceListInfo struct {
 	Name         string
 	Image        string
