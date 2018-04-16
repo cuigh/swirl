@@ -35,8 +35,10 @@
         <dl class="is-horizontal is-marginless">
           <dt class="has-text-left">ID</dt>
           <dd>{{ .Task.ID }}</dd>
+          <dt class="has-text-left">Service ID</dt>
+          <dd><a href="/service/{{ .Task.ServiceID }}/detail">{{ .Task.ServiceID }}</a></dd>
           {{ if .Task.Status.ContainerStatus.ContainerID }}
-          <dt class="has-text-left">ContainerID</dt>
+          <dt class="has-text-left">Container ID</dt>
           <dd><a href="/container/{{ .Task.Status.ContainerStatus.ContainerID }}/detail">{{ .Task.Status.ContainerStatus.ContainerID }}</a></dd>
           {{ end }}
           {{ if .Task.Status.ContainerStatus.PID }}

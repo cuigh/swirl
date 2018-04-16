@@ -76,6 +76,11 @@ func serviceDetail(ctx web.Context) error {
 		return err
 	}
 
+	// redirect if name is service id
+	if name != service.Spec.Name {
+		return ctx.Redirect("/service/" + service.Spec.Name + "/detail")
+	}
+
 	info := model.NewServiceDetailInfo(service)
 	for _, vip := range service.Endpoint.VirtualIPs {
 		n, e := docker.NetworkInspect(vip.NetworkID)
