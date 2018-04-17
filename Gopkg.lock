@@ -59,7 +59,7 @@
     "util/lazy",
     "util/run"
   ]
-  revision = "92f7532da4ac19d55266a770847167bb9fb5130f"
+  revision = "9855e0c983b3355b993c7b8af526a30594eccfe8"
 
 [[projects]]
   branch = "master"

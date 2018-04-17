@@ -13,16 +13,16 @@
 <label for="{{id ? id : (name + "-" + value)}}">{{label}}</label>
 {{ end }}
 
-{{ block radios(name, values, labels="", checked) }}
-{{ labels = eq(labels, "") ? values : labels }}
+{{ block radios(name, values, labels, checked) }}
+{{ labels = choose(labels, values) }}
 {{ range i, v := values }}
 <input id="{{ name + "-" + v }}" name="{{name}}" value="{{v}}" type="radio" class="is-checkradio"{{ if eq(checked, v) }} checked{{end}}>
 <label for="{{ name + "-" + v }}">{{ labels[i] }}</label>
 {{ end }}
 {{ end }}
 
-{{ block select(name, values, labels="", selected, dt) }}
-{{ labels = eq(labels, "") ? values : labels }}
+{{ block select(name, values, labels, selected, dt) }}
+{{ labels = choose(labels, values) }}
 <select name="{{name}}"{{if dt}} data-type="{{dt}}"{{end}}>
 {{ range i, v := values }}
 <option value="{{ v }}"{{ if eq(selected, v) }} selected{{ end }}>{{ labels[i] }}</option>
