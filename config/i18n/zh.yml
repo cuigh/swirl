@@ -151,7 +151,7 @@ service.template.button.create: 创建服务
 stack.title: 编排
 stack.description: 编排是相关服务的一个逻辑分组，这些服务通常互相依赖，需要一块部署。
 stack.button.deploy: 发布
-stack.button.shutdown: 发布
+stack.button.shutdown: 下线
 
 # task pages
 task.title: 任务
