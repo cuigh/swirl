@@ -46,7 +46,7 @@
     </div>
   </nav>
 
-  <table id="table-items" class="table is-bordered is-striped is-narrow is-fullwidth">
+  <table id="table-items" class="table is-bordered is-striped is-hoverable is-narrow is-fullwidth">
     <thead>
       <tr>
         <th width="30"><input type="checkbox" data-action="check-all"></th>

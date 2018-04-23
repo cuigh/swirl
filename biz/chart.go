@@ -174,21 +174,21 @@ func (b *chartBiz) FetchDatas(key string, names []string, period time.Duration) 
 		case "line", "bar":
 			d, err := Metric.GetMatrix(query, chart.Legend, start, end)
 			if err != nil {
-				log.Get("metric").Error(err, query)
+				log.Get("metric").Error(err)
 			} else {
 				datas[chart.Name] = d
 			}
 		case "pie":
 			d, err := Metric.GetVector(query, chart.Legend, end)
 			if err != nil {
-				log.Get("metric").Error(err, query)
+				log.Get("metric").Error(err)
 			} else {
 				datas[chart.Name] = d
 			}
 		case "gauge":
 			d, err := Metric.GetScalar(query, end)
 			if err != nil {
-				log.Get("metric").Error(err, query)
+				log.Get("metric").Error(err)
 			} else {
 				datas[chart.Name] = &model.ChartValue{
 					//Name:  "",

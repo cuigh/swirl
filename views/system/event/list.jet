@@ -91,7 +91,7 @@
     </div>
   </nav>
 
-  <table id="table-items" class="table is-bordered is-striped is-narrow is-fullwidth">
+  <table id="table-items" class="table is-bordered is-striped is-hoverable is-narrow is-fullwidth">
     <thead>
         <tr>
           <th>{{ i18n("field.type") }}</th>
