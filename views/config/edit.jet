@@ -49,12 +49,13 @@
     <form method="post" action="update" data-form="ajax-json" data-form="ajax-json" data-url="/config/">
       <input name="id" value="{{ .Config.ID }}" type="hidden">
       <input name="version" value="{{ .Config.Version.Index }}" data-type="integer" type="hidden">
-      {*<div class="field">*}
-        {*<label class="label">Data</label>*}
-        {*<div class="control">*}
-          {*<textarea name="data" class="textarea" rows="12" placeholder="Config file content" data-v-rule="native" required></textarea>*}
-        {*</div>*}
-      {*</div>*}
+      <div class="field">
+        <label class="label">Data</label>
+        <div class="control">
+          <textarea class="textarea" rows="12" readonly>{{ .Config.Spec.Data }}</textarea>
+        </div>
+        <p class="help is-danger">Editing is not supported now!</p>
+      </div>
       <div class="field">
         <label class="label">Labels</label>
         {{ yield options(name="label", items=.Config.Spec.Labels) }}
