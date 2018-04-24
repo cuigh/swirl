@@ -553,10 +553,16 @@ func (pc *PlacementConstraint) ToConstraint() string {
 	return ""
 }
 
+type Driver struct {
+	Name    string            `json:"name,omitempty"`
+	Options map[string]string `json:"options,omitempty"`
+}
+
 type ConfigCreateInfo struct {
-	Name   string  `json:"name"`
-	Data   string  `json:"data"`
-	Labels Options `json:"labels"`
+	Name     string  `json:"name"`
+	Data     string  `json:"data"`
+	Labels   Options `json:"labels"`
+	Template Driver  `json:"template"`
 }
 
 type ConfigUpdateInfo struct {

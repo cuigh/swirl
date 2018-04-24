@@ -19,52 +19,31 @@
   <h2 class="title">Create config</h2>
   <hr>
   <form method="post" data-form="ajax-json" data-url="/config/">
-    <div class="field is-horizontal">
-      <div class="field-label is-normal">
-        <label class="label">{{ i18n("field.name") }}</label>
-      </div>
-      <div class="field-body">
-        <div class="field">
-          <p class="control is-expanded">
-            <input name="name" class="input" type="text" placeholder="Config file name" data-v-rule="native" required>
-          </p>
-        </div>
+    <div class="field">
+      <label class="label">{{ i18n("field.name") }}</label>
+      <div class="control">
+        <input name="name" class="input" type="text" placeholder="Config file name" data-v-rule="native" required>
       </div>
     </div>
-    <div class="field is-horizontal">
-      <div class="field-label is-normal">
-        <label class="label">Data</label>
-      </div>
-      <div class="field-body">
-        <div class="field">
-          <div class="control">
-            <textarea name="data" class="textarea" rows="12" placeholder="Config file content" data-v-rule="native" required></textarea>
-          </div>
-        </div>
+    <div class="field">
+      <label class="label">{{ i18n("field.data") }}</label>
+      <div class="control">
+        <textarea name="data" class="textarea" rows="12" placeholder="Config file content" data-v-rule="native" required></textarea>
       </div>
     </div>
-    <div class="field is-horizontal">
-      <div class="field-label is-normal">
-        <label class="label">Labels</label>
-      </div>
-      <div class="field-body">
-        <div class="field">
-          {{ yield options(name="label") }}
-        </div>
-      </div>
+    <div class="field">
+      <label class="label">{{ i18n("field.label") }}</label>
+      {{ yield options(name="label") }}
     </div>
-    <div class="field is-horizontal">
-      <div class="field-label">
+    <div class="field">
+      <label class="label">{{ i18n("field.template") }}</label>
+      <div class="control">
+        {{ yield radio(name="template.name", value="", label="None", checked="") }}
+        {{ yield radio(name="template.name", value="golang", label="Golang") }}
       </div>
-      <div class="field-body">
-        <div class="field">
-          <div class="control">
-            <button type="submit" class="button is-primary">{{ i18n("button.submit") }}</button>
-            <a href="/config/" class="button is-link">{{ i18n("button.cancel") }}</a>
-          </div>
-        </div>
-      </div>
+      <p class="help">Template feature needs Docker API version 1.37+</p>
     </div>
+    {{ yield form_submit(url="/config/") }}
   </form>
 </section>
 {{ end }}

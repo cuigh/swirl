@@ -7,14 +7,16 @@ import (
 )
 
 const (
-	keyDockerEndpoint = "swirl.docker_endpoint"
-	keyDBType         = "swirl.db_type"
-	keyDBAddress      = "swirl.db_address"
-	keyAuthTimeout    = "swirl.auth_timeout"
-	envDockerEndpoint = "DOCKER_ENDPOINT"
-	envDBType         = "DB_TYPE"
-	envDBAddress      = "DB_ADDRESS"
-	envAuthTimeout    = "AUTH_TIMEOUT"
+	keyDockerEndpoint   = "swirl.docker_endpoint"
+	keyDockerAPIVersion = "swirl.docker_api_version"
+	keyDBType           = "swirl.db_type"
+	keyDBAddress        = "swirl.db_address"
+	keyAuthTimeout      = "swirl.auth_timeout"
+	envDockerEndpoint   = "DOCKER_ENDPOINT"
+	envDockerAPIVersion = "DOCKER_API_VERSION"
+	envDBType           = "DB_TYPE"
+	envDBAddress        = "DB_ADDRESS"
+	envAuthTimeout      = "AUTH_TIMEOUT"
 )
 
 // TimeZones holds some commonly used time-zones.
@@ -51,10 +53,11 @@ var TimeZones = []struct {
 
 // Options holds custom options of swirl.
 var Options = &struct {
-	DockerEndpoint string
-	DBType         string
-	DBAddress      string
-	AuthTimeout    time.Duration
+	DockerEndpoint   string
+	DockerAPIVersion string
+	DBType           string
+	DBAddress        string
+	AuthTimeout      time.Duration
 }{
 	DBType:      "mongo",
 	DBAddress:   "localhost:27017/swirl",
@@ -64,6 +67,7 @@ var Options = &struct {
 // BindOptions binds options to environment variables.
 func BindOptions() {
 	config.BindEnv(keyDockerEndpoint, envDockerEndpoint)
+	config.BindEnv(keyDockerAPIVersion, envDockerAPIVersion)
 	config.BindEnv(keyDBType, envDBType)
 	config.BindEnv(keyDBAddress, envDBAddress)
 	config.BindEnv(keyAuthTimeout, envAuthTimeout)

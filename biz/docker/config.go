@@ -41,6 +41,12 @@ func ConfigCreate(info *model.ConfigCreateInfo) error {
 		spec.Name = info.Name
 		spec.Data = []byte(info.Data)
 		spec.Labels = info.Labels.ToMap()
+		if info.Template.Name != "" {
+			spec.Templating = &swarm.Driver{
+				Name:    info.Template.Name,
+				Options: info.Template.Options,
+			}
+		}
 		_, err = cli.ConfigCreate(ctx, spec)
 		return
 	})

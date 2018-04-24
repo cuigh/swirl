@@ -34,6 +34,7 @@ field.login-name: Login name
 field.password: Password
 field.id: ID
 field.tag: Tags
+field.label: Labels
 field.size: Size
 field.created-at: Created at
 field.created-by: Created by
@@ -57,6 +58,8 @@ field.title: Title
 field.legend: Legend
 field.desc: Description
 field.dashboard: Dashboard
+field.data: Data
+field.template: Template
 
 # menu
 menu.home: Home

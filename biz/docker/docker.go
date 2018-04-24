@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	apiVersion = "1.32"
+	defaultAPIVersion = "1.32"
 )
 
 var mgr = &manager{}
@@ -37,11 +37,15 @@ func (m *manager) Client() (ctx context.Context, cli *client.Client, err error) 
 		defer m.locker.Unlock()
 
 		if m.client == nil {
+			apiVersion := misc.Options.DockerAPIVersion
+			if apiVersion == "" {
+				apiVersion = defaultAPIVersion
+			}
 			if misc.Options.DockerEndpoint == "" {
 				os.Setenv("DOCKER_API_VERSION", apiVersion)
-				m.client, err = client.NewEnvClient()
+				m.client, err = client.NewClientWithOpts(client.FromEnv)
 			} else {
-				m.client, err = client.NewClient(misc.Options.DockerEndpoint, apiVersion, nil, nil)
+				m.client, err = client.NewClientWithOpts(client.WithHost(misc.Options.DockerEndpoint), client.WithVersion(apiVersion))
 			}
 			if err != nil {
 				return

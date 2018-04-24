@@ -34,6 +34,7 @@ field.login-name: 登录名称
 field.password: 密码
 field.id: ID
 field.tag: 标签
+field.label: 标签
 field.size: 大小
 field.created-at: 创建时间
 field.created-by: 创建人
@@ -57,6 +58,8 @@ field.title: 标题
 field.legend: 图例
 field.desc: 描述
 field.dashboard: 仪表盘
+field.data: 数据
+field.template: 模板
 
 # menu
 menu.home: 首页
