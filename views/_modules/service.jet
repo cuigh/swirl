@@ -526,6 +526,7 @@
     <div class="field">
       <label class="label">Name</label>
       <div class="control">
+        {{ yield radio(id="log_driver.name-default", name="log_driver.name", value="", label="default", checked=.Service.LogDriver.Name) }}
         {{ yield radios(name="log_driver.name", values=slice("json-file", "syslog", "journald", "gelf", "fluentd", "awslogs", "splunk", "etwlogs", "gcplogs", "none"), checked=.Service.LogDriver.Name) }}
       </div>
     </div>

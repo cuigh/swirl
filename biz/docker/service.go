@@ -310,7 +310,9 @@ func ServiceUpdate(info *model.ServiceInfo) error { // nolint: gocyclo
 		}
 
 		// log driver
-		if info.LogDriver.Name != "" {
+		if info.LogDriver.Name == "" {
+			spec.TaskTemplate.LogDriver = nil
+		} else {
 			spec.TaskTemplate.LogDriver = &swarm.Driver{
 				Name:    info.LogDriver.Name,
 				Options: info.LogDriver.Options.ToMap(),
