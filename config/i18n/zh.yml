@@ -74,8 +74,6 @@ menu.network: 网络
 menu.service: 服务
 menu.service.template: 模板
 menu.stack: 编排
-menu.stack.task: 任务
-menu.stack.archive: 档案
 menu.task: 任务
 menu.secret: 私密配置
 menu.config: 常规配置

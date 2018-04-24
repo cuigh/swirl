@@ -74,8 +74,6 @@ menu.network: Networks
 menu.service: Services
 menu.service.template: Templates
 menu.stack: Stacks
-menu.stack.task: Tasks
-menu.stack.archive: Archives
 menu.task: Tasks
 menu.secret: Secrets
 menu.config: Configs
