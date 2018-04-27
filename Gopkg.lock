@@ -20,6 +20,13 @@
   version = "v0.4.7"
 
 [[projects]]
+  name = "github.com/boltdb/bolt"
+  packages = ["."]
+  revision = "48ea1b39c25fc1bab3506fbc712ecbaa842c4d2d"
+  source = "https://github.com/coreos/bbolt.git"
+  version = "v1.3.1-coreos.6"
+
+[[projects]]
   branch = "master"
   name = "github.com/cuigh/auxo"
   packages = [
@@ -208,7 +215,10 @@
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
-  packages = ["windows"]
+  packages = [
+    "unix",
+    "windows"
+  ]
   revision = "2f57af4873d00d535c5c9028850aa2152e6a5566"
 
 [[projects]]
@@ -226,6 +236,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "dea823c7646b8b71101e0443b1c0c36a723989261f733ad4cb44c6e9b0d3942d"
+  inputs-digest = "fe9c254e0c7e739370b6380ed53816426b8245a1610db2cfc612aec63aa01701"
   solver-name = "gps-cdcl"
   solver-version = 1

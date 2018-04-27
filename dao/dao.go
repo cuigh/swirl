@@ -3,6 +3,7 @@ package dao
 import (
 	"github.com/cuigh/auxo/errors"
 	"github.com/cuigh/auxo/util/lazy"
+	"github.com/cuigh/swirl/dao/bolt"
 	"github.com/cuigh/swirl/dao/mongo"
 	"github.com/cuigh/swirl/misc"
 	"github.com/cuigh/swirl/model"
@@ -14,6 +15,9 @@ var (
 
 // Interface is the interface that wraps all dao methods.
 type Interface interface {
+	Init()
+	Close()
+
 	RoleGet(id string) (*model.Role, error)
 	RoleList() (roles []*model.Role, err error)
 	RoleCreate(role *model.Role) error
@@ -41,18 +45,12 @@ type Interface interface {
 	RegistryList() (registries []*model.Registry, err error)
 	RegistryDelete(id string) error
 
-	ArchiveList(args *model.ArchiveListArgs) (archives []*model.Archive, count int, err error)
-	ArchiveGet(id string) (*model.Archive, error)
-	ArchiveCreate(archive *model.Archive) error
-	ArchiveUpdate(archive *model.Archive) error
-	ArchiveDelete(id string) error
-
 	StackList() (stacks []*model.Stack, err error)
 	StackGet(name string) (*model.Stack, error)
 	StackCreate(stack *model.Stack) error
 	StackUpdate(stack *model.Stack) error
 	StackDelete(name string) error
-	// StackMigrate migrates stacks from old archive collection. This method will removed after v0.8.
+	// StackMigrate migrates stacks from old archive collection. This method will be removed after v0.8.
 	StackMigrate()
 
 	TemplateList(args *model.TemplateListArgs) (tpls []*model.Template, count int, err error)
@@ -92,11 +90,18 @@ func Get() (Interface, error) {
 }
 
 func create() (d interface{}, err error) {
+	var i Interface
 	switch misc.Options.DBType {
 	case "", "mongo":
-		return mongo.New(misc.Options.DBAddress)
+		i, err = mongo.New(misc.Options.DBAddress)
+	case "bolt":
+		i, err = bolt.New(misc.Options.DBAddress)
 	default:
 		err = errors.New("Unknown database type: " + misc.Options.DBType)
 	}
-	return
+
+	if err == nil {
+		i.Init()
+	}
+	return i, err
 }

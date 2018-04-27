@@ -33,19 +33,20 @@ func main() {
 	app.Action = func(ctx *app.Context) {
 		err := config.UnmarshalOption("swirl", &misc.Options)
 		if err != nil {
-			log.Get(app.Name).Error("Load options failed: ", err)
+			log.Get(app.Name).Error("Failed to load options: ", err)
 			os.Exit(1)
 		}
 
 		setting, err := biz.Setting.Get()
 		if err != nil {
-			log.Get(app.Name).Error("Load setting failed: ", err)
+			log.Get(app.Name).Error("Failed to load settings: ", err)
 			os.Exit(1)
 		}
 
 		biz.Stack.Migrate()
-
-		scaler.Start()
+		if setting.Metrics.Prometheus != "" {
+			scaler.Start()
+		}
 		app.Run(server(setting))
 	}
 	app.Flags.Register(flag.All)

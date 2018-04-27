@@ -75,7 +75,7 @@ Only these options can be set by environment variables for now.
 
 | Name            | Value                        |
 | --------------- | -----------------------------|
-| DB_TYPE         | mongo                        |
+| DB_TYPE         | mongo,bolt                   |
 | DB_ADDRESS      | localhost:27017/swirl        |
 | DOCKER_ENDPOINT | tcp://docker-proxy:2375      |
 | AUTH_TIMEOUT    | 4h                           |
@@ -85,6 +85,8 @@ Only these options can be set by environment variables for now.
 Docker support mounting configuration file through swarm from v17.06, so you can store your config in swarm and mount it to your program.
 
 ## Deployment
+
+Swirl support two storage engines now: mongo and bolt. **bolt** is suitable for develepment environment, **Swirl** can only deploy one replica if you use **bolt** storage engine.
 
 ### Stand alone
 
@@ -96,6 +98,19 @@ Just copy the swirl binary and config/assets/views directories to the host, and 
 
 ### Docker
 
+* Use **bolt** storage engine
+
+```bash
+docker run -d -p 8001:8001 \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    -v /data/swirl:/data/swirl \
+    -e DB_TYPE=bolt \
+    --name=swirl \
+    cuigh/swirl
+```
+
+* Use **MongoDB** storage engine
+
 ```bash
 docker run -d -p 8001:8001 \
     --mount type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock \
@@ -106,6 +121,21 @@ docker run -d -p 8001:8001 \
 ```
 
 ### Docker swarm
+
+* Use **bolt** storage engine
+
+```bash
+docker service create \
+  --name=swirl \
+  --publish=8001:8001/tcp \
+  --env DB_TYPE=bolt \
+  --constraint=node.role==manager \
+  --mount=type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock \
+  --mount=type=bind,src=/data/swirl,dst=/data/swirl \
+  cuigh/swirl
+```
+
+* Use **MongoDB** storage engine
 
 ```bash
 docker service create \

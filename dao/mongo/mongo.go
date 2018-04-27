@@ -72,11 +72,10 @@ func New(addr string) (*Dao, error) {
 		session: s,
 		logger:  log.Get("mongo"),
 	}
-	d.createIndexes()
 	return d, nil
 }
 
-func (d *Dao) createIndexes() {
+func (d *Dao) Init() {
 	db := d.db()
 	defer db.Close()
 
@@ -89,6 +88,10 @@ func (d *Dao) createIndexes() {
 			}
 		}
 	}
+}
+
+func (d *Dao) Close() {
+	d.session.Close()
 }
 
 func (d *Dao) db() *database {
