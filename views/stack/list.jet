@@ -84,7 +84,13 @@
       <tbody>
           {{range .Stacks}}
           <tr>
-            <td><a href="{{.Name}}/detail">{{.Name}}</a>{{ if !.Internal }}<span class="icon has-text-danger tooltip is-tooltip-right" data-tooltip="External stack, can't be edited by Swirl"><i class="fas fa-exclamation-circle"></i></span>{{ end }}</td>
+            <td>
+              {{ if .Internal }}
+              <a href="{{.Name}}/detail">{{.Name}}</a>
+              {{ else }}
+              {{.Name}}<span class="icon has-text-danger tooltip is-tooltip-right" data-tooltip="External stack, can't be edited by Swirl"><i class="fas fa-exclamation-circle"></i></span>
+              {{ end }}
+            </td>
             <td>
               <div class="tags">
                 {{range .Services}}
