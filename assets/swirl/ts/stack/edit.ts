@@ -9,7 +9,6 @@ namespace Swirl.Stack {
         validate($form: JQuery, $input: JQuery, arg?: string): {ok: boolean, error?: string} {
             let el = <HTMLInputElement>$input[0];
             if ($("#type-" + arg).prop("checked")) {
-                console.log(el.value);
                 return {ok: el.checkValidity ? el.checkValidity() : true, error: el.validationMessage};
             }
             return {ok: true}

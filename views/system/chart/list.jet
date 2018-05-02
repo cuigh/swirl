@@ -55,8 +55,8 @@
           <div class="card-content">
             <article class="media">
               <figure class="media-left">
-                {{ if .Type == "value" }}
-                <i class="fas fa-bullseye fa-4x"></i>
+                {{ if .Type == "gauge" }}
+                <i class="fas fa-tachometer-alt fa-4x"></i>
                 {{ else }}
                 <i class="fas fa-chart-{{ .Type }} fa-4x"></i>
                 {{ end }}
