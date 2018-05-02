@@ -563,6 +563,7 @@ type ConfigCreateInfo struct {
 	Data     string  `json:"data"`
 	Labels   Options `json:"labels"`
 	Template Driver  `json:"template"`
+	Base64   bool    `json:"base64"`
 }
 
 type ConfigUpdateInfo struct {

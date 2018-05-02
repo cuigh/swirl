@@ -2,6 +2,7 @@ package docker
 
 import (
 	"context"
+	"encoding/base64"
 	"sort"
 
 	"github.com/cuigh/swirl/misc"
@@ -39,7 +40,14 @@ func SecretCreate(info *model.ConfigCreateInfo) error {
 	return mgr.Do(func(ctx context.Context, cli *client.Client) (err error) {
 		spec := swarm.SecretSpec{}
 		spec.Name = info.Name
-		spec.Data = []byte(info.Data)
+		if info.Base64 {
+			spec.Data, err = base64.StdEncoding.DecodeString(info.Data)
+			if err != nil {
+				return
+			}
+		} else {
+			spec.Data = []byte(info.Data)
+		}
 		spec.Labels = info.Labels.ToMap()
 		if info.Template.Name != "" {
 			spec.Templating = &swarm.Driver{
