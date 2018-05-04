@@ -47,6 +47,8 @@ func Validator(setting *model.Setting) func(name, pwd string) (ticket string, er
 				}
 				err = biz.User.Create(mu, nil)
 			}
+		} else {
+			err = certify.ErrInvalidToken
 		}
 
 		// replace user session, one session is allowed per user.
