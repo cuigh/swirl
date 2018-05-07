@@ -3,6 +3,7 @@ package controller
 import (
 	"strings"
 
+	"github.com/cuigh/auxo/data"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/auxo/util/cast"
 	"github.com/cuigh/swirl/biz/docker"
@@ -12,21 +13,23 @@ import (
 
 // ContainerController is a controller of docker container
 type ContainerController struct {
-	List   web.HandlerFunc `path:"/" name:"container.list" authorize:"!" desc:"container list page"`
-	Detail web.HandlerFunc `path:"/:id/detail" name:"container.detail" authorize:"!" desc:"container detail page"`
-	Raw    web.HandlerFunc `path:"/:id/raw" name:"container.raw" authorize:"!" desc:"container raw page"`
-	Logs   web.HandlerFunc `path:"/:id/logs" name:"container.logs" authorize:"!" desc:"container logs page"`
-	Delete web.HandlerFunc `path:"/delete" method:"post" name:"container.delete" authorize:"!" desc:"delete container"`
+	List      web.HandlerFunc `path:"/" name:"container.list" authorize:"!" desc:"container list page"`
+	Detail    web.HandlerFunc `path:"/:id/detail" name:"container.detail" authorize:"!" desc:"container detail page"`
+	Raw       web.HandlerFunc `path:"/:id/raw" name:"container.raw" authorize:"!" desc:"container raw page"`
+	Logs      web.HandlerFunc `path:"/:id/logs" name:"container.logs" authorize:"!" desc:"container logs page"`
+	FetchLogs web.HandlerFunc `path:"/:id/fetch_logs" name:"container.fetch_logs" authorize:"?" desc:"fetch container logs"`
+	Delete    web.HandlerFunc `path:"/delete" method:"post" name:"container.delete" authorize:"!" desc:"delete container"`
 }
 
 // Container creates an instance of ContainerController
 func Container() (c *ContainerController) {
 	return &ContainerController{
-		List:   containerList,
-		Detail: containerDetail,
-		Raw:    containerRaw,
-		Logs:   containerLogs,
-		Delete: containerDelete,
+		List:      containerList,
+		Detail:    containerDetail,
+		Raw:       containerRaw,
+		Logs:      containerLogs,
+		Delete:    containerDelete,
+		FetchLogs: containerFetchLogs,
 	}
 }
 
@@ -87,16 +90,23 @@ func containerLogs(ctx web.Context) error {
 		return err
 	}
 
+	m := newModel(ctx).Set("Container", container)
+	return ctx.Render("container/logs", m)
+}
+
+func containerFetchLogs(ctx web.Context) error {
+	id := ctx.P("id")
 	line := cast.ToInt(ctx.Q("line"), 500)
 	timestamps := cast.ToBool(ctx.Q("timestamps"), false)
 	stdout, stderr, err := docker.ContainerLogs(id, line, timestamps)
 	if err != nil {
-		return err
+		return ajaxResult(ctx, err)
 	}
 
-	m := newModel(ctx).Set("Container", container).Set("Line", line).Set("Timestamps", timestamps).
-		Set("Stdout", stdout.String()).Set("Stderr", stderr.String())
-	return ctx.Render("container/logs", m)
+	return ctx.JSON(data.Map{
+		"stdout": stdout.String(),
+		"stderr": stderr.String(),
+	})
 }
 
 func containerDelete(ctx web.Context) error {

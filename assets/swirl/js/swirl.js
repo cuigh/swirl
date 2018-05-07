@@ -2682,6 +2682,49 @@ var Swirl;
 })(Swirl || (Swirl = {}));
 var Swirl;
 (function (Swirl) {
+    var Task;
+    (function (Task) {
+        class LogsPage {
+            constructor() {
+                this.refreshInterval = 3000;
+                this.$line = $("#txt-line");
+                this.$timestamps = $("#cb-timestamps");
+                this.$refresh = $("#cb-refresh");
+                this.$stdout = $("#txt-stdout");
+                this.$stderr = $("#txt-stderr");
+                this.$refresh.change(e => {
+                    let elem = (e.target);
+                    if (elem.checked) {
+                        this.refreshData();
+                    }
+                    else if (this.timer > 0) {
+                        window.clearTimeout(this.timer);
+                        this.timer = 0;
+                    }
+                });
+                this.refreshData();
+            }
+            refreshData() {
+                let args = {
+                    line: this.$line.val(),
+                    timestamps: this.$timestamps.prop("checked"),
+                };
+                $ajax.get('fetch_logs', args).json((r) => {
+                    this.$stdout.val(r.stdout);
+                    this.$stderr.val(r.stderr);
+                    this.$stdout.get(0).scrollTop = this.$stdout.get(0).scrollHeight;
+                    this.$stderr.get(0).scrollTop = this.$stderr.get(0).scrollHeight;
+                });
+                if (this.$refresh.prop("checked")) {
+                    this.timer = setTimeout(this.refreshData.bind(this), this.refreshInterval);
+                }
+            }
+        }
+        Task.LogsPage = LogsPage;
+    })(Task = Swirl.Task || (Swirl.Task = {}));
+})(Swirl || (Swirl = {}));
+var Swirl;
+(function (Swirl) {
     var User;
     (function (User) {
         var Modal = Swirl.Core.Modal;
@@ -2791,5 +2834,48 @@ var Swirl;
         }
         Volume.NewPage = NewPage;
     })(Volume = Swirl.Volume || (Swirl.Volume = {}));
+})(Swirl || (Swirl = {}));
+var Swirl;
+(function (Swirl) {
+    var Service;
+    (function (Service) {
+        class LogsPage {
+            constructor() {
+                this.refreshInterval = 3000;
+                this.$line = $("#txt-line");
+                this.$timestamps = $("#cb-timestamps");
+                this.$refresh = $("#cb-refresh");
+                this.$stdout = $("#txt-stdout");
+                this.$stderr = $("#txt-stderr");
+                this.$refresh.change(e => {
+                    let elem = (e.target);
+                    if (elem.checked) {
+                        this.refreshData();
+                    }
+                    else if (this.timer > 0) {
+                        window.clearTimeout(this.timer);
+                        this.timer = 0;
+                    }
+                });
+                this.refreshData();
+            }
+            refreshData() {
+                let args = {
+                    line: this.$line.val(),
+                    timestamps: this.$timestamps.prop("checked"),
+                };
+                $ajax.get('fetch_logs', args).json((r) => {
+                    this.$stdout.val(r.stdout);
+                    this.$stderr.val(r.stderr);
+                    this.$stdout.get(0).scrollTop = this.$stdout.get(0).scrollHeight;
+                    this.$stderr.get(0).scrollTop = this.$stderr.get(0).scrollHeight;
+                });
+                if (this.$refresh.prop("checked")) {
+                    this.timer = setTimeout(this.refreshData.bind(this), this.refreshInterval);
+                }
+            }
+        }
+        Service.LogsPage = LogsPage;
+    })(Service = Swirl.Service || (Swirl.Service = {}));
 })(Swirl || (Swirl = {}));
 //# sourceMappingURL=swirl.js.map

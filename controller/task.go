@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"github.com/cuigh/auxo/data"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/auxo/util/cast"
 	"github.com/cuigh/swirl/biz/docker"
@@ -10,19 +11,21 @@ import (
 
 // TaskController is a controller of swarm task
 type TaskController struct {
-	List   web.HandlerFunc `path:"/" name:"task.list" authorize:"!" desc:"task list page"`
-	Detail web.HandlerFunc `path:"/:id/detail" name:"task.detail" authorize:"!" desc:"task detail page"`
-	Raw    web.HandlerFunc `path:"/:id/raw" name:"task.raw" authorize:"!" desc:"task raw page"`
-	Logs   web.HandlerFunc `path:"/:id/logs" name:"task.logs" authorize:"!" desc:"task logs page"`
+	List      web.HandlerFunc `path:"/" name:"task.list" authorize:"!" desc:"task list page"`
+	Detail    web.HandlerFunc `path:"/:id/detail" name:"task.detail" authorize:"!" desc:"task detail page"`
+	Raw       web.HandlerFunc `path:"/:id/raw" name:"task.raw" authorize:"!" desc:"task raw page"`
+	Logs      web.HandlerFunc `path:"/:id/logs" name:"task.logs" authorize:"!" desc:"task logs page"`
+	FetchLogs web.HandlerFunc `path:"/:id/fetch_logs" name:"task.fetch_logs" authorize:"?" desc:"fetch task logs"`
 }
 
 // Task creates an instance of TaskController
 func Task() (c *TaskController) {
 	return &TaskController{
-		List:   taskList,
-		Detail: taskDetail,
-		Raw:    taskRaw,
-		Logs:   taskLogs,
+		List:      taskList,
+		Detail:    taskDetail,
+		Raw:       taskRaw,
+		Logs:      taskLogs,
+		FetchLogs: taskFetchLogs,
 	}
 }
 
@@ -82,14 +85,21 @@ func taskLogs(ctx web.Context) error {
 		return err
 	}
 
+	m := newModel(ctx).Set("Task", task)
+	return ctx.Render("task/logs", m)
+}
+
+func taskFetchLogs(ctx web.Context) error {
+	id := ctx.P("id")
 	line := cast.ToInt(ctx.Q("line"), 500)
 	timestamps := cast.ToBool(ctx.Q("timestamps"), false)
 	stdout, stderr, err := docker.TaskLogs(id, line, timestamps)
 	if err != nil {
-		return err
+		return ajaxResult(ctx, err)
 	}
 
-	m := newModel(ctx).Set("Task", task).Set("Line", line).Set("Timestamps", timestamps).
-		Set("Stdout", stdout.String()).Set("Stderr", stderr.String())
-	return ctx.Render("task/logs", m)
+	return ctx.JSON(data.Map{
+		"stdout": stdout.String(),
+		"stderr": stderr.String(),
+	})
 }

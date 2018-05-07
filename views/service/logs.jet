@@ -1,5 +1,9 @@
 {{ extends "_base" }}
 
+{{ block script() }}
+<script>$(() => new Swirl.Task.LogsPage())</script>
+{{ end }}
+
 {{ block body_content() }}
 <div class="container">
   <nav class="breadcrumb has-succeeds-separator is-small is-marginless" aria-label="breadcrumbs">
@@ -37,33 +41,30 @@
 <section class="section">
   <div class="container">
     <nav class="level">
-      <form>
-        <div class="level-left">
-          <div class="level-item">
-            <div class="field has-addons">
-              <p class="control">
-                <a class="button is-static">Lines</a>
-              </p>
-              <p class="control">
-                <input name="line" value="{{ .Line }}" class="input" placeholder="Max lines from tail">
-              </p>
-            </div>
-          </div>
-          <div class="level-item">
-            <div class="field">
-              <input id="cb-timestamps" name="timestamps" value="true" type="checkbox" class="switch is-success is-rounded"{{if .Timestamps}} checked{{end}}>
-              <label for="cb-timestamps">Add timestamps</label>
-            </div>
-          </div>
-          <div class="level-item">
-            <div class="field">
-              <p class="control">
-                <button class="button is-primary">Search</button>
-              </p>
-            </div>
+      <div class="level-left">
+        <div class="level-item">
+          <div class="field has-addons">
+            <p class="control">
+              <a class="button is-static">Lines</a>
+            </p>
+            <p class="control">
+              <input id="txt-line" name="line" value="500" class="input" placeholder="Max lines from tail">
+            </p>
           </div>
         </div>
-      </form>
+        <div class="level-item">
+          <div class="field">
+            <input id="cb-timestamps" name="timestamps" value="true" type="checkbox" class="switch is-success is-rounded">
+            <label for="cb-timestamps">Add timestamps</label>
+          </div>
+        </div>
+        <div class="level-item">
+          <div class="field">
+            <input id="cb-refresh" name="refresh" value="true" type="checkbox" class="switch is-success is-rounded" checked>
+            <label for="cb-refresh">Auto refresh</label>
+          </div>
+        </div>
+      </div>
     </nav>
 
     <div class="tabs is-boxed" data-target="tab-content">
@@ -79,12 +80,12 @@
     <div id="tab-content" class="content">
       <div class="field">
         <div class="control">
-          {{ if .Stdout }}<textarea class="textarea code is-small" rows="30" readonly>{{ .Stdout }}</textarea>{{ end }}
+          <textarea id="txt-stdout" class="textarea code is-small" rows="30" readonly></textarea>
         </div>
       </div>
       <div class="field" style="display: none">
         <div class="control">
-          {{ if .Stderr }}<textarea class="textarea code is-small" rows="30" readonly>{{ .Stderr }}</textarea>{{ end }}
+          <textarea id="txt-stderr" class="textarea code is-small has-text-danger" rows="30" readonly></textarea>
         </div>
       </div>
     </div>

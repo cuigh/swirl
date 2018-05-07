@@ -26,7 +26,7 @@ type Dao struct {
 // New creates a Dao instance.
 func New(addr string) (*Dao, error) {
 	if addr == "" {
-		addr = "/data/bolt"
+		addr = "/data/swirl"
 	}
 
 	db, err := bolt.Open(filepath.Join(addr, "swirl.db"), 0600, nil)

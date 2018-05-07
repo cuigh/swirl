@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/cuigh/auxo/data"
 	"github.com/cuigh/auxo/data/set"
 	"github.com/cuigh/auxo/errors"
 	"github.com/cuigh/auxo/net/web"
@@ -21,6 +22,7 @@ type ServiceController struct {
 	Detail     web.HandlerFunc `path:"/:name/detail" name:"service.detail" authorize:"!" perm:"read,service,name"`
 	Raw        web.HandlerFunc `path:"/:name/raw" name:"service.raw" authorize:"!" perm:"read,service,name"`
 	Logs       web.HandlerFunc `path:"/:name/logs" name:"service.logs" authorize:"!" perm:"read,service,name"`
+	FetchLogs  web.HandlerFunc `path:"/:name/fetch_logs" name:"service.fetch_logs" authorize:"?" desc:"fetch service logs"`
 	Delete     web.HandlerFunc `path:"/:name/delete" method:"post" name:"service.delete" authorize:"!" perm:"write,service,name"`
 	Scale      web.HandlerFunc `path:"/:name/scale" method:"post" name:"service.scale" authorize:"!" perm:"write,service,name"`
 	Rollback   web.HandlerFunc `path:"/:name/rollback" method:"post" name:"service.rollback" authorize:"!" perm:"write,service,name"`
@@ -41,6 +43,7 @@ func Service() (c *ServiceController) {
 		Detail:     serviceDetail,
 		Raw:        serviceRaw,
 		Logs:       serviceLogs,
+		FetchLogs:  serviceFetchLogs,
 		Delete:     serviceDelete,
 		New:        serviceNew,
 		Create:     serviceCreate,
@@ -122,16 +125,23 @@ func serviceRaw(ctx web.Context) error {
 
 func serviceLogs(ctx web.Context) error {
 	name := ctx.P("name")
+	m := newModel(ctx).Set("Service", name)
+	return ctx.Render("service/logs", m)
+}
+
+func serviceFetchLogs(ctx web.Context) error {
+	name := ctx.P("name")
 	line := cast.ToInt(ctx.Q("line"), 500)
 	timestamps := cast.ToBool(ctx.Q("timestamps"), false)
 	stdout, stderr, err := docker.ServiceLogs(name, line, timestamps)
 	if err != nil {
-		return err
+		return ajaxResult(ctx, err)
 	}
 
-	m := newModel(ctx).Set("Service", name).Set("Line", line).Set("Timestamps", timestamps).
-		Set("Stdout", stdout.String()).Set("Stderr", stderr.String())
-	return ctx.Render("service/logs", m)
+	return ctx.JSON(data.Map{
+		"stdout": stdout.String(),
+		"stderr": stderr.String(),
+	})
 }
 
 func serviceDelete(ctx web.Context) error {
