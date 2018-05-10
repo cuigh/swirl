@@ -4,7 +4,7 @@
 {{ block body_content() }}
 <section class="section">
   <div class="container">
-    <h2 class="title">Create chart</h2>
+    <h2 class="title">{{ .Chart.Name ? "Edit" : "Create" }} chart</h2>
     <hr>
     <form method="post" data-form="ajax-json" data-url="/system/chart/">
       <div class="columns is-bottom-marginless">
