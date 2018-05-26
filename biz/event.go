@@ -26,7 +26,6 @@ func (b *eventBiz) Create(event *model.Event) {
 			log.Get("event").Errorf("Create event `%+v` failed: %v", event, err)
 		}
 	})
-	return
 }
 
 func (b *eventBiz) CreateRegistry(action model.EventAction, id, name string, user web.User) {

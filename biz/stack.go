@@ -124,5 +124,4 @@ func (b *stackBiz) Migrate() {
 	do(func(d dao.Interface) {
 		d.StackMigrate()
 	})
-	return
 }

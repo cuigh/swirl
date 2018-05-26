@@ -39,7 +39,6 @@ func (d *Dao) ChartBatch(names ...string) (charts []*model.Chart, err error) {
 		q := bson.M{"_id": bson.M{"$in": names}}
 		charts = make([]*model.Chart, 0)
 		err = db.C("chart").Find(q).All(&charts)
-		return
 	})
 	return
 }

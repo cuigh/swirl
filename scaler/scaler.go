@@ -101,16 +101,23 @@ func tryScale(service *swarm.Service, opts data.Options) {
 		return
 	}
 
+	logger := log.Get("scaler")
 	replicas := *service.Spec.Mode.Replicated.Replicas
 	if result.Type == scaleUp {
 		if replicas < max {
-			docker.ServiceScale(service.Spec.Name, service.Version.Index, replicas+step)
-			log.Get("scaler").Infof("scaler > Service '%s' scaled up for: %v", service.Spec.Name, result.Reasons)
+			if err := docker.ServiceScale(service.Spec.Name, service.Version.Index, replicas+step); err != nil {
+				logger.Errorf("scaler > Failed to scale service '%s': %v", service.Spec.Name, err)
+			} else {
+				logger.Infof("scaler > Service '%s' scaled up for: %v", service.Spec.Name, result.Reasons)
+			}
 		}
 	} else if result.Type == scaleDown {
 		if replicas > min {
-			docker.ServiceScale(service.Spec.Name, service.Version.Index, replicas-step)
-			log.Get("scaler").Infof("scaler > Service '%s' scaled down for: %v", service.Spec.Name, result.Reasons)
+			if err := docker.ServiceScale(service.Spec.Name, service.Version.Index, replicas-step); err != nil {
+				logger.Errorf("scaler > Failed to scale service '%s': %v", service.Spec.Name, err)
+			} else {
+				logger.Infof("scaler > Service '%s' scaled down for: %v", service.Spec.Name, result.Reasons)
+			}
 		}
 	}
 }

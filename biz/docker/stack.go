@@ -299,12 +299,12 @@ func createConfigs(ctx context.Context, cli *client.Client, configs []swarm.Conf
 		case err == nil:
 			// config already exists, then we update that
 			if err = cli.ConfigUpdate(ctx, config.ID, config.Meta.Version, configSpec); err != nil {
-				errors.Wrap(err, "failed to update config "+configSpec.Name)
+				return errors.Wrap(err, "failed to update config "+configSpec.Name)
 			}
 		case client.IsErrNotFound(err):
 			// config does not exist, then we create a new one.
 			if _, err = cli.ConfigCreate(ctx, configSpec); err != nil {
-				errors.Wrap(err, "failed to create config "+configSpec.Name)
+				return errors.Wrap(err, "failed to create config "+configSpec.Name)
 			}
 		default:
 			return err

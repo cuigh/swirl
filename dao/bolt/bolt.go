@@ -1,7 +1,6 @@
 package bolt
 
 import (
-	"encoding/binary"
 	"encoding/json"
 	"path/filepath"
 	"strings"
@@ -145,8 +144,8 @@ func matchAny(s string, list ...string) bool {
 }
 
 // itob returns an 8-byte big endian representation of v.
-func itob(i uint64) []byte {
-	b := make([]byte, 8)
-	binary.BigEndian.PutUint64(b, i)
-	return b
-}
+//func itob(i uint64) []byte {
+//	b := make([]byte, 8)
+//	binary.BigEndian.PutUint64(b, i)
+//	return b
+//}
