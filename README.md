@@ -10,7 +10,7 @@
 * Swarm components management
 * Image and container management
 * Compose management with deployment support
-* Service monitoring based on [Prometheus](https://hub.docker.com/r/cuigh/prometheus/)
+* Service monitoring based on [Prometheus](https://hub.docker.com/r/cuigh/prometheus/) and [cadvisor](https://github.com/google/cadvisor)
 * Service auto scaling
 * LDAP authentication support
 * Full permission control based on RBAC model
