@@ -105,6 +105,7 @@ docker run -d -p 8001:8001 \
     -v /var/run/docker.sock:/var/run/docker.sock \
     -v /data/swirl:/data/swirl \
     -e DB_TYPE=bolt \
+    -e DB_ADDRESS=/data/swirl \
     --name=swirl \
     cuigh/swirl
 ```
@@ -129,7 +130,8 @@ docker service create \
   --name=swirl \
   --publish=8001:8001/tcp \
   --env DB_TYPE=bolt \
-  --constraint=node.role==manager \
+  --env DB_ADDRESS=/data/swirl \
+  --constraint=node.hostname==manager1 \
   --mount=type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock \
   --mount=type=bind,src=/data/swirl,dst=/data/swirl \
   cuigh/swirl
