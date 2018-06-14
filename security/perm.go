@@ -145,6 +145,8 @@ var Perms = []PermGroup{
 			{Key: "container.detail", Text: "View detail"},
 			{Key: "container.raw", Text: "View raw"},
 			{Key: "container.logs", Text: "View logs"},
+			{Key: "container.exec", Text: "View exec"},
+			{Key: "container.connect", Text: "Connect"},
 			{Key: "container.delete", Text: "Delete"},
 		},
 	},
