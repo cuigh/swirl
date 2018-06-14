@@ -2837,45 +2837,64 @@ var Swirl;
 })(Swirl || (Swirl = {}));
 var Swirl;
 (function (Swirl) {
-    var Service;
-    (function (Service) {
-        class LogsPage {
+    var Container;
+    (function (Container) {
+        class ExecPage {
             constructor() {
-                this.refreshInterval = 3000;
-                this.$line = $("#txt-line");
-                this.$timestamps = $("#cb-timestamps");
-                this.$refresh = $("#cb-refresh");
-                this.$stdout = $("#txt-stdout");
-                this.$stderr = $("#txt-stderr");
-                this.$refresh.change(e => {
-                    let elem = (e.target);
-                    if (elem.checked) {
-                        this.refreshData();
-                    }
-                    else if (this.timer > 0) {
-                        window.clearTimeout(this.timer);
-                        this.timer = 0;
-                    }
-                });
-                this.refreshData();
+                this.$cmd = $("#txt-cmd");
+                this.$connect = $("#btn-connect");
+                this.$disconnect = $("#btn-disconnect");
+                this.$connect.click(this.connect.bind(this));
+                this.$disconnect.click(this.disconnect.bind(this));
+                Terminal.applyAddon(fit);
             }
-            refreshData() {
-                let args = {
-                    line: this.$line.val(),
-                    timestamps: this.$timestamps.prop("checked"),
+            connect(e) {
+                this.$connect.hide();
+                this.$disconnect.show();
+                let url = location.host + location.pathname.substring(0, location.pathname.lastIndexOf("/")) + "/connect?cmd=" + encodeURIComponent(this.$cmd.val());
+                let ws = new WebSocket("ws://" + url);
+                ws.onopen = () => {
+                    this.term = new Terminal();
+                    this.term.on('data', (data) => {
+                        if (ws.readyState == WebSocket.OPEN) {
+                            ws.send(data);
+                        }
+                    });
+                    this.term.open(document.getElementById('terminal-container'));
+                    this.term.focus();
+                    let width = Math.floor(($('#terminal-container').width() - 20) / 8.39);
+                    let height = 30;
+                    this.term.resize(width, height);
+                    this.term.setOption('cursorBlink', true);
+                    this.term.fit();
+                    window.onresize = () => {
+                        this.term.fit();
+                    };
+                    ws.onmessage = (e) => {
+                        this.term.write(e.data);
+                    };
+                    ws.onerror = function (error) {
+                        console.log("error: " + error);
+                    };
+                    ws.onclose = () => {
+                        console.log("close");
+                    };
                 };
-                $ajax.get('fetch_logs', args).json((r) => {
-                    this.$stdout.val(r.stdout);
-                    this.$stderr.val(r.stderr);
-                    this.$stdout.get(0).scrollTop = this.$stdout.get(0).scrollHeight;
-                    this.$stderr.get(0).scrollTop = this.$stderr.get(0).scrollHeight;
-                });
-                if (this.$refresh.prop("checked")) {
-                    this.timer = setTimeout(this.refreshData.bind(this), this.refreshInterval);
+                this.ws = ws;
+            }
+            disconnect(e) {
+                if (this.ws && this.ws.readyState != WebSocket.CLOSED) {
+                    this.ws.close();
                 }
+                if (this.term) {
+                    this.term.destroy();
+                    this.term = null;
+                }
+                this.$connect.show();
+                this.$disconnect.hide();
             }
         }
-        Service.LogsPage = LogsPage;
-    })(Service = Swirl.Service || (Swirl.Service = {}));
+        Container.ExecPage = ExecPage;
+    })(Container = Swirl.Container || (Swirl.Container = {}));
 })(Swirl || (Swirl = {}));
 //# sourceMappingURL=swirl.js.map

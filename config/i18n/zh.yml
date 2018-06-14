@@ -27,6 +27,8 @@ button.next: 后一页
 button.import: 导入
 button.export: 导出
 button.more: 更多
+button.connect: 连接
+button.disconnect: 断开
 
 # field
 field.name: 名称
@@ -92,6 +94,7 @@ menu.edit: 编辑
 menu.log: 日志
 menu.perm: 权限
 menu.stats: 状态
+menu.exec: 执行
 
 # login page
 login.title: 登录到 Swirl

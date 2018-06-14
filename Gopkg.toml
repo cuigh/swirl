@@ -1,5 +1,9 @@
 required = ["github.com/docker/distribution"]
 
+[[override]]
+  branch = "master"
+  name = "github.com/gobwas/pool"
+
 [[constraint]]
   branch = "master"
   name = "github.com/cuigh/auxo"

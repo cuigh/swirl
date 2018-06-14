@@ -37,6 +37,7 @@
       <a class="navbar-item is-tab is-active" href="/container/{{.Container.ContainerJSONBase.ID}}/detail">{{ i18n("menu.detail") }}</a>
       <a class="navbar-item is-tab" href="/container/{{.Container.ContainerJSONBase.ID}}/raw">{{ i18n("menu.raw") }}</a>
       <a class="navbar-item is-tab" href="/container/{{.Container.ContainerJSONBase.ID}}/logs">{{ i18n("menu.log") }}</a>
+      <a class="navbar-item is-tab" href="/container/{{.Container.ContainerJSONBase.ID}}/exec">{{ i18n("menu.exec") }}</a>
     </div>
   </div>
 </nav>

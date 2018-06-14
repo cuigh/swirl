@@ -27,6 +27,8 @@ button.next: Next
 button.import: Import
 button.export: Export
 button.more: More
+button.connect: Connect
+button.disconnect: Disconnect
 
 # field
 field.name: Name
@@ -92,6 +94,7 @@ menu.edit: Edit
 menu.log: Logs
 menu.perm: Permission
 menu.stats: Stats
+menu.exec: Exec
 
 # login page
 login.title: Sign in to Swirl

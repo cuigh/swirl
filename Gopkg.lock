@@ -139,6 +139,32 @@
   version = "v2.5.1"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/gobwas/httphead"
+  packages = ["."]
+  revision = "2c6c146eadee0b69f856f87e3e9f1d0cd6aad2f5"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/gobwas/pool"
+  packages = [
+    ".",
+    "internal/pmath",
+    "pbufio",
+    "pbytes"
+  ]
+  revision = "fa3125c39d7eca32e1387bb69b1b38dcb31b1e0b"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/gobwas/ws"
+  packages = [
+    ".",
+    "wsutil"
+  ]
+  revision = "b93773f50025fc1c14bbd7e97a3b170aae9a0977"
+
+[[projects]]
   name = "github.com/gogo/protobuf"
   packages = ["proto"]
   revision = "1adfc126b41513cc696b209667c8656ea7aac67c"
@@ -236,6 +262,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "fe9c254e0c7e739370b6380ed53816426b8245a1610db2cfc612aec63aa01701"
+  inputs-digest = "d650099fe870caa619261ca2780130300821767813a6fb79199aaae1cc6e69f1"
   solver-name = "gps-cdcl"
   solver-version = 1

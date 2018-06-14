@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"context"
 	"io"
-
 	"strconv"
+	"strings"
 
 	"github.com/cuigh/swirl/misc"
 	"github.com/cuigh/swirl/model"
@@ -110,4 +110,46 @@ func ContainerLogs(id string, line int, timestamps bool) (stdout, stderr *bytes.
 		_, err = stdcopy.StdCopy(stdout, stderr, rc)
 	}
 	return
+}
+
+// ContainerExecCreate creates an exec instance.
+func ContainerExecCreate(id string, cmd string) (resp types.IDResponse, err error) {
+	err = mgr.Do(func(ctx context.Context, cli *client.Client) (err error) {
+		opts := types.ExecConfig{
+			AttachStdin:  true,
+			AttachStdout: true,
+			AttachStderr: true,
+			Tty:          true,
+			//User: "root",
+			Cmd: strings.Split(cmd, " "),
+		}
+		//cli.DialSession()
+		resp, err = cli.ContainerExecCreate(ctx, id, opts)
+		return
+	})
+	return
+}
+
+// ContainerExecAttach attaches a connection to an exec process in the server.
+func ContainerExecAttach(id string) (resp types.HijackedResponse, err error) {
+	err = mgr.Do(func(ctx context.Context, cli *client.Client) (err error) {
+		opts := types.ExecStartCheck{
+			Detach: false,
+			Tty:    true,
+		}
+		resp, err = cli.ContainerExecAttach(ctx, id, opts)
+		return err
+	})
+	return
+}
+
+// ContainerExecStart starts an exec instance.
+func ContainerExecStart(id string) error {
+	return mgr.Do(func(ctx context.Context, cli *client.Client) (err error) {
+		opts := types.ExecStartCheck{
+			Detach: false,
+			Tty:    true,
+		}
+		return cli.ContainerExecStart(ctx, id, opts)
+	})
 }
