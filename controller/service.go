@@ -338,6 +338,6 @@ func serviceStats(ctx web.Context) error {
 	period := cast.ToDuration(ctx.Q("time"), time.Hour)
 	refresh := cast.ToBool(ctx.Q("refresh"), true)
 	m := newModel(ctx).Set("Service", service).Set("Tasks", tasks).Set("Time", period.String()).
-		Set("Refresh", refresh).Set("Charts", charts)
+		Set("Refresh", refresh).Set("Prometheus", setting.Metrics.Prometheus).Set("Charts", charts)
 	return ctx.Render("service/stats", m)
 }

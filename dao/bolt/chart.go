@@ -53,19 +53,19 @@ func (d *Dao) ChartDelete(name string) (err error) {
 }
 
 func (d *Dao) DashboardGet(name, key string) (dashboard *model.ChartDashboard, err error) {
-	dashboard = &model.ChartDashboard{
+	cd := &model.ChartDashboard{
 		Name: name,
 		Key:  key,
 	}
 
 	var v Value
-	v, err = d.get("dashboard", dashboard.ID())
-	if err == nil {
-		if v != nil {
-			err = v.Unmarshal(dashboard)
+	v, err = d.get("dashboard", cd.ID())
+	if v != nil {
+		if err = v.Unmarshal(cd); err == nil {
+			return cd, nil
 		}
 	}
-	return
+	return nil, err
 }
 
 func (d *Dao) DashboardUpdate(dashboard *model.ChartDashboard) (err error) {

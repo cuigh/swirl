@@ -47,7 +47,7 @@
 
 <section class="section">
   <div class="container">
-    {{ if .Charts }}
+    {{ if .Prometheus }}
     <nav class="level is-mobile">
       <form>
         <div class="level-left">
