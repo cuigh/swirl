@@ -2,7 +2,6 @@ package controller
 
 import (
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/cuigh/auxo/data"
@@ -145,14 +144,12 @@ func serviceFetchLogs(ctx web.Context) error {
 }
 
 func serviceDelete(ctx web.Context) error {
-	names := strings.Split(ctx.F("names"), ",")
-	for _, name := range names {
-		if err := docker.ServiceRemove(name); err != nil {
-			return ajaxResult(ctx, err)
-		}
+	name := ctx.P("name")
+	err := docker.ServiceRemove(name)
+	if err == nil {
 		biz.Event.CreateService(model.EventActionDelete, name, ctx.User())
 	}
-	return ajaxSuccess(ctx, nil)
+	return ajaxResult(ctx, err)
 }
 
 func serviceNew(ctx web.Context) error {
@@ -266,7 +263,7 @@ func serviceUpdate(ctx web.Context) error {
 }
 
 func serviceScale(ctx web.Context) error {
-	name := ctx.F("name")
+	name := ctx.P("name")
 	count, err := strconv.Atoi(ctx.F("count"))
 	if err != nil {
 		return err
@@ -280,7 +277,7 @@ func serviceScale(ctx web.Context) error {
 }
 
 func serviceRollback(ctx web.Context) error {
-	name := ctx.F("name")
+	name := ctx.P("name")
 	err := docker.ServiceRollback(name)
 	if err == nil {
 		biz.Event.CreateService(model.EventActionRollback, name, ctx.User())
@@ -289,7 +286,7 @@ func serviceRollback(ctx web.Context) error {
 }
 
 func serviceRestart(ctx web.Context) error {
-	name := ctx.F("name")
+	name := ctx.P("name")
 	err := docker.ServiceRestart(name)
 	if err == nil {
 		biz.Event.CreateService(model.EventActionRestart, name, ctx.User())

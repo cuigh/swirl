@@ -1,6 +1,10 @@
 {{ extends "_base" }}
 {{ import "../_modules/detail" }}
 
+{{ block script() }}
+<script>$(() => new Swirl.Service.DetailPage())</script>
+{{ end }}
+
 {{ block body_content() }}
 <div class="container">
   <nav class="breadcrumb has-succeeds-separator is-small is-marginless" aria-label="breadcrumbs">
@@ -15,7 +19,7 @@
 <section class="hero is-small is-light">
   <div class="hero-body">
     <div class="container">
-      <h2 class="title is-2">
+      <h2 id="h2-name" class="title is-2">
         {{ .Service.Spec.Name }}
       </h2>      
     </div>
@@ -37,6 +41,22 @@
 
 <section class="section">
   <div class="container">
+    <div class="buttons">
+      <button id="btn-delete" class="button is-danger">
+        <span class="icon"><i class="far fa-trash-alt"></i></span><span>{{ i18n("button.delete") }}</span>
+      </button>
+      {{ if .Service.Spec.Mode.Replicated }}
+      <button id="btn-scale" class="button is-dark">
+        <span class="icon"><i class="fas fa-adjust"></i></span><span>{{ i18n("button.scale") }}</span>
+      </button>
+      {{ end }}
+      <button id="btn-restart" class="button is-dark">
+        <span class="icon"><i class="fas fa-redo"></i></span><span>{{ i18n("button.restart") }}</span>
+      </button>
+      <button id="btn-rollback" class="button is-dark">
+        <span class="icon"><i class="fas fa-reply"></i></span><span>{{ i18n("button.rollback") }}</span>
+      </button>
+    </div>
     <div class="message is-primary">
       <div class="message-body">
       <dl class="is-horizontal is-marginless">
@@ -49,7 +69,7 @@
           <div class="tags has-addons">
             <span class="tag is-info">{{if .Service.Spec.Mode.Replicated}}replicated{{else}}global{{end}}</span>
             {{if .Service.Spec.Mode.Replicated}}
-            <span class="tag is-success">{{.Service.Replicas}}</span>
+            <span id="span-replicas" class="tag is-success">{{.Service.Replicas}}</span>
             {{end}}
           </div>
         </dd>

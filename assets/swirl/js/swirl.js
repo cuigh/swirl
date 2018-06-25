@@ -1784,6 +1784,68 @@ var Swirl;
 (function (Swirl) {
     var Container;
     (function (Container) {
+        class ExecPage {
+            constructor() {
+                this.$cmd = $("#txt-cmd");
+                this.$connect = $("#btn-connect");
+                this.$disconnect = $("#btn-disconnect");
+                this.$connect.click(this.connect.bind(this));
+                this.$disconnect.click(this.disconnect.bind(this));
+                Terminal.applyAddon(fit);
+            }
+            connect(e) {
+                this.$connect.hide();
+                this.$disconnect.show();
+                let url = location.host + location.pathname.substring(0, location.pathname.lastIndexOf("/")) + "/connect?cmd=" + encodeURIComponent(this.$cmd.val());
+                let ws = new WebSocket("ws://" + url);
+                ws.onopen = () => {
+                    this.term = new Terminal();
+                    this.term.on('data', (data) => {
+                        if (ws.readyState == WebSocket.OPEN) {
+                            ws.send(data);
+                        }
+                    });
+                    this.term.open(document.getElementById('terminal-container'));
+                    this.term.focus();
+                    let width = Math.floor(($('#terminal-container').width() - 20) / 8.39);
+                    let height = 30;
+                    this.term.resize(width, height);
+                    this.term.setOption('cursorBlink', true);
+                    this.term.fit();
+                    window.onresize = () => {
+                        this.term.fit();
+                    };
+                    ws.onmessage = (e) => {
+                        this.term.write(e.data);
+                    };
+                    ws.onerror = function (error) {
+                        console.log("error: " + error);
+                    };
+                    ws.onclose = () => {
+                        console.log("close");
+                    };
+                };
+                this.ws = ws;
+            }
+            disconnect(e) {
+                if (this.ws && this.ws.readyState != WebSocket.CLOSED) {
+                    this.ws.close();
+                }
+                if (this.term) {
+                    this.term.destroy();
+                    this.term = null;
+                }
+                this.$connect.show();
+                this.$disconnect.hide();
+            }
+        }
+        Container.ExecPage = ExecPage;
+    })(Container = Swirl.Container || (Swirl.Container = {}));
+})(Swirl || (Swirl = {}));
+var Swirl;
+(function (Swirl) {
+    var Container;
+    (function (Container) {
         var Modal = Swirl.Core.Modal;
         var Table = Swirl.Core.ListTable;
         class ListPage {
@@ -2449,21 +2511,20 @@ var Swirl;
                 let $tr = $(e.target).closest("tr");
                 let name = $tr.find("td:eq(0)").text().trim();
                 Modal.confirm(`Are you sure to remove service: <strong>${name}</strong>?`, "Delete service", (dlg, e) => {
-                    $ajax.post(`${name}/delete`, { names: name }).trigger(e.target).encoder("form").json(() => {
+                    $ajax.post(`${name}/delete`).trigger(e.target).encoder("form").json(() => {
                         $tr.remove();
                         dlg.close();
                     });
                 });
             }
             scaleService(e) {
-                let $target = $(e.target), $tr = $target.closest("tr");
+                let $target = $(e.target), $tr = $target.closest("tr"), name = $tr.find("td:eq(0)").text().trim();
                 let data = {
-                    name: $tr.find("td:eq(0)").text().trim(),
                     count: $target.data("replicas"),
                 };
                 Modal.confirm(`<input name="count" value="${data.count}" class="input" placeholder="Replicas">`, "Scale service", dlg => {
                     data.count = dlg.find("input[name=count]").val();
-                    $ajax.post(`${data.name}/scale`, data).encoder("form").json(() => {
+                    $ajax.post(`${name}/scale`, data).encoder("form").json(() => {
                         location.reload();
                     });
                 });
@@ -2471,7 +2532,7 @@ var Swirl;
             rollbackService(e) {
                 let $tr = $(e.target).closest("tr"), name = $tr.find("td:eq(0)").text().trim();
                 Modal.confirm(`Are you sure to rollback service: <strong>${name}</strong>?`, "Rollback service", dlg => {
-                    $ajax.post(`${name}/rollback`, { name: name }).encoder("form").json(() => {
+                    $ajax.post(`${name}/rollback`).encoder("form").json(() => {
                         dlg.close();
                     });
                 });
@@ -2479,7 +2540,7 @@ var Swirl;
             restartService(e) {
                 let $tr = $(e.target).closest("tr"), name = $tr.find("td:eq(0)").text().trim();
                 Modal.confirm(`Are you sure to restart service: <strong>${name}</strong>?`, "Restart service", dlg => {
-                    $ajax.post(`${name}/restart`, { name: name }).encoder("form").json(() => {
+                    $ajax.post(`${name}/restart`).encoder("form").json(() => {
                         dlg.close();
                     });
                 });
@@ -2837,64 +2898,53 @@ var Swirl;
 })(Swirl || (Swirl = {}));
 var Swirl;
 (function (Swirl) {
-    var Container;
-    (function (Container) {
-        class ExecPage {
+    var Service;
+    (function (Service) {
+        var Modal = Swirl.Core.Modal;
+        class DetailPage {
             constructor() {
-                this.$cmd = $("#txt-cmd");
-                this.$connect = $("#btn-connect");
-                this.$disconnect = $("#btn-disconnect");
-                this.$connect.click(this.connect.bind(this));
-                this.$disconnect.click(this.disconnect.bind(this));
-                Terminal.applyAddon(fit);
+                $("#btn-delete").click(this.deleteService.bind(this));
+                $("#btn-scale").click(this.scaleService.bind(this));
+                $("#btn-restart").click(this.restartService.bind(this));
+                $("#btn-rollback").click(this.rollbackService.bind(this));
             }
-            connect(e) {
-                this.$connect.hide();
-                this.$disconnect.show();
-                let url = location.host + location.pathname.substring(0, location.pathname.lastIndexOf("/")) + "/connect?cmd=" + encodeURIComponent(this.$cmd.val());
-                let ws = new WebSocket("ws://" + url);
-                ws.onopen = () => {
-                    this.term = new Terminal();
-                    this.term.on('data', (data) => {
-                        if (ws.readyState == WebSocket.OPEN) {
-                            ws.send(data);
-                        }
+            deleteService(e) {
+                let name = $("#h2-name").text().trim();
+                Modal.confirm(`Are you sure to remove service: <strong>${name}</strong>?`, "Delete service", (dlg, e) => {
+                    $ajax.post(`delete`).trigger(e.target).encoder("form").json(() => {
+                        location.href = "/service/";
                     });
-                    this.term.open(document.getElementById('terminal-container'));
-                    this.term.focus();
-                    let width = Math.floor(($('#terminal-container').width() - 20) / 8.39);
-                    let height = 30;
-                    this.term.resize(width, height);
-                    this.term.setOption('cursorBlink', true);
-                    this.term.fit();
-                    window.onresize = () => {
-                        this.term.fit();
-                    };
-                    ws.onmessage = (e) => {
-                        this.term.write(e.data);
-                    };
-                    ws.onerror = function (error) {
-                        console.log("error: " + error);
-                    };
-                    ws.onclose = () => {
-                        console.log("close");
-                    };
-                };
-                this.ws = ws;
+                });
             }
-            disconnect(e) {
-                if (this.ws && this.ws.readyState != WebSocket.CLOSED) {
-                    this.ws.close();
-                }
-                if (this.term) {
-                    this.term.destroy();
-                    this.term = null;
-                }
-                this.$connect.show();
-                this.$disconnect.hide();
+            scaleService(e) {
+                let data = {
+                    count: $("#span-replicas").text().trim(),
+                };
+                Modal.confirm(`<input name="count" value="${data.count}" class="input" placeholder="Replicas">`, "Scale service", dlg => {
+                    data.count = dlg.find("input[name=count]").val();
+                    $ajax.post(`scale`, data).trigger(e.target).encoder("form").json(() => {
+                        location.reload();
+                    });
+                });
+            }
+            rollbackService(e) {
+                let name = $("#h2-name").text().trim();
+                Modal.confirm(`Are you sure to rollback service: <strong>${name}</strong>?`, "Rollback service", dlg => {
+                    $ajax.post(`rollback`).trigger(e.target).encoder("form").json(() => {
+                        location.reload();
+                    });
+                });
+            }
+            restartService(e) {
+                let name = $("#h2-name").text().trim();
+                Modal.confirm(`Are you sure to restart service: <strong>${name}</strong>?`, "Restart service", dlg => {
+                    $ajax.post(`restart`).trigger(e.target).encoder("form").json(() => {
+                        location.reload();
+                    });
+                });
             }
         }
-        Container.ExecPage = ExecPage;
-    })(Container = Swirl.Container || (Swirl.Container = {}));
+        Service.DetailPage = DetailPage;
+    })(Service = Swirl.Service || (Swirl.Service = {}));
 })(Swirl || (Swirl = {}));
 //# sourceMappingURL=swirl.js.map
