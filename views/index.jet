@@ -45,7 +45,7 @@
   <div class="hero-body">
     <div class="container has-text-centered">
       <h1 class="title is-2">
-        SWIRL <span class="tag is-success">V{{ version }}</span>
+        SWIRL <span class="tag is-success">v{{ version }}({{ go_version }})</span>
       </h1>
       <h2 class="subtitle is-5">{{ i18n("description") }}</h2>
       <p>
