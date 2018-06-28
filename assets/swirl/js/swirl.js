@@ -1304,12 +1304,21 @@ var Swirl;
                         {
                             type: 'gauge',
                             radius: '100%',
-                            center: ["50%", "58%"],
+                            center: ["50%", "50%"],
                             max: d.value,
+                            axisLine: {
+                                show: false,
+                                lineStyle: { width: 0, opacity: 0, shadowBlur: 0 },
+                            },
                             axisLabel: { show: false },
+                            axisTick: { show: false },
+                            splitLine: { show: false },
                             pointer: { show: false },
                             detail: {
+                                formatter: this.formatValue.bind(this),
                                 offsetCenter: [0, 0],
+                                fontSize: 64,
+                                fontWeight: 'bold',
                             },
                             data: [{ value: d.value }]
                         }

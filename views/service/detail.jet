@@ -42,9 +42,6 @@
 <section class="section">
   <div class="container">
     <div class="buttons">
-      <button id="btn-delete" class="button is-danger">
-        <span class="icon"><i class="far fa-trash-alt"></i></span><span>{{ i18n("button.delete") }}</span>
-      </button>
       {{ if .Service.Spec.Mode.Replicated }}
       <button id="btn-scale" class="button is-dark">
         <span class="icon"><i class="fas fa-adjust"></i></span><span>{{ i18n("button.scale") }}</span>
@@ -55,6 +52,9 @@
       </button>
       <button id="btn-rollback" class="button is-dark">
         <span class="icon"><i class="fas fa-reply"></i></span><span>{{ i18n("button.rollback") }}</span>
+      </button>
+      <button id="btn-delete" class="button is-danger">
+        <span class="icon"><i class="far fa-trash-alt"></i></span><span>{{ i18n("button.delete") }}</span>
       </button>
     </div>
     <div class="message is-primary">
