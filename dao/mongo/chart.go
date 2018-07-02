@@ -45,12 +45,6 @@ func (d *Dao) ChartBatch(names ...string) (charts []*model.Chart, err error) {
 
 func (d *Dao) ChartUpdate(chart *model.Chart) (err error) {
 	d.do(func(db *database) {
-		//update := bson.M{
-		//	"$set": bson.M{
-		//		"name": chart.Name,
-		//		"desc": chart.Description,
-		//	},
-		//}
 		err = db.C("chart").UpdateId(chart.Name, chart)
 	})
 	return

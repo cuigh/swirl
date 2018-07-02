@@ -99,6 +99,14 @@ namespace Swirl.Core {
         }
 
         protected formatValue(value: number): string {
+            if (value >= 0) {
+                return this.formatPositiveValue(value)
+            } else {
+                return "-" + this.formatPositiveValue(-value);
+            }
+        }
+
+        private formatPositiveValue(value: number): string {
             switch (this.opts.unit) {
                 case "percent:100":
                     return value.toFixed(1) + "%";

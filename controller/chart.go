@@ -115,6 +115,13 @@ func chartUpdate(ctx web.Context) error {
 	chart := &model.Chart{}
 	err := ctx.Bind(chart)
 	if err == nil {
+		var metrics []model.ChartMetric
+		for _, m := range chart.Metrics {
+			if m.Query != "" {
+				metrics = append(metrics, m)
+			}
+		}
+		chart.Metrics = metrics
 		err = biz.Chart.Update(chart, ctx.User())
 	}
 	return ajaxResult(ctx, err)

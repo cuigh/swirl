@@ -1,6 +1,10 @@
 {{ extends "_base" }}
 {{ import "../../_modules/form" }}
 
+{{ block script() }}
+<script>$(() => new Swirl.Metric.EditPage())</script>
+{{ end }}
+
 {{ block body_content() }}
 <section class="section">
   <div class="container">
@@ -22,9 +26,9 @@
             </div>
           </div>
           <div class="field">
-            <label class="label">{{ i18n("field.legend") }}</label>
+            <label class="label">{{ i18n("field.desc") }}</label>
             <div class="control">
-              <input name="legend" value="{{ .Chart.Legend }}"  class="input" placeholder="Legend expression for dataset, e.g. ${name}">
+              <input name="desc" value="{{ .Chart.Description }}" class="input" placeholder="Chart description">
             </div>
           </div>
         </div>
@@ -89,18 +93,6 @@
         </div>
       </div>
       <div class="field">
-        <label class="label">{{ i18n("field.desc") }}</label>
-        <div class="control">
-          <input name="desc" value="{{ .Chart.Description }}" class="input" placeholder="Chart description">
-        </div>
-      </div>
-      <div class="field">
-        <label class="label">Query expression</label>
-        <div class="control">
-          <input name="query" value="{{ .Chart.Query }}" class="input" placeholder="Prometheus query expression, for service dashboard, you can use '${service}' variable" data-v-rule="native" required>
-        </div>
-      </div>
-      <div class="field">
         <label class="label">{{ i18n("field.type") }}</label>
         <div class="control">
           {{ yield radio(name="type", value="line", label="Line", checked=.Chart.Type) }}
@@ -119,6 +111,43 @@
           {*{{ yield radio(name="dashboard", value="task", label="Task", checked=.Chart.Dashboard) }}*}
         </div>
       </div>
+      <fieldset>
+        <legend class="lead is-5">Metrics</legend>
+        <table id="table-metrics" class="table is-bordered is-narrow is-fullwidth is-marginless" data-name="metric">
+          <thead>
+            <tr>
+              <th width="25%">Legend</th>
+              <th>Query</th>
+              <th width="50">
+                <a class="button is-small is-outlined is-success" data-action="add-metric">
+                  <span class="icon is-small">
+                    <i class="fas fa-plus"></i>
+                  </span>
+                </a>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {{ range i, c := .Chart.Metrics }}
+            <tr>
+              <td>
+                <input name="metrics[{{i}}].legend" value="{{c.Legend}}" class="input is-small" placeholder="Legend expression for dataset, e.g. ${name}">
+              </td>
+              <td>
+                <input name="metrics[{{i}}].query" value="{{c.Query}}" class="input is-small" placeholder="Prometheus query expression, for service dashboard, you can use '${service}' variable">
+              </td>
+              <td>
+                <a class="button is-small is-outlined is-danger" data-action="delete-metric">
+                  <span class="icon is-small">
+                    <i class="far fa-trash-alt"></i>
+                  </span>
+                </a>
+              </td>
+            </tr>
+            {{ end }}
+          </tbody>
+        </table>
+      </fieldset>
       {{ yield form_submit(url="/system/chart/") }}
     </form>
   </div>

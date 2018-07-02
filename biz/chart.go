@@ -2,6 +2,7 @@ package biz
 
 import (
 	"os"
+	"sync"
 	"time"
 
 	"github.com/cuigh/auxo/data"
@@ -25,19 +26,6 @@ func newChartBiz() *chartBiz {
 	b.builtin = append(b.builtin, model.NewChart("service", "$memory", "Memory", "${name}", `container_memory_usage_bytes{container_label_com_docker_swarm_service_name="${service}"}`, "size:bytes"))
 	b.builtin = append(b.builtin, model.NewChart("service", "$network_in", "Network Receive", "${name}", `sum(irate(container_network_receive_bytes_total{container_label_com_docker_swarm_service_name="${service}"}[5m])) by(name)`, "size:bytes"))
 	b.builtin = append(b.builtin, model.NewChart("service", "$network_out", "Network Send", "${name}", `sum(irate(container_network_transmit_bytes_total{container_label_com_docker_swarm_service_name="${service}"}[5m])) by(name)`, "size:bytes"))
-	// for _, c := range categories {
-	// 	if c == "java" {
-	// 		charts = append(charts, model.NewChart("threads", "Threads", "${instance}", `jvm_threads_current{service="%s"}`, ""))
-	// 		charts = append(charts, model.NewChart("gc_duration", "GC Duration", "${instance}", `rate(jvm_gc_collection_seconds_sum{service="%s"}[1m])`, "time:s"))
-	// 	} else if c == "go" {
-	// 		charts = append(charts, model.NewChart("threads", "Threads", "${instance}", `go_threads{service="%s"}`, ""))
-	// 		charts = append(charts, model.NewChart("goroutines", "Goroutines", "${instance}", `go_goroutines{service="%s"}`, ""))
-	// 		charts = append(charts, model.NewChart("gc_duration", "GC Duration", "${instance}", `sum(go_gc_duration_seconds{service="%s"}) by (instance)`, "time:s"))
-	// 	}
-	// }
-	// for i, c := range charts {
-	// 	charts[i].Query = fmt.Sprintf(c.Query, name)
-	// }
 	return b
 }
 
@@ -67,6 +55,9 @@ func (b *chartBiz) Delete(id string, user web.User) (err error) {
 func (b *chartBiz) Get(name string) (chart *model.Chart, err error) {
 	do(func(d dao.Interface) {
 		chart, err = d.ChartGet(name)
+		if len(chart.Metrics) == 0 {
+			chart.Metrics = append(chart.Metrics, model.ChartMetric{Legend: chart.Legend, Query: chart.Query})
+		}
 	})
 	return
 }
@@ -74,6 +65,13 @@ func (b *chartBiz) Get(name string) (chart *model.Chart, err error) {
 func (b *chartBiz) Batch(names ...string) (charts []*model.Chart, err error) {
 	do(func(d dao.Interface) {
 		charts, err = d.ChartBatch(names...)
+		if err == nil {
+			for _, c := range charts {
+				if len(c.Metrics) == 0 {
+					c.Metrics = append(c.Metrics, model.ChartMetric{Legend: c.Legend, Query: c.Query})
+				}
+			}
+		}
 	})
 	return
 }
@@ -164,58 +162,99 @@ func (b *chartBiz) FetchDatas(key string, names []string, period time.Duration) 
 	datas := data.Map{}
 	end := time.Now()
 	start := end.Add(-period)
+	var wg sync.WaitGroup
 	for _, chart := range charts {
-		query, err := b.formatQuery(chart, key)
+		wg.Add(1)
+		go func(c *model.Chart) {
+			defer wg.Done()
+
+			switch c.Type {
+			case "line", "bar":
+				d, err := b.fetchMatrixData(c, key, start, end)
+				if err != nil {
+					log.Get("metric").Error(err)
+				} else {
+					datas[c.Name] = d
+				}
+			case "pie":
+				d, err := b.fetchVectorData(c, key, end)
+				if err != nil {
+					log.Get("metric").Error(err)
+				} else {
+					datas[c.Name] = d
+				}
+			case "gauge":
+				d, err := b.fetchScalarData(c, key, end)
+				if err != nil {
+					log.Get("metric").Error(err)
+				} else {
+					datas[c.Name] = &model.ChartValue{
+						//Name:  "",
+						Value: d,
+					}
+				}
+			}
+		}(chart)
+	}
+	wg.Wait()
+	return datas, nil
+}
+
+func (b *chartBiz) fetchMatrixData(chart *model.Chart, key string, start, end time.Time) (*model.ChartMatrixData, error) {
+	var cmd *model.ChartMatrixData
+	for i, m := range chart.Metrics {
+		q, err := b.formatQuery(m.Query, chart.Dashboard, key)
 		if err != nil {
 			return nil, err
 		}
 
-		switch chart.Type {
-		case "line", "bar":
-			d, err := Metric.GetMatrix(query, chart.Legend, start, end)
-			if err != nil {
-				log.Get("metric").Error(err)
-			} else {
-				datas[chart.Name] = d
-			}
-		case "pie":
-			d, err := Metric.GetVector(query, chart.Legend, end)
-			if err != nil {
-				log.Get("metric").Error(err)
-			} else {
-				datas[chart.Name] = d
-			}
-		case "gauge":
-			d, err := Metric.GetScalar(query, end)
-			if err != nil {
-				log.Get("metric").Error(err)
-			} else {
-				datas[chart.Name] = &model.ChartValue{
-					//Name:  "",
-					Value: d,
-				}
-			}
+		d, err := Metric.GetMatrix(q, m.Legend, start, end)
+		if err != nil {
+			log.Get("metric").Error(err)
+		} else if i == 0 {
+			cmd = d
+		} else {
+			cmd.Legend = append(cmd.Legend, d.Legend...)
+			cmd.Series = append(cmd.Series, d.Series...)
 		}
 	}
-	return datas, nil
+	return cmd, nil
 }
 
-func (b *chartBiz) formatQuery(chart *model.Chart, key string) (string, error) {
-	if chart.Dashboard == "home" {
-		return chart.Query, nil
+func (b *chartBiz) fetchVectorData(chart *model.Chart, key string, end time.Time) (*model.ChartVectorData, error) {
+	query, err := b.formatQuery(chart.Metrics[0].Query, chart.Dashboard, key)
+	if err != nil {
+		return nil, err
+	}
+
+	return Metric.GetVector(query, chart.Legend, end)
+}
+
+func (b *chartBiz) fetchScalarData(chart *model.Chart, key string, end time.Time) (float64, error) {
+	query, err := b.formatQuery(chart.Metrics[0].Query, chart.Dashboard, key)
+	if err != nil {
+		return 0, err
+	}
+
+	return Metric.GetScalar(query, end)
+}
+
+func (b *chartBiz) formatQuery(query, dashboard, key string) (string, error) {
+	if dashboard == "home" {
+		return query, nil
 	}
 
 	var errs []error
-	m := map[string]string{chart.Dashboard: key}
-	query := os.Expand(chart.Query, func(k string) string {
+	m := map[string]string{dashboard: key}
+	q := os.Expand(query, func(k string) string {
 		if v, ok := m[k]; ok {
 			return v
 		}
-		errs = append(errs, errors.New("invalid argument in query: "+chart.Query))
+		errs = append(errs, errors.New("invalid argument in query: "+query))
 		return ""
 	})
 	if len(errs) == 0 {
-		return query, nil
+		return q, nil
 	}
 	return "", errs[0]
 }

@@ -34,9 +34,9 @@
               </div>
             </div>
           </form>
-          <p class="has-text-centered">
-            <a href="/password_reset">{{ i18n("login.forgot-password") }}</a>
-          </p>
+          {*<p class="has-text-centered">*}
+            {*<a href="/password_reset">{{ i18n("login.forgot-password") }}</a>*}
+          {*</p>*}
         </div>
       </div>
     </div>

@@ -9,18 +9,19 @@ import (
 
 // Chart represents a dashboard chart.
 type Chart struct {
-	Name        string   `json:"name" bson:"_id" valid:"required"` // unique, the name of build-in charts has '$' prefix.
-	Title       string   `json:"title" valid:"required"`
-	Description string   `json:"desc"`
-	Legend      string   `json:"legend"` // ${name} - ${instance}
-	Query       string   `json:"query" valid:"required"`
-	Kind        string   `json:"kind"`      // builtin/custom
-	Dashboard   string   `json:"dashboard"` // home/service/task...
-	Type        string   `json:"type"`      // pie/line...
-	Unit        string   `json:"unit"`      // bytes/milliseconds/percent:100...
-	Width       int32    `json:"width"`     // 1-12(12 columns total)
-	Height      int32    `json:"height"`    // default 50
-	Options     data.Map `json:"options"`
+	Name        string        `json:"name" bson:"_id" valid:"required"` // unique, the name of build-in charts has '$' prefix.
+	Title       string        `json:"title" valid:"required"`
+	Description string        `json:"desc"`
+	Legend      string        `json:"-"`
+	Query       string        `json:"-"`
+	Metrics     []ChartMetric `json:"metrics" valid:"required"`
+	Kind        string        `json:"kind"`      // builtin/custom
+	Dashboard   string        `json:"dashboard"` // home/service/task...
+	Type        string        `json:"type"`      // pie/line...
+	Unit        string        `json:"unit"`      // bytes/milliseconds/percent:100...
+	Width       int32         `json:"width"`     // 1-12(12 columns total)
+	Height      int32         `json:"height"`    // default 50
+	Options     data.Map      `json:"options"`
 	//Colors      []string `json:"colors"`
 }
 
@@ -29,14 +30,20 @@ func NewChart(dashboard, name, title, legend, query, unit string) *Chart {
 		Name:        name,
 		Title:       title,
 		Description: title,
-		Legend:      legend,
-		Query:       query,
-		Dashboard:   dashboard,
-		Type:        "line",
-		Unit:        unit,
-		Width:       12,
-		Height:      200,
+		Metrics: []ChartMetric{
+			{Legend: legend, Query: query},
+		},
+		Dashboard: dashboard,
+		Type:      "line",
+		Unit:      unit,
+		Width:     12,
+		Height:    200,
 	}
+}
+
+type ChartMetric struct {
+	Legend string `json:"legend"`
+	Query  string `json:"query"`
 }
 
 type ChartOption struct {

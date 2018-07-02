@@ -1198,6 +1198,14 @@ var Swirl;
             config(opt) {
             }
             formatValue(value) {
+                if (value >= 0) {
+                    return this.formatPositiveValue(value);
+                }
+                else {
+                    return "-" + this.formatPositiveValue(-value);
+                }
+            }
+            formatPositiveValue(value) {
                 switch (this.opts.unit) {
                     case "percent:100":
                         return value.toFixed(1) + "%";
@@ -2955,5 +2963,37 @@ var Swirl;
         }
         Service.DetailPage = DetailPage;
     })(Service = Swirl.Service || (Swirl.Service = {}));
+})(Swirl || (Swirl = {}));
+var Swirl;
+(function (Swirl) {
+    var Metric;
+    (function (Metric) {
+        var EditTable = Swirl.Core.EditTable;
+        class MetricTable extends EditTable {
+            render() {
+                return `<tr>
+                <td>
+                  <input name="metrics[${this.index}].legend" class="input is-small" placeholder="Legend expression for dataset, e.g. ${name}">
+                </td>
+                <td>
+                  <input name="metrics[${this.index}].query" class="input is-small" placeholder="Prometheus query expression, for service dashboard, you can use '$\{service\}' variable">
+                </td>
+                <td>
+                  <a class="button is-small is-outlined is-danger" data-action="delete-metric">
+                    <span class="icon is-small">
+                      <i class="far fa-trash-alt"></i>
+                    </span>
+                  </a>
+                </td>
+              </tr>`;
+            }
+        }
+        class EditPage {
+            constructor() {
+                new MetricTable("#table-metrics");
+            }
+        }
+        Metric.EditPage = EditPage;
+    })(Metric = Swirl.Metric || (Swirl.Metric = {}));
 })(Swirl || (Swirl = {}));
 //# sourceMappingURL=swirl.js.map
