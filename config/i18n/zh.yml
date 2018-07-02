@@ -29,6 +29,7 @@ button.export: 导出
 button.more: 更多
 button.connect: 连接
 button.disconnect: 断开
+button.save-as-default: 保存为默认
 
 # field
 field.name: 名称

@@ -480,7 +480,7 @@ namespace Swirl.Core {
             }
         }
 
-        save() {
+        save(asDefault: boolean = false) {
             let charts: any = [];
             this.$panel.children().each((index: number, elem: Element) => {
                 let name = $(elem).data("name");
@@ -498,7 +498,7 @@ namespace Swirl.Core {
             });
             let args = {
                 name: this.opts.name,
-                key: this.opts.key || '',
+                key: asDefault ? '' : (this.opts.key || ''),
                 charts: charts,
             };
             $ajax.post(`/system/chart/save_dashboard`, args).json<AjaxResult>((r: AjaxResult) => {
@@ -549,6 +549,9 @@ namespace Swirl.Core {
             $("#btn-add-chart").click(this.addChart.bind(this));
             $("#btn-save").click(() => {
                 this.dashboard.save();
+            });
+            $("#btn-save-as-default").click(() => {
+                this.dashboard.save(true);
             });
         }
 

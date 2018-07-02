@@ -1536,7 +1536,7 @@ var Swirl;
                     $elem.remove();
                 }
             }
-            save() {
+            save(asDefault = false) {
                 let charts = [];
                 this.$panel.children().each((index, elem) => {
                     let name = $(elem).data("name");
@@ -1554,7 +1554,7 @@ var Swirl;
                 });
                 let args = {
                     name: this.opts.name,
-                    key: this.opts.key || '',
+                    key: asDefault ? '' : (this.opts.key || ''),
                     charts: charts,
                 };
                 $ajax.post(`/system/chart/save_dashboard`, args).json((r) => {
@@ -1598,6 +1598,9 @@ var Swirl;
                 $("#btn-add-chart").click(this.addChart.bind(this));
                 $("#btn-save").click(() => {
                     this.dashboard.save();
+                });
+                $("#btn-save-as-default").click(() => {
+                    this.dashboard.save(true);
                 });
             }
             showAddDlg() {

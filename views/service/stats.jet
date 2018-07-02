@@ -87,6 +87,9 @@
             <button id="btn-save" class="button">
               <span class="icon"><i class="fas fa-save"></i></span><span>{{ i18n("button.save") }}</span>
             </button>
+            <button id="btn-save-as-default" class="button">
+              <span class="icon"><i class="fas fa-save"></i></span><span>{{ i18n("button.save-as-default") }}</span>
+            </button>
           </div>
         </div>
       </div>
