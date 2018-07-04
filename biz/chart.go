@@ -2,7 +2,6 @@ package biz
 
 import (
 	"os"
-	"sync"
 	"time"
 
 	"github.com/cuigh/auxo/data"
@@ -159,45 +158,43 @@ func (b *chartBiz) FetchDatas(key string, names []string, period time.Duration) 
 		return nil, err
 	}
 
-	datas := data.Map{}
+	type Data struct {
+		name string
+		data interface{}
+		err  error
+	}
+
+	ch := make(chan Data, len(charts))
 	end := time.Now()
 	start := end.Add(-period)
-	var wg sync.WaitGroup
 	for _, chart := range charts {
-		wg.Add(1)
 		go func(c *model.Chart) {
-			defer wg.Done()
-
+			d := Data{name: c.Name}
 			switch c.Type {
 			case "line", "bar":
-				d, err := b.fetchMatrixData(c, key, start, end)
-				if err != nil {
-					log.Get("metric").Error(err)
-				} else {
-					datas[c.Name] = d
-				}
+				d.data, d.err = b.fetchMatrixData(c, key, start, end)
 			case "pie":
-				d, err := b.fetchVectorData(c, key, end)
-				if err != nil {
-					log.Get("metric").Error(err)
-				} else {
-					datas[c.Name] = d
-				}
+				d.data, d.err = b.fetchVectorData(c, key, end)
 			case "gauge":
-				d, err := b.fetchScalarData(c, key, end)
-				if err != nil {
-					log.Get("metric").Error(err)
-				} else {
-					datas[c.Name] = &model.ChartValue{
-						//Name:  "",
-						Value: d,
-					}
-				}
+				d.data, d.err = b.fetchScalarData(c, key, end)
+			default:
+				d.err = errors.New("invalid chart type: " + c.Type)
 			}
+			ch <- d
 		}(chart)
 	}
-	wg.Wait()
-	return datas, nil
+
+	ds := data.Map{}
+	for range charts {
+		d := <-ch
+		if d.err != nil {
+			log.Get("metric").Error(err)
+		} else {
+			ds.Set(d.name, d.data)
+		}
+	}
+	close(ch)
+	return ds, nil
 }
 
 func (b *chartBiz) fetchMatrixData(chart *model.Chart, key string, start, end time.Time) (*model.ChartMatrixData, error) {
@@ -230,13 +227,21 @@ func (b *chartBiz) fetchVectorData(chart *model.Chart, key string, end time.Time
 	return Metric.GetVector(query, chart.Legend, end)
 }
 
-func (b *chartBiz) fetchScalarData(chart *model.Chart, key string, end time.Time) (float64, error) {
+func (b *chartBiz) fetchScalarData(chart *model.Chart, key string, end time.Time) (*model.ChartValue, error) {
 	query, err := b.formatQuery(chart.Metrics[0].Query, chart.Dashboard, key)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 
-	return Metric.GetScalar(query, end)
+	v, err := Metric.GetScalar(query, end)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.ChartValue{
+		//Name:  "",
+		Value: v,
+	}, nil
 }
 
 func (b *chartBiz) formatQuery(query, dashboard, key string) (string, error) {
