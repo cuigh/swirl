@@ -188,7 +188,7 @@ func (b *chartBiz) FetchDatas(key string, names []string, period time.Duration) 
 	for range charts {
 		d := <-ch
 		if d.err != nil {
-			log.Get("metric").Error(err)
+			log.Get("metric").Error(d.err)
 		} else {
 			ds.Set(d.name, d.data)
 		}
