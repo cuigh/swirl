@@ -14,7 +14,7 @@
   </div>
 </section>
 <section class="section">
-  <nav class="level">
+  <nav class="level is-mobile">
     <!-- Left side -->
     <div class="level-left">
       <div class="level-item">
@@ -78,7 +78,7 @@
             <th>Services</th>
             <th>{{ i18n("field.created-at") }}</th>
             <th>{{ i18n("field.updated-at") }}</th>
-            <th>{{ i18n("field.action") }}</th>
+            <th style="min-width: 210px">{{ i18n("field.action") }}</th>
           </tr>
       </thead>
       <tbody>
