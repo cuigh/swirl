@@ -23,7 +23,8 @@ namespace Swirl.Container {
             this.$disconnect.show();
 
             let url = location.host + location.pathname.substring(0, location.pathname.lastIndexOf("/")) + "/connect?cmd=" + encodeURIComponent(this.$cmd.val());
-            let ws = new WebSocket("ws://" + url);
+            let protocol = (location.protocol === "https:") ? "wss://" : "ws://";
+            let ws = new WebSocket(protocol + url);
             ws.onopen = () => {
                 this.term = new Terminal();
                 this.term.on('data', (data: any) => {

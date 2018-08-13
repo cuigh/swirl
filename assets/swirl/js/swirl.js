@@ -1675,6 +1675,38 @@ var Swirl;
 (function (Swirl) {
     var Metric;
     (function (Metric) {
+        var EditTable = Swirl.Core.EditTable;
+        class MetricTable extends EditTable {
+            render() {
+                return `<tr>
+                <td>
+                  <input name="metrics[${this.index}].legend" class="input is-small" placeholder="Legend expression for dataset, e.g. ${name}">
+                </td>
+                <td>
+                  <input name="metrics[${this.index}].query" class="input is-small" placeholder="Prometheus query expression, for service dashboard, you can use '$\{service\}' variable">
+                </td>
+                <td>
+                  <a class="button is-small is-outlined is-danger" data-action="delete-metric">
+                    <span class="icon is-small">
+                      <i class="far fa-trash-alt"></i>
+                    </span>
+                  </a>
+                </td>
+              </tr>`;
+            }
+        }
+        class EditPage {
+            constructor() {
+                new MetricTable("#table-metrics");
+            }
+        }
+        Metric.EditPage = EditPage;
+    })(Metric = Swirl.Metric || (Swirl.Metric = {}));
+})(Swirl || (Swirl = {}));
+var Swirl;
+(function (Swirl) {
+    var Metric;
+    (function (Metric) {
         var Modal = Swirl.Core.Modal;
         var Dispatcher = Swirl.Core.Dispatcher;
         var FilterBox = Swirl.Core.FilterBox;
@@ -1817,7 +1849,8 @@ var Swirl;
                 this.$connect.hide();
                 this.$disconnect.show();
                 let url = location.host + location.pathname.substring(0, location.pathname.lastIndexOf("/")) + "/connect?cmd=" + encodeURIComponent(this.$cmd.val());
-                let ws = new WebSocket("ws://" + url);
+                let protocol = (location.protocol === "https:") ? "wss://" : "ws://";
+                let ws = new WebSocket(protocol + url);
                 ws.onopen = () => {
                     this.term = new Terminal();
                     this.term.on('data', (data) => {
@@ -2283,6 +2316,57 @@ var Swirl;
         }
         Secret.NewPage = NewPage;
     })(Secret = Swirl.Secret || (Swirl.Secret = {}));
+})(Swirl || (Swirl = {}));
+var Swirl;
+(function (Swirl) {
+    var Service;
+    (function (Service) {
+        var Modal = Swirl.Core.Modal;
+        class DetailPage {
+            constructor() {
+                $("#btn-delete").click(this.deleteService.bind(this));
+                $("#btn-scale").click(this.scaleService.bind(this));
+                $("#btn-restart").click(this.restartService.bind(this));
+                $("#btn-rollback").click(this.rollbackService.bind(this));
+            }
+            deleteService(e) {
+                let name = $("#h2-name").text().trim();
+                Modal.confirm(`Are you sure to remove service: <strong>${name}</strong>?`, "Delete service", (dlg, e) => {
+                    $ajax.post(`delete`).trigger(e.target).encoder("form").json(() => {
+                        location.href = "/service/";
+                    });
+                });
+            }
+            scaleService(e) {
+                let data = {
+                    count: $("#span-replicas").text().trim(),
+                };
+                Modal.confirm(`<input name="count" value="${data.count}" class="input" placeholder="Replicas">`, "Scale service", dlg => {
+                    data.count = dlg.find("input[name=count]").val();
+                    $ajax.post(`scale`, data).trigger(e.target).encoder("form").json(() => {
+                        location.reload();
+                    });
+                });
+            }
+            rollbackService(e) {
+                let name = $("#h2-name").text().trim();
+                Modal.confirm(`Are you sure to rollback service: <strong>${name}</strong>?`, "Rollback service", dlg => {
+                    $ajax.post(`rollback`).trigger(e.target).encoder("form").json(() => {
+                        location.reload();
+                    });
+                });
+            }
+            restartService(e) {
+                let name = $("#h2-name").text().trim();
+                Modal.confirm(`Are you sure to restart service: <strong>${name}</strong>?`, "Restart service", dlg => {
+                    $ajax.post(`restart`).trigger(e.target).encoder("form").json(() => {
+                        location.reload();
+                    });
+                });
+            }
+        }
+        Service.DetailPage = DetailPage;
+    })(Service = Swirl.Service || (Swirl.Service = {}));
 })(Swirl || (Swirl = {}));
 var Swirl;
 (function (Swirl) {
@@ -2915,88 +2999,5 @@ var Swirl;
         }
         Volume.NewPage = NewPage;
     })(Volume = Swirl.Volume || (Swirl.Volume = {}));
-})(Swirl || (Swirl = {}));
-var Swirl;
-(function (Swirl) {
-    var Service;
-    (function (Service) {
-        var Modal = Swirl.Core.Modal;
-        class DetailPage {
-            constructor() {
-                $("#btn-delete").click(this.deleteService.bind(this));
-                $("#btn-scale").click(this.scaleService.bind(this));
-                $("#btn-restart").click(this.restartService.bind(this));
-                $("#btn-rollback").click(this.rollbackService.bind(this));
-            }
-            deleteService(e) {
-                let name = $("#h2-name").text().trim();
-                Modal.confirm(`Are you sure to remove service: <strong>${name}</strong>?`, "Delete service", (dlg, e) => {
-                    $ajax.post(`delete`).trigger(e.target).encoder("form").json(() => {
-                        location.href = "/service/";
-                    });
-                });
-            }
-            scaleService(e) {
-                let data = {
-                    count: $("#span-replicas").text().trim(),
-                };
-                Modal.confirm(`<input name="count" value="${data.count}" class="input" placeholder="Replicas">`, "Scale service", dlg => {
-                    data.count = dlg.find("input[name=count]").val();
-                    $ajax.post(`scale`, data).trigger(e.target).encoder("form").json(() => {
-                        location.reload();
-                    });
-                });
-            }
-            rollbackService(e) {
-                let name = $("#h2-name").text().trim();
-                Modal.confirm(`Are you sure to rollback service: <strong>${name}</strong>?`, "Rollback service", dlg => {
-                    $ajax.post(`rollback`).trigger(e.target).encoder("form").json(() => {
-                        location.reload();
-                    });
-                });
-            }
-            restartService(e) {
-                let name = $("#h2-name").text().trim();
-                Modal.confirm(`Are you sure to restart service: <strong>${name}</strong>?`, "Restart service", dlg => {
-                    $ajax.post(`restart`).trigger(e.target).encoder("form").json(() => {
-                        location.reload();
-                    });
-                });
-            }
-        }
-        Service.DetailPage = DetailPage;
-    })(Service = Swirl.Service || (Swirl.Service = {}));
-})(Swirl || (Swirl = {}));
-var Swirl;
-(function (Swirl) {
-    var Metric;
-    (function (Metric) {
-        var EditTable = Swirl.Core.EditTable;
-        class MetricTable extends EditTable {
-            render() {
-                return `<tr>
-                <td>
-                  <input name="metrics[${this.index}].legend" class="input is-small" placeholder="Legend expression for dataset, e.g. ${name}">
-                </td>
-                <td>
-                  <input name="metrics[${this.index}].query" class="input is-small" placeholder="Prometheus query expression, for service dashboard, you can use '$\{service\}' variable">
-                </td>
-                <td>
-                  <a class="button is-small is-outlined is-danger" data-action="delete-metric">
-                    <span class="icon is-small">
-                      <i class="far fa-trash-alt"></i>
-                    </span>
-                  </a>
-                </td>
-              </tr>`;
-            }
-        }
-        class EditPage {
-            constructor() {
-                new MetricTable("#table-metrics");
-            }
-        }
-        Metric.EditPage = EditPage;
-    })(Metric = Swirl.Metric || (Swirl.Metric = {}));
 })(Swirl || (Swirl = {}));
 //# sourceMappingURL=swirl.js.map

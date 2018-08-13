@@ -3,31 +3,40 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:214ec96f580117856bef40a4b76c90411fa0ae55d0cfd7e305af9f034574ac10"
   name = "github.com/CloudyKit/fastprinter"
   packages = ["."]
+  pruneopts = ""
   revision = "74b38d55f37af5d6c05ca11147d616b613a3420e"
 
 [[projects]]
+  digest = "1:18f735ce6bacedab1b003b2d3eb19dc67cca8228e346af90ffb90ff56ef65f7d"
   name = "github.com/CloudyKit/jet"
   packages = ["."]
+  pruneopts = ""
   revision = "2b064536b25ab0e9c54245f9e2cc5bd4766033fe"
   version = "v2.1.2"
 
 [[projects]]
+  digest = "1:6331095c1906771fbe129fe4a1f94ac5b5a97b0f60f2f80653bb95c3e5dad81e"
   name = "github.com/Microsoft/go-winio"
   packages = ["."]
+  pruneopts = ""
   revision = "7da180ee92d8bd8bb8c37fc560e673e6557c392f"
   version = "v0.4.7"
 
 [[projects]]
+  digest = "1:15d8c38b5661cc3c1e82f0141feaf9743bf84a4cafd87d94893cf1f417a19a60"
   name = "github.com/boltdb/bolt"
   packages = ["."]
+  pruneopts = ""
   revision = "48ea1b39c25fc1bab3506fbc712ecbaa842c4d2d"
   source = "https://github.com/coreos/bbolt.git"
   version = "v1.3.1-coreos.6"
 
 [[projects]]
   branch = "master"
+  digest = "1:f4c88ff57ed3d5bae8a8bd829ddde62aeb536504c9fa9deb44c9a936383a7bc8"
   name = "github.com/cuigh/auxo"
   packages = [
     ".",
@@ -64,22 +73,26 @@
     "util/debug",
     "util/i18n",
     "util/lazy",
-    "util/run"
+    "util/run",
   ]
+  pruneopts = ""
   revision = "9855e0c983b3355b993c7b8af526a30594eccfe8"
 
 [[projects]]
   branch = "master"
+  digest = "1:1a8fd913b087787e048c4da5bbba21b6dfa9f1920d1ff6791dbc0af7a640f589"
   name = "github.com/docker/distribution"
   packages = [
     ".",
     "digestset",
-    "reference"
+    "reference",
   ]
+  pruneopts = ""
   revision = "83389a148052d74ac602f5f1d62f86ff2f3c4aa5"
 
 [[projects]]
   branch = "master"
+  digest = "1:959373261310f0f620fad51f79d7967bde832e6b7577ad69d05129c3deb64dda"
   name = "github.com/docker/docker"
   packages = [
     "api",
@@ -99,169 +112,263 @@
     "api/types/versions",
     "api/types/volume",
     "client",
-    "pkg/stdcopy"
+    "pkg/stdcopy",
   ]
+  pruneopts = ""
   revision = "ea579a6194525ce3b98eba04f74de19a106bf918"
   source = "https://github.com/moby/moby.git"
 
 [[projects]]
+  digest = "1:a5ecc2e70260a87aa263811281465a5effcfae8a54bac319cee87c4625f04d63"
   name = "github.com/docker/go-connections"
   packages = [
     "nat",
     "sockets",
-    "tlsconfig"
+    "tlsconfig",
   ]
+  pruneopts = ""
   revision = "3ede32e2033de7505e6500d6c868c2b9ed9f169d"
   version = "v0.3.0"
 
 [[projects]]
+  digest = "1:582d54fcb7233da8dde1dfd2210a5b9675d0685f84246a8d317b07d680c18b1b"
   name = "github.com/docker/go-units"
   packages = ["."]
+  pruneopts = ""
   revision = "47565b4f722fb6ceae66b95f853feed578a4a51c"
   version = "v0.3.3"
 
 [[projects]]
   branch = "master"
+  digest = "1:2f95ebdbaf8e9173a8957b0a3450ae170e7045db73657e7ff5a238074f33ae58"
   name = "github.com/globalsign/mgo"
   packages = [
     ".",
     "bson",
     "internal/json",
     "internal/sasl",
-    "internal/scram"
+    "internal/scram",
   ]
+  pruneopts = ""
   revision = "f76e4f9da92ecd56e3be26f5ba92580af1ef97b4"
 
 [[projects]]
+  digest = "1:367baf06b7dbd0ef0bbdd785f6a79f929c96b0c18e9d3b29c0eed1ac3f5db133"
   name = "github.com/go-ldap/ldap"
   packages = ["."]
+  pruneopts = ""
   revision = "bb7a9ca6e4fbc2129e3db588a34bc970ffe811a9"
   version = "v2.5.1"
 
 [[projects]]
   branch = "master"
+  digest = "1:be23fcfb36ec6756f321989ab9498008c1a8ee4153af546f058863e08ad26b0b"
   name = "github.com/gobwas/httphead"
   packages = ["."]
+  pruneopts = ""
   revision = "2c6c146eadee0b69f856f87e3e9f1d0cd6aad2f5"
 
 [[projects]]
   branch = "master"
+  digest = "1:173252fb31220c85b98c22c3e2e31b3c7b6dae82544ba1a56e5a10c3c599c73a"
   name = "github.com/gobwas/pool"
   packages = [
     ".",
     "internal/pmath",
     "pbufio",
-    "pbytes"
+    "pbytes",
   ]
+  pruneopts = ""
   revision = "fa3125c39d7eca32e1387bb69b1b38dcb31b1e0b"
 
 [[projects]]
   branch = "master"
+  digest = "1:21ed3e85cef4521f432e92006872c4ed6a72ac63b1c25c1d2ba079de3fab33bb"
   name = "github.com/gobwas/ws"
   packages = [
     ".",
-    "wsutil"
+    "wsutil",
   ]
+  pruneopts = ""
   revision = "b93773f50025fc1c14bbd7e97a3b170aae9a0977"
 
 [[projects]]
+  digest = "1:0a3f6a0c68ab8f3d455f8892295503b179e571b7fefe47cc6c556405d1f83411"
   name = "github.com/gogo/protobuf"
   packages = ["proto"]
+  pruneopts = ""
   revision = "1adfc126b41513cc696b209667c8656ea7aac67c"
   version = "v1.0.0"
 
 [[projects]]
+  digest = "1:477cce5379198d3b8230b5c0961c61fcd1b337371cda81318e89a109245d83cb"
   name = "github.com/mattn/go-shellwords"
   packages = ["."]
+  pruneopts = ""
   revision = "02e3cf038dcea8290e44424da473dd12be796a8a"
   version = "v1.0.3"
 
 [[projects]]
   branch = "master"
+  digest = "1:59fa50d593e5673a0dfffa1852b66fd700c05b35e368680b4b89a68fdb2c1379"
   name = "github.com/mitchellh/mapstructure"
   packages = ["."]
+  pruneopts = ""
   revision = "00c29f56e2386353d58c599509e8dc3801b0d716"
 
 [[projects]]
+  digest = "1:5d9b668b0b4581a978f07e7d2e3314af18eb27b3fb5d19b70185b7c575723d11"
   name = "github.com/opencontainers/go-digest"
   packages = ["."]
+  pruneopts = ""
   revision = "279bed98673dd5bef374d3b6e4b09e2af76183bf"
   version = "v1.0.0-rc1"
 
 [[projects]]
+  digest = "1:f26c8670b11e29a49c8e45f7ec7f2d5bac62e8fd4e3c0ae1662baa4a697f984a"
   name = "github.com/opencontainers/image-spec"
   packages = [
     "specs-go",
-    "specs-go/v1"
+    "specs-go/v1",
   ]
+  pruneopts = ""
   revision = "d60099175f88c47cd379c4738d158884749ed235"
   version = "v1.0.1"
 
 [[projects]]
+  digest = "1:7365acd48986e205ccb8652cc746f09c8b7876030d53710ea6ef7d0bd0dcd7ca"
   name = "github.com/pkg/errors"
   packages = ["."]
+  pruneopts = ""
   revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
   version = "v0.8.0"
 
 [[projects]]
+  digest = "1:2f69dc6b2685b31a1a410ef697410aa8a669704fb201d45dbd8c1911728afa75"
   name = "github.com/prometheus/client_golang"
   packages = [
     "api",
-    "api/prometheus/v1"
+    "api/prometheus/v1",
   ]
+  pruneopts = ""
   revision = "967789050ba94deca04a5e84cce8ad472ce313c1"
   version = "v0.9.0-pre1"
 
 [[projects]]
   branch = "master"
+  digest = "1:af21ee3e0a8212f17bb317cd7237f9920bcb2641a291ac111f30f63b3cab817f"
   name = "github.com/prometheus/common"
   packages = ["model"]
+  pruneopts = ""
   revision = "d0f7cd64bda49e08b22ae8a730aa57aa0db125d6"
 
 [[projects]]
   branch = "master"
+  digest = "1:47ff8b3229cff95d3cf3738c7a8461fdeacd3f46801e54d301a62500605ce202"
   name = "golang.org/x/crypto"
   packages = [
     "acme",
-    "acme/autocert"
+    "acme/autocert",
   ]
+  pruneopts = ""
   revision = "d6449816ce06963d9d136eee5a56fca5b0616e7e"
 
 [[projects]]
   branch = "master"
+  digest = "1:fa627c9ebce73369832336a9eb84b7b495059fc447612d424874ba5b941f052b"
   name = "golang.org/x/net"
   packages = [
     "context",
     "context/ctxhttp",
     "internal/socks",
-    "proxy"
+    "proxy",
   ]
+  pruneopts = ""
   revision = "500e7a4f953ddaf55d316b4d3adc516aa0379622"
 
 [[projects]]
   branch = "master"
+  digest = "1:b2db832baab812d1cbe1f3f0dc293fdded0cfdfd5fafbcf9ebc2b3c6fc9fa287"
   name = "golang.org/x/sys"
   packages = [
     "unix",
-    "windows"
+    "windows",
   ]
+  pruneopts = ""
   revision = "2f57af4873d00d535c5c9028850aa2152e6a5566"
 
 [[projects]]
+  digest = "1:3cad99e0d1f94b8c162787c12e59d0a0b9df1ef75590eb145cdd625479091efe"
   name = "gopkg.in/asn1-ber.v1"
   packages = ["."]
+  pruneopts = ""
   revision = "379148ca0225df7a432012b8df0355c2a2063ac0"
   version = "v1.2"
 
 [[projects]]
+  branch = "v2"
+  digest = "1:f0620375dd1f6251d9973b5f2596228cc8042e887cd7f827e4220bc1ce8c30e2"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
+  pruneopts = ""
   revision = "5420a8b6744d3b0345ab293f6fcba19c978f1183"
-  version = "v2.2.1"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "d650099fe870caa619261ca2780130300821767813a6fb79199aaae1cc6e69f1"
+  input-imports = [
+    "github.com/boltdb/bolt",
+    "github.com/cuigh/auxo/app",
+    "github.com/cuigh/auxo/app/flag",
+    "github.com/cuigh/auxo/byte/size",
+    "github.com/cuigh/auxo/cache",
+    "github.com/cuigh/auxo/cache/memory",
+    "github.com/cuigh/auxo/config",
+    "github.com/cuigh/auxo/data",
+    "github.com/cuigh/auxo/data/guid",
+    "github.com/cuigh/auxo/data/set",
+    "github.com/cuigh/auxo/data/valid",
+    "github.com/cuigh/auxo/errors",
+    "github.com/cuigh/auxo/ext/texts",
+    "github.com/cuigh/auxo/ext/times",
+    "github.com/cuigh/auxo/log",
+    "github.com/cuigh/auxo/net/web",
+    "github.com/cuigh/auxo/net/web/filter",
+    "github.com/cuigh/auxo/net/web/filter/auth",
+    "github.com/cuigh/auxo/net/web/renderer/jet",
+    "github.com/cuigh/auxo/security",
+    "github.com/cuigh/auxo/security/certify",
+    "github.com/cuigh/auxo/security/certify/ldap",
+    "github.com/cuigh/auxo/security/passwd",
+    "github.com/cuigh/auxo/util/cast",
+    "github.com/cuigh/auxo/util/i18n",
+    "github.com/cuigh/auxo/util/lazy",
+    "github.com/cuigh/auxo/util/run",
+    "github.com/docker/distribution",
+    "github.com/docker/docker/api/types",
+    "github.com/docker/docker/api/types/container",
+    "github.com/docker/docker/api/types/filters",
+    "github.com/docker/docker/api/types/image",
+    "github.com/docker/docker/api/types/mount",
+    "github.com/docker/docker/api/types/network",
+    "github.com/docker/docker/api/types/swarm",
+    "github.com/docker/docker/api/types/versions",
+    "github.com/docker/docker/api/types/volume",
+    "github.com/docker/docker/client",
+    "github.com/docker/docker/pkg/stdcopy",
+    "github.com/docker/go-connections/nat",
+    "github.com/docker/go-units",
+    "github.com/globalsign/mgo",
+    "github.com/globalsign/mgo/bson",
+    "github.com/gobwas/ws",
+    "github.com/gobwas/ws/wsutil",
+    "github.com/mattn/go-shellwords",
+    "github.com/mitchellh/mapstructure",
+    "github.com/pkg/errors",
+    "github.com/prometheus/client_golang/api",
+    "github.com/prometheus/client_golang/api/prometheus/v1",
+    "github.com/prometheus/common/model",
+    "gopkg.in/yaml.v2",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1
