@@ -205,8 +205,7 @@ func (b *chartBiz) fetchMatrixData(chart *model.Chart, key string, start, end ti
 			return nil, err
 		}
 
-		d, err := Metric.GetMatrix(q, m.Legend, start, end)
-		if err != nil {
+		if d, err := Metric.GetMatrix(q, m.Legend, start, end); err != nil {
 			log.Get("metric").Error(err)
 		} else if i == 0 {
 			cmd = d
@@ -219,12 +218,23 @@ func (b *chartBiz) fetchMatrixData(chart *model.Chart, key string, start, end ti
 }
 
 func (b *chartBiz) fetchVectorData(chart *model.Chart, key string, end time.Time) (*model.ChartVectorData, error) {
-	query, err := b.formatQuery(chart.Metrics[0].Query, chart.Dashboard, key)
-	if err != nil {
-		return nil, err
-	}
+	var cvd *model.ChartVectorData
+	for i, m := range chart.Metrics {
+		query, err := b.formatQuery(m.Query, chart.Dashboard, key)
+		if err != nil {
+			return nil, err
+		}
 
-	return Metric.GetVector(query, chart.Legend, end)
+		if d, err := Metric.GetVector(query, m.Legend, end); err != nil {
+			log.Get("metric").Error(err)
+		} else if i == 0 {
+			cvd = d
+		} else {
+			cvd.Legend = append(cvd.Legend, d.Legend...)
+			cvd.Data = append(cvd.Data, d.Data...)
+		}
+	}
+	return cvd, nil
 }
 
 func (b *chartBiz) fetchScalarData(chart *model.Chart, key string, end time.Time) (*model.ChartValue, error) {
