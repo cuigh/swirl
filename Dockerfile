@@ -4,7 +4,7 @@ ADD . .
 #RUN dep ensure
 RUN CGO_ENABLED=0 go build -ldflags "-s -w"
 
-FROM alpine:3.7
+FROM alpine:3.8
 LABEL maintainer="cuigh <noname@live.com>"
 WORKDIR /app
 RUN apk add --no-cache ca-certificates

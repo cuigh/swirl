@@ -1,8 +1,8 @@
 package main
 
 import (
+	"github.com/pkg/errors"
 	"net/http"
-	"os"
 	"path/filepath"
 	"runtime"
 
@@ -11,7 +11,6 @@ import (
 	_ "github.com/cuigh/auxo/cache/memory"
 	"github.com/cuigh/auxo/config"
 	"github.com/cuigh/auxo/data/valid"
-	"github.com/cuigh/auxo/log"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/auxo/net/web/filter"
 	"github.com/cuigh/auxo/net/web/filter/auth"
@@ -30,17 +29,15 @@ func main() {
 	app.Name = "Swirl"
 	app.Version = "0.8.3"
 	app.Desc = "A web management UI for Docker, focused on swarm cluster"
-	app.Action = func(ctx *app.Context) {
+	app.Action = func(ctx *app.Context) error {
 		err := config.UnmarshalOption("swirl", &misc.Options)
 		if err != nil {
-			log.Get(app.Name).Error("Failed to load options: ", err)
-			os.Exit(1)
+			return errors.Wrap(err, "Failed to load options")
 		}
 
 		setting, err := biz.Setting.Get()
 		if err != nil {
-			log.Get(app.Name).Error("Failed to load settings: ", err)
-			os.Exit(1)
+			return errors.Wrap(err, "Failed to load settings: ")
 		}
 
 		biz.Stack.Migrate()
@@ -48,6 +45,7 @@ func main() {
 			scaler.Start()
 		}
 		app.Run(server(setting))
+		return nil
 	}
 	app.Flags.Register(flag.All)
 	app.Start()

@@ -145,7 +145,7 @@ func containerConnect(ctx web.Context) error {
 		return err
 	}
 
-	conn, _, _, err := ws.UpgradeHTTP(ctx.Request(), ctx.Response(), nil)
+	conn, _, _, err := ws.UpgradeHTTP(ctx.Request(), ctx.Response())
 	if err != nil {
 		return err
 	}

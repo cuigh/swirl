@@ -165,10 +165,9 @@ swirl.scale | Service auto scaling | `swirl.scale=min=1,max=5,cpu=30:50`
 
 ## Build
 
-**Swirl** use `dep` as dependency management tool. You can build **Swirl**
+To build **Swirl** from source, you need `go1.11` installed.
 
 ```sh
-$ dep ensure
 $ go build
 ```
 
