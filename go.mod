@@ -5,7 +5,7 @@ require (
 	github.com/CloudyKit/jet v2.1.2+incompatible
 	github.com/Microsoft/go-winio v0.4.11
 	github.com/boltdb/bolt v1.3.1
-	github.com/cuigh/auxo v0.0.0-20180910024834-ee4737b5b47d
+	github.com/cuigh/auxo v0.0.0-20180918072922-35f08384a278
 	github.com/docker/distribution v0.0.0-20180327202408-83389a148052
 	github.com/docker/docker v0.0.0-20180415161252-ea579a619452
 	github.com/docker/go-connections v0.4.0

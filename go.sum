@@ -10,6 +10,8 @@ github.com/cuigh/auxo v0.0.0-20180417034426-9855e0c983b3 h1:7hg8vqZm4xNYhESUZTcO
 github.com/cuigh/auxo v0.0.0-20180417034426-9855e0c983b3/go.mod h1:d1PEypAL3Oqwb3OILA0KaBNmhz7gSXdzRABgefRbHr8=
 github.com/cuigh/auxo v0.0.0-20180910024834-ee4737b5b47d h1:i842L3OQIgdT5APCnJdU1bMHlvVFcsm6bAJvBYETBBY=
 github.com/cuigh/auxo v0.0.0-20180910024834-ee4737b5b47d/go.mod h1:d1PEypAL3Oqwb3OILA0KaBNmhz7gSXdzRABgefRbHr8=
+github.com/cuigh/auxo v0.0.0-20180918072922-35f08384a278 h1:kQkV7iVka1cun4Brhmv7FiXeBkSJMIYwwZn80JLHFyQ=
+github.com/cuigh/auxo v0.0.0-20180918072922-35f08384a278/go.mod h1:d1PEypAL3Oqwb3OILA0KaBNmhz7gSXdzRABgefRbHr8=
 github.com/docker/distribution v0.0.0-20180327202408-83389a148052 h1:bYklS+YB8BZreSEY+/WqaH+S8upfuYf0Hq/EmNOQMIA=
 github.com/docker/distribution v0.0.0-20180327202408-83389a148052/go.mod h1:J2gT2udsDAN96Uj4KfcMRqY0/ypR+oyYUYmja8H+y+w=
 github.com/docker/docker v0.0.0-20180415161252-ea579a619452 h1:3DHHYhTKAP1ZgL0g+msknSuFuZBA0UW6BqcAA5qsWWc=

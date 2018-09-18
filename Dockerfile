@@ -1,7 +1,6 @@
 FROM golang:alpine AS build
 WORKDIR /go/src/github.com/cuigh/swirl/
 ADD . .
-#RUN dep ensure
 RUN CGO_ENABLED=0 go build -ldflags "-s -w"
 
 FROM alpine:3.8
