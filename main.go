@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/pkg/errors"
 	"net/http"
 	"path/filepath"
 	"runtime"
@@ -11,6 +10,7 @@ import (
 	_ "github.com/cuigh/auxo/cache/memory"
 	"github.com/cuigh/auxo/config"
 	"github.com/cuigh/auxo/data/valid"
+	"github.com/cuigh/auxo/errors"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/auxo/net/web/filter"
 	"github.com/cuigh/auxo/net/web/filter/auth"
@@ -27,7 +27,7 @@ func main() {
 	misc.BindOptions()
 
 	app.Name = "Swirl"
-	app.Version = "0.8.3"
+	app.Version = "0.8.4"
 	app.Desc = "A web management UI for Docker, focused on swarm cluster"
 	app.Action = func(ctx *app.Context) error {
 		err := config.UnmarshalOption("swirl", &misc.Options)

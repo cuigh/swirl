@@ -2446,8 +2446,9 @@ var Swirl;
                 <td>
                   <div class="select is-small">
                     <select name="endpoint.ports[${this.index}].protocol">
-                      <option value="false">TCP</option>
-                      <option value="true">UDP</option>
+                      <option value="tcp">TCP</option>
+                      <option value="udp">UDP</option>
+                      <option value="sctp">SCTP</option>                      
                     </select>
                   </div>
                 </td>
