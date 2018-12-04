@@ -31,6 +31,10 @@ func Validator(setting *model.Setting) func(name, pwd string) (ticket string, er
 			return
 		}
 
+		if mu != nil && mu.Status == model.UserStatusBlocked {
+			return "", certify.ErrAccountDisabled
+		}
+
 		if mu != nil && mu.Type == model.UserTypeInternal { // internal user
 			if !passwd.Validate(pwd, mu.Password, mu.Salt) {
 				err = certify.ErrInvalidToken
