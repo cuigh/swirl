@@ -1,6 +1,7 @@
 FROM golang:alpine AS build
 WORKDIR /go/src/github.com/cuigh/swirl/
 ADD . .
+ENV GO111MODULE on
 RUN CGO_ENABLED=0 go build -ldflags "-s -w"
 
 FROM alpine:3.8
