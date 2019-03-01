@@ -275,8 +275,12 @@ func NewServiceInfo(service swarm.Service) *ServiceInfo {
 	if len(spec.TaskTemplate.ContainerSpec.Env) > 0 {
 		si.Environments = Options{}
 		for _, env := range spec.TaskTemplate.ContainerSpec.Env {
+			var v string
 			pair := strings.SplitN(env, "=", 2)
-			si.Environments = append(si.Environments, &Option{Name: pair[0], Value: pair[1]})
+			if len(pair) == 2 {
+				v = pair[1]
+			}
+			si.Environments = append(si.Environments, &Option{Name: pair[0], Value: v})
 		}
 	}
 	for _, m := range spec.TaskTemplate.ContainerSpec.Mounts {
