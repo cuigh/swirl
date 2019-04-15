@@ -336,8 +336,9 @@ type External struct {
 
 // CredentialSpecConfig for credential spec on Windows
 type CredentialSpecConfig struct {
-	File     string
-	Registry string
+	Config   string `yaml:",omitempty" json:"config,omitempty"` // Config was added in API v1.40
+	File     string `yaml:",omitempty" json:"file,omitempty"`
+	Registry string `yaml:",omitempty" json:"registry,omitempty"`
 }
 
 type fileObjectConfig struct {

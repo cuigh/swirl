@@ -17,7 +17,7 @@ func VolumeList(name string, pageIndex, pageSize int) (volumes []*types.Volume, 
 	var (
 		ctx  context.Context
 		cli  *client.Client
-		resp volume.VolumesListOKBody
+		resp volume.VolumeListOKBody
 	)
 
 	ctx, cli, err = mgr.Client()
@@ -48,7 +48,7 @@ func VolumeList(name string, pageIndex, pageSize int) (volumes []*types.Volume, 
 // VolumeCreate create a volume.
 func VolumeCreate(info *model.VolumeCreateInfo) error {
 	return mgr.Do(func(ctx context.Context, cli *client.Client) (err error) {
-		options := volume.VolumesCreateBody{
+		options := volume.VolumeCreateBody{
 			Name:       info.Name,
 			DriverOpts: info.Options.ToMap(),
 			Labels:     info.Labels.ToMap(),

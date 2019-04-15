@@ -110,7 +110,7 @@ func Service(
 	}
 
 	var privileges swarm.Privileges
-	privileges.CredentialSpec, err = convertCredentialSpec(service.CredentialSpec)
+	privileges.CredentialSpec, err = convertCredentialSpec(namespace, service.CredentialSpec, configs)
 	if err != nil {
 		return swarm.ServiceSpec{}, err
 	}
@@ -561,14 +561,47 @@ func convertDNSConfig(DNS []string, DNSSearch []string) (*swarm.DNSConfig, error
 	return nil, nil
 }
 
-func convertCredentialSpec(spec CredentialSpecConfig) (*swarm.CredentialSpec, error) {
-	if spec.File == "" && spec.Registry == "" {
-		return nil, nil
+func convertCredentialSpec(namespace Namespace, spec CredentialSpecConfig, refs []*swarm.ConfigReference) (*swarm.CredentialSpec, error) {
+	var o []string
+
+	// Config was added in API v1.40
+	if spec.Config != "" {
+		o = append(o, `"Config"`)
 	}
-	if spec.File != "" && spec.Registry != "" {
-		return nil, errors.New("Invalid credential spec - must provide one of `File` or `Registry`")
+	if spec.File != "" {
+		o = append(o, `"File"`)
+	}
+	if spec.Registry != "" {
+		o = append(o, `"Registry"`)
+	}
+	l := len(o)
+	switch {
+	case l == 0:
+		return nil, nil
+	case l == 2:
+		return nil, errors.Errorf("invalid credential spec: cannot specify both %s and %s", o[0], o[1])
+	case l > 2:
+		return nil, errors.Errorf("invalid credential spec: cannot specify both %s, and %s", strings.Join(o[:l-1], ", "), o[l-1])
 	}
 	swarmCredSpec := swarm.CredentialSpec(spec)
+	// if we're using a swarm Config for the credential spec, over-write it
+	// here with the config ID
+	if swarmCredSpec.Config != "" {
+		for _, config := range refs {
+			if swarmCredSpec.Config == config.ConfigName {
+				swarmCredSpec.Config = config.ConfigID
+				return &swarmCredSpec, nil
+			}
+		}
+		// if none of the configs match, try namespacing
+		for _, config := range refs {
+			if namespace.Scope(swarmCredSpec.Config) == config.ConfigName {
+				swarmCredSpec.Config = config.ConfigID
+				return &swarmCredSpec, nil
+			}
+		}
+		return nil, errors.Errorf("invalid credential spec: spec specifies config %v, but no such config can be found", swarmCredSpec.Config)
+	}
 	return &swarmCredSpec, nil
 }
 
