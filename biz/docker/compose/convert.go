@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"strings"
 
+	composetypes "github.com/cuigh/swirl/biz/docker/compose/types"
 	"github.com/docker/docker/api/types"
 	networktypes "github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/api/types/swarm"
@@ -48,12 +49,12 @@ func AddStackLabel(namespace Namespace, labels map[string]string) map[string]str
 	return labels
 }
 
-type networkMap map[string]NetworkConfig
+type networkMap map[string]composetypes.NetworkConfig
 
 // Networks from the compose-file type to the engine API type
 func Networks(namespace Namespace, networks networkMap, servicesNetworks map[string]struct{}) (map[string]types.NetworkCreate, []string) {
 	if networks == nil {
-		networks = make(map[string]NetworkConfig)
+		networks = make(map[string]composetypes.NetworkConfig)
 	}
 
 	externalNetworks := []string{}
@@ -61,7 +62,7 @@ func Networks(namespace Namespace, networks networkMap, servicesNetworks map[str
 	for internalName := range servicesNetworks {
 		network := networks[internalName]
 		if network.External.External {
-			externalNetworks = append(externalNetworks, network.External.Name)
+			externalNetworks = append(externalNetworks, network.Name)
 			continue
 		}
 
@@ -86,38 +87,54 @@ func Networks(namespace Namespace, networks networkMap, servicesNetworks map[str
 			}
 			createOpts.IPAM.Config = append(createOpts.IPAM.Config, config)
 		}
-		result[internalName] = createOpts
+
+		networkName := namespace.Scope(internalName)
+		if network.Name != "" {
+			networkName = network.Name
+		}
+		result[networkName] = createOpts
 	}
 
 	return result, externalNetworks
 }
 
 // Secrets converts secrets from the Compose type to the engine API type
-func Secrets(namespace Namespace, secrets map[string]SecretConfig) ([]swarm.SecretSpec, error) {
+func Secrets(namespace Namespace, secrets map[string]composetypes.SecretConfig) ([]swarm.SecretSpec, error) {
 	result := []swarm.SecretSpec{}
 	for name, secret := range secrets {
 		if secret.External.External {
 			continue
 		}
 
-		data, err := ioutil.ReadFile(secret.File)
+		var obj swarmFileObject
+		var err error
+		if secret.Driver != "" {
+			obj, err = driverObjectConfig(namespace, name, composetypes.FileObjectConfig(secret))
+		} else {
+			obj, err = fileObjectConfig(namespace, name, composetypes.FileObjectConfig(secret))
+		}
 		if err != nil {
 			return nil, err
 		}
-
-		result = append(result, swarm.SecretSpec{
-			Annotations: swarm.Annotations{
-				Name:   namespace.Scope(name),
-				Labels: AddStackLabel(namespace, secret.Labels),
-			},
-			Data: data,
-		})
+		spec := swarm.SecretSpec{Annotations: obj.Annotations, Data: obj.Data}
+		if secret.Driver != "" {
+			spec.Driver = &swarm.Driver{
+				Name:    secret.Driver,
+				Options: secret.DriverOpts,
+			}
+		}
+		if secret.TemplateDriver != "" {
+			spec.Templating = &swarm.Driver{
+				Name: secret.TemplateDriver,
+			}
+		}
+		result = append(result, spec)
 	}
 	return result, nil
 }
 
 // Configs converts config objects from the Compose type to the engine API type
-func Configs(namespace Namespace, configs map[string]ConfigObjConfig) ([]swarm.ConfigSpec, error) {
+func Configs(namespace Namespace, configs map[string]composetypes.ConfigObjConfig) ([]swarm.ConfigSpec, error) {
 	result := []swarm.ConfigSpec{}
 	for name, config := range configs {
 		if config.External.External {
@@ -138,4 +155,46 @@ func Configs(namespace Namespace, configs map[string]ConfigObjConfig) ([]swarm.C
 		})
 	}
 	return result, nil
+}
+
+type swarmFileObject struct {
+	Annotations swarm.Annotations
+	Data        []byte
+}
+
+func driverObjectConfig(namespace Namespace, name string, obj composetypes.FileObjectConfig) (swarmFileObject, error) {
+	if obj.Name != "" {
+		name = obj.Name
+	} else {
+		name = namespace.Scope(name)
+	}
+
+	return swarmFileObject{
+		Annotations: swarm.Annotations{
+			Name:   name,
+			Labels: AddStackLabel(namespace, obj.Labels),
+		},
+		Data: []byte{},
+	}, nil
+}
+
+func fileObjectConfig(namespace Namespace, name string, obj composetypes.FileObjectConfig) (swarmFileObject, error) {
+	data, err := ioutil.ReadFile(obj.File)
+	if err != nil {
+		return swarmFileObject{}, err
+	}
+
+	if obj.Name != "" {
+		name = obj.Name
+	} else {
+		name = namespace.Scope(name)
+	}
+
+	return swarmFileObject{
+		Annotations: swarm.Annotations{
+			Name:   name,
+			Labels: AddStackLabel(namespace, obj.Labels),
+		},
+		Data: data,
+	}, nil
 }

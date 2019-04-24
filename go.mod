@@ -19,6 +19,7 @@ require (
 	github.com/gobwas/ws v1.0.0
 	github.com/google/go-cmp v0.2.0 // indirect
 	github.com/gorilla/mux v1.7.1 // indirect
+	github.com/imdario/mergo v0.3.7
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/mattn/go-shellwords v1.0.3
 	github.com/mitchellh/mapstructure v1.0.0

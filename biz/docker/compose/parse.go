@@ -5,9 +5,11 @@ import (
 	"os"
 	"sort"
 	"strings"
+
+	composetypes "github.com/cuigh/swirl/biz/docker/compose/types"
 )
 
-func Parse(name, content string) (*Config, error) {
+func Parse(name, content string) (*composetypes.Config, error) {
 	//absPath, err := filepath.Abs(composefile)
 	//if err != nil {
 	//	return details, err
@@ -24,8 +26,8 @@ func Parse(name, content string) (*Config, error) {
 		return nil, err
 	}
 
-	details := ConfigDetails{
-		ConfigFiles: []ConfigFile{*configFile},
+	details := composetypes.ConfigDetails{
+		ConfigFiles: []composetypes.ConfigFile{*configFile},
 		Environment: env,
 	}
 	cfg, err := Load(details)
@@ -47,12 +49,12 @@ func propertyWarnings(properties map[string]string) string {
 	return strings.Join(msgs, "\n\n")
 }
 
-func getConfigFile(name, content string) (*ConfigFile, error) {
+func getConfigFile(name, content string) (*composetypes.ConfigFile, error) {
 	config, err := ParseYAML([]byte(content))
 	if err != nil {
 		return nil, err
 	}
-	return &ConfigFile{
+	return &composetypes.ConfigFile{
 		Filename: name,
 		Config:   config,
 	}, nil
@@ -71,7 +73,7 @@ func buildEnvironment(env []string) (map[string]string, error) {
 	return result, nil
 }
 
-func GetServicesDeclaredNetworks(serviceConfigs []ServiceConfig) map[string]struct{} {
+func GetServicesDeclaredNetworks(serviceConfigs []composetypes.ServiceConfig) map[string]struct{} {
 	serviceNetworks := map[string]struct{}{}
 	for _, serviceConfig := range serviceConfigs {
 		if len(serviceConfig.Networks) == 0 {

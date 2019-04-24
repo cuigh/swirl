@@ -5,6 +5,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
+	"github.com/cuigh/swirl/biz/docker/compose/types"
 	"github.com/docker/docker/api/types/mount"
 	"github.com/pkg/errors"
 )
@@ -12,8 +13,8 @@ import (
 const endOfSpec = rune(0)
 
 // ParseVolume parses a volume spec without any knowledge of the target platform
-func ParseVolume(spec string) (ServiceVolumeConfig, error) {
-	volume := ServiceVolumeConfig{}
+func ParseVolume(spec string) (types.ServiceVolumeConfig, error) {
+	volume := types.ServiceVolumeConfig{}
 
 	switch len(spec) {
 	case 0:
@@ -48,7 +49,7 @@ func isWindowsDrive(buffer []rune, char rune) bool {
 	return char == ':' && len(buffer) == 1 && unicode.IsLetter(buffer[0])
 }
 
-func populateFieldFromBuffer(char rune, buffer []rune, volume *ServiceVolumeConfig) error {
+func populateFieldFromBuffer(char rune, buffer []rune, volume *types.ServiceVolumeConfig) error {
 	strBuffer := string(buffer)
 	switch {
 	case len(buffer) == 0:
@@ -73,10 +74,10 @@ func populateFieldFromBuffer(char rune, buffer []rune, volume *ServiceVolumeConf
 		case "rw":
 			volume.ReadOnly = false
 		case "nocopy":
-			volume.Volume = &ServiceVolumeVolume{NoCopy: true}
+			volume.Volume = &types.ServiceVolumeVolume{NoCopy: true}
 		default:
 			if isBindOption(option) {
-				volume.Bind = &ServiceVolumeBind{Propagation: option}
+				volume.Bind = &types.ServiceVolumeBind{Propagation: option}
 			}
 			// ignore unknown options
 		}
@@ -93,7 +94,7 @@ func isBindOption(option string) bool {
 	return false
 }
 
-func populateType(volume *ServiceVolumeConfig) {
+func populateType(volume *types.ServiceVolumeConfig) {
 	switch {
 	// Anonymous volume
 	case volume.Source == "":
@@ -108,6 +109,11 @@ func populateType(volume *ServiceVolumeConfig) {
 func isFilePath(source string) bool {
 	switch source[0] {
 	case '.', '/', '~':
+		return true
+	}
+
+	// windows named pipes
+	if strings.HasPrefix(source, `\\`) {
 		return true
 	}
 
