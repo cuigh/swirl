@@ -253,8 +253,7 @@ func createNetworks(ctx context.Context, cli *client.Client, namespace compose.N
 		existingNetworkMap[network.Name] = network
 	}
 
-	for internalName, createOpts := range networks {
-		name := namespace.Scope(internalName)
+	for name, createOpts := range networks {
 		if _, exists := existingNetworkMap[name]; exists {
 			continue
 		}
@@ -265,7 +264,7 @@ func createNetworks(ctx context.Context, cli *client.Client, namespace compose.N
 
 		mgr.Logger().Infof("Creating network %s", name)
 		if _, err = cli.NetworkCreate(ctx, name, createOpts); err != nil {
-			return errors.Wrap(err, "failed to create network "+internalName)
+			return errors.Wrap(err, "failed to create network "+name)
 		}
 	}
 	return nil
