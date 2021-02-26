@@ -1,8 +1,8 @@
 package main
 
 import (
+	"embed"
 	"net/http"
-	"path/filepath"
 	"runtime"
 
 	"github.com/cuigh/auxo/app"
@@ -23,11 +23,15 @@ import (
 	"github.com/cuigh/swirl/security"
 )
 
+//go:embed assets
+//go:embed views/*
+var resFS embed.FS
+
 func main() {
 	misc.BindOptions()
 
 	app.Name = "Swirl"
-	app.Version = "0.8.5"
+	app.Version = "0.8.6"
 	app.Desc = "A web management UI for Docker, focused on swarm cluster"
 	app.Action = func(ctx *app.Context) error {
 		err := config.UnmarshalOption("swirl", &misc.Options)
@@ -72,7 +76,7 @@ func server(setting *model.Setting) *web.Server {
 
 	// set render
 	ws.Validator = &valid.Validator{Tag: "valid"}
-	ws.Renderer = jet.Must(jet.Debug(config.GetBool("debug")), jet.VarMap(misc.Funcs), jet.VarMap(map[string]interface{}{
+	ws.Renderer = jet.Must(jet.Dir(resFS, "views"), jet.Debug(config.GetBool("debug")), jet.VarMap(misc.Funcs), jet.VarMap(map[string]interface{}{
 		"language":   setting.Language,
 		"version":    app.Version,
 		"go_version": runtime.Version(),
@@ -84,8 +88,8 @@ func server(setting *model.Setting) *web.Server {
 	ws.Use(filter.NewRecover())
 
 	// register static handlers
-	ws.File("/favicon.ico", filepath.Join(filepath.Dir(app.Path()), "assets/swirl/img/favicon.ico"))
-	ws.Static("/assets", filepath.Join(filepath.Dir(app.Path()), "assets"))
+	ws.FSFile("/favicon.ico", resFS, "assets/swirl/img/favicon.ico")
+	ws.FS("/assets", resFS)
 
 	// create biz group
 	form := &auth.Form{

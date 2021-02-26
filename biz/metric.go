@@ -64,7 +64,7 @@ func (b *metricBiz) GetMatrix(query, legend string, start, end time.Time) (data 
 	}
 
 	period := end.Sub(start)
-	value, err := api.QueryRange(context.Background(), query, papi.Range{
+	value, _, err := api.QueryRange(context.Background(), query, papi.Range{
 		Start: start,
 		End:   end,
 		Step:  b.calcStep(period),
@@ -96,7 +96,7 @@ func (b *metricBiz) GetScalar(query string, t time.Time) (v float64, err error) 
 		return 0, err
 	}
 
-	value, err := api.Query(context.Background(), query, t)
+	value, _, err := api.Query(context.Background(), query, t)
 	if err != nil {
 		return 0, err
 	}
@@ -118,7 +118,7 @@ func (b *metricBiz) GetVector(query, label string, t time.Time) (data *model.Cha
 	}
 
 	var value pmodel.Value
-	value, err = api.Query(context.Background(), query, t)
+	value, _, err = api.Query(context.Background(), query, t)
 	if err != nil {
 		return
 	}

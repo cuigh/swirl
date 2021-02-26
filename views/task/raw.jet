@@ -1,4 +1,4 @@
-{{ extends "_base" }}
+{{ extends "base" }}
 
 {{ block style() }}
 <link rel="stylesheet" href="/assets/highlight/highlight.css?v=9.12">

@@ -1,4 +1,4 @@
-{{ extends "_base" }}
+{{ extends "base" }}
 {{ import "../../_modules/form" }}
 
 {{ block script() }}

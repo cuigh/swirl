@@ -1,4 +1,4 @@
-{{ extends "_base" }}
+{{ extends "base" }}
 
 {{ block script() }}
 <script>$(() => new Swirl.Metric.ListPage())</script>

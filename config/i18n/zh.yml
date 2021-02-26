@@ -30,6 +30,8 @@ button.more: 更多
 button.connect: 连接
 button.disconnect: 断开
 button.save-as-default: 保存为默认
+button.backup: 备份
+button.restore: 恢复
 
 # field
 field.name: 名称
