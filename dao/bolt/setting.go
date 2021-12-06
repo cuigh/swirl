@@ -1,23 +1,41 @@
 package bolt
 
 import (
+	"context"
+	"time"
+
 	"github.com/cuigh/swirl/model"
 )
 
-const settingID = "0"
-
-func (d *Dao) SettingGet() (setting *model.Setting, err error) {
-	var v Value
-	v, err = d.get("setting", settingID)
-	if err == nil {
-		setting = &model.Setting{}
-		if v != nil {
-			err = v.Unmarshal(setting)
+func (d *Dao) SettingList(ctx context.Context) (settings []*model.Setting, err error) {
+	err = d.each("setting", func(v Value) error {
+		s := &model.Setting{}
+		err = v.Unmarshal(s)
+		if err != nil {
+			return err
 		}
+
+		settings = append(settings, s)
+		return nil
+	})
+	return
+}
+
+func (d *Dao) SettingGet(ctx context.Context, id string) (setting *model.Setting, err error) {
+	var v Value
+	v, err = d.get("setting", id)
+	if err == nil && v != nil {
+		setting = &model.Setting{}
+		err = v.Unmarshal(setting)
 	}
 	return
 }
 
-func (d *Dao) SettingUpdate(setting *model.Setting) (err error) {
-	return d.update("setting", settingID, setting)
+func (d *Dao) SettingUpdate(ctx context.Context, id string, options []*model.SettingOption) (err error) {
+	setting := &model.Setting{
+		ID:        id,
+		Options:   options,
+		UpdatedAt: time.Now(),
+	}
+	return d.update("setting", id, setting)
 }

@@ -1,26 +1,22 @@
 package scaler
 
 import (
+	"context"
 	"fmt"
 	"strings"
 	"time"
 
+	"github.com/cuigh/auxo/app/container"
 	"github.com/cuigh/auxo/data"
 	"github.com/cuigh/auxo/data/set"
 	"github.com/cuigh/auxo/log"
 	"github.com/cuigh/auxo/util/cast"
 	"github.com/cuigh/auxo/util/run"
 	"github.com/cuigh/swirl/biz"
-	"github.com/cuigh/swirl/biz/docker"
+	"github.com/cuigh/swirl/docker"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/swarm"
 )
-
-type checker func(service string, low, high float64) (scaleType, float64)
-
-var checkers = map[string]checker{
-	"cpu": cpuChecker,
-}
 
 type scaleType int
 
@@ -37,15 +33,37 @@ const (
 	policyAll policyType = "all"
 )
 
+const Name = "scaler"
+
+type Scaler struct {
+	d        *docker.Docker
+	checkers map[string]Checker
+}
+
+func NewScaler(d *docker.Docker, mb biz.MetricBiz) *Scaler {
+	s := &Scaler{
+		d:        d,
+		checkers: map[string]Checker{},
+	}
+	if mb.Enabled() {
+		s.checkers["cpu"] = &cpuChecker{mb: mb}
+	}
+	return s
+}
+
 // Start starts a timer to scale services automatically.
-func Start() {
+func (s *Scaler) Start() {
 	const labelScale = "swirl.scale"
+
+	if len(s.checkers) > 0 {
+		return
+	}
 
 	run.Schedule(time.Minute, func() {
 		args := filters.NewArgs()
 		args.Add("mode", "replicated")
 		args.Add("label", labelScale)
-		services, err := docker.ServiceSearch(args)
+		services, err := s.d.ServiceSearch(context.TODO(), args)
 		if err != nil {
 			log.Get("scaler").Error("scaler > Failed to search service: ", err)
 			return
@@ -54,14 +72,14 @@ func Start() {
 		for _, service := range services {
 			label := service.Spec.Labels[labelScale]
 			opts := data.ParseOptions(label, ",", "=")
-			tryScale(&service, opts)
+			s.tryScale(&service, opts)
 		}
 	}, nil)
 }
 
 // nolint: gocyclo
-func tryScale(service *swarm.Service, opts data.Options) {
-	// ignore services with global mode
+func (s *Scaler) tryScale(service *swarm.Service, opts data.Options) {
+	// only care about services running in replicated mode
 	if service.Spec.Mode.Replicated == nil {
 		return
 	}
@@ -73,6 +91,7 @@ func tryScale(service *swarm.Service, opts data.Options) {
 		window        = 3 * time.Minute
 		policy        = policyAny
 		args   data.Options
+		ctx    = context.TODO()
 	)
 	for _, opt := range opts {
 		switch opt.Name {
@@ -96,7 +115,7 @@ func tryScale(service *swarm.Service, opts data.Options) {
 		return
 	}
 
-	result := check(service, policy, args)
+	result := s.check(service, policy, args)
 	if result.Type == scaleNone {
 		return
 	}
@@ -105,7 +124,7 @@ func tryScale(service *swarm.Service, opts data.Options) {
 	replicas := *service.Spec.Mode.Replicated.Replicas
 	if result.Type == scaleUp {
 		if replicas < max {
-			if err := docker.ServiceScale(service.Spec.Name, service.Version.Index, replicas+step); err != nil {
+			if err := s.d.ServiceScale(ctx, service.Spec.Name, service.Version.Index, replicas+step); err != nil {
 				logger.Errorf("scaler > Failed to scale service '%s': %v", service.Spec.Name, err)
 			} else {
 				logger.Infof("scaler > Service '%s' scaled up for: %v", service.Spec.Name, result.Reasons)
@@ -113,7 +132,7 @@ func tryScale(service *swarm.Service, opts data.Options) {
 		}
 	} else if result.Type == scaleDown {
 		if replicas > min {
-			if err := docker.ServiceScale(service.Spec.Name, service.Version.Index, replicas-step); err != nil {
+			if err := s.d.ServiceScale(ctx, service.Spec.Name, service.Version.Index, replicas-step); err != nil {
 				logger.Errorf("scaler > Failed to scale service '%s': %v", service.Spec.Name, err)
 			} else {
 				logger.Infof("scaler > Service '%s' scaled down for: %v", service.Spec.Name, result.Reasons)
@@ -122,13 +141,13 @@ func tryScale(service *swarm.Service, opts data.Options) {
 	}
 }
 
-func check(service *swarm.Service, policy policyType, args data.Options) checkResult {
+func (s *Scaler) check(service *swarm.Service, policy policyType, args data.Options) checkResult {
 	result := checkResult{
 		Reasons: make(map[string]float64),
 	}
 	if policy == policyAny {
 		for _, arg := range args {
-			st, value := checkArg(service.Spec.Name, arg)
+			st, value := s.checkArg(service.Spec.Name, arg)
 			if st == scaleNone {
 				continue
 			}
@@ -139,7 +158,7 @@ func check(service *swarm.Service, policy policyType, args data.Options) checkRe
 	} else if policy == policyAll {
 		types := set.Set{}
 		for _, arg := range args {
-			st, value := checkArg(service.Spec.Name, arg)
+			st, value := s.checkArg(service.Spec.Name, arg)
 			types.Add(st)
 			if types.Len() > 1 {
 				result.Type = scaleNone
@@ -152,14 +171,14 @@ func check(service *swarm.Service, policy policyType, args data.Options) checkRe
 	return result
 }
 
-func checkArg(service string, arg data.Option) (scaleType, float64) {
+func (s *Scaler) checkArg(service string, arg data.Option) (scaleType, float64) {
 	items := strings.Split(arg.Value, ":")
 	if len(items) != 2 {
 		log.Get("scaler").Warnf("scaler > Invalid scale argument: %s=%s", arg.Name, arg.Value)
 		return scaleNone, 0
 	}
 
-	c := checkers[arg.Name]
+	c := s.checkers[arg.Name]
 	if c == nil {
 		log.Get("scaler").Warnf("scaler > Metric checker '%s' not found", arg.Name)
 		return scaleNone, 0
@@ -167,12 +186,25 @@ func checkArg(service string, arg data.Option) (scaleType, float64) {
 
 	low := cast.ToFloat64(items[0])
 	high := cast.ToFloat64(items[1])
-	return c(service, low, high)
+	return c.Check(service, low, high)
 }
 
-func cpuChecker(service string, low, high float64) (scaleType, float64) {
+type checkResult struct {
+	Type    scaleType
+	Reasons map[string]float64
+}
+
+type Checker interface {
+	Check(service string, low, high float64) (scaleType, float64)
+}
+
+type cpuChecker struct {
+	mb biz.MetricBiz
+}
+
+func (c *cpuChecker) Check(service string, low, high float64) (scaleType, float64) {
 	query := fmt.Sprintf(`avg(rate(container_cpu_user_seconds_total{container_label_com_docker_swarm_service_name="%s"}[1m]) * 100)`, service)
-	vector, err := biz.Metric.GetVector(query, "", time.Now())
+	vector, err := c.mb.GetVector(query, "", time.Now())
 	if err != nil {
 		log.Get("scaler").Error("scaler > Failed to query metrics: ", err)
 		return scaleNone, 0
@@ -190,7 +222,14 @@ func cpuChecker(service string, low, high float64) (scaleType, float64) {
 	return scaleNone, 0
 }
 
-type checkResult struct {
-	Type    scaleType
-	Reasons map[string]float64
+func Start() error {
+	s, err := container.TryFind(Name)
+	if err == nil {
+		s.(*Scaler).Start()
+	}
+	return err
+}
+
+func init() {
+	container.Put(NewScaler, container.Name(Name))
 }

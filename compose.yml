@@ -4,11 +4,11 @@ services:
   swirl:
     image: cuigh/swirl
     environment:
-      DB_ADDRESS: mongo:27017/swirl
+      DB_ADDRESS: mongodb://mongo:27017/swirl
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
-      - 8001:8001
+      - "8001:8001"
     networks:
       - net
     deploy:

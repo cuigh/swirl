@@ -1,96 +1,75 @@
 package dao
 
 import (
+	"context"
+
+	"github.com/cuigh/auxo/app/container"
 	"github.com/cuigh/auxo/errors"
-	"github.com/cuigh/auxo/util/lazy"
 	"github.com/cuigh/swirl/dao/bolt"
 	"github.com/cuigh/swirl/dao/mongo"
 	"github.com/cuigh/swirl/misc"
 	"github.com/cuigh/swirl/model"
 )
 
-var (
-	value = lazy.Value{New: create}
-)
-
 // Interface is the interface that wraps all dao methods.
 type Interface interface {
-	Init()
+	Init() error
 	Close()
 
-	RoleGet(id string) (*model.Role, error)
-	RoleList() (roles []*model.Role, err error)
-	RoleCreate(role *model.Role) error
-	RoleUpdate(role *model.Role) error
-	RoleDelete(id string) error
+	RoleGet(ctx context.Context, id string) (*model.Role, error)
+	RoleList(ctx context.Context, name string) (roles []*model.Role, err error)
+	RoleCreate(ctx context.Context, role *model.Role) error
+	RoleUpdate(ctx context.Context, role *model.Role) error
+	RoleDelete(ctx context.Context, id string) error
 
-	UserCreate(user *model.User) error
-	UserUpdate(user *model.User) error
-	UserList(args *model.UserListArgs) (users []*model.User, count int, err error)
-	UserCount() (int, error)
-	UserGetByID(id string) (*model.User, error)
-	UserGetByName(loginName string) (*model.User, error)
-	UserBlock(id string, blocked bool) error
-	UserDelete(id string) error
+	UserCreate(ctx context.Context, user *model.User) error
+	UserUpdate(ctx context.Context, user *model.User) error
+	UserList(ctx context.Context, args *model.UserSearchArgs) (users []*model.User, count int, err error)
+	UserCount(ctx context.Context) (int, error)
+	UserGetByID(ctx context.Context, id string) (*model.User, error)
+	UserGetByName(ctx context.Context, loginName string) (*model.User, error)
+	UserSetStatus(ctx context.Context, id string, status int32) error
+	UserDelete(ctx context.Context, id string) error
+	UserModifyProfile(ctx context.Context, user *model.User) error
+	UserModifyPassword(ctx context.Context, id, pwd, salt string) error
 
-	ProfileUpdateInfo(user *model.User) error
-	ProfileUpdatePassword(id, pwd, salt string) error
+	SessionUpdate(ctx context.Context, session *model.Session) error
+	SessionGet(ctx context.Context, token string) (*model.Session, error)
 
-	SessionUpdate(session *model.Session) error
-	SessionGet(token string) (*model.Session, error)
+	RegistryCreate(ctx context.Context, registry *model.Registry) error
+	RegistryUpdate(ctx context.Context, registry *model.Registry) error
+	RegistryGet(ctx context.Context, id string) (*model.Registry, error)
+	RegistryGetByURL(ctx context.Context, url string) (registry *model.Registry, err error)
+	RegistryList(ctx context.Context) (registries []*model.Registry, err error)
+	RegistryDelete(ctx context.Context, id string) error
 
-	RegistryCreate(registry *model.Registry) error
-	RegistryUpdate(registry *model.Registry) error
-	RegistryGet(id string) (*model.Registry, error)
-	RegistryList() (registries []*model.Registry, err error)
-	RegistryDelete(id string) error
+	StackList(ctx context.Context) (stacks []*model.Stack, err error)
+	StackGet(ctx context.Context, name string) (*model.Stack, error)
+	StackCreate(ctx context.Context, stack *model.Stack) error
+	StackUpdate(ctx context.Context, stack *model.Stack) error
+	StackDelete(ctx context.Context, name string) error
 
-	StackList() (stacks []*model.Stack, err error)
-	StackGet(name string) (*model.Stack, error)
-	StackCreate(stack *model.Stack) error
-	StackUpdate(stack *model.Stack) error
-	StackDelete(name string) error
-	// StackMigrate migrates stacks from old archive collection. This method will be removed after v0.8.
-	StackMigrate()
+	EventCreate(ctx context.Context, event *model.Event) error
+	EventList(ctx context.Context, args *model.EventListArgs) (events []*model.Event, count int, err error)
 
-	TemplateList(args *model.TemplateListArgs) (tpls []*model.Template, count int, err error)
-	TemplateGet(id string) (*model.Template, error)
-	TemplateCreate(tpl *model.Template) error
-	TemplateUpdate(tpl *model.Template) error
-	TemplateDelete(id string) error
+	SettingList(ctx context.Context) (settings []*model.Setting, err error)
+	SettingGet(ctx context.Context, id string) (*model.Setting, error)
+	SettingUpdate(ctx context.Context, id string, opts []*model.SettingOption) error
 
-	EventCreate(event *model.Event) error
-	EventList(args *model.EventListArgs) (events []*model.Event, count int, err error)
+	ChartGet(ctx context.Context, id string) (*model.Chart, error)
+	ChartBatch(ctx context.Context, ids ...string) ([]*model.Chart, error)
+	ChartList(ctx context.Context, title, dashboard string, pageIndex, pageSize int) (charts []*model.Chart, count int, err error)
+	ChartCreate(ctx context.Context, chart *model.Chart) error
+	ChartUpdate(ctx context.Context, chart *model.Chart) error
+	ChartDelete(ctx context.Context, id string) error
 
-	PermGet(resType, resID string) (*model.Perm, error)
-	PermUpdate(perm *model.Perm) error
-	PermDelete(resType, resID string) error
-
-	SettingGet() (setting *model.Setting, err error)
-	SettingUpdate(setting *model.Setting) error
-
-	ChartGet(name string) (*model.Chart, error)
-	ChartBatch(names ...string) ([]*model.Chart, error)
-	ChartList() (charts []*model.Chart, err error)
-	ChartCreate(chart *model.Chart) error
-	ChartUpdate(chart *model.Chart) error
-	ChartDelete(name string) error
-
-	DashboardGet(name, key string) (dashboard *model.ChartDashboard, err error)
-	DashboardUpdate(dashboard *model.ChartDashboard) error
+	DashboardGet(ctx context.Context, name, key string) (dashboard *model.Dashboard, err error)
+	DashboardUpdate(ctx context.Context, dashboard *model.Dashboard) error
 }
 
-// Get return a dao instance according to DB_TYPE.
-func Get() (Interface, error) {
-	v, err := value.Get()
-	if err != nil {
-		return nil, err
-	}
-	return v.(Interface), nil
-}
+func newInterface() (i Interface) {
+	var err error
 
-func create() (d interface{}, err error) {
-	var i Interface
 	switch misc.Options.DBType {
 	case "", "mongo":
 		i, err = mongo.New(misc.Options.DBAddress)
@@ -100,8 +79,13 @@ func create() (d interface{}, err error) {
 		err = errors.New("Unknown database type: " + misc.Options.DBType)
 	}
 
-	if err == nil {
-		i.Init()
+	if err != nil {
+		panic(err)
 	}
-	return i, err
+
+	return i
+}
+
+func init() {
+	container.Put(newInterface)
 }

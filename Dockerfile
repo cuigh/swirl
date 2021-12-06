@@ -1,17 +1,24 @@
-FROM golang:alpine AS build
-RUN apk add git
-WORKDIR /go/src/swirl/
-ADD . .
-ENV GO111MODULE on
+# ---- Build UI----
+FROM node:alpine AS node
+WORKDIR /app
+COPY ui .
+RUN yarn install
+RUN yarn run build
+
+# ---- Build Go----
+FROM golang:1.17-alpine AS golang
+WORKDIR /app
+COPY --from=node /app/dist ui/dist
+COPY . .
+RUN apk update && apk add git
 RUN CGO_ENABLED=0 go build -ldflags "-s -w"
 
-FROM alpine:3.8
+# ---- Release ----
+FROM alpine
 LABEL maintainer="cuigh <noname@live.com>"
 WORKDIR /app
 RUN apk add --no-cache ca-certificates
-COPY --from=build /go/src/swirl/swirl .
-COPY --from=build /go/src/swirl/config ./config/
-COPY --from=build /go/src/swirl/assets ./assets/
-COPY --from=build /go/src/swirl/views ./views/
+COPY --from=golang /app/swirl .
+COPY --from=golang /app/config config/
 EXPOSE 8001
 ENTRYPOINT ["/app/swirl"]

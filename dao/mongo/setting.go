@@ -1,30 +1,36 @@
 package mongo
 
 import (
+	"context"
+	"time"
+
 	"github.com/cuigh/swirl/model"
-	"github.com/globalsign/mgo"
-	"github.com/globalsign/mgo/bson"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
-const settingID int32 = 0
+const Setting = "setting"
 
-func (d *Dao) SettingGet() (setting *model.Setting, err error) {
-	d.do(func(db *database) {
-		setting = &model.Setting{}
-		err = db.C("setting").FindId(settingID).One(setting)
-		if err == mgo.ErrNotFound {
-			err = nil
-		}
-	})
+func (d *Dao) SettingList(ctx context.Context) (settings []*model.Setting, err error) {
+	settings = []*model.Setting{}
+	err = d.fetch(ctx, Setting, bson.M{}, &settings)
 	return
 }
 
-func (d *Dao) SettingUpdate(setting *model.Setting) (err error) {
-	d.do(func(db *database) {
-		update := bson.M{
-			"$set": setting,
-		}
-		_, err = db.C("setting").UpsertId(settingID, update)
-	})
+func (d *Dao) SettingGet(ctx context.Context, id string) (setting *model.Setting, err error) {
+	setting = &model.Setting{}
+	found, err := d.find(ctx, Setting, id, setting)
+	if !found {
+		return nil, err
+	}
 	return
+}
+
+func (d *Dao) SettingUpdate(ctx context.Context, id string, options []*model.SettingOption) (err error) {
+	update := bson.M{
+		"$set": bson.M{
+			"options":    options,
+			"updated_at": time.Now(),
+		},
+	}
+	return d.upsert(ctx, Setting, id, update)
 }

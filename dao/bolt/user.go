@@ -1,6 +1,7 @@
 package bolt
 
 import (
+	"context"
 	"encoding/json"
 	"time"
 
@@ -10,17 +11,18 @@ import (
 	"github.com/cuigh/swirl/model"
 )
 
-func (d *Dao) UserCount() (count int, err error) {
+func (d *Dao) UserCount(ctx context.Context) (count int, err error) {
 	return d.count("user")
 }
 
-func (d *Dao) UserCreate(user *model.User) (err error) {
+func (d *Dao) UserCreate(ctx context.Context, user *model.User) (err error) {
 	return d.update("user", user.ID, user)
 }
 
-func (d *Dao) UserUpdate(user *model.User) (err error) {
+func (d *Dao) UserUpdate(ctx context.Context, user *model.User) (err error) {
 	return d.userUpdate(user.ID, func(u *model.User) {
 		u.Name = user.Name
+		u.LoginName = user.LoginName
 		u.Email = user.Email
 		u.Admin = user.Admin
 		u.Type = user.Type
@@ -28,21 +30,17 @@ func (d *Dao) UserUpdate(user *model.User) (err error) {
 	})
 }
 
-func (d *Dao) UserBlock(id string, blocked bool) (err error) {
+func (d *Dao) UserSetStatus(ctx context.Context, id string, status int32) (err error) {
 	return d.userUpdate(id, func(u *model.User) {
-		if blocked {
-			u.Status = model.UserStatusBlocked
-		} else {
-			u.Status = model.UserStatusActive
-		}
+		u.Status = status
 	})
 }
 
-func (d *Dao) UserDelete(id string) (err error) {
+func (d *Dao) UserDelete(ctx context.Context, id string) (err error) {
 	return d.delete("user", id)
 }
 
-func (d *Dao) UserList(args *model.UserListArgs) (users []*model.User, count int, err error) {
+func (d *Dao) UserList(ctx context.Context, args *model.UserSearchArgs) (users []*model.User, count int, err error) {
 	err = d.each("user", func(v Value) error {
 		user := &model.User{}
 		err = v.Unmarshal(user)
@@ -51,18 +49,17 @@ func (d *Dao) UserList(args *model.UserListArgs) (users []*model.User, count int
 		}
 
 		match := true
-		if args.Query != "" {
-			match = matchAny(args.Query, user.LoginName, user.Name, user.Email)
+		if args.Name != "" {
+			match = matchAny(args.Name, user.Name)
 		}
-		if match {
-			switch args.Filter {
-			case "admins":
-				match = user.Admin
-			case "active":
-				match = user.Status == model.UserStatusActive
-			case "blocked":
-				match = user.Status == model.UserStatusBlocked
-			}
+		if match && args.LoginName != "" {
+			match = matchAny(args.LoginName, user.LoginName)
+		}
+		if match && args.Admin {
+			match = user.Admin
+		}
+		if match && args.Status >= 0 {
+			match = user.Status == args.Status
 		}
 
 		if match {
@@ -78,7 +75,7 @@ func (d *Dao) UserList(args *model.UserListArgs) (users []*model.User, count int
 	return
 }
 
-func (d *Dao) UserGetByID(id string) (user *model.User, err error) {
+func (d *Dao) UserGetByID(ctx context.Context, id string) (user *model.User, err error) {
 	var v Value
 	v, err = d.get("user", id)
 	if err == nil {
@@ -90,7 +87,7 @@ func (d *Dao) UserGetByID(id string) (user *model.User, err error) {
 	return
 }
 
-func (d *Dao) UserGetByName(loginName string) (user *model.User, err error) {
+func (d *Dao) UserGetByName(ctx context.Context, loginName string) (user *model.User, err error) {
 	err = d.db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte("user"))
 		c := b.Cursor()
@@ -110,14 +107,15 @@ func (d *Dao) UserGetByName(loginName string) (user *model.User, err error) {
 	return
 }
 
-func (d *Dao) ProfileUpdateInfo(user *model.User) (err error) {
+func (d *Dao) UserModifyProfile(ctx context.Context, user *model.User) (err error) {
 	return d.userUpdate(user.ID, func(u *model.User) {
 		u.Name = user.Name
+		u.LoginName = user.LoginName
 		u.Email = user.Email
 	})
 }
 
-func (d *Dao) ProfileUpdatePassword(id, pwd, salt string) (err error) {
+func (d *Dao) UserModifyPassword(ctx context.Context, id, pwd, salt string) (err error) {
 	return d.userUpdate(id, func(u *model.User) {
 		u.Password = pwd
 		u.Salt = salt
@@ -148,7 +146,7 @@ func (d *Dao) userUpdate(id string, decorator func(u *model.User)) (err error) {
 	})
 }
 
-func (d *Dao) SessionGet(token string) (session *model.Session, err error) {
+func (d *Dao) SessionGet(ctx context.Context, token string) (session *model.Session, err error) {
 	err = d.db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte("session"))
 		c := b.Cursor()
@@ -168,6 +166,6 @@ func (d *Dao) SessionGet(token string) (session *model.Session, err error) {
 	return
 }
 
-func (d *Dao) SessionUpdate(session *model.Session) (err error) {
+func (d *Dao) SessionUpdate(ctx context.Context, session *model.Session) (err error) {
 	return d.update("session", session.UserID, session)
 }

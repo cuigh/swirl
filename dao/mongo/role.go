@@ -1,63 +1,56 @@
 package mongo
 
 import (
+	"context"
+
 	"github.com/cuigh/swirl/model"
-	"github.com/globalsign/mgo"
-	"github.com/globalsign/mgo/bson"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
-func (d *Dao) RoleList() (roles []*model.Role, err error) {
-	d.do(func(db *database) {
-		roles = []*model.Role{}
-		err = db.C("role").Find(nil).All(&roles)
-	})
+const Role = "role"
+
+func (d *Dao) RoleList(ctx context.Context, name string) (roles []*model.Role, err error) {
+	filter := bson.M{}
+	if name != "" {
+		filter["name"] = name
+	}
+	roles = []*model.Role{}
+	err = d.fetch(ctx, Role, filter, &roles)
 	return
 }
 
-func (d *Dao) RoleCreate(role *model.Role) (err error) {
-	d.do(func(db *database) {
-		err = db.C("role").Insert(role)
-	})
+func (d *Dao) RoleCreate(ctx context.Context, role *model.Role) (err error) {
+	return d.create(ctx, Role, role)
+}
+
+func (d *Dao) RoleGet(ctx context.Context, id string) (role *model.Role, err error) {
+	role = &model.Role{}
+	found, err := d.find(ctx, Role, id, role)
+	if !found {
+		return nil, err
+	}
 	return
 }
 
-func (d *Dao) RoleGet(id string) (role *model.Role, err error) {
-	d.do(func(db *database) {
-		role = &model.Role{}
-		err = db.C("role").FindId(id).One(role)
-		if err == mgo.ErrNotFound {
-			role, err = nil, nil
-		} else if err != nil {
-			role = nil
-		}
-	})
-	return
+func (d *Dao) RoleUpdate(ctx context.Context, role *model.Role) (err error) {
+	update := bson.M{
+		"$set": bson.M{
+			"name":       role.Name,
+			"desc":       role.Description,
+			"perms":      role.Perms,
+			"updated_at": role.UpdatedAt,
+		},
+	}
+	return d.update(ctx, Role, role.ID, update)
 }
 
-func (d *Dao) RoleUpdate(role *model.Role) (err error) {
-	d.do(func(db *database) {
+func (d *Dao) RoleDelete(ctx context.Context, id string) (err error) {
+	err = d.delete(ctx, Role, id)
+	if err == nil {
 		update := bson.M{
-			"$set": bson.M{
-				"name":       role.Name,
-				"desc":       role.Description,
-				"perms":      role.Perms,
-				"updated_at": role.UpdatedAt,
-			},
+			"$pull": bson.M{"roles": id},
 		}
-		err = db.C("role").UpdateId(role.ID, update)
-	})
-	return
-}
-
-func (d *Dao) RoleDelete(id string) (err error) {
-	d.do(func(db *database) {
-		err = db.C("role").RemoveId(id)
-		if err == nil {
-			update := bson.M{
-				"$pull": bson.M{"roles": id},
-			}
-			_, err = db.C("user").UpdateAll(nil, update)
-		}
-	})
+		_, err = d.db.Collection(User).UpdateMany(ctx, bson.M{}, update)
+	}
 	return
 }

@@ -1,84 +1,73 @@
 package mongo
 
 import (
+	"context"
+
 	"github.com/cuigh/swirl/model"
-	"github.com/globalsign/mgo"
-	"github.com/globalsign/mgo/bson"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
-func (d *Dao) ChartList() (charts []*model.Chart, err error) {
-	d.do(func(db *database) {
-		charts = []*model.Chart{}
-		err = db.C("chart").Find(nil).All(&charts)
-	})
+const (
+	Chart     = "chart"
+	Dashboard = "dashboard"
+)
+
+func (d *Dao) ChartList(ctx context.Context, title, dashboard string, pageIndex, pageSize int) (charts []*model.Chart, count int, err error) {
+	filter := bson.M{}
+	if title != "" {
+		filter["title"] = title
+	}
+	if dashboard != "" {
+		filter["dashboard"] = bson.M{"$in": []string{"", dashboard}}
+	}
+	opts := searchOptions{filter: filter, sorter: bson.M{"updated_at": -1}, pageIndex: pageIndex, pageSize: pageSize}
+	charts = []*model.Chart{}
+	count, err = d.search(ctx, Chart, opts, &charts)
 	return
 }
 
-func (d *Dao) ChartCreate(chart *model.Chart) (err error) {
-	d.do(func(db *database) {
-		err = db.C("chart").Insert(chart)
-	})
+func (d *Dao) ChartCreate(ctx context.Context, chart *model.Chart) (err error) {
+	return d.create(ctx, Chart, chart)
+}
+
+func (d *Dao) ChartGet(ctx context.Context, id string) (chart *model.Chart, err error) {
+	chart = &model.Chart{}
+	found, err := d.find(ctx, Chart, id, chart)
+	if !found {
+		return nil, err
+	}
 	return
 }
 
-func (d *Dao) ChartGet(name string) (chart *model.Chart, err error) {
-	d.do(func(db *database) {
-		chart = &model.Chart{}
-		err = db.C("chart").FindId(name).One(chart)
-		if err == mgo.ErrNotFound {
-			chart, err = nil, nil
-		} else if err != nil {
-			chart = nil
-		}
-	})
+func (d *Dao) ChartBatch(ctx context.Context, names ...string) (charts []*model.Chart, err error) {
+	charts = []*model.Chart{}
+	err = d.fetch(ctx, Chart, bson.M{"_id": bson.M{"$in": names}}, &charts)
 	return
 }
 
-func (d *Dao) ChartBatch(names ...string) (charts []*model.Chart, err error) {
-	d.do(func(db *database) {
-		q := bson.M{"_id": bson.M{"$in": names}}
-		charts = make([]*model.Chart, 0)
-		err = db.C("chart").Find(q).All(&charts)
-	})
+func (d *Dao) ChartUpdate(ctx context.Context, chart *model.Chart) (err error) {
+	return d.update(ctx, Chart, chart.ID, chart)
+}
+
+func (d *Dao) ChartDelete(ctx context.Context, id string) (err error) {
+	return d.delete(ctx, Chart, id)
+}
+
+func (d *Dao) DashboardGet(ctx context.Context, name, key string) (dashboard *model.Dashboard, err error) {
+	dashboard = &model.Dashboard{
+		Name: name,
+		Key:  key,
+	}
+	found, err := d.find(ctx, Dashboard, dashboard.ID(), dashboard)
+	if !found {
+		return nil, err
+	}
 	return
 }
 
-func (d *Dao) ChartUpdate(chart *model.Chart) (err error) {
-	d.do(func(db *database) {
-		err = db.C("chart").UpdateId(chart.Name, chart)
-	})
-	return
-}
-
-func (d *Dao) ChartDelete(name string) (err error) {
-	d.do(func(db *database) {
-		err = db.C("chart").RemoveId(name)
-	})
-	return
-}
-
-func (d *Dao) DashboardGet(name, key string) (dashboard *model.ChartDashboard, err error) {
-	d.do(func(db *database) {
-		dashboard = &model.ChartDashboard{
-			Name: name,
-			Key:  key,
-		}
-		err = db.C("dashboard").FindId(dashboard.ID()).One(dashboard)
-		if err == mgo.ErrNotFound {
-			dashboard, err = nil, nil
-		} else if err != nil {
-			dashboard = nil
-		}
-	})
-	return
-}
-
-func (d *Dao) DashboardUpdate(dashboard *model.ChartDashboard) (err error) {
-	d.do(func(db *database) {
-		update := bson.M{
-			"$set": dashboard,
-		}
-		_, err = db.C("dashboard").UpsertId(dashboard.ID(), update)
-	})
-	return
+func (d *Dao) DashboardUpdate(ctx context.Context, dashboard *model.Dashboard) (err error) {
+	update := bson.M{
+		"$set": dashboard,
+	}
+	return d.update(ctx, Dashboard, dashboard.ID(), update)
 }

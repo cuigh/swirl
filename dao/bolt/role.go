@@ -1,6 +1,7 @@
 package bolt
 
 import (
+	"context"
 	"encoding/json"
 	"time"
 
@@ -9,23 +10,27 @@ import (
 	"github.com/cuigh/swirl/model"
 )
 
-func (d *Dao) RoleList() (roles []*model.Role, err error) {
+func (d *Dao) RoleList(ctx context.Context, name string) (roles []*model.Role, err error) {
 	err = d.each("role", func(v Value) error {
 		role := &model.Role{}
 		err = v.Unmarshal(role)
-		if err == nil {
+		if err != nil {
+			return err
+		}
+
+		if matchAny(name, role.Name) {
 			roles = append(roles, role)
 		}
-		return err
+		return nil
 	})
 	return
 }
 
-func (d *Dao) RoleCreate(role *model.Role) (err error) {
+func (d *Dao) RoleCreate(ctx context.Context, role *model.Role) (err error) {
 	return d.update("role", role.ID, role)
 }
 
-func (d *Dao) RoleGet(id string) (role *model.Role, err error) {
+func (d *Dao) RoleGet(ctx context.Context, id string) (role *model.Role, err error) {
 	var v Value
 	v, err = d.get("role", id)
 	if err == nil {
@@ -37,7 +42,7 @@ func (d *Dao) RoleGet(id string) (role *model.Role, err error) {
 	return
 }
 
-func (d *Dao) RoleUpdate(role *model.Role) (err error) {
+func (d *Dao) RoleUpdate(ctx context.Context, role *model.Role) (err error) {
 	return d.batch("role", func(b *bolt.Bucket) error {
 		data := b.Get([]byte(role.ID))
 		if data == nil {
@@ -63,6 +68,6 @@ func (d *Dao) RoleUpdate(role *model.Role) (err error) {
 	})
 }
 
-func (d *Dao) RoleDelete(id string) (err error) {
+func (d *Dao) RoleDelete(ctx context.Context, id string) (err error) {
 	return d.delete("role", id)
 }

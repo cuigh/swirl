@@ -18,8 +18,8 @@ func (v Value) Unmarshal(i interface{}) error {
 
 // Dao implements dao.Interface interface.
 type Dao struct {
-	logger log.Logger
 	db     *bolt.DB
+	logger log.Logger
 }
 
 // New creates a Dao instance.
@@ -40,19 +40,14 @@ func New(addr string) (*Dao, error) {
 	return d, nil
 }
 
-func (d *Dao) Init() {
-	d.db.Update(func(tx *bolt.Tx) error {
-		tx.CreateBucketIfNotExists([]byte("chart"))
-		tx.CreateBucketIfNotExists([]byte("dashboard"))
-		tx.CreateBucketIfNotExists([]byte("event"))
-		tx.CreateBucketIfNotExists([]byte("perm"))
-		tx.CreateBucketIfNotExists([]byte("registry"))
-		tx.CreateBucketIfNotExists([]byte("role"))
-		tx.CreateBucketIfNotExists([]byte("session"))
-		tx.CreateBucketIfNotExists([]byte("setting"))
-		tx.CreateBucketIfNotExists([]byte("stack"))
-		tx.CreateBucketIfNotExists([]byte("template"))
-		tx.CreateBucketIfNotExists([]byte("user"))
+func (d *Dao) Init() error {
+	buckets := []string{"chart", "dashboard", "event", "registry", "role", "setting", "stack", "user" /*"perm","session","template"*/}
+	return d.db.Update(func(tx *bolt.Tx) error {
+		for _, bucket := range buckets {
+			if _, err := tx.CreateBucketIfNotExists([]byte(bucket)); err != nil {
+				return err
+			}
+		}
 		return nil
 	})
 }

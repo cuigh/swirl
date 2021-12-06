@@ -1,13 +1,14 @@
 package bolt
 
 import (
+	"context"
 	"sort"
 
 	"github.com/cuigh/swirl/misc"
 	"github.com/cuigh/swirl/model"
 )
 
-func (d *Dao) EventList(args *model.EventListArgs) (events []*model.Event, count int, err error) {
+func (d *Dao) EventList(ctx context.Context, args *model.EventListArgs) (events []*model.Event, count int, err error) {
 	err = d.each("event", func(v Value) error {
 		event := &model.Event{}
 		err = v.Unmarshal(event)
@@ -39,12 +40,6 @@ func (d *Dao) EventList(args *model.EventListArgs) (events []*model.Event, count
 	return
 }
 
-func (d *Dao) EventCreate(event *model.Event) (err error) {
-	// TODO:
-	return d.update("event", event.ID, event)
-	//return nil
-	//d.do(func(db *database) {
-	//	err = db.C("event").Insert(event)
-	//})
-	//return
+func (d *Dao) EventCreate(ctx context.Context, event *model.Event) (err error) {
+	return d.update("event", event.ID.Hex(), event)
 }

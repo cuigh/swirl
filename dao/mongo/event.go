@@ -1,35 +1,28 @@
 package mongo
 
 import (
+	"context"
+
 	"github.com/cuigh/swirl/model"
-	"github.com/globalsign/mgo/bson"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
-func (d *Dao) EventList(args *model.EventListArgs) (events []*model.Event, count int, err error) {
-	d.do(func(db *database) {
-		query := bson.M{}
-		if args.Type != "" {
-			query["type"] = args.Type
-		}
-		if args.Name != "" {
-			query["name"] = args.Name
-		}
+const Event = "event"
 
-		q := db.C("event").Find(query)
-		count, err = q.Count()
-		if err != nil {
-			return
-		}
-
-		events = []*model.Event{}
-		err = q.Sort("-time").Skip(args.PageSize * (args.PageIndex - 1)).Limit(args.PageSize).All(&events)
-	})
+func (d *Dao) EventList(ctx context.Context, args *model.EventListArgs) (events []*model.Event, count int, err error) {
+	filter := bson.M{}
+	if args.Type != "" {
+		filter["type"] = args.Type
+	}
+	if args.Name != "" {
+		filter["name"] = args.Name
+	}
+	opts := searchOptions{filter: filter, sorter: bson.M{"_id": -1}, pageIndex: args.PageIndex, pageSize: args.PageSize}
+	events = []*model.Event{}
+	count, err = d.search(ctx, Event, opts, &events)
 	return
 }
 
-func (d *Dao) EventCreate(event *model.Event) (err error) {
-	d.do(func(db *database) {
-		err = db.C("event").Insert(event)
-	})
-	return
+func (d *Dao) EventCreate(ctx context.Context, event *model.Event) (err error) {
+	return d.create(ctx, Event, event)
 }

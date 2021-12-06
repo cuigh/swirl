@@ -1,0 +1,36 @@
+.n-layout-header {
+    padding: 0 16px;
+    height: 56px;
+    display: flex;
+    display: -webkit-flex;
+    align-items: center;
+}
+.n-layout-footer {
+    text-align: center;
+    line-height: 40px;
+    height: 64px;
+    padding: 12px;
+}
+.logo {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    font-size: 18px;
+}
+.logo > img {
+    margin-right: 8px;
+    height: 28px;
+    width: 28px;
+}
+.page-body {
+    padding: 16px;
+}
+.n-a {
+    text-decoration: none;
+}
+.n-input-group-label {
+    text-align: center;
+}
+.CodeMirror {
+    height: 450px !important;
+}

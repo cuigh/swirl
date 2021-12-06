@@ -2,62 +2,59 @@ package biz
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"os"
 	"time"
 
 	"github.com/cuigh/auxo/ext/times"
+	"github.com/cuigh/auxo/util/cast"
 	"github.com/cuigh/auxo/util/lazy"
-	"github.com/cuigh/swirl/model"
-	pclient "github.com/prometheus/client_golang/api"
+	"github.com/cuigh/swirl/misc"
+	client "github.com/prometheus/client_golang/api"
 	papi "github.com/prometheus/client_golang/api/prometheus/v1"
-	pmodel "github.com/prometheus/common/model"
+	"github.com/prometheus/common/model"
 )
 
-// Metric return a metric biz instance.
-var Metric = &metricBiz{
-	api: lazy.Value{
-		New: func() (interface{}, error) {
-			setting, err := Setting.Get()
-			if err != nil {
-				return nil, err
-			}
+type MetricBiz interface {
+	Enabled() bool
+	GetMatrix(query, legend string, start, end time.Time) (data *MatrixData, err error)
+	GetScalar(query string, t time.Time) (data float64, err error)
+	GetVector(query, label string, t time.Time) (data *VectorData, err error)
+}
 
-			client, err := pclient.NewClient(pclient.Config{Address: setting.Metrics.Prometheus})
-			if err != nil {
-				return nil, err
-			}
-
-			return papi.NewAPI(client), nil
-		},
-	},
+func NewMetric(setting *misc.Setting) MetricBiz {
+	b := &metricBiz{prometheus: setting.Metric.Prometheus}
+	b.api.New = b.createAPI
+	return b
 }
 
 type metricBiz struct {
-	api lazy.Value
+	prometheus string
+	api        lazy.Value
 }
 
-// func (b *metricBiz) GetServiceCharts(service string, categories []string) (charts []model.ChartInfo) {
-// 	charts = append(charts, model.NewChartInfo("cpu", "CPU", "${name}", `rate(container_cpu_user_seconds_total{container_label_com_docker_swarm_service_name="%s"}[5m]) * 100`))
-// 	charts = append(charts, model.NewChartInfo("memory", "Memory", "${name}", `container_memory_usage_bytes{container_label_com_docker_swarm_service_name="%s"}`))
-// 	charts = append(charts, model.NewChartInfo("network_in", "Network Receive", "${name}", `sum(irate(container_network_receive_bytes_total{container_label_com_docker_swarm_service_name="%s"}[5m])) by(name)`))
-// 	charts = append(charts, model.NewChartInfo("network_out", "Network Send", "${name}", `sum(irate(container_network_transmit_bytes_total{container_label_com_docker_swarm_service_name="%s"}[5m])) by(name)`))
-// 	for _, c := range categories {
-// 		if c == "java" {
-// 			charts = append(charts, model.NewChartInfo("threads", "Threads", "${instance}", `jvm_threads_current{service="%s"}`))
-// 			charts = append(charts, model.NewChartInfo("gc_duration", "GC Duration", "${instance}", `rate(jvm_gc_collection_seconds_sum{service="%s"}[1m])`))
-// 		} else if c == "go" {
-// 			charts = append(charts, model.NewChartInfo("threads", "Threads", "${instance}", `go_threads{service="%s"}`))
-// 			charts = append(charts, model.NewChartInfo("goroutines", "Goroutines", "${instance}", `go_goroutines{service="%s"}`))
-// 			charts = append(charts, model.NewChartInfo("gc_duration", "GC Duration", "${instance}", `sum(go_gc_duration_seconds{service="%s"}) by (instance)`))
-// 		}
-// 	}
-// 	for i, c := range charts {
-// 		charts[i].Query = fmt.Sprintf(c.Query, service)
-// 	}
-// 	return
-// }
+func (b *metricBiz) createAPI() (api interface{}, err error) {
+	if b.prometheus == "" {
+		return nil, errors.New("prometheus address is not configured")
+	}
 
-func (b *metricBiz) GetMatrix(query, legend string, start, end time.Time) (data *model.ChartMatrixData, err error) {
+	var c client.Client
+	if c, err = client.NewClient(client.Config{Address: b.prometheus}); err == nil {
+		api = papi.NewAPI(c)
+	}
+	return
+}
+
+func (b *metricBiz) Enabled() bool {
+	return b.prometheus != ""
+}
+
+func (b *metricBiz) GetMatrix(query, legend string, start, end time.Time) (data *MatrixData, err error) {
+	if !b.Enabled() {
+		return
+	}
+
 	api, err := b.getAPI()
 	if err != nil {
 		return nil, err
@@ -73,13 +70,13 @@ func (b *metricBiz) GetMatrix(query, legend string, start, end time.Time) (data 
 		return nil, err
 	}
 
-	data = &model.ChartMatrixData{}
-	matrix := value.(pmodel.Matrix)
+	data = &MatrixData{}
+	matrix := value.(model.Matrix)
 	for _, stream := range matrix {
 		data.Legend = append(data.Legend, b.formatLabel(legend, stream.Metric))
-		line := model.ChartLine{Name: b.formatLabel(legend, stream.Metric)}
+		line := MatrixLine{Name: b.formatLabel(legend, stream.Metric)}
 		for _, v := range stream.Values {
-			p := model.ChartPoint{
+			p := MatrixPoint{
 				X: int64(v.Timestamp),
 				Y: float64(v.Value),
 			}
@@ -91,6 +88,10 @@ func (b *metricBiz) GetMatrix(query, legend string, start, end time.Time) (data 
 }
 
 func (b *metricBiz) GetScalar(query string, t time.Time) (v float64, err error) {
+	if !b.Enabled() {
+		return
+	}
+
 	api, err := b.getAPI()
 	if err != nil {
 		return 0, err
@@ -101,8 +102,8 @@ func (b *metricBiz) GetScalar(query string, t time.Time) (v float64, err error) 
 		return 0, err
 	}
 
-	//scalar := value.(*pmodel.Scalar)
-	vector := value.(pmodel.Vector)
+	//scalar := value.(*model.Scalar)
+	vector := value.(model.Vector)
 	if len(vector) > 0 {
 		sample := vector[0]
 		return float64(sample.Value), nil
@@ -110,23 +111,27 @@ func (b *metricBiz) GetScalar(query string, t time.Time) (v float64, err error) 
 	return 0, nil
 }
 
-func (b *metricBiz) GetVector(query, label string, t time.Time) (data *model.ChartVectorData, err error) {
+func (b *metricBiz) GetVector(query, label string, t time.Time) (data *VectorData, err error) {
+	if !b.Enabled() {
+		return
+	}
+
 	var api papi.API
 	api, err = b.getAPI()
 	if err != nil {
 		return
 	}
 
-	var value pmodel.Value
+	var value model.Value
 	value, _, err = api.Query(context.Background(), query, t)
 	if err != nil {
 		return
 	}
 
-	data = &model.ChartVectorData{}
-	vector := value.(pmodel.Vector)
+	data = &VectorData{}
+	vector := value.(model.Vector)
 	for _, sample := range vector {
-		cv := model.ChartValue{
+		cv := VectorValue{
 			Name:  b.formatLabel(label, sample.Metric),
 			Value: float64(sample.Value),
 		}
@@ -159,11 +164,40 @@ func (b *metricBiz) getAPI() (api papi.API, err error) {
 	return v.(papi.API), nil
 }
 
-func (b *metricBiz) formatLabel(label string, metric pmodel.Metric) string {
+func (b *metricBiz) formatLabel(label string, metric model.Metric) string {
 	return os.Expand(label, func(key string) string {
-		if s := string(metric[pmodel.LabelName(key)]); s != "" {
+		if s := string(metric[model.LabelName(key)]); s != "" {
 			return s
 		}
 		return "[" + key + "]"
 	})
+}
+
+type MatrixData struct {
+	Legend []string     `json:"legend"`
+	Series []MatrixLine `json:"series"`
+}
+
+type MatrixLine struct {
+	Name string        `json:"name"`
+	Data []MatrixPoint `json:"data"`
+}
+
+type MatrixPoint struct {
+	X int64   `json:"x"`
+	Y float64 `json:"y"`
+}
+
+func (p *MatrixPoint) MarshalJSON() ([]byte, error) {
+	return cast.StringToBytes(fmt.Sprintf("[%v,%v]", p.X, p.Y)), nil
+}
+
+type VectorData struct {
+	Legend []string      `json:"legend"`
+	Data   []VectorValue `json:"data"`
+}
+
+type VectorValue struct {
+	Name  string  `json:"name"`
+	Value float64 `json:"value"`
 }
