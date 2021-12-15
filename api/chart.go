@@ -91,7 +91,7 @@ func chartDelete(b biz.ChartBiz) web.HandlerFunc {
 
 func chartSave(b biz.ChartBiz) web.HandlerFunc {
 	return func(ctx web.Context) error {
-		r := &model.Chart{}
+		r := &biz.Chart{}
 		err := ctx.Bind(r, true)
 		if err == nil {
 			if r.ID == "" {

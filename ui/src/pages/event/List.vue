@@ -21,7 +21,12 @@
         style="width: 140px"
         clearable
       />
-      <n-input size="small" v-model:value="filter.name" :placeholder="t('fields.object')" clearable />
+      <n-input
+        size="small"
+        v-model:value="filter.name"
+        :placeholder="t('fields.object')"
+        clearable
+      />
       <n-button size="small" type="primary" @click="() => fetchData()">{{ t('buttons.search') }}</n-button>
     </n-space>
     <n-data-table
@@ -108,10 +113,6 @@ const types: any = [
         value: 'Service'
       },
       {
-        label: 'Template',
-        value: 'Template'
-      },
-      {
         label: 'Stack',
         value: 'Stack'
       },
@@ -192,14 +193,14 @@ const { state, pagination, fetchData, changePageSize } = useDataTable(eventApi.s
 
 function url(e: Event): string {
   switch (e.type) {
-    case "Authentication":
+    case "User":
       return `/system/users/${e.code}`
     case "Role":
       return `/system/roles/${e.code}`
-    case "User":
-      return `/system/users/${e.code}`
+    case "Chart":
+      return `/system/charts/${e.code}`
     case "Setting":
-      return '/system/setting'
+      return '/system/settings'
     case "Registry":
       return `/swarm/registries/${e.code}`
     case "Node":
@@ -208,8 +209,6 @@ function url(e: Event): string {
       return `/swarm/networks/${e.code}`
     case "Service":
       return `/swarm/services/${e.code}`
-    case "Template":
-      return `/swarm/templates/${e.code}`
     case "Stack":
       return `/swarm/stacks/${e.code}`
     case "Config":

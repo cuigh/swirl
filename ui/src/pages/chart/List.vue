@@ -84,7 +84,7 @@ const columns = [
     title: t('fields.title'),
     key: "title",
     fixed: "left" as const,
-    render: (c: Chart) => renderLink(`/system/charts/${c.id}/edit`, c.title),
+    render: (c: Chart) => renderLink(`/system/charts/${c.id}`, c.title),
   },
   {
     title: t('fields.type'),

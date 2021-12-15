@@ -116,7 +116,7 @@ type EventListArgs struct {
 type Chart struct {
 	ID          string        `json:"id" bson:"_id"` // unique, the name of build-in charts has '$' prefix.
 	Title       string        `json:"title" valid:"required"`
-	Description string        `json:"desc"`
+	Description string        `json:"desc" bson:"desc"`
 	Metrics     []ChartMetric `json:"metrics" valid:"required"`
 	Dashboard   string        `json:"dashboard"` // home/service/task...
 	Type        string        `json:"type"`      // pie/line...

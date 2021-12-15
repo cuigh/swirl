@@ -46,7 +46,21 @@ func (d *Dao) ChartBatch(ctx context.Context, names ...string) (charts []*model.
 }
 
 func (d *Dao) ChartUpdate(ctx context.Context, chart *model.Chart) (err error) {
-	return d.update(ctx, Chart, chart.ID, chart)
+	update := bson.M{
+		"$set": bson.M{
+			"title":      chart.Title,
+			"desc":       chart.Description,
+			"width":      chart.Width,
+			"height":     chart.Height,
+			"unit":       chart.Unit,
+			"dashboard":  chart.Dashboard,
+			"type":       chart.Type,
+			"margin":     chart.Margin,
+			"metrics":    chart.Metrics,
+			"updated_at": chart.UpdatedAt,
+		},
+	}
+	return d.update(ctx, Chart, chart.ID, update)
 }
 
 func (d *Dao) ChartDelete(ctx context.Context, id string) (err error) {
@@ -69,5 +83,5 @@ func (d *Dao) DashboardUpdate(ctx context.Context, dashboard *model.Dashboard) (
 	update := bson.M{
 		"$set": dashboard,
 	}
-	return d.update(ctx, Dashboard, dashboard.ID(), update)
+	return d.upsert(ctx, Dashboard, dashboard.ID(), update)
 }

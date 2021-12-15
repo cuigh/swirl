@@ -17,7 +17,7 @@ RUN CGO_ENABLED=0 go build -ldflags "-s -w"
 FROM alpine
 LABEL maintainer="cuigh <noname@live.com>"
 WORKDIR /app
-RUN apk add --no-cache ca-certificates
+RUN apk add --no-cache ca-certificates tzdata
 COPY --from=golang /app/swirl .
 COPY --from=golang /app/config config/
 EXPOSE 8001

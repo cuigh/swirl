@@ -282,6 +282,11 @@ const routes: RouteRecordRaw[] = [
     component: () => import('../pages/chart/List.vue'),
   },
   {
+    name: "chart_detail",
+    path: "/system/charts/:id",
+    component: () => import('../pages/chart/View.vue'),
+  },
+  {
     name: "chart_new",
     path: "/system/charts/new",
     component: () => import('../pages/chart/Edit.vue'),

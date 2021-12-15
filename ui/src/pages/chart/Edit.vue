@@ -140,7 +140,7 @@ import chartApi from "@/api/chart";
 import type { Chart } from "@/api/chart";
 import { useRoute } from "vue-router";
 import { router } from "@/router/router";
-import { useForm, requiredRule } from "@/utils/form";
+import { useForm, requiredRule, customRule } from "@/utils/form";
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
@@ -212,6 +212,9 @@ const dashboards = [
 ]
 const rules: any = {
   title: requiredRule(),
+  metrics: customRule((rule: any, value: any[]) => {
+    return !!value && value.length > 0
+  }, t('tips.required_rule')),
 };
 const form = ref();
 const { submit, submiting } = useForm(form, () => chartApi.save(model.value), () => {

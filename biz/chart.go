@@ -17,10 +17,10 @@ import (
 type ChartBiz interface {
 	Search(title, dashboard string, pageIndex, pageSize int) (charts []*Chart, total int, err error)
 	Delete(id, title string, user web.User) (err error)
-	Find(id string) (chart *model.Chart, err error)
+	Find(id string) (chart *Chart, err error)
 	Batch(ids ...string) (charts []*model.Chart, err error)
-	Create(chart *model.Chart, user web.User) (err error)
-	Update(chart *model.Chart, user web.User) (err error)
+	Create(chart *Chart, user web.User) (err error)
+	Update(chart *Chart, user web.User) (err error)
 	FetchData(key string, ids []string, period time.Duration) (data.Map, error)
 	FindDashboard(name, key string) (dashboard *Dashboard, err error)
 	UpdateDashboard(dashboard *model.Dashboard, user web.User) (err error)
@@ -59,13 +59,19 @@ func (b *chartBiz) Search(title, dashboard string, pageIndex, pageSize int) (cha
 	return
 }
 
-func (b *chartBiz) Create(chart *model.Chart, user web.User) (err error) {
-	chart.ID = createId()
-	chart.CreatedAt = time.Now()
-	chart.UpdatedAt = chart.CreatedAt
-	err = b.d.ChartCreate(context.TODO(), chart)
+func (b *chartBiz) Create(chart *Chart, user web.User) (err error) {
+	c := &model.Chart{
+		ID:        createId(),
+		CreatedAt: time.Now(),
+	}
+	c.UpdatedAt = c.CreatedAt
+	if err = copier.CopyWithOption(c, chart, copier.Option{IgnoreEmpty: true, DeepCopy: true}); err != nil {
+		return err
+	}
+
+	err = b.d.ChartCreate(context.TODO(), c)
 	if err == nil {
-		b.eb.CreateChart(EventActionCreate, chart.ID, chart.Title, user)
+		b.eb.CreateChart(EventActionCreate, c.ID, c.Title, user)
 	}
 	return
 }
@@ -78,8 +84,12 @@ func (b *chartBiz) Delete(id, title string, user web.User) (err error) {
 	return
 }
 
-func (b *chartBiz) Find(id string) (chart *model.Chart, err error) {
-	chart, err = b.d.ChartGet(context.TODO(), id)
+func (b *chartBiz) Find(id string) (chart *Chart, err error) {
+	var c *model.Chart
+	c, err = b.d.ChartGet(context.TODO(), id)
+	if err == nil {
+		chart = newChart(c)
+	}
 	return
 }
 
@@ -88,9 +98,15 @@ func (b *chartBiz) Batch(ids ...string) (charts []*model.Chart, err error) {
 	return
 }
 
-func (b *chartBiz) Update(chart *model.Chart, user web.User) (err error) {
-	chart.UpdatedAt = time.Now()
-	err = b.d.ChartUpdate(context.TODO(), chart)
+func (b *chartBiz) Update(chart *Chart, user web.User) (err error) {
+	c := &model.Chart{
+		UpdatedAt: time.Now(),
+	}
+	if err = copier.CopyWithOption(c, chart, copier.Option{IgnoreEmpty: true, DeepCopy: true}); err != nil {
+		return err
+	}
+
+	err = b.d.ChartUpdate(context.TODO(), c)
 	if err == nil {
 		b.eb.CreateChart(EventActionUpdate, chart.ID, chart.Title, user)
 	}
