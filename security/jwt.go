@@ -11,7 +11,7 @@ import (
 	"github.com/cuigh/auxo/security"
 	"github.com/cuigh/auxo/util/cast"
 	"github.com/cuigh/swirl/misc"
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt"
 )
 
 var ErrNoNeedRefresh = errors.New("no need to refresh")
