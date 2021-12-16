@@ -2,7 +2,6 @@ package mongo
 
 import (
 	"context"
-	"time"
 
 	"github.com/cuigh/swirl/model"
 	"go.mongodb.org/mongo-driver/bson"
@@ -20,7 +19,8 @@ func (d *Dao) RegistryUpdate(ctx context.Context, registry *model.Registry) (err
 		"name":       registry.Name,
 		"url":        registry.URL,
 		"username":   registry.Username,
-		"updated_at": time.Now(),
+		"updated_at": registry.UpdatedAt,
+		"updated_by": registry.UpdatedBy,
 	}
 	if registry.Password != "" {
 		update["password"] = registry.Password
@@ -28,7 +28,7 @@ func (d *Dao) RegistryUpdate(ctx context.Context, registry *model.Registry) (err
 	return d.update(ctx, Registry, registry.ID, bson.M{"$set": update})
 }
 
-func (d *Dao) RegistryList(ctx context.Context) (registries []*model.Registry, err error) {
+func (d *Dao) RegistryGetAll(ctx context.Context) (registries []*model.Registry, err error) {
 	registries = []*model.Registry{}
 	err = d.fetch(ctx, Registry, bson.M{}, &registries)
 	return

@@ -67,7 +67,7 @@ func newEvent(e *model.Event) *Event {
 }
 
 type EventBiz interface {
-	Search(args *model.EventListArgs) (events []*Event, total int, err error)
+	Search(args *model.EventSearchArgs) (events []*Event, total int, err error)
 	CreateRegistry(action EventAction, id, name string, user web.User)
 	CreateNode(action EventAction, id, name string, user web.User)
 	CreateNetwork(action EventAction, id, name string, user web.User)
@@ -91,9 +91,9 @@ type eventBiz struct {
 	d dao.Interface
 }
 
-func (b *eventBiz) Search(args *model.EventListArgs) (events []*Event, total int, err error) {
+func (b *eventBiz) Search(args *model.EventSearchArgs) (events []*Event, total int, err error) {
 	var list []*model.Event
-	list, total, err = b.d.EventList(context.TODO(), args)
+	list, total, err = b.d.EventSearch(context.TODO(), args)
 	if err == nil && len(list) > 0 {
 		events = make([]*Event, len(list))
 		for i, e := range list {

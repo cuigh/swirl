@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"strconv"
+	"time"
 
 	"github.com/cuigh/auxo/data"
 	"github.com/cuigh/auxo/net/web"
@@ -45,7 +46,7 @@ func (b *settingBiz) Find(id string) (options data.Map, err error) {
 // Load returns settings of swirl. If not found, default settings will be returned.
 func (b *settingBiz) Load() (options data.Map, err error) {
 	var settings []*model.Setting
-	settings, err = b.d.SettingList(context.TODO())
+	settings, err = b.d.SettingGetAll(context.TODO())
 	if err != nil {
 		return
 	}
@@ -58,7 +59,13 @@ func (b *settingBiz) Load() (options data.Map, err error) {
 }
 
 func (b *settingBiz) Save(id string, options data.Map, user web.User) (err error) {
-	err = b.d.SettingUpdate(context.TODO(), id, b.toOptions(options))
+	setting := &model.Setting{
+		ID:        id,
+		Options:   b.toOptions(options),
+		UpdatedAt: time.Now(),
+		UpdatedBy: model.Operator{ID: user.ID(), Name: user.Name()},
+	}
+	err = b.d.SettingUpdate(context.TODO(), setting)
 	if err == nil && user != nil {
 		b.eb.CreateSetting(EventActionUpdate, user)
 	}

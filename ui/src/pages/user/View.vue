@@ -19,22 +19,15 @@
   <n-space class="page-body" vertical :size="16">
     <x-description cols="1 640:2" label-position="left" label-align="right" :label-width="100">
       <x-description-item :label="t('fields.id')">{{ model.user.id }}</x-description-item>
+      <x-description-item :label="t('fields.email')">{{ model.user.email }}</x-description-item>
+      <x-description-item :label="t('fields.username')">{{ model.user.name }}</x-description-item>
+      <x-description-item :label="t('fields.login_name')">{{ model.user.loginName }}</x-description-item>
       <x-description-item :label="t('fields.status')">
         <n-tag
           round
           size="small"
           :type="model.user.status ? 'primary' : 'warning'"
         >{{ t(model.user.status ? 'enums.normal' : 'enums.blocked') }}</n-tag>
-      </x-description-item>
-      <x-description-item :label="t('fields.username')">{{ model.user.name }}</x-description-item>
-      <x-description-item :label="t('fields.login_name')">{{ model.user.loginName }}</x-description-item>
-      <x-description-item :label="t('fields.email')">{{ model.user.email }}</x-description-item>
-      <x-description-item :label="t('fields.type')">
-        <n-tag
-          size="small"
-          round
-          :type="model.user.type === 'internal' ? 'default' : 'warning'"
-        >{{ model.user.type }}</n-tag>
       </x-description-item>
       <x-description-item :label="t('fields.admin')">
         <n-tag
@@ -43,7 +36,24 @@
           :type="model.user.admin ? 'success' : 'default'"
         >{{ t(model.user.admin ? "enums.yes" : "enums.no") }}</n-tag>
       </x-description-item>
+      <x-description-item :label="t('fields.type')" :span="2">
+        <n-tag
+          size="small"
+          round
+          :type="model.user.type === 'internal' ? 'default' : 'warning'"
+        >{{ model.user.type }}</n-tag>
+      </x-description-item>
+      <x-description-item :label="t('fields.created_by')">
+        <x-anchor
+          :url="`/system/users/${model.user.createdBy?.id}`"
+        >{{ model.user.createdBy?.name }}</x-anchor>
+      </x-description-item>
       <x-description-item :label="t('fields.created_at')">{{ model.user.createdAt }}</x-description-item>
+      <x-description-item :label="t('fields.updated_by')">
+        <x-anchor
+          :url="`/system/users/${model.user.updatedBy?.id}`"
+        >{{ model.user.updatedBy?.name }}</x-anchor>
+      </x-description-item>
       <x-description-item :label="t('fields.updated_at')">{{ model.user.updatedAt }}</x-description-item>
       <x-description-item
         :label="t('objects.role', 2)"
@@ -74,6 +84,7 @@ import {
 import { useRoute } from "vue-router";
 import { ArrowBackCircleOutline as BackIcon } from "@vicons/ionicons5";
 import XPageHeader from "@/components/PageHeader.vue";
+import XAnchor from "@/components/Anchor.vue";
 import { XDescription, XDescriptionItem } from "@/components/description";
 import userApi from "@/api/user";
 import roleApi from "@/api/role";

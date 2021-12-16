@@ -9,7 +9,7 @@ import (
 
 const Role = "role"
 
-func (d *Dao) RoleList(ctx context.Context, name string) (roles []*model.Role, err error) {
+func (d *Dao) RoleSearch(ctx context.Context, name string) (roles []*model.Role, err error) {
 	filter := bson.M{}
 	if name != "" {
 		filter["name"] = name
@@ -39,6 +39,7 @@ func (d *Dao) RoleUpdate(ctx context.Context, role *model.Role) (err error) {
 			"desc":       role.Description,
 			"perms":      role.Perms,
 			"updated_at": role.UpdatedAt,
+			"updated_by": role.UpdatedBy,
 		},
 	}
 	return d.update(ctx, Role, role.ID, update)

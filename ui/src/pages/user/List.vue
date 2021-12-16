@@ -112,6 +112,10 @@ const columns = [
     ),
   },
   {
+    title: t('fields.updated_at'),
+    key: "updatedAt",
+  },
+  {
     title: t('fields.actions'),
     key: "actions",
     render(row: User, index: number) {

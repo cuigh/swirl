@@ -16,9 +16,17 @@ export interface User {
     type: string;
     status: number;
     email: string;
+    roles: string[];
     createdAt: string;
     updatedAt: string;
-    roles: string[];
+    createdBy: {
+        id: string;
+        name: string;
+    };
+    updatedBy: {
+        id: string;
+        name: string;
+    };
 }
 
 export interface LoginArgs {

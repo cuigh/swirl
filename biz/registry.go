@@ -12,42 +12,6 @@ import (
 	"github.com/docker/docker/api/types"
 )
 
-type Registry struct {
-	ID        string `json:"id,omitempty"`
-	Name      string `json:"name" valid:"required"`
-	URL       string `json:"url" valid:"required,url"`
-	Username  string `json:"username" valid:"required"`
-	Password  string `json:"password"`
-	CreatedAt string `json:"createdAt,omitempty"`
-	UpdatedAt string `json:"updatedAt,omitempty"`
-}
-
-func newRegistry(r *model.Registry) *Registry {
-	if r == nil {
-		return nil
-	}
-
-	return &Registry{
-		ID:        r.ID,
-		Name:      r.Name,
-		URL:       r.URL,
-		Username:  r.Username,
-		CreatedAt: formatTime(r.CreatedAt),
-		UpdatedAt: formatTime(r.UpdatedAt),
-		//Password:  r.Password, // omit password
-	}
-}
-
-func (r *Registry) Convert() *model.Registry {
-	return &model.Registry{
-		ID:       r.ID,
-		Name:     r.Name,
-		URL:      r.URL,
-		Username: r.Username,
-		Password: r.Password,
-	}
-}
-
 type RegistryBiz interface {
 	Search() ([]*Registry, error)
 	Find(id string) (*Registry, error)
@@ -71,6 +35,9 @@ func (b *registryBiz) Create(registry *Registry, user web.User) (err error) {
 	r.ID = createId()
 	r.CreatedAt = time.Now()
 	r.UpdatedAt = r.CreatedAt
+	r.CreatedBy.ID = user.ID()
+	r.CreatedBy.Name = user.Name()
+	r.UpdatedBy = r.CreatedBy
 
 	err = b.d.RegistryCreate(context.TODO(), r)
 	if err == nil {
@@ -80,7 +47,11 @@ func (b *registryBiz) Create(registry *Registry, user web.User) (err error) {
 }
 
 func (b *registryBiz) Update(registry *Registry, user web.User) (err error) {
-	err = b.d.RegistryUpdate(context.TODO(), registry.Convert())
+	r := registry.Convert()
+	r.UpdatedAt = time.Now()
+	r.UpdatedBy.ID = user.ID()
+	r.UpdatedBy.Name = user.Name()
+	err = b.d.RegistryUpdate(context.TODO(), r)
 	if err == nil {
 		b.eb.CreateRegistry(EventActionUpdate, registry.ID, registry.Name, user)
 	}
@@ -89,7 +60,7 @@ func (b *registryBiz) Update(registry *Registry, user web.User) (err error) {
 
 func (b *registryBiz) Search() (registries []*Registry, err error) {
 	var list []*model.Registry
-	if list, err = b.d.RegistryList(context.TODO()); err == nil {
+	if list, err = b.d.RegistryGetAll(context.TODO()); err == nil {
 		for _, r := range list {
 			registries = append(registries, newRegistry(r))
 		}
@@ -129,4 +100,44 @@ func (b *registryBiz) Delete(id, name string, user web.User) (err error) {
 		b.eb.CreateRegistry(EventActionDelete, id, name, user)
 	}
 	return
+}
+
+type Registry struct {
+	ID        string         `json:"id,omitempty"`
+	Name      string         `json:"name" valid:"required"`
+	URL       string         `json:"url" valid:"required,url"`
+	Username  string         `json:"username" valid:"required"`
+	Password  string         `json:"password" copier:"-"`
+	CreatedAt string         `json:"createdAt,omitempty" copier:"-"`
+	UpdatedAt string         `json:"updatedAt,omitempty" copier:"-"`
+	CreatedBy model.Operator `json:"createdBy" bson:"created_by"`
+	UpdatedBy model.Operator `json:"updatedBy" bson:"updated_by"`
+}
+
+func newRegistry(r *model.Registry) *Registry {
+	if r == nil {
+		return nil
+	}
+
+	return &Registry{
+		ID:        r.ID,
+		Name:      r.Name,
+		URL:       r.URL,
+		Username:  r.Username,
+		CreatedAt: formatTime(r.CreatedAt),
+		UpdatedAt: formatTime(r.UpdatedAt),
+		CreatedBy: r.CreatedBy,
+		UpdatedBy: r.UpdatedBy,
+		//Password:  r.Password, // omit password
+	}
+}
+
+func (r *Registry) Convert() *model.Registry {
+	return &model.Registry{
+		ID:       r.ID,
+		Name:     r.Name,
+		URL:      r.URL,
+		Username: r.Username,
+		Password: r.Password,
+	}
 }

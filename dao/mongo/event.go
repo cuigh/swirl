@@ -9,7 +9,7 @@ import (
 
 const Event = "event"
 
-func (d *Dao) EventList(ctx context.Context, args *model.EventListArgs) (events []*model.Event, count int, err error) {
+func (d *Dao) EventSearch(ctx context.Context, args *model.EventSearchArgs) (events []*model.Event, count int, err error) {
 	filter := bson.M{}
 	if args.Type != "" {
 		filter["type"] = args.Type

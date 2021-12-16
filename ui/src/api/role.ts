@@ -7,6 +7,14 @@ export interface Role {
     perms: string[];
     createdAt: string;
     updatedAt: string;
+    createdBy: {
+        id: string;
+        name: string;
+    };
+    updatedBy: {
+        id: string;
+        name: string;
+    };
 }
 
 export class RoleApi {

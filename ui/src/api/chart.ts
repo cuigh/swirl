@@ -22,6 +22,14 @@ export interface Chart {
     };
     createdAt: string;
     updatedAt: string;
+    createdBy: {
+        id: string;
+        name: string;
+    };
+    updatedBy: {
+        id: string;
+        name: string;
+    };
 }
 
 export interface Dashboard {

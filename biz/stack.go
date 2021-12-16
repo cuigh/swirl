@@ -3,6 +3,7 @@ package biz
 import (
 	"context"
 	"strings"
+	"time"
 
 	"github.com/cuigh/auxo/errors"
 	"github.com/cuigh/auxo/net/web"
@@ -46,7 +47,7 @@ func (b *stackBiz) Search(name, filter string) (stacks []*Stack, err error) {
 	}
 
 	// load stack definitions
-	internalStacks, err = b.s.StackList(context.TODO())
+	internalStacks, err = b.s.StackGetAll(context.TODO())
 	if err != nil {
 		return
 	}
@@ -110,9 +111,14 @@ func (b *stackBiz) Create(s *Stack, user web.User) (err error) {
 	stack := &model.Stack{
 		Name:      s.Name,
 		Content:   s.Content,
-		CreatedBy: user.ID(),
-		UpdatedBy: user.ID(),
+		CreatedAt: time.Now(),
+		CreatedBy: model.Operator{
+			ID:   user.ID(),
+			Name: user.Name(),
+		},
 	}
+	stack.UpdatedAt = stack.CreatedAt
+	stack.UpdatedBy = stack.CreatedBy
 	err = b.s.StackCreate(context.TODO(), stack)
 	if err == nil {
 		b.eb.CreateStack(EventActionCreate, stack.Name, user)
@@ -128,8 +134,10 @@ func (b *stackBiz) Update(s *Stack, user web.User) (err error) {
 	stack := &model.Stack{
 		Name:      s.Name,
 		Content:   s.Content,
-		UpdatedBy: user.ID(),
+		UpdatedAt: time.Now(),
 	}
+	stack.UpdatedBy.ID = user.ID()
+	stack.UpdatedBy.Name = user.Name()
 	err = b.s.StackUpdate(context.TODO(), stack)
 	if err == nil {
 		b.eb.CreateStack(EventActionUpdate, stack.Name, user)
@@ -169,7 +177,7 @@ func (b *stackBiz) Deploy(name string, user web.User) (err error) {
 		return err
 	}
 
-	registries, err := b.s.RegistryList(context.TODO())
+	registries, err := b.s.RegistryGetAll(context.TODO())
 	if err != nil {
 		return err
 	}
@@ -194,15 +202,15 @@ func (b *stackBiz) Deploy(name string, user web.User) (err error) {
 }
 
 type Stack struct {
-	ID        string   `json:"id,omitempty"`
-	Name      string   `json:"name,omitempty"`
-	Content   string   `json:"content,omitempty"`
-	CreatedBy string   `json:"createdBy,omitempty"`
-	CreatedAt string   `json:"createdAt,omitempty"`
-	UpdatedBy string   `json:"updatedBy,omitempty"`
-	UpdatedAt string   `json:"updatedAt,omitempty"`
-	Services  []string `json:"services,omitempty"`
-	Internal  bool     `json:"internal"`
+	ID        string         `json:"id,omitempty"`
+	Name      string         `json:"name,omitempty"`
+	Content   string         `json:"content,omitempty"`
+	Services  []string       `json:"services,omitempty"`
+	Internal  bool           `json:"internal"`
+	CreatedAt string         `json:"createdAt,omitempty"`
+	UpdatedAt string         `json:"updatedAt,omitempty"`
+	CreatedBy model.Operator `json:"createdBy,omitempty"`
+	UpdatedBy model.Operator `json:"updatedBy,omitempty"`
 }
 
 func newStack(s *model.Stack) *Stack {
@@ -210,10 +218,10 @@ func newStack(s *model.Stack) *Stack {
 		ID:        s.Name,
 		Name:      s.Name,
 		Content:   s.Content,
-		CreatedBy: s.CreatedBy,
-		CreatedAt: formatTime(s.CreatedAt),
-		UpdatedBy: s.UpdatedBy,
-		UpdatedAt: formatTime(s.UpdatedAt),
 		Internal:  true,
+		CreatedAt: formatTime(s.CreatedAt),
+		UpdatedAt: formatTime(s.UpdatedAt),
+		CreatedBy: s.CreatedBy,
+		UpdatedBy: s.UpdatedBy,
 	}
 }

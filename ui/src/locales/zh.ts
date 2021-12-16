@@ -61,6 +61,8 @@ export default {
         "username": "用户名",
         "created_at": "创建时间",
         "updated_at": "更新时间",
+        "created_by": "创建人",
+        "updated_by": "更新人",
         "started_at": "启动时间",
         "action": "操作",
         "actions": "操作",

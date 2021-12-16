@@ -1,19 +1,23 @@
 package bolt
 
 import (
-	"encoding/json"
 	"path/filepath"
 	"strings"
 
 	"github.com/boltdb/bolt"
 	"github.com/cuigh/auxo/errors"
 	"github.com/cuigh/auxo/log"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
-type Value []byte
+var ErrNoRecords = errors.New("no records")
 
-func (v Value) Unmarshal(i interface{}) error {
-	return json.Unmarshal([]byte(v), i)
+func encode(v interface{}) ([]byte, error) {
+	return bson.Marshal(v)
+}
+
+func decode(d []byte, v interface{}) error {
+	return bson.Unmarshal(d, v)
 }
 
 // Dao implements dao.Interface interface.
@@ -52,18 +56,34 @@ func (d *Dao) Init() error {
 	})
 }
 
-func (d *Dao) Close() {
-	d.db.Close()
-}
-
-func (d *Dao) update(bucket, key string, value interface{}) error {
+func (d *Dao) replace(bucket, key string, value interface{}) error {
 	return d.db.Update(func(tx *bolt.Tx) error {
-		buf, err := json.Marshal(value)
+		buf, err := encode(value)
 		if err != nil {
 			return err
 		}
 
 		b := tx.Bucket([]byte(bucket))
+		return b.Put([]byte(key), buf)
+	})
+}
+
+func (d *Dao) update(bucket, key string, oldValue interface{}, newValue func() interface{}) error {
+	return d.db.Update(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte(bucket))
+		data := b.Get([]byte(key))
+		if data == nil {
+			return ErrNoRecords
+		}
+
+		if err := decode(data, oldValue); err != nil {
+			return err
+		}
+
+		buf, err := encode(newValue())
+		if err != nil {
+			return err
+		}
 		return b.Put([]byte(key), buf)
 	})
 }
@@ -75,12 +95,28 @@ func (d *Dao) delete(bucket, key string) error {
 	})
 }
 
-func (d *Dao) get(bucket, key string) (val Value, err error) {
+func (d *Dao) get(bucket, key string, value interface{}) error {
+	return d.db.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte(bucket))
+		if b != nil {
+			if data := b.Get([]byte(key)); data != nil {
+				return decode(data, value)
+			}
+		}
+		return ErrNoRecords
+	})
+}
+
+func (d Dao) find(bucket string, value interface{}, matcher func() bool) (found bool, err error) {
 	err = d.db.View(func(tx *bolt.Tx) error {
-		if b := tx.Bucket([]byte(bucket)); b != nil {
-			v := b.Get([]byte(key))
-			if v != nil {
-				val = Value(v)
+		c := tx.Bucket([]byte(bucket)).Cursor()
+		for k, v := c.First(); k != nil; k, v = c.Next() {
+			if err = decode(v, value); err != nil {
+				return err
+			}
+			if matcher() {
+				found = true
+				return nil
 			}
 		}
 		return nil
@@ -98,33 +134,26 @@ func (d *Dao) count(bucket string) (count int, err error) {
 	return
 }
 
-func (d *Dao) each(bucket string, fn func(v Value) error) (err error) {
+func (d *Dao) each(bucket string, fn func(v []byte) error) (err error) {
 	return d.db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(bucket))
 		return b.ForEach(func(k, v []byte) error {
-			return fn(Value(v))
+			return fn(v)
 		})
 	})
 }
 
-func (d *Dao) slice(bucket string, fn func(v Value) error, keys ...string) (err error) {
+func (d *Dao) slice(bucket string, fn func(v []byte) error, keys ...string) (err error) {
 	return d.db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(bucket))
 		for _, key := range keys {
 			if data := b.Get([]byte(key)); data != nil {
-				if err = fn(Value(data)); err != nil {
+				if err = fn(data); err != nil {
 					return err
 				}
 			}
 		}
 		return nil
-	})
-}
-
-func (d *Dao) batch(bucket string, fn func(b *bolt.Bucket) error) (err error) {
-	return d.db.Batch(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte(bucket))
-		return fn(b)
 	})
 }
 
@@ -137,10 +166,3 @@ func matchAny(s string, list ...string) bool {
 	}
 	return false
 }
-
-// itob returns an 8-byte big endian representation of v.
-//func itob(i uint64) []byte {
-//	b := make([]byte, 8)
-//	binary.BigEndian.PutUint64(b, i)
-//	return b
-//}

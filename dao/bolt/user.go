@@ -2,48 +2,55 @@ package bolt
 
 import (
 	"context"
-	"encoding/json"
-	"time"
 
-	"github.com/boltdb/bolt"
-	"github.com/cuigh/auxo/errors"
 	"github.com/cuigh/swirl/misc"
 	"github.com/cuigh/swirl/model"
 )
 
+const User = "user"
+const Session = "session"
+
 func (d *Dao) UserCount(ctx context.Context) (count int, err error) {
-	return d.count("user")
+	return d.count(User)
 }
 
 func (d *Dao) UserCreate(ctx context.Context, user *model.User) (err error) {
-	return d.update("user", user.ID, user)
+	return d.replace(User, user.ID, user)
 }
 
 func (d *Dao) UserUpdate(ctx context.Context, user *model.User) (err error) {
-	return d.userUpdate(user.ID, func(u *model.User) {
-		u.Name = user.Name
-		u.LoginName = user.LoginName
-		u.Email = user.Email
-		u.Admin = user.Admin
-		u.Type = user.Type
-		u.Roles = user.Roles
+	old := &model.User{}
+	return d.update(User, user.ID, old, func() interface{} {
+		old.Name = user.Name
+		old.LoginName = user.LoginName
+		old.Email = user.Email
+		old.Admin = user.Admin
+		old.Type = user.Type
+		old.Roles = user.Roles
+		old.UpdatedAt = user.UpdatedAt
+		old.UpdatedBy = user.UpdatedBy
+		return old
 	})
 }
 
-func (d *Dao) UserSetStatus(ctx context.Context, id string, status int32) (err error) {
-	return d.userUpdate(id, func(u *model.User) {
-		u.Status = status
+func (d *Dao) UserUpdateStatus(ctx context.Context, user *model.User) (err error) {
+	old := &model.User{}
+	return d.update(User, user.ID, old, func() interface{} {
+		old.Status = user.Status
+		old.UpdatedAt = user.UpdatedAt
+		old.UpdatedBy = user.UpdatedBy
+		return old
 	})
 }
 
 func (d *Dao) UserDelete(ctx context.Context, id string) (err error) {
-	return d.delete("user", id)
+	return d.delete(User, id)
 }
 
-func (d *Dao) UserList(ctx context.Context, args *model.UserSearchArgs) (users []*model.User, count int, err error) {
-	err = d.each("user", func(v Value) error {
+func (d *Dao) UserSearch(ctx context.Context, args *model.UserSearchArgs) (users []*model.User, count int, err error) {
+	err = d.each(User, func(v []byte) error {
 		user := &model.User{}
-		err = v.Unmarshal(user)
+		err = decode(v, user)
 		if err != nil {
 			return err
 		}
@@ -75,97 +82,58 @@ func (d *Dao) UserList(ctx context.Context, args *model.UserSearchArgs) (users [
 	return
 }
 
-func (d *Dao) UserGetByID(ctx context.Context, id string) (user *model.User, err error) {
-	var v Value
-	v, err = d.get("user", id)
-	if err == nil {
-		if v != nil {
-			user = &model.User{}
-			err = v.Unmarshal(user)
-		}
+func (d *Dao) UserGet(ctx context.Context, id string) (user *model.User, err error) {
+	user = &model.User{}
+	err = d.get(User, id, user)
+	if err == ErrNoRecords {
+		return nil, nil
+	} else if err != nil {
+		user = nil
 	}
 	return
 }
 
 func (d *Dao) UserGetByName(ctx context.Context, loginName string) (user *model.User, err error) {
-	err = d.db.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte("user"))
-		c := b.Cursor()
-		for k, v := c.First(); k != nil; k, v = c.Next() {
-			u := &model.User{}
-			err = json.Unmarshal(v, u)
-			if err != nil {
-				return err
-			}
-			if u.LoginName == loginName {
-				user = u
-				return nil
-			}
-		}
-		return nil
-	})
-	return
+	u := &model.User{}
+	found, err := d.find(User, u, func() bool { return u.LoginName == loginName })
+	if found {
+		return u, nil
+	}
+	return nil, err
 }
 
-func (d *Dao) UserModifyProfile(ctx context.Context, user *model.User) (err error) {
-	return d.userUpdate(user.ID, func(u *model.User) {
-		u.Name = user.Name
-		u.LoginName = user.LoginName
-		u.Email = user.Email
+func (d *Dao) UserUpdateProfile(ctx context.Context, user *model.User) (err error) {
+	old := &model.User{}
+	return d.update(User, user.ID, old, func() interface{} {
+		old.Name = user.Name
+		old.LoginName = user.LoginName
+		old.Email = user.Email
+		old.UpdatedAt = user.UpdatedAt
+		old.UpdatedBy = user.UpdatedBy
+		return old
 	})
 }
 
-func (d *Dao) UserModifyPassword(ctx context.Context, id, pwd, salt string) (err error) {
-	return d.userUpdate(id, func(u *model.User) {
-		u.Password = pwd
-		u.Salt = salt
-	})
-}
-
-func (d *Dao) userUpdate(id string, decorator func(u *model.User)) (err error) {
-	return d.batch("user", func(b *bolt.Bucket) error {
-		data := b.Get([]byte(id))
-		if data == nil {
-			return errors.New("user not found: " + id)
-		}
-
-		u := &model.User{}
-		err = json.Unmarshal(data, u)
-		if err != nil {
-			return err
-		}
-
-		decorator(u)
-		u.UpdatedAt = time.Now()
-		data, err = json.Marshal(u)
-		if err != nil {
-			return err
-		}
-
-		return b.Put([]byte(id), data)
+func (d *Dao) UserUpdatePassword(ctx context.Context, user *model.User) (err error) {
+	old := &model.User{}
+	return d.update(User, user.ID, old, func() interface{} {
+		old.Password = user.Password
+		old.Salt = user.Salt
+		old.UpdatedAt = user.UpdatedAt
+		old.UpdatedBy = user.UpdatedBy
+		return old
 	})
 }
 
 func (d *Dao) SessionGet(ctx context.Context, token string) (session *model.Session, err error) {
-	err = d.db.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte("session"))
-		c := b.Cursor()
-		for k, v := c.First(); k != nil; k, v = c.Next() {
-			s := &model.Session{}
-			err = json.Unmarshal(v, s)
-			if err != nil {
-				return err
-			}
-			if s.Token == token {
-				session = s
-				return nil
-			}
-		}
-		return nil
-	})
-	return
+	s := &model.Session{}
+	found, err := d.find(Session, s, func() bool { return s.Token == token })
+	if found {
+		return s, nil
+	}
+	return nil, err
 }
 
 func (d *Dao) SessionUpdate(ctx context.Context, session *model.Session) (err error) {
-	return d.update("session", session.UserID, session)
+	return d.replace(Session, session.UserID, session)
 }

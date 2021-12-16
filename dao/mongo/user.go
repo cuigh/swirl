@@ -2,7 +2,6 @@ package mongo
 
 import (
 	"context"
-	"time"
 
 	"github.com/cuigh/swirl/model"
 	"go.mongodb.org/mongo-driver/bson"
@@ -34,26 +33,28 @@ func (d *Dao) UserUpdate(ctx context.Context, user *model.User) (err error) {
 			"type":       user.Type,
 			"roles":      user.Roles,
 			"updated_at": user.UpdatedAt,
+			"updated_by": user.UpdatedBy,
 		},
 	}
 	return d.update(ctx, User, user.ID, update)
 }
 
-func (d *Dao) UserSetStatus(ctx context.Context, id string, status int32) (err error) {
+func (d *Dao) UserUpdateStatus(ctx context.Context, user *model.User) (err error) {
 	update := bson.M{
 		"$set": bson.M{
-			"status":     status,
-			"updated_at": time.Now(),
+			"status":     user.Status,
+			"updated_at": user.UpdatedAt,
+			"updated_by": user.UpdatedBy,
 		},
 	}
-	return d.update(ctx, User, id, update)
+	return d.update(ctx, User, user.ID, update)
 }
 
 func (d *Dao) UserDelete(ctx context.Context, id string) (err error) {
 	return d.delete(ctx, User, id)
 }
 
-func (d *Dao) UserList(ctx context.Context, args *model.UserSearchArgs) (users []*model.User, count int, err error) {
+func (d *Dao) UserSearch(ctx context.Context, args *model.UserSearchArgs) (users []*model.User, count int, err error) {
 	filter := bson.M{}
 	if args.Name != "" {
 		filter["name"] = args.Name
@@ -73,7 +74,7 @@ func (d *Dao) UserList(ctx context.Context, args *model.UserSearchArgs) (users [
 	return
 }
 
-func (d *Dao) UserGetByID(ctx context.Context, id string) (user *model.User, err error) {
+func (d *Dao) UserGet(ctx context.Context, id string) (user *model.User, err error) {
 	user = &model.User{}
 	found, err := d.find(ctx, User, id, user)
 	if !found {
@@ -93,27 +94,29 @@ func (d *Dao) UserGetByName(ctx context.Context, loginName string) (user *model.
 	return
 }
 
-func (d *Dao) UserModifyProfile(ctx context.Context, user *model.User) (err error) {
+func (d *Dao) UserUpdateProfile(ctx context.Context, user *model.User) (err error) {
 	update := bson.M{
 		"$set": bson.M{
 			"name":       user.Name,
 			"login_name": user.LoginName,
 			"email":      user.Email,
-			"updated_at": time.Now(),
+			"updated_at": user.UpdatedAt,
+			"updated_by": user.UpdatedBy,
 		},
 	}
 	return d.update(ctx, User, user.ID, update)
 }
 
-func (d *Dao) UserModifyPassword(ctx context.Context, id, pwd, salt string) (err error) {
+func (d *Dao) UserUpdatePassword(ctx context.Context, user *model.User) (err error) {
 	update := bson.M{
 		"$set": bson.M{
-			"password":   pwd,
-			"salt":       salt,
-			"updated_at": time.Now(),
+			"password":   user.Password,
+			"salt":       user.Salt,
+			"updated_at": user.UpdatedAt,
+			"updated_by": user.UpdatedBy,
 		},
 	}
-	return d.update(ctx, User, id, update)
+	return d.update(ctx, User, user.ID, update)
 }
 
 func (d *Dao) SessionGet(ctx context.Context, token string) (session *model.Session, err error) {

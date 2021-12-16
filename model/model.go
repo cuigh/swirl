@@ -3,19 +3,65 @@ package model
 import (
 	"encoding/base64"
 	"encoding/json"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/cuigh/auxo/data"
+	"github.com/cuigh/auxo/errors"
+	"github.com/cuigh/auxo/ext/times"
 	"github.com/docker/docker/api/types"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/bsontype"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/x/bsonx/bsoncore"
 )
+
+type Time time.Time
+
+func (t Time) MarshalBSONValue() (bsontype.Type, []byte, error) {
+	return bson.MarshalValue(time.Time(t))
+}
+
+func (t *Time) UnmarshalBSONValue(bt bsontype.Type, data []byte) error {
+	if v, _, valid := bsoncore.ReadValue(data, bt); valid {
+		*t = Time(v.Time())
+		return nil
+	}
+	return errors.Format("unmarshal failed, type: %s, data:%s", bt, data)
+}
+
+func (t Time) MarshalJSON() (b []byte, err error) {
+	return strconv.AppendInt(b, times.ToUnixMilli(time.Time(t)), 10), nil
+}
+
+func (t *Time) UnmarshalJSON(data []byte) (err error) {
+	i, err := strconv.ParseInt(string(data), 10, 64)
+	if err == nil {
+		*t = Time(times.FromUnixMilli(i))
+	}
+	return err
+}
+
+func (t Time) String() string {
+	return time.Time(t).String()
+}
+
+func (t Time) Format(layout string) string {
+	return time.Time(t).Format(layout)
+}
+
+type Operator struct {
+	ID   string `json:"id,omitempty" bson:"_id,omitempty"`
+	Name string `json:"name,omitempty" bson:"name,omitempty"`
+}
 
 // Setting represents the options of swirl.
 type Setting struct {
 	ID        string           `json:"id" bson:"_id"`
 	Options   []*SettingOption `json:"options" bson:"options,omitempty"`
 	UpdatedAt time.Time        `bson:"updated_at" json:"updatedAt,omitempty"`
+	UpdatedBy Operator         `json:"updatedBy" bson:"updated_by"`
 }
 
 type SettingOption struct {
@@ -31,6 +77,8 @@ type Role struct {
 	Perms       []string  `bson:"perms" json:"perms,omitempty"`
 	CreatedAt   time.Time `bson:"created_at" json:"created_at,omitempty"`
 	UpdatedAt   time.Time `bson:"updated_at" json:"updated_at,omitempty"`
+	CreatedBy   Operator  `json:"createdBy" bson:"created_by"`
+	UpdatedBy   Operator  `json:"updatedBy" bson:"updated_by"`
 }
 
 type User struct {
@@ -46,6 +94,8 @@ type User struct {
 	Roles     []string  `bson:"roles" json:"roles,omitempty"`
 	CreatedAt time.Time `bson:"created_at" json:"createdAt,omitempty"`
 	UpdatedAt time.Time `bson:"updated_at" json:"updatedAt,omitempty"`
+	CreatedBy Operator  `json:"createdBy" bson:"created_by"`
+	UpdatedBy Operator  `json:"updatedBy" bson:"updated_by"`
 }
 
 type UserSearchArgs struct {
@@ -65,6 +115,8 @@ type Registry struct {
 	Password  string    `bson:"password" json:"-"`
 	CreatedAt time.Time `bson:"created_at" json:"createdAt,omitempty"`
 	UpdatedAt time.Time `bson:"updated_at" json:"updatedAt,omitempty"`
+	CreatedBy Operator  `json:"createdBy" bson:"created_by"`
+	UpdatedBy Operator  `json:"updatedBy" bson:"updated_by"`
 }
 
 func (r *Registry) Match(image string) bool {
@@ -86,12 +138,12 @@ func (r *Registry) GetEncodedAuth() string {
 type Stack struct {
 	Name      string    `bson:"_id" json:"name,omitempty"`
 	Content   string    `bson:"content" json:"content,omitempty" bind:"content=form,content=file"`
-	CreatedBy string    `bson:"created_by" json:"createdBy,omitempty"`
-	CreatedAt time.Time `bson:"created_at" json:"createdAt,omitempty"`
-	UpdatedBy string    `bson:"updated_by" json:"updatedBy,omitempty"`
-	UpdatedAt time.Time `bson:"updated_at" json:"updatedAt,omitempty"`
 	Services  []string  `bson:"-" json:"services,omitempty"`
 	Internal  bool      `bson:"-" json:"internal"`
+	CreatedAt time.Time `bson:"created_at" json:"createdAt,omitempty"`
+	UpdatedAt time.Time `bson:"updated_at" json:"updatedAt,omitempty"`
+	CreatedBy Operator  `json:"createdBy" bson:"created_by"`
+	UpdatedBy Operator  `json:"updatedBy" bson:"updated_by"`
 }
 
 type Event struct {
@@ -105,7 +157,7 @@ type Event struct {
 	Time     time.Time          `bson:"time"`
 }
 
-type EventListArgs struct {
+type EventSearchArgs struct {
 	Type      string `bind:"type"`
 	Name      string `bind:"name"`
 	PageIndex int    `bind:"pageIndex"`
@@ -133,6 +185,8 @@ type Chart struct {
 	//Colors      []string `json:"colors"`
 	CreatedAt time.Time `bson:"created_at" json:"createdAt,omitempty"`
 	UpdatedAt time.Time `bson:"updated_at" json:"updatedAt,omitempty"`
+	CreatedBy Operator  `json:"createdBy" bson:"created_by"`
+	UpdatedBy Operator  `json:"updatedBy" bson:"updated_by"`
 }
 
 func NewChart(dashboard, id, title, legend, query, unit string, left int32) *Chart {
@@ -158,12 +212,21 @@ type ChartMetric struct {
 	Query  string `json:"query"`
 }
 
+type ChartSearchArgs struct {
+	Title     string `bind:"title"`
+	Dashboard string `bind:"dashboard"`
+	PageIndex int    `bind:"pageIndex"`
+	PageSize  int    `bind:"pageSize"`
+}
+
 type Dashboard struct {
-	Name     string      `json:"name"`
-	Key      string      `json:"key,omitempty"`
-	Period   int32       `json:"period,omitempty"`   // data range in minutes
-	Interval int32       `json:"interval,omitempty"` // refresh interval in seconds, 0 means disabled.
-	Charts   []ChartInfo `json:"charts,omitempty"`
+	Name      string      `json:"name"`
+	Key       string      `json:"key,omitempty"`
+	Period    int32       `json:"period,omitempty"`   // data range in minutes
+	Interval  int32       `json:"interval,omitempty"` // refresh interval in seconds, 0 means disabled.
+	Charts    []ChartInfo `json:"charts,omitempty"`
+	UpdatedAt time.Time   `bson:"updated_at" json:"updatedAt,omitempty"`
+	UpdatedBy Operator    `json:"updatedBy" bson:"updated_by"`
 }
 
 type ChartInfo struct {

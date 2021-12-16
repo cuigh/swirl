@@ -171,7 +171,7 @@ var stop: () => void
 
 async function saveDashboard() {
   await chartApi.saveDashboard(dashboard.value);
-  window.message.success('保存成功')
+  window.message.success(t('texts.action_success'))
 }
 
 function showDlg() {

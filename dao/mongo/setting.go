@@ -2,7 +2,6 @@ package mongo
 
 import (
 	"context"
-	"time"
 
 	"github.com/cuigh/swirl/model"
 	"go.mongodb.org/mongo-driver/bson"
@@ -10,7 +9,7 @@ import (
 
 const Setting = "setting"
 
-func (d *Dao) SettingList(ctx context.Context) (settings []*model.Setting, err error) {
+func (d *Dao) SettingGetAll(ctx context.Context) (settings []*model.Setting, err error) {
 	settings = []*model.Setting{}
 	err = d.fetch(ctx, Setting, bson.M{}, &settings)
 	return
@@ -25,12 +24,13 @@ func (d *Dao) SettingGet(ctx context.Context, id string) (setting *model.Setting
 	return
 }
 
-func (d *Dao) SettingUpdate(ctx context.Context, id string, options []*model.SettingOption) (err error) {
+func (d *Dao) SettingUpdate(ctx context.Context, setting *model.Setting) (err error) {
 	update := bson.M{
 		"$set": bson.M{
-			"options":    options,
-			"updated_at": time.Now(),
+			"options":    setting.Options,
+			"updated_at": setting.UpdatedAt,
+			"updated_by": setting.UpdatedBy,
 		},
 	}
-	return d.upsert(ctx, Setting, id, update)
+	return d.upsert(ctx, Setting, setting.ID, update)
 }

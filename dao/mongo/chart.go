@@ -12,15 +12,15 @@ const (
 	Dashboard = "dashboard"
 )
 
-func (d *Dao) ChartList(ctx context.Context, title, dashboard string, pageIndex, pageSize int) (charts []*model.Chart, count int, err error) {
+func (d *Dao) ChartSearch(ctx context.Context, args *model.ChartSearchArgs) (charts []*model.Chart, count int, err error) {
 	filter := bson.M{}
-	if title != "" {
-		filter["title"] = title
+	if args.Title != "" {
+		filter["title"] = args.Title
 	}
-	if dashboard != "" {
-		filter["dashboard"] = bson.M{"$in": []string{"", dashboard}}
+	if args.Dashboard != "" {
+		filter["dashboard"] = bson.M{"$in": []string{"", args.Dashboard}}
 	}
-	opts := searchOptions{filter: filter, sorter: bson.M{"updated_at": -1}, pageIndex: pageIndex, pageSize: pageSize}
+	opts := searchOptions{filter: filter, sorter: bson.M{"updated_at": -1}, pageIndex: args.PageIndex, pageSize: args.PageSize}
 	charts = []*model.Chart{}
 	count, err = d.search(ctx, Chart, opts, &charts)
 	return
@@ -39,7 +39,7 @@ func (d *Dao) ChartGet(ctx context.Context, id string) (chart *model.Chart, err 
 	return
 }
 
-func (d *Dao) ChartBatch(ctx context.Context, names ...string) (charts []*model.Chart, err error) {
+func (d *Dao) ChartGetBatch(ctx context.Context, names ...string) (charts []*model.Chart, err error) {
 	charts = []*model.Chart{}
 	err = d.fetch(ctx, Chart, bson.M{"_id": bson.M{"$in": names}}, &charts)
 	return
@@ -58,6 +58,7 @@ func (d *Dao) ChartUpdate(ctx context.Context, chart *model.Chart) (err error) {
 			"margin":     chart.Margin,
 			"metrics":    chart.Metrics,
 			"updated_at": chart.UpdatedAt,
+			"updated_by": chart.UpdatedBy,
 		},
 	}
 	return d.update(ctx, Chart, chart.ID, update)

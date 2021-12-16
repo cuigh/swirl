@@ -36,21 +36,15 @@ func NewChart(b biz.ChartBiz) *ChartHandler {
 }
 
 func chartSearch(b biz.ChartBiz) web.HandlerFunc {
-	type Args struct {
-		Name      string `json:"name" bind:"name"`
-		Dashboard string `json:"dashboard" bind:"dashboard"`
-		PageIndex int    `json:"pageIndex" bind:"pageIndex"`
-		PageSize  int    `json:"pageSize" bind:"pageSize"`
-	}
 	return func(ctx web.Context) (err error) {
 		var (
-			args   = &Args{}
+			args   = &model.ChartSearchArgs{}
 			charts []*biz.Chart
 			total  int
 		)
 
 		if err = ctx.Bind(args); err == nil {
-			charts, total, err = b.Search(args.Name, args.Dashboard, args.PageIndex, args.PageSize)
+			charts, total, err = b.Search(args)
 		}
 
 		if err != nil {

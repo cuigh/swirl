@@ -7,9 +7,15 @@ export interface Stack {
     services?: string[];
     internal: boolean;
     createdAt: string;
-    createdBy: string;
     updatedAt: string;
-    updatedBy: string;
+    createdBy: {
+        id: string;
+        name: string;
+    };
+    updatedBy: {
+        id: string;
+        name: string;
+    };    
 }
 
 export interface SearchArgs {

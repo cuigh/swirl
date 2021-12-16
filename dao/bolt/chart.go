@@ -8,17 +8,21 @@ import (
 	"github.com/cuigh/swirl/model"
 )
 
-func (d *Dao) ChartList(ctx context.Context, title, dashboard string, pageIndex, pageSize int) (charts []*model.Chart, count int, err error) {
-	err = d.each("chart", func(v Value) error {
+const (
+	Chart     = "chart"
+	Dashboard = "dashboard"
+)
+
+func (d *Dao) ChartSearch(ctx context.Context, args *model.ChartSearchArgs) (charts []*model.Chart, count int, err error) {
+	err = d.each(Chart, func(v []byte) error {
 		chart := &model.Chart{}
-		err = v.Unmarshal(chart)
-		if err == nil {
+		if err = decode(v, chart); err == nil {
 			match := true
-			if title != "" {
-				match = matchAny(title, chart.Title)
+			if args.Title != "" {
+				match = matchAny(args.Title, chart.Title)
 			}
-			if match && dashboard != "" {
-				match = matchAny(chart.Dashboard, dashboard, "")
+			if match && args.Dashboard != "" {
+				match = matchAny(chart.Dashboard, args.Dashboard, "")
 			}
 			if match {
 				charts = append(charts, chart)
@@ -31,62 +35,65 @@ func (d *Dao) ChartList(ctx context.Context, title, dashboard string, pageIndex,
 		sort.Slice(charts, func(i, j int) bool {
 			return charts[i].CreatedAt.After(charts[j].UpdatedAt)
 		})
-		start, end := misc.Page(count, pageIndex, pageSize)
+		start, end := misc.Page(count, args.PageIndex, args.PageSize)
 		charts = charts[start:end]
 	}
 	return
 }
 
 func (d *Dao) ChartCreate(ctx context.Context, chart *model.Chart) (err error) {
-	return d.update("chart", chart.ID, chart)
+	return d.replace(Chart, chart.ID, chart)
 }
 
 func (d *Dao) ChartGet(ctx context.Context, name string) (chart *model.Chart, err error) {
-	var v Value
-	v, err = d.get("chart", name)
-	if err == nil && v != nil {
-		chart = &model.Chart{}
-		err = v.Unmarshal(chart)
+	chart = &model.Chart{}
+	err = d.get(Chart, name, chart)
+	if err == ErrNoRecords {
+		return nil, nil
+	} else if err != nil {
+		chart = nil
 	}
 	return
 }
 
-func (d *Dao) ChartBatch(ctx context.Context, names ...string) (charts []*model.Chart, err error) {
-	err = d.slice("chart", func(v Value) error {
+func (d *Dao) ChartGetBatch(ctx context.Context, ids ...string) (charts []*model.Chart, err error) {
+	err = d.slice(Chart, func(v []byte) error {
 		chart := &model.Chart{}
-		err = v.Unmarshal(chart)
-		if err == nil {
+		if err = decode(v, chart); err == nil {
 			charts = append(charts, chart)
 		}
 		return err
-	}, names...)
+	}, ids...)
 	return
 }
 
 func (d *Dao) ChartUpdate(ctx context.Context, chart *model.Chart) (err error) {
-	return d.update("chart", chart.ID, chart)
+	old := &model.Chart{}
+	return d.update(Chart, chart.ID, old, func() interface{} {
+		chart.CreatedAt = old.CreatedAt
+		chart.CreatedBy = old.CreatedBy
+		return chart
+	})
 }
 
 func (d *Dao) ChartDelete(ctx context.Context, name string) (err error) {
-	return d.delete("chart", name)
+	return d.delete(Chart, name)
 }
 
 func (d *Dao) DashboardGet(ctx context.Context, name, key string) (dashboard *model.Dashboard, err error) {
-	cd := &model.Dashboard{
+	dashboard = &model.Dashboard{
 		Name: name,
 		Key:  key,
 	}
-
-	var v Value
-	v, err = d.get("dashboard", cd.ID())
-	if v != nil {
-		if err = v.Unmarshal(cd); err == nil {
-			return cd, nil
-		}
+	err = d.get(Dashboard, dashboard.ID(), dashboard)
+	if err == ErrNoRecords {
+		return nil, nil
+	} else if err != nil {
+		dashboard = nil
 	}
-	return nil, err
+	return
 }
 
 func (d *Dao) DashboardUpdate(ctx context.Context, dashboard *model.Dashboard) (err error) {
-	return d.update("dashboard", dashboard.ID(), dashboard)
+	return d.replace(Dashboard, dashboard.ID(), dashboard)
 }

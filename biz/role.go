@@ -10,12 +10,14 @@ import (
 )
 
 type Role struct {
-	ID          string   `json:"id,omitempty"`
-	Name        string   `json:"name,omitempty" valid:"required"`
-	Description string   `json:"desc,omitempty"`
-	Perms       []string `json:"perms,omitempty"`
-	CreatedAt   string   `json:"createdAt,omitempty"`
-	UpdatedAt   string   `json:"updatedAt,omitempty"`
+	ID          string         `json:"id,omitempty"`
+	Name        string         `json:"name,omitempty" valid:"required"`
+	Description string         `json:"desc,omitempty"`
+	Perms       []string       `json:"perms,omitempty"`
+	CreatedAt   string         `json:"createdAt,omitempty"`
+	UpdatedAt   string         `json:"updatedAt,omitempty"`
+	CreatedBy   model.Operator `json:"createdBy" bson:"created_by"`
+	UpdatedBy   model.Operator `json:"updatedBy" bson:"updated_by"`
 }
 
 func newRole(r *model.Role) *Role {
@@ -26,6 +28,8 @@ func newRole(r *model.Role) *Role {
 		Perms:       r.Perms,
 		CreatedAt:   formatTime(r.CreatedAt),
 		UpdatedAt:   formatTime(r.UpdatedAt),
+		CreatedBy:   r.CreatedBy,
+		UpdatedBy:   r.UpdatedBy,
 	}
 }
 
@@ -48,7 +52,7 @@ type roleBiz struct {
 
 func (b *roleBiz) Search(name string) (roles []*Role, err error) {
 	var list []*model.Role
-	list, err = b.d.RoleList(context.TODO(), name)
+	list, err = b.d.RoleSearch(context.TODO(), name)
 	if err == nil {
 		for _, r := range list {
 			roles = append(roles, newRole(r))
@@ -98,6 +102,8 @@ func (b *roleBiz) Update(role *Role, user web.User) (err error) {
 		Perms:       role.Perms,
 		UpdatedAt:   time.Now(),
 	}
+	r.UpdatedBy.ID = user.ID()
+	r.UpdatedBy.Name = user.Name()
 	err = b.d.RoleUpdate(context.TODO(), r)
 	if err == nil {
 		b.eb.CreateRole(EventActionUpdate, role.ID, role.Name, user)

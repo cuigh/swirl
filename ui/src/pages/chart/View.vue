@@ -54,7 +54,13 @@
       </x-description-item>
       <x-description-item :label="t('fields.dashboard')">{{ model.dashboard }}</x-description-item>
       <x-description-item :label="t('fields.type')">{{ model.type }}</x-description-item>
+      <x-description-item :label="t('fields.created_by')">
+        <x-anchor :url="`/system/users/${model.createdBy?.id}`">{{ model.createdBy?.name }}</x-anchor>
+      </x-description-item>
       <x-description-item :label="t('fields.created_at')">{{ model.createdAt }}</x-description-item>
+      <x-description-item :label="t('fields.updated_by')">
+        <x-anchor :url="`/system/users/${model.updatedBy?.id}`">{{ model.updatedBy?.name }}</x-anchor>
+      </x-description-item>
       <x-description-item :label="t('fields.updated_at')">{{ model.updatedAt }}</x-description-item>
     </x-description>
     <x-panel :title="t('fields.metrics')">
@@ -88,6 +94,7 @@ import { ArrowBackCircleOutline as BackIcon } from "@vicons/ionicons5";
 import XPageHeader from "@/components/PageHeader.vue";
 import XPairTag from "@/components/PairTag.vue";
 import XPanel from "@/components/Panel.vue";
+import XAnchor from "@/components/Anchor.vue";
 import chartApi from "@/api/chart";
 import type { Chart } from "@/api/chart";
 import { useRoute } from "vue-router";

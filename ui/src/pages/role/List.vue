@@ -22,6 +22,7 @@
           <th>{{ t('fields.id') }}</th>
           <th>{{ t('fields.name') }}</th>
           <th>{{ t('fields.desc') }}</th>
+          <th>{{ t('fields.updated_at') }}</th>
           <th>{{ t('fields.actions') }}</th>
         </tr>
       </thead>
@@ -32,6 +33,7 @@
           </td>
           <td>{{ r.name }}</td>
           <td>{{ r.desc }}</td>
+          <td>{{ r.updatedAt }}</td>
           <td>
             <n-popconfirm :show-icon="false" @positive-click="deleteRole(r, index)">
               <template #trigger>

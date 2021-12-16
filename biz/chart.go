@@ -15,7 +15,7 @@ import (
 )
 
 type ChartBiz interface {
-	Search(title, dashboard string, pageIndex, pageSize int) (charts []*Chart, total int, err error)
+	Search(args *model.ChartSearchArgs) (charts []*Chart, total int, err error)
 	Delete(id, title string, user web.User) (err error)
 	Find(id string) (chart *Chart, err error)
 	Batch(ids ...string) (charts []*model.Chart, err error)
@@ -47,9 +47,9 @@ type chartBiz struct {
 	eb      EventBiz
 }
 
-func (b *chartBiz) Search(title, dashboard string, pageIndex, pageSize int) (charts []*Chart, total int, err error) {
+func (b *chartBiz) Search(args *model.ChartSearchArgs) (charts []*Chart, total int, err error) {
 	var list []*model.Chart
-	list, total, err = b.d.ChartList(context.TODO(), title, dashboard, pageIndex, pageSize)
+	list, total, err = b.d.ChartSearch(context.TODO(), args)
 	if err == nil {
 		charts = make([]*Chart, len(list))
 		for i, c := range list {
@@ -63,6 +63,7 @@ func (b *chartBiz) Create(chart *Chart, user web.User) (err error) {
 	c := &model.Chart{
 		ID:        createId(),
 		CreatedAt: time.Now(),
+		CreatedBy: model.Operator{ID: user.ID(), Name: user.Name()},
 	}
 	c.UpdatedAt = c.CreatedAt
 	if err = copier.CopyWithOption(c, chart, copier.Option{IgnoreEmpty: true, DeepCopy: true}); err != nil {
@@ -94,7 +95,7 @@ func (b *chartBiz) Find(id string) (chart *Chart, err error) {
 }
 
 func (b *chartBiz) Batch(ids ...string) (charts []*model.Chart, err error) {
-	charts, err = b.d.ChartBatch(context.TODO(), ids...)
+	charts, err = b.d.ChartGetBatch(context.TODO(), ids...)
 	return
 }
 
@@ -105,6 +106,8 @@ func (b *chartBiz) Update(chart *Chart, user web.User) (err error) {
 	if err = copier.CopyWithOption(c, chart, copier.Option{IgnoreEmpty: true, DeepCopy: true}); err != nil {
 		return err
 	}
+	c.UpdatedBy.ID = user.ID()
+	c.UpdatedBy.Name = user.Name()
 
 	err = b.d.ChartUpdate(context.TODO(), c)
 	if err == nil {
@@ -130,6 +133,9 @@ func (b *chartBiz) FindDashboard(name, key string) (dashboard *Dashboard, err er
 }
 
 func (b *chartBiz) UpdateDashboard(dashboard *model.Dashboard, user web.User) (err error) {
+	dashboard.UpdatedAt = time.Now()
+	dashboard.UpdatedBy.ID = user.ID()
+	dashboard.UpdatedBy.Name = user.Name()
 	return b.d.DashboardUpdate(context.TODO(), dashboard)
 }
 
@@ -360,6 +366,8 @@ type Chart struct {
 	Options   data.Map            `json:"options,omitempty"`
 	CreatedAt string              `json:"createdAt,omitempty" copier:"-"`
 	UpdatedAt string              `json:"updatedAt,omitempty" copier:"-"`
+	CreatedBy model.Operator      `json:"createdBy"`
+	UpdatedBy model.Operator      `json:"updatedBy"`
 }
 
 func newChart(c *model.Chart) *Chart {

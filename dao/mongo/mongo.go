@@ -98,9 +98,6 @@ func (d *Dao) Init() (err error) {
 	return
 }
 
-func (d *Dao) Close() {
-}
-
 func (d *Dao) find(ctx context.Context, coll string, id interface{}, v interface{}) (found bool, err error) {
 	err = d.db.Collection(coll).FindOne(ctx, bson.M{"_id": id}).Decode(v)
 	if err == nil {

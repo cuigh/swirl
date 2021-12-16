@@ -147,7 +147,7 @@ func userSetStatus(b biz.UserBiz) web.HandlerFunc {
 		args := &Args{}
 		err := ctx.Bind(args)
 		if err == nil {
-			err = b.SetStatus(args.ID, args.Status)
+			err = b.SetStatus(args.ID, args.Status, ctx.User())
 		}
 		return ajax(ctx, err)
 	}
@@ -163,7 +163,7 @@ func userModifyPassword(b biz.UserBiz) web.HandlerFunc {
 		args := &Args{}
 		err := ctx.Bind(args)
 		if err == nil {
-			err = b.ModifyPassword(ctx.User().ID(), args.OldPassword, args.NewPassword)
+			err = b.ModifyPassword(args.OldPassword, args.NewPassword, ctx.User())
 		}
 		return ajax(ctx, err)
 	}
@@ -174,8 +174,7 @@ func userModifyProfile(b biz.UserBiz) web.HandlerFunc {
 		u := &biz.User{}
 		err := ctx.Bind(u, true)
 		if err == nil {
-			u.ID = ctx.User().ID()
-			err = b.ModifyProfile(u)
+			err = b.ModifyProfile(u, ctx.User())
 		}
 		return ajax(ctx, err)
 	}

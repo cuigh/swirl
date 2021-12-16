@@ -8,10 +8,12 @@ import (
 	"github.com/cuigh/swirl/model"
 )
 
-func (d *Dao) EventList(ctx context.Context, args *model.EventListArgs) (events []*model.Event, count int, err error) {
-	err = d.each("event", func(v Value) error {
+const Event = "event"
+
+func (d *Dao) EventSearch(ctx context.Context, args *model.EventSearchArgs) (events []*model.Event, count int, err error) {
+	err = d.each(Event, func(v []byte) error {
 		event := &model.Event{}
-		err = v.Unmarshal(event)
+		err = decode(v, event)
 		if err != nil {
 			return err
 		}
@@ -21,7 +23,7 @@ func (d *Dao) EventList(ctx context.Context, args *model.EventListArgs) (events 
 			match = matchAny(args.Name, event.Name)
 		}
 		if match && args.Type != "" {
-			match = string(event.Type) == args.Type
+			match = event.Type == args.Type
 		}
 
 		if match {
@@ -41,5 +43,5 @@ func (d *Dao) EventList(ctx context.Context, args *model.EventListArgs) (events 
 }
 
 func (d *Dao) EventCreate(ctx context.Context, event *model.Event) (err error) {
-	return d.update("event", event.ID.Hex(), event)
+	return d.replace(Event, event.ID.Hex(), event)
 }

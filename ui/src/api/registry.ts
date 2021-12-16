@@ -6,8 +6,16 @@ export interface Registry {
     url: string;
     username: string;
     password: string;
-    createdAt: number;
-    updatedAt: number;
+    createdAt: string;
+    updatedAt: string;
+    createdBy: {
+        id: string;
+        name: string;
+    };
+    updatedBy: {
+        id: string;
+        name: string;
+    };
 }
 
 export class RegistryApi {

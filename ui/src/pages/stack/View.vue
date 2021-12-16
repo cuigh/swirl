@@ -9,14 +9,24 @@
         </template>
         {{ t('buttons.return') }}
       </n-button>
-      <n-button secondary size="small" @click="$router.push(`/swarm/stacks/${model.name}/edit`)">{{ t('buttons.edit') }}</n-button>
+      <n-button
+        secondary
+        size="small"
+        @click="$router.push(`/swarm/stacks/${model.name}/edit`)"
+      >{{ t('buttons.edit') }}</n-button>
     </template>
   </x-page-header>
   <div class="page-body">
     <n-space vertical :size="16">
       <x-description :label-width="90">
         <x-description-item :label="t('fields.name')" :span="2">{{ model.name }}</x-description-item>
+        <x-description-item :label="t('fields.created_by')">
+          <x-anchor :url="`/system/users/${model.createdBy?.id}`">{{ model.createdBy?.name }}</x-anchor>
+        </x-description-item>
         <x-description-item :label="t('fields.created_at')">{{ model.createdAt }}</x-description-item>
+        <x-description-item :label="t('fields.updated_by')">
+          <x-anchor :url="`/system/users/${model.updatedBy?.id}`">{{ model.updatedBy?.name }}</x-anchor>
+        </x-description-item>
         <x-description-item :label="t('fields.updated_at')">{{ model.updatedAt }}</x-description-item>
       </x-description>
       <x-panel :title="t('fields.content')">
@@ -37,6 +47,7 @@ import { ArrowBackCircleOutline as BackIcon } from "@vicons/ionicons5";
 import XPageHeader from "@/components/PageHeader.vue";
 import XCode from "@/components/Code.vue";
 import XPanel from "@/components/Panel.vue";
+import XAnchor from "@/components/Anchor.vue";
 import { XDescription, XDescriptionItem } from "@/components/description";
 import stackApi from "@/api/stack";
 import type { Stack } from "@/api/stack";

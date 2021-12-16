@@ -2,7 +2,6 @@ package mongo
 
 import (
 	"context"
-	"time"
 
 	"github.com/cuigh/swirl/model"
 	"go.mongodb.org/mongo-driver/bson"
@@ -10,15 +9,13 @@ import (
 
 const Stack = "stack"
 
-func (d *Dao) StackList(ctx context.Context) (stacks []*model.Stack, err error) {
+func (d *Dao) StackGetAll(ctx context.Context) (stacks []*model.Stack, err error) {
 	stacks = []*model.Stack{}
 	err = d.fetch(ctx, Stack, bson.M{}, &stacks)
 	return
 }
 
 func (d *Dao) StackCreate(ctx context.Context, stack *model.Stack) (err error) {
-	stack.CreatedAt = time.Now()
-	stack.UpdatedAt = stack.CreatedAt
 	return d.create(ctx, Stack, stack)
 }
 
@@ -36,7 +33,7 @@ func (d *Dao) StackUpdate(ctx context.Context, stack *model.Stack) (err error) {
 		"$set": bson.M{
 			"content":    stack.Content,
 			"updated_by": stack.UpdatedBy,
-			"updated_at": time.Now(),
+			"updated_at": stack.UpdatedAt,
 		},
 	}
 	return d.update(ctx, Stack, stack.Name, update)

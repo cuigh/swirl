@@ -61,6 +61,8 @@ export default {
         "username": "Username",
         "created_at": "Created at",
         "updated_at": "Updated at",
+        "created_by": "Created by",
+        "updated_by": "Updated by",
         "started_at": "Started at",
         "action": "Action",
         "actions": "Actions",
