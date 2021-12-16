@@ -3,6 +3,7 @@ package bolt
 import (
 	"context"
 	"sort"
+	"time"
 
 	"github.com/cuigh/swirl/misc"
 	"github.com/cuigh/swirl/model"
@@ -34,7 +35,7 @@ func (d *Dao) EventSearch(ctx context.Context, args *model.EventSearchArgs) (eve
 	if err == nil {
 		count = len(events)
 		sort.Slice(events, func(i, j int) bool {
-			return events[i].Time.After(events[j].Time)
+			return time.Time(events[i].Time).After(time.Time(events[j].Time))
 		})
 		start, end := misc.Page(count, args.PageIndex, args.PageSize)
 		events = events[start:end]

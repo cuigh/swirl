@@ -127,11 +127,13 @@ func (d *Dao) UserUpdatePassword(ctx context.Context, user *model.User) (err err
 
 func (d *Dao) SessionGet(ctx context.Context, token string) (session *model.Session, err error) {
 	s := &model.Session{}
-	found, err := d.find(Session, s, func() bool { return s.Token == token })
-	if found {
-		return s, nil
+	err = d.get(Session, token, s)
+	if err == ErrNoRecords {
+		return nil, nil
+	} else if err != nil {
+		s = nil
 	}
-	return nil, err
+	return
 }
 
 func (d *Dao) SessionUpdate(ctx context.Context, session *model.Session) (err error) {

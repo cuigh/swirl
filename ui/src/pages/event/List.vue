@@ -59,7 +59,7 @@ import XPageHeader from "@/components/PageHeader.vue";
 import eventApi from "@/api/event";
 import type { Event } from "@/api/event";
 import { useDataTable } from "@/utils/data-table";
-import { renderLink, renderTag } from "@/utils/render";
+import { renderLink, renderTag, renderTime } from "@/utils/render";
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
@@ -186,7 +186,8 @@ const columns = [
   },
   {
     title: t('fields.time'),
-    key: "time"
+    key: "time",
+    render: (e: Event) => renderTime(e.time),
   },
 ];
 const { state, pagination, fetchData, changePageSize } = useDataTable(eventApi.search, filter)

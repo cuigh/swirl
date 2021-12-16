@@ -3,6 +3,7 @@ package api
 import (
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/biz"
+	"github.com/cuigh/swirl/model"
 )
 
 // RoleHandler encapsulates role related handlers.
@@ -61,7 +62,7 @@ func roleDelete(b biz.RoleBiz) web.HandlerFunc {
 
 func roleSave(b biz.RoleBiz) web.HandlerFunc {
 	return func(ctx web.Context) error {
-		r := &biz.Role{}
+		r := &model.Role{}
 		err := ctx.Bind(r, true)
 		if err == nil {
 			if r.ID == "" {

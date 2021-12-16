@@ -30,8 +30,12 @@
           </td>
           <td>{{ r.url }}</td>
           <td>{{ r.username }}</td>
-          <td>{{ r.createdAt }}</td>
-          <td>{{ r.updatedAt }}</td>
+          <td>
+            <n-time :time="r.createdAt" format="y-MM-dd HH:mm:ss" />
+          </td>
+          <td>
+            <n-time :time="r.updatedAt" format="y-MM-dd HH:mm:ss" />
+          </td>
           <td>
             <n-button
               size="tiny"
@@ -60,6 +64,7 @@ import {
   NTable,
   NPopconfirm,
   NIcon,
+  NTime,
 } from "naive-ui";
 import { AddOutline as AddIcon } from "@vicons/ionicons5";
 import XPageHeader from "@/components/PageHeader.vue";

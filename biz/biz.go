@@ -11,6 +11,8 @@ import (
 
 	"github.com/cuigh/auxo/app/container"
 	"github.com/cuigh/auxo/data"
+	"github.com/cuigh/auxo/net/web"
+	"github.com/cuigh/swirl/model"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -99,6 +101,14 @@ func indentJSON(raw []byte) (s string, err error) {
 		s = buf.String()
 	}
 	return
+}
+
+func now() model.Time {
+	return model.Time(time.Now())
+}
+
+func newOperator(user web.User) model.Operator {
+	return model.Operator{ID: user.ID(), Name: user.Name()}
 }
 
 func init() {

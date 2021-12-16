@@ -59,8 +59,8 @@ type Operator struct {
 // Setting represents the options of swirl.
 type Setting struct {
 	ID        string           `json:"id" bson:"_id"`
-	Options   []*SettingOption `json:"options" bson:"options,omitempty"`
-	UpdatedAt time.Time        `bson:"updated_at" json:"updatedAt,omitempty"`
+	Options   []*SettingOption `json:"options" bson:"options"`
+	UpdatedAt time.Time        `json:"updatedAt" bson:"updated_at"`
 	UpdatedBy Operator         `json:"updatedBy" bson:"updated_by"`
 }
 
@@ -71,31 +71,31 @@ type SettingOption struct {
 }
 
 type Role struct {
-	ID          string    `bson:"_id" json:"id,omitempty"`
-	Name        string    `bson:"name" json:"name,omitempty" valid:"required"`
-	Description string    `bson:"desc" json:"desc,omitempty"`
-	Perms       []string  `bson:"perms" json:"perms,omitempty"`
-	CreatedAt   time.Time `bson:"created_at" json:"created_at,omitempty"`
-	UpdatedAt   time.Time `bson:"updated_at" json:"updated_at,omitempty"`
-	CreatedBy   Operator  `json:"createdBy" bson:"created_by"`
-	UpdatedBy   Operator  `json:"updatedBy" bson:"updated_by"`
+	ID          string   `json:"id,omitempty" bson:"_id"`
+	Name        string   `json:"name,omitempty" bson:"name" valid:"required"`
+	Description string   `json:"desc,omitempty" bson:"desc,omitempty"`
+	Perms       []string `json:"perms,omitempty" bson:"perms,omitempty"`
+	UpdatedAt   Time     `json:"updatedAt" bson:"updated_at"`
+	CreatedAt   Time     `json:"createdAt" bson:"created_at"`
+	CreatedBy   Operator `json:"createdBy" bson:"created_by"`
+	UpdatedBy   Operator `json:"updatedBy" bson:"updated_by"`
 }
 
 type User struct {
-	ID        string    `bson:"_id" json:"id,omitempty"`
-	Name      string    `bson:"name" json:"name,omitempty" valid:"required"`
-	LoginName string    `bson:"login_name" json:"loginName,omitempty" valid:"required"`
-	Password  string    `bson:"password" json:"-"`
-	Salt      string    `bson:"salt" json:"-"`
-	Email     string    `bson:"email" json:"email,omitempty" valid:"required"`
-	Admin     bool      `bson:"admin" json:"admin,omitempty"`
-	Type      string    `bson:"type" json:"type,omitempty"`
-	Status    int32     `bson:"status" json:"status,omitempty"`
-	Roles     []string  `bson:"roles" json:"roles,omitempty"`
-	CreatedAt time.Time `bson:"created_at" json:"createdAt,omitempty"`
-	UpdatedAt time.Time `bson:"updated_at" json:"updatedAt,omitempty"`
-	CreatedBy Operator  `json:"createdBy" bson:"created_by"`
-	UpdatedBy Operator  `json:"updatedBy" bson:"updated_by"`
+	ID        string   `json:"id,omitempty" bson:"_id"`
+	Name      string   `json:"name" bson:"name" valid:"required"`
+	LoginName string   `json:"loginName" bson:"login_name" valid:"required"`
+	Password  string   `json:"-" bson:"password"`
+	Salt      string   `json:"-" bson:"salt"`
+	Email     string   `json:"email" bson:"email" valid:"required"`
+	Admin     bool     `json:"admin" bson:"admin"`
+	Type      string   `json:"type" bson:"type"`
+	Status    int32    `json:"status" bson:"status"`
+	Roles     []string `json:"roles,omitempty" bson:"roles,omitempty"`
+	CreatedAt Time     `json:"createdAt" bson:"created_at"`
+	UpdatedAt Time     `json:"updatedAt" bson:"updated_at"`
+	CreatedBy Operator `json:"createdBy" bson:"created_by"`
+	UpdatedBy Operator `json:"updatedBy" bson:"updated_by"`
 }
 
 type UserSearchArgs struct {
@@ -108,15 +108,15 @@ type UserSearchArgs struct {
 }
 
 type Registry struct {
-	ID        string    `bson:"_id" json:"id"`
-	Name      string    `bson:"name" json:"name"`
-	URL       string    `bson:"url" json:"url"`
-	Username  string    `bson:"username" json:"username"`
-	Password  string    `bson:"password" json:"-"`
-	CreatedAt time.Time `bson:"created_at" json:"createdAt,omitempty"`
-	UpdatedAt time.Time `bson:"updated_at" json:"updatedAt,omitempty"`
-	CreatedBy Operator  `json:"createdBy" bson:"created_by"`
-	UpdatedBy Operator  `json:"updatedBy" bson:"updated_by"`
+	ID        string   `json:"id" bson:"_id"`
+	Name      string   `json:"name" bson:"name"`
+	URL       string   `json:"url" bson:"url"`
+	Username  string   `json:"username" bson:"username"`
+	Password  string   `json:"password,omitempty" bson:"password,omitempty"`
+	CreatedAt Time     `json:"createdAt" bson:"created_at"`
+	UpdatedAt Time     `json:"updatedAt" bson:"updated_at"`
+	CreatedBy Operator `json:"createdBy" bson:"created_by"`
+	UpdatedBy Operator `json:"updatedBy" bson:"updated_by"`
 }
 
 func (r *Registry) Match(image string) bool {
@@ -136,25 +136,25 @@ func (r *Registry) GetEncodedAuth() string {
 }
 
 type Stack struct {
-	Name      string    `bson:"_id" json:"name,omitempty"`
-	Content   string    `bson:"content" json:"content,omitempty" bind:"content=form,content=file"`
-	Services  []string  `bson:"-" json:"services,omitempty"`
-	Internal  bool      `bson:"-" json:"internal"`
-	CreatedAt time.Time `bson:"created_at" json:"createdAt,omitempty"`
-	UpdatedAt time.Time `bson:"updated_at" json:"updatedAt,omitempty"`
-	CreatedBy Operator  `json:"createdBy" bson:"created_by"`
-	UpdatedBy Operator  `json:"updatedBy" bson:"updated_by"`
+	Name      string   `json:"name" bson:"_id"`
+	Content   string   `json:"content" bson:"content"`
+	Services  []string `json:"services,omitempty" bson:"-"`
+	Internal  bool     `json:"internal" bson:"-"`
+	CreatedAt Time     `json:"createdAt" bson:"created_at"`
+	UpdatedAt Time     `json:"updatedAt" bson:"updated_at"`
+	CreatedBy Operator `json:"createdBy" bson:"created_by"`
+	UpdatedBy Operator `json:"updatedBy" bson:"updated_by"`
 }
 
 type Event struct {
-	ID       primitive.ObjectID `bson:"_id"`
-	Type     string             `bson:"type"`
-	Action   string             `bson:"action"`
-	Code     string             `bson:"code"`
-	Name     string             `bson:"name"`
-	UserID   string             `bson:"user_id"`
-	Username string             `bson:"username"`
-	Time     time.Time          `bson:"time"`
+	ID       primitive.ObjectID `json:"id" bson:"_id"`
+	Type     string             `json:"type" bson:"type"`
+	Action   string             `json:"action" bson:"action"`
+	Code     string             `json:"code" bson:"code"`
+	Name     string             `json:"name" bson:"name"`
+	UserID   string             `json:"userId" bson:"user_id"`
+	Username string             `json:"username" bson:"username"`
+	Time     Time               `json:"time" bson:"time"`
 }
 
 type EventSearchArgs struct {
@@ -166,27 +166,26 @@ type EventSearchArgs struct {
 
 // Chart represents a dashboard chart.
 type Chart struct {
-	ID          string        `json:"id" bson:"_id"` // unique, the name of build-in charts has '$' prefix.
-	Title       string        `json:"title" valid:"required"`
+	ID          string        `json:"id" bson:"_id"` // the id of built-in charts has '$' prefix.
+	Title       string        `json:"title" bson:"title" valid:"required"`
 	Description string        `json:"desc" bson:"desc"`
-	Metrics     []ChartMetric `json:"metrics" valid:"required"`
-	Dashboard   string        `json:"dashboard"` // home/service/task...
-	Type        string        `json:"type"`      // pie/line...
-	Unit        string        `json:"unit"`      // bytes/milliseconds/percent:100...
-	Width       int32         `json:"width"`     // 1-12(12 columns total)
-	Height      int32         `json:"height"`    // default 50
-	Options     data.Map      `json:"options,omitempty"`
+	Metrics     []ChartMetric `json:"metrics" bson:"metrics" valid:"required"`
+	Dashboard   string        `json:"dashboard" bson:"dashboard"` // home/service...
+	Type        string        `json:"type" bson:"type"`           // pie/line...
+	Unit        string        `json:"unit" bson:"unit"`           // bytes/milliseconds/percent:100...
+	Width       int32         `json:"width" bson:"width"`         // 1-12(12 columns total)
+	Height      int32         `json:"height" bson:"height"`       // default 50
+	Options     data.Map      `json:"options,omitempty" bson:"options,omitempty"`
 	Margin      struct {
-		Left   int32 `json:"left,omitempty"`
-		Right  int32 `json:"right,omitempty"`
-		Top    int32 `json:"top,omitempty"`
-		Bottom int32 `json:"bottom,omitempty"`
-	} `json:"margin"`
-	//Colors      []string `json:"colors"`
-	CreatedAt time.Time `bson:"created_at" json:"createdAt,omitempty"`
-	UpdatedAt time.Time `bson:"updated_at" json:"updatedAt,omitempty"`
-	CreatedBy Operator  `json:"createdBy" bson:"created_by"`
-	UpdatedBy Operator  `json:"updatedBy" bson:"updated_by"`
+		Left   int32 `json:"left,omitempty" bson:"left,omitempty"`
+		Right  int32 `json:"right,omitempty" bson:"right,omitempty"`
+		Top    int32 `json:"top,omitempty" bson:"top,omitempty"`
+		Bottom int32 `json:"bottom,omitempty" bson:"bottom,omitempty"`
+	} `json:"margin" bson:"margin"`
+	CreatedAt Time     `json:"createdAt" bson:"created_at"`
+	UpdatedAt Time     `json:"updatedAt" bson:"updated_at"`
+	CreatedBy Operator `json:"createdBy" bson:"created_by"`
+	UpdatedBy Operator `json:"updatedBy" bson:"updated_by"`
 }
 
 func NewChart(dashboard, id, title, legend, query, unit string, left int32) *Chart {
@@ -220,20 +219,28 @@ type ChartSearchArgs struct {
 }
 
 type Dashboard struct {
-	Name      string      `json:"name"`
-	Key       string      `json:"key,omitempty"`
-	Period    int32       `json:"period,omitempty"`   // data range in minutes
-	Interval  int32       `json:"interval,omitempty"` // refresh interval in seconds, 0 means disabled.
-	Charts    []ChartInfo `json:"charts,omitempty"`
-	UpdatedAt time.Time   `bson:"updated_at" json:"updatedAt,omitempty"`
-	UpdatedBy Operator    `json:"updatedBy" bson:"updated_by"`
+	Name      string      `json:"name" bson:"name"`
+	Key       string      `json:"key,omitempty" bson:"key,omitempty"`
+	Period    int32       `json:"period,omitempty" bson:"period,omitempty"`     // data range in minutes
+	Interval  int32       `json:"interval,omitempty" bson:"interval,omitempty"` // refresh interval in seconds, 0 means disabled.
+	Charts    []ChartInfo `json:"charts,omitempty" bson:"charts,omitempty"`
+	UpdatedAt Time        `json:"-" bson:"updated_at"`
+	UpdatedBy Operator    `json:"-" bson:"updated_by"`
 }
 
 type ChartInfo struct {
-	ID     string `json:"id"`
-	Width  int32  `json:"width,omitempty"`
-	Height int32  `json:"height,omitempty"`
-	//Colors []string `json:"colors,omitempty"`
+	ID     string `json:"id" bson:"id"`
+	Width  int32  `json:"width,omitempty" bson:"width,omitempty"`
+	Height int32  `json:"height,omitempty" bson:"height,omitempty"`
+	Title  string `json:"title" bson:"-"`
+	Type   string `json:"type" bson:"-"`
+	Unit   string `json:"unit" bson:"-"`
+	Margin struct {
+		Left   int32 `json:"left,omitempty" bson:"-"`
+		Right  int32 `json:"right,omitempty" bson:"-"`
+		Top    int32 `json:"top,omitempty" bson:"-"`
+		Bottom int32 `json:"bottom,omitempty" bson:"-"`
+	} `json:"margin" bson:"-"`
 }
 
 func (cd *Dashboard) ID() string {
@@ -244,65 +251,12 @@ func (cd *Dashboard) ID() string {
 }
 
 type Session struct {
-	UserID    string    `bson:"_id" json:"id,omitempty"`
-	Token     string    `bson:"token" json:"token,omitempty"`
-	Expires   time.Time `bson:"expires" json:"expires,omitempty"`
-	UpdatedAt time.Time `bson:"updated_at" json:"updated_at,omitempty"`
+	ID        string    `json:"id" bson:"_id"` // token
+	UserID    string    `json:"userId" bson:"user_id"`
+	Roles     []string  `json:"roles" bson:"roles"`
+	Perm      int64     `json:"perm" bson:"perm"`
+	Dirty     bool      `json:"dirty" bson:"dirty"`
+	Expiry    time.Time `json:"expiry" bson:"expiry"`
+	MaxExpiry time.Time `json:"maxExpiry" bson:"max_expiry"`
+	UpdatedAt time.Time `json:"updatedAt" bson:"updated_at"`
 }
-
-//type AuthUser struct {
-//	user  *User
-//	roles []*Role
-//	perms map[string]struct{}
-//}
-//
-//func NewAuthUser(user *User, roles []*Role) *AuthUser {
-//	if user == nil {
-//		panic(111)
-//	}
-//	u := &AuthUser{
-//		user:  user,
-//		roles: roles,
-//		perms: make(map[string]struct{}),
-//	}
-//	for _, role := range roles {
-//		for _, perm := range role.Perms {
-//			u.perms[perm] = data.Empty
-//		}
-//	}
-//	return u
-//}
-//
-//func (u *AuthUser) ID() string {
-//	return u.user.ID
-//}
-//
-//func (u *AuthUser) Name() string {
-//	return u.user.Name
-//}
-//
-//func (u *AuthUser) Anonymous() bool {
-//	return u.user.ID == ""
-//}
-//
-//func (u *AuthUser) Admin() bool {
-//	return u.user.Admin
-//}
-//
-//func (u *AuthUser) IsInRole(roleID string) bool {
-//	for _, role := range u.roles {
-//		if role.ID == roleID {
-//			return true
-//		}
-//	}
-//	return false
-//}
-//
-//func (u *AuthUser) IsAllowed(perm string) bool {
-//	if u.user.Admin {
-//		return true
-//	}
-//
-//	_, ok := u.perms[perm]
-//	return ok
-//}

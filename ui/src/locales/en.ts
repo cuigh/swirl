@@ -394,6 +394,7 @@ export default {
         "1002": "Account is disabled",
         "1003": "Old password is incorrect",
         "1004": "Can not deploy external stack",
+        "1005": "system was already initialized",
     },
     "copyright": "© 2017-2021 cuigh. All rights reserved.",
 }

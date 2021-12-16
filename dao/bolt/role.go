@@ -40,7 +40,7 @@ func (d *Dao) RoleGet(ctx context.Context, id string) (role *model.Role, err err
 }
 
 func (d *Dao) RoleUpdate(ctx context.Context, role *model.Role) (err error) {
-	old := &model.Registry{}
+	old := &model.Role{}
 	return d.update(Role, role.ID, old, func() interface{} {
 		role.CreatedAt = old.CreatedAt
 		role.CreatedBy = old.CreatedBy

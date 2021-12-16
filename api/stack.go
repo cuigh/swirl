@@ -6,6 +6,7 @@ import (
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/biz"
 	"github.com/cuigh/swirl/docker/compose"
+	"github.com/cuigh/swirl/model"
 )
 
 // StackHandler encapsulates stack related handlers.
@@ -53,7 +54,7 @@ func stackSearch(b biz.StackBiz) web.HandlerFunc {
 	return func(ctx web.Context) (err error) {
 		var (
 			args   = &Args{}
-			stacks []*biz.Stack
+			stacks []*model.Stack
 		)
 
 		if err = ctx.Bind(args); err == nil {
@@ -119,8 +120,13 @@ func stackDeploy(b biz.StackBiz) web.HandlerFunc {
 }
 
 func stackSave(b biz.StackBiz) web.HandlerFunc {
+	type Args struct {
+		ID string `json:"id"`
+		model.Stack
+	}
+
 	return func(ctx web.Context) error {
-		stack := &biz.Stack{}
+		stack := &Args{}
 		err := ctx.Bind(stack, true)
 		if err != nil {
 			return err
@@ -133,9 +139,9 @@ func stackSave(b biz.StackBiz) web.HandlerFunc {
 		}
 
 		if stack.ID == "" {
-			err = b.Create(stack, ctx.User())
+			err = b.Create(&stack.Stack, ctx.User())
 		} else {
-			err = b.Update(stack, ctx.User())
+			err = b.Update(&stack.Stack, ctx.User())
 		}
 		return ajax(ctx, err)
 	}

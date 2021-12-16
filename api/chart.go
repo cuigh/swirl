@@ -39,7 +39,7 @@ func chartSearch(b biz.ChartBiz) web.HandlerFunc {
 	return func(ctx web.Context) (err error) {
 		var (
 			args   = &model.ChartSearchArgs{}
-			charts []*biz.Chart
+			charts []*model.Chart
 			total  int
 		)
 
@@ -85,7 +85,7 @@ func chartDelete(b biz.ChartBiz) web.HandlerFunc {
 
 func chartSave(b biz.ChartBiz) web.HandlerFunc {
 	return func(ctx web.Context) error {
-		r := &biz.Chart{}
+		r := &model.Chart{}
 		err := ctx.Bind(r, true)
 		if err == nil {
 			if r.ID == "" {
@@ -122,7 +122,7 @@ func chartFetchData(b biz.ChartBiz) web.HandlerFunc {
 func chartFindDashboard(b biz.ChartBiz) web.HandlerFunc {
 	return func(ctx web.Context) (err error) {
 		var (
-			d    *biz.Dashboard
+			d    *model.Dashboard
 			name = ctx.Query("name")
 			key  = ctx.Query("key")
 		)

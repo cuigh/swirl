@@ -3,7 +3,6 @@ package biz
 import (
 	"context"
 	"strings"
-	"time"
 
 	"github.com/cuigh/auxo/errors"
 	"github.com/cuigh/auxo/net/web"
@@ -15,13 +14,13 @@ import (
 )
 
 type StackBiz interface {
-	Search(name, filter string) (stacks []*Stack, err error)
-	Find(name string) (stack *Stack, err error)
+	Search(name, filter string) (stacks []*model.Stack, err error)
+	Find(name string) (stack *model.Stack, err error)
 	Delete(name string, user web.User) (err error)
 	Shutdown(name string, user web.User) (err error)
 	Deploy(name string, user web.User) (err error)
-	Create(s *Stack, user web.User) (err error)
-	Update(s *Stack, user web.User) (err error)
+	Create(s *model.Stack, user web.User) (err error)
+	Update(s *model.Stack, user web.User) (err error)
 }
 
 func NewStack(d *docker.Docker, s dao.Interface, eb EventBiz) StackBiz {
@@ -34,7 +33,7 @@ type stackBiz struct {
 	eb EventBiz
 }
 
-func (b *stackBiz) Search(name, filter string) (stacks []*Stack, err error) {
+func (b *stackBiz) Search(name, filter string) (stacks []*model.Stack, err error) {
 	var (
 		activeStacks   map[string][]string
 		internalStacks []*model.Stack
@@ -53,8 +52,8 @@ func (b *stackBiz) Search(name, filter string) (stacks []*Stack, err error) {
 	}
 
 	// merge stacks and definitions
-	for _, s := range internalStacks {
-		stack := newStack(s)
+	for i := range internalStacks {
+		stack := internalStacks[i]
 		if services, ok := activeStacks[stack.Name]; ok {
 			stack.Services = services
 			delete(activeStacks, stack.Name)
@@ -64,7 +63,7 @@ func (b *stackBiz) Search(name, filter string) (stacks []*Stack, err error) {
 		}
 	}
 	for n, services := range activeStacks {
-		stack := &Stack{Name: n, Services: services}
+		stack := &model.Stack{Name: n, Services: services}
 		if !b.filter(stack, name, filter) {
 			stacks = append(stacks, stack)
 		}
@@ -72,17 +71,17 @@ func (b *stackBiz) Search(name, filter string) (stacks []*Stack, err error) {
 	return
 }
 
-func (b *stackBiz) Find(name string) (stack *Stack, err error) {
-	s, err := b.s.StackGet(context.TODO(), name)
+func (b *stackBiz) Find(name string) (s *model.Stack, err error) {
+	s, err = b.s.StackGet(context.TODO(), name)
 	if err != nil {
 		return nil, err
 	} else if s == nil {
-		return &Stack{ID: name, Name: name}, nil
+		s = &model.Stack{Name: name}
 	}
-	return newStack(s), nil
+	return
 }
 
-func (b *stackBiz) filter(stack *Stack, name, filter string) bool {
+func (b *stackBiz) filter(stack *model.Stack, name, filter string) bool {
 	if name != "" {
 		if !strings.Contains(strings.ToLower(stack.Name), strings.ToLower(name)) {
 			return true
@@ -107,15 +106,12 @@ func (b *stackBiz) filter(stack *Stack, name, filter string) bool {
 	return false
 }
 
-func (b *stackBiz) Create(s *Stack, user web.User) (err error) {
+func (b *stackBiz) Create(s *model.Stack, user web.User) (err error) {
 	stack := &model.Stack{
 		Name:      s.Name,
 		Content:   s.Content,
-		CreatedAt: time.Now(),
-		CreatedBy: model.Operator{
-			ID:   user.ID(),
-			Name: user.Name(),
-		},
+		CreatedAt: now(),
+		CreatedBy: newOperator(user),
 	}
 	stack.UpdatedAt = stack.CreatedAt
 	stack.UpdatedBy = stack.CreatedBy
@@ -126,18 +122,13 @@ func (b *stackBiz) Create(s *Stack, user web.User) (err error) {
 	return
 }
 
-func (b *stackBiz) Get(name string) (stack *model.Stack, err error) {
-	return b.s.StackGet(context.TODO(), name)
-}
-
-func (b *stackBiz) Update(s *Stack, user web.User) (err error) {
+func (b *stackBiz) Update(s *model.Stack, user web.User) (err error) {
 	stack := &model.Stack{
 		Name:      s.Name,
 		Content:   s.Content,
-		UpdatedAt: time.Now(),
+		UpdatedAt: now(),
+		UpdatedBy: newOperator(user),
 	}
-	stack.UpdatedBy.ID = user.ID()
-	stack.UpdatedBy.Name = user.Name()
 	err = b.s.StackUpdate(context.TODO(), stack)
 	if err == nil {
 		b.eb.CreateStack(EventActionUpdate, stack.Name, user)
@@ -199,29 +190,4 @@ func (b *stackBiz) Deploy(name string, user web.User) (err error) {
 		b.eb.CreateStack(EventActionDeploy, name, user)
 	}
 	return
-}
-
-type Stack struct {
-	ID        string         `json:"id,omitempty"`
-	Name      string         `json:"name,omitempty"`
-	Content   string         `json:"content,omitempty"`
-	Services  []string       `json:"services,omitempty"`
-	Internal  bool           `json:"internal"`
-	CreatedAt string         `json:"createdAt,omitempty"`
-	UpdatedAt string         `json:"updatedAt,omitempty"`
-	CreatedBy model.Operator `json:"createdBy,omitempty"`
-	UpdatedBy model.Operator `json:"updatedBy,omitempty"`
-}
-
-func newStack(s *model.Stack) *Stack {
-	return &Stack{
-		ID:        s.Name,
-		Name:      s.Name,
-		Content:   s.Content,
-		Internal:  true,
-		CreatedAt: formatTime(s.CreatedAt),
-		UpdatedAt: formatTime(s.UpdatedAt),
-		CreatedBy: s.CreatedBy,
-		UpdatedBy: s.UpdatedBy,
-	}
 }

@@ -26,7 +26,7 @@ func eventSearch(b biz.EventBiz) web.HandlerFunc {
 	return func(ctx web.Context) (err error) {
 		var (
 			args   = &model.EventSearchArgs{}
-			events []*biz.Event
+			events []*model.Event
 			total  int
 		)
 

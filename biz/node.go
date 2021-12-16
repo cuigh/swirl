@@ -9,61 +9,6 @@ import (
 	"github.com/docker/docker/api/types/swarm"
 )
 
-type Node struct {
-	ID            string                 `json:"id"`
-	Name          string                 `json:"name,omitempty"`
-	Hostname      string                 `json:"hostname"`
-	Version       uint64                 `json:"version"`
-	Role          swarm.NodeRole         `json:"role"`
-	Availability  swarm.NodeAvailability `json:"availability"`
-	EngineVersion string                 `json:"engineVersion"`
-	Architecture  string                 `json:"arch"`
-	OS            string                 `json:"os"`
-	CPU           int64                  `json:"cpu"`
-	Memory        float32                `json:"memory"`
-	Address       string                 `json:"address"`
-	State         swarm.NodeState        `json:"state"`
-	Manager       *NodeManager           `json:"manager,omitempty"`
-	Labels        data.Options           `json:"labels,omitempty"`
-	CreatedAt     string                 `json:"createdAt"`
-	UpdatedAt     string                 `json:"updatedAt"`
-}
-
-type NodeManager struct {
-	Leader       bool               `json:"leader,omitempty"`
-	Reachability swarm.Reachability `json:"reachability,omitempty"`
-	Addr         string             `json:"addr,omitempty"`
-}
-
-func newNode(sn *swarm.Node) *Node {
-	n := &Node{
-		ID:            sn.ID,
-		Name:          sn.Spec.Name,
-		Hostname:      sn.Description.Hostname,
-		Version:       sn.Version.Index,
-		Role:          sn.Spec.Role,
-		Availability:  sn.Spec.Availability,
-		EngineVersion: sn.Description.Engine.EngineVersion,
-		Architecture:  sn.Description.Platform.Architecture,
-		OS:            sn.Description.Platform.OS,
-		CPU:           sn.Description.Resources.NanoCPUs / 1e9,
-		Memory:        float32(sn.Description.Resources.MemoryBytes>>20) / 1024,
-		Address:       sn.Status.Addr,
-		State:         sn.Status.State,
-		Labels:        mapToOptions(sn.Spec.Labels),
-		CreatedAt:     formatTime(sn.CreatedAt),
-		UpdatedAt:     formatTime(sn.UpdatedAt),
-	}
-	if n.Role == swarm.NodeRoleManager {
-		n.Manager = &NodeManager{
-			Leader:       sn.ManagerStatus.Leader,
-			Reachability: sn.ManagerStatus.Reachability,
-			Addr:         sn.ManagerStatus.Addr,
-		}
-	}
-	return n
-}
-
 type NodeBiz interface {
 	Search() ([]*Node, error)
 	Find(id string) (node *Node, raw string, err error)
@@ -128,4 +73,59 @@ func (b *nodeBiz) Update(n *Node, user web.User) (err error) {
 		b.eb.CreateNode(EventActionUpdate, n.ID, n.Hostname, user)
 	}
 	return
+}
+
+type Node struct {
+	ID            string                 `json:"id"`
+	Name          string                 `json:"name,omitempty"`
+	Hostname      string                 `json:"hostname"`
+	Version       uint64                 `json:"version"`
+	Role          swarm.NodeRole         `json:"role"`
+	Availability  swarm.NodeAvailability `json:"availability"`
+	EngineVersion string                 `json:"engineVersion"`
+	Architecture  string                 `json:"arch"`
+	OS            string                 `json:"os"`
+	CPU           int64                  `json:"cpu"`
+	Memory        float32                `json:"memory"`
+	Address       string                 `json:"address"`
+	State         swarm.NodeState        `json:"state"`
+	Manager       *NodeManager           `json:"manager,omitempty"`
+	Labels        data.Options           `json:"labels,omitempty"`
+	CreatedAt     string                 `json:"createdAt"`
+	UpdatedAt     string                 `json:"updatedAt"`
+}
+
+type NodeManager struct {
+	Leader       bool               `json:"leader,omitempty"`
+	Reachability swarm.Reachability `json:"reachability,omitempty"`
+	Addr         string             `json:"addr,omitempty"`
+}
+
+func newNode(sn *swarm.Node) *Node {
+	n := &Node{
+		ID:            sn.ID,
+		Name:          sn.Spec.Name,
+		Hostname:      sn.Description.Hostname,
+		Version:       sn.Version.Index,
+		Role:          sn.Spec.Role,
+		Availability:  sn.Spec.Availability,
+		EngineVersion: sn.Description.Engine.EngineVersion,
+		Architecture:  sn.Description.Platform.Architecture,
+		OS:            sn.Description.Platform.OS,
+		CPU:           sn.Description.Resources.NanoCPUs / 1e9,
+		Memory:        float32(sn.Description.Resources.MemoryBytes>>20) / 1024,
+		Address:       sn.Status.Addr,
+		State:         sn.Status.State,
+		Labels:        mapToOptions(sn.Spec.Labels),
+		CreatedAt:     formatTime(sn.CreatedAt),
+		UpdatedAt:     formatTime(sn.UpdatedAt),
+	}
+	if n.Role == swarm.NodeRoleManager {
+		n.Manager = &NodeManager{
+			Leader:       sn.ManagerStatus.Leader,
+			Reachability: sn.ManagerStatus.Reachability,
+			Addr:         sn.ManagerStatus.Addr,
+		}
+	}
+	return n
 }

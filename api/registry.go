@@ -3,6 +3,7 @@ package api
 import (
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/biz"
+	"github.com/cuigh/swirl/model"
 )
 
 // RegistryHandler encapsulates registry related handlers.
@@ -60,7 +61,7 @@ func registryDelete(b biz.RegistryBiz) web.HandlerFunc {
 
 func registrySave(b biz.RegistryBiz) web.HandlerFunc {
 	return func(ctx web.Context) error {
-		r := &biz.Registry{}
+		r := &model.Registry{}
 		err := ctx.Bind(r, true)
 		if err == nil {
 			if r.ID == "" {

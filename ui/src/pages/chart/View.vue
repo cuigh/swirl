@@ -57,11 +57,15 @@
       <x-description-item :label="t('fields.created_by')">
         <x-anchor :url="`/system/users/${model.createdBy?.id}`">{{ model.createdBy?.name }}</x-anchor>
       </x-description-item>
-      <x-description-item :label="t('fields.created_at')">{{ model.createdAt }}</x-description-item>
+      <x-description-item :label="t('fields.created_at')">
+        <n-time :time="model.createdAt" format="y-MM-dd HH:mm:ss" />
+      </x-description-item>
       <x-description-item :label="t('fields.updated_by')">
         <x-anchor :url="`/system/users/${model.updatedBy?.id}`">{{ model.updatedBy?.name }}</x-anchor>
       </x-description-item>
-      <x-description-item :label="t('fields.updated_at')">{{ model.updatedAt }}</x-description-item>
+      <x-description-item :label="t('fields.updated_at')">
+        <n-time :time="model.updatedAt" format="y-MM-dd HH:mm:ss" />
+      </x-description-item>
     </x-description>
     <x-panel :title="t('fields.metrics')">
       <n-table size="small" :bordered="true" :single-line="false">
@@ -89,6 +93,7 @@ import {
   NSpace,
   NIcon,
   NTable,
+  NTime,
 } from "naive-ui";
 import { ArrowBackCircleOutline as BackIcon } from "@vicons/ionicons5";
 import XPageHeader from "@/components/PageHeader.vue";

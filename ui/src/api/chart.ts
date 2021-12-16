@@ -20,8 +20,8 @@ export interface Chart {
         top: number;
         bottom: number;
     };
-    createdAt: string;
-    updatedAt: string;
+    createdAt: number;
+    updatedAt: number;
     createdBy: {
         id: string;
         name: string;

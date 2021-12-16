@@ -5,8 +5,8 @@ export interface Role {
     name: string;
     desc: string;
     perms: string[];
-    createdAt: string;
-    updatedAt: string;
+    createdAt: number;
+    updatedAt: number;
     createdBy: {
         id: string;
         name: string;

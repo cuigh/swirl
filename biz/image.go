@@ -11,6 +11,63 @@ import (
 	"github.com/docker/docker/api/types/image"
 )
 
+type ImageBiz interface {
+	Search(name string, pageIndex, pageSize int) ([]*Image, int, error)
+	Find(name string) (image *Image, raw string, err error)
+	Delete(id string, user web.User) (err error)
+}
+
+func NewImage(d *docker.Docker) ImageBiz {
+	return &imageBiz{d: d}
+}
+
+type imageBiz struct {
+	d *docker.Docker
+}
+
+func (b *imageBiz) Find(id string) (img *Image, raw string, err error) {
+	var (
+		i         types.ImageInspect
+		r         []byte
+		histories []image.HistoryResponseItem
+		ctx       = context.TODO()
+	)
+
+	if i, r, err = b.d.ImageInspect(ctx, id); err == nil {
+		raw, err = indentJSON(r)
+	}
+
+	if err == nil {
+		histories, err = b.d.ImageHistory(ctx, id)
+	}
+
+	if err == nil {
+		img = newImageDetail(&i, histories)
+	}
+	return
+}
+
+func (b *imageBiz) Search(name string, pageIndex, pageSize int) (images []*Image, total int, err error) {
+	list, total, err := b.d.ImageList(context.TODO(), name, pageIndex, pageSize)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	images = make([]*Image, len(list))
+	for i, nr := range list {
+		images[i] = newImageSummary(&nr)
+	}
+	return images, total, nil
+}
+
+func (b *imageBiz) Delete(id string, user web.User) (err error) {
+	err = b.d.ImageRemove(context.TODO(), id)
+	//if err == nil {
+	//	Event.CreateImage(model.EventActionDelete, id, user)
+	//}
+	return
+}
+
 type Image struct {
 	/* Summary */
 	ID          string       `json:"id"`
@@ -122,61 +179,4 @@ func newImageDetail(is *types.ImageInspect, items []image.HistoryResponseItem) *
 		Histories: histories,
 	}
 	return i
-}
-
-type ImageBiz interface {
-	Search(name string, pageIndex, pageSize int) ([]*Image, int, error)
-	Find(name string) (image *Image, raw string, err error)
-	Delete(id string, user web.User) (err error)
-}
-
-func NewImage(d *docker.Docker) ImageBiz {
-	return &imageBiz{d: d}
-}
-
-type imageBiz struct {
-	d *docker.Docker
-}
-
-func (b *imageBiz) Find(id string) (img *Image, raw string, err error) {
-	var (
-		i         types.ImageInspect
-		r         []byte
-		histories []image.HistoryResponseItem
-		ctx       = context.TODO()
-	)
-
-	if i, r, err = b.d.ImageInspect(ctx, id); err == nil {
-		raw, err = indentJSON(r)
-	}
-
-	if err == nil {
-		histories, err = b.d.ImageHistory(ctx, id)
-	}
-
-	if err == nil {
-		img = newImageDetail(&i, histories)
-	}
-	return
-}
-
-func (b *imageBiz) Search(name string, pageIndex, pageSize int) (images []*Image, total int, err error) {
-	list, total, err := b.d.ImageList(context.TODO(), name, pageIndex, pageSize)
-	if err != nil {
-		return nil, 0, err
-	}
-
-	images = make([]*Image, len(list))
-	for i, nr := range list {
-		images[i] = newImageSummary(&nr)
-	}
-	return images, total, nil
-}
-
-func (b *imageBiz) Delete(id string, user web.User) (err error) {
-	err = b.d.ImageRemove(context.TODO(), id)
-	//if err == nil {
-	//	Event.CreateImage(model.EventActionDelete, id, user)
-	//}
-	return
 }

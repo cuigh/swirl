@@ -6,8 +6,8 @@ export interface Registry {
     url: string;
     username: string;
     password: string;
-    createdAt: string;
-    updatedAt: string;
+    createdAt: number;
+    updatedAt: number;
     createdBy: {
         id: string;
         name: string;

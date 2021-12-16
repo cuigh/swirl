@@ -70,7 +70,7 @@ import XPageHeader from "@/components/PageHeader.vue";
 import userApi from "@/api/user";
 import type { User } from "@/api/user";
 import { useDataTable } from "@/utils/data-table";
-import { renderButtons, renderLink, renderTag } from "@/utils/render";
+import { renderButtons, renderLink, renderTag, renderTime } from "@/utils/render";
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
@@ -114,6 +114,7 @@ const columns = [
   {
     title: t('fields.updated_at'),
     key: "updatedAt",
+    render: (row: User) => renderTime(row.updatedAt),
   },
   {
     title: t('fields.actions'),

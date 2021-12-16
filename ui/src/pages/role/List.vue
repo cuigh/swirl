@@ -33,7 +33,9 @@
           </td>
           <td>{{ r.name }}</td>
           <td>{{ r.desc }}</td>
-          <td>{{ r.updatedAt }}</td>
+          <td>
+            <n-time :time="r.updatedAt" format="y-MM-dd HH:mm:ss" />
+          </td>
           <td>
             <n-popconfirm :show-icon="false" @positive-click="deleteRole(r, index)">
               <template #trigger>
@@ -63,6 +65,7 @@ import {
   NIcon,
   NTable,
   NPopconfirm,
+  NTime,
 } from "naive-ui";
 import {
   AddOutline as AddIcon,

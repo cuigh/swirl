@@ -11,41 +11,6 @@ import (
 	"github.com/docker/docker/api/types/volume"
 )
 
-type Volume struct {
-	Name         string                 `json:"name"`
-	Driver       string                 `json:"driver,omitempty"`
-	CustomDriver string                 `json:"customDriver,omitempty"`
-	CreatedAt    string                 `json:"createdAt"`
-	MountPoint   string                 `json:"mountPoint,omitempty"`
-	Scope        string                 `json:"scope"`
-	Labels       data.Options           `json:"labels,omitempty"`
-	Options      data.Options           `json:"options,omitempty"`
-	Status       map[string]interface{} `json:"status,omitempty"`
-	RefCount     int64                  `json:"refCount"`
-	Size         int64                  `json:"size"`
-}
-
-func newVolume(v *types.Volume) *Volume {
-	createdAt, _ := time.Parse(time.RFC3339Nano, v.CreatedAt)
-	vol := &Volume{
-		Name:       v.Name,
-		Driver:     v.Driver,
-		CreatedAt:  formatTime(createdAt),
-		MountPoint: v.Mountpoint,
-		Scope:      v.Scope,
-		Status:     v.Status,
-		Labels:     mapToOptions(v.Labels),
-		Options:    mapToOptions(v.Options),
-		RefCount:   -1,
-		Size:       -1,
-	}
-	if v.UsageData != nil {
-		vol.RefCount = v.UsageData.RefCount
-		vol.Size = v.UsageData.Size
-	}
-	return vol
-}
-
 type VolumeBiz interface {
 	Search(name string, pageIndex, pageSize int) ([]*Volume, int, error)
 	Find(name string) (volume *Volume, raw string, err error)
@@ -128,4 +93,39 @@ func (b *volumeBiz) Prune(user web.User) (deletedVolumes []string, reclaimedSpac
 		b.eb.CreateVolume(EventActionPrune, "", user)
 	}
 	return
+}
+
+type Volume struct {
+	Name         string                 `json:"name"`
+	Driver       string                 `json:"driver,omitempty"`
+	CustomDriver string                 `json:"customDriver,omitempty"`
+	CreatedAt    string                 `json:"createdAt"`
+	MountPoint   string                 `json:"mountPoint,omitempty"`
+	Scope        string                 `json:"scope"`
+	Labels       data.Options           `json:"labels,omitempty"`
+	Options      data.Options           `json:"options,omitempty"`
+	Status       map[string]interface{} `json:"status,omitempty"`
+	RefCount     int64                  `json:"refCount"`
+	Size         int64                  `json:"size"`
+}
+
+func newVolume(v *types.Volume) *Volume {
+	createdAt, _ := time.Parse(time.RFC3339Nano, v.CreatedAt)
+	vol := &Volume{
+		Name:       v.Name,
+		Driver:     v.Driver,
+		CreatedAt:  formatTime(createdAt),
+		MountPoint: v.Mountpoint,
+		Scope:      v.Scope,
+		Status:     v.Status,
+		Labels:     mapToOptions(v.Labels),
+		Options:    mapToOptions(v.Options),
+		RefCount:   -1,
+		Size:       -1,
+	}
+	if v.UsageData != nil {
+		vol.RefCount = v.UsageData.RefCount
+		vol.Size = v.UsageData.Size
+	}
+	return vol
 }

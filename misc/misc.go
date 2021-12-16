@@ -7,6 +7,7 @@ const (
 	ErrAccountDisabled      = 1002
 	ErrOldPasswordIncorrect = 1003
 	ErrExternalStack        = 1004
+	ErrSystemInitialized    = 1005
 )
 
 func Error(code int32, err error) error {

@@ -9,39 +9,6 @@ import (
 	"github.com/docker/docker/api/types/swarm"
 )
 
-type Config struct {
-	ID         string       `json:"id"`
-	Name       string       `json:"name,omitempty"`
-	Version    uint64       `json:"version"`
-	Data       string       `json:"data"`
-	Labels     data.Options `json:"labels,omitempty"`
-	Templating Driver       `json:"templating"`
-	CreatedAt  string       `json:"createdAt"`
-	UpdatedAt  string       `json:"updatedAt"`
-}
-
-type Driver struct {
-	Name    string       `json:"name"`
-	Options data.Options `json:"options,omitempty"`
-}
-
-func newConfig(c *swarm.Config) *Config {
-	config := &Config{
-		ID:        c.ID,
-		Name:      c.Spec.Name,
-		Version:   c.Version.Index,
-		Data:      string(c.Spec.Data),
-		Labels:    mapToOptions(c.Spec.Labels),
-		CreatedAt: formatTime(c.CreatedAt),
-		UpdatedAt: formatTime(c.UpdatedAt),
-	}
-	if c.Spec.Templating != nil {
-		config.Templating.Name = c.Spec.Templating.Name
-		config.Templating.Options = mapToOptions(c.Spec.Templating.Options)
-	}
-	return config
-}
-
 type ConfigBiz interface {
 	Search(name string, pageIndex, pageSize int) (configs []*Config, total int, err error)
 	Find(id string) (config *Config, raw string, err error)
@@ -133,4 +100,37 @@ func (b *configBiz) Update(c *Config, user web.User) (err error) {
 		b.eb.CreateConfig(EventActionUpdate, c.ID, c.Name, user)
 	}
 	return
+}
+
+type Config struct {
+	ID         string       `json:"id"`
+	Name       string       `json:"name,omitempty"`
+	Version    uint64       `json:"version"`
+	Data       string       `json:"data"`
+	Labels     data.Options `json:"labels,omitempty"`
+	Templating Driver       `json:"templating"`
+	CreatedAt  string       `json:"createdAt"`
+	UpdatedAt  string       `json:"updatedAt"`
+}
+
+type Driver struct {
+	Name    string       `json:"name"`
+	Options data.Options `json:"options,omitempty"`
+}
+
+func newConfig(c *swarm.Config) *Config {
+	config := &Config{
+		ID:        c.ID,
+		Name:      c.Spec.Name,
+		Version:   c.Version.Index,
+		Data:      string(c.Spec.Data),
+		Labels:    mapToOptions(c.Spec.Labels),
+		CreatedAt: formatTime(c.CreatedAt),
+		UpdatedAt: formatTime(c.UpdatedAt),
+	}
+	if c.Spec.Templating != nil {
+		config.Templating.Name = c.Spec.Templating.Name
+		config.Templating.Options = mapToOptions(c.Spec.Templating.Options)
+	}
+	return config
 }

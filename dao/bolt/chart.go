@@ -3,6 +3,7 @@ package bolt
 import (
 	"context"
 	"sort"
+	"time"
 
 	"github.com/cuigh/swirl/misc"
 	"github.com/cuigh/swirl/model"
@@ -33,7 +34,7 @@ func (d *Dao) ChartSearch(ctx context.Context, args *model.ChartSearchArgs) (cha
 	if err == nil {
 		count = len(charts)
 		sort.Slice(charts, func(i, j int) bool {
-			return charts[i].CreatedAt.After(charts[j].UpdatedAt)
+			return time.Time(charts[i].UpdatedAt).After(time.Time(charts[j].UpdatedAt))
 		})
 		start, end := misc.Page(count, args.PageIndex, args.PageSize)
 		charts = charts[start:end]

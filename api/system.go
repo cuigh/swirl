@@ -6,9 +6,12 @@ import (
 
 	"github.com/cuigh/auxo/app"
 	"github.com/cuigh/auxo/data"
+	"github.com/cuigh/auxo/errors"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/biz"
 	"github.com/cuigh/swirl/docker"
+	"github.com/cuigh/swirl/misc"
+	"github.com/cuigh/swirl/model"
 )
 
 //var ErrSystemInitialized = errors.New("system was already initialized")
@@ -22,10 +25,10 @@ type SystemHandler struct {
 }
 
 // NewSystem creates an instance of SystemHandler
-func NewSystem(d *docker.Docker, b biz.SystemBiz) *SystemHandler {
+func NewSystem(d *docker.Docker, b biz.SystemBiz, ub biz.UserBiz) *SystemHandler {
 	return &SystemHandler{
 		CheckState:  systemCheckState(b),
-		CreateAdmin: systemCreateAdmin(b),
+		CreateAdmin: systemCreateAdmin(ub),
 		Version:     systemVersion,
 		Summarize:   systemSummarize(d),
 	}
@@ -74,12 +77,21 @@ func systemSummarize(d *docker.Docker) web.HandlerFunc {
 	}
 }
 
-func systemCreateAdmin(b biz.SystemBiz) web.HandlerFunc {
+func systemCreateAdmin(ub biz.UserBiz) web.HandlerFunc {
 	return func(c web.Context) (err error) {
-		user := &biz.User{}
-		if err = c.Bind(user, true); err == nil {
-			err = b.CreateAdmin(user)
+		user := &model.User{}
+		if err = c.Bind(user, true); err != nil {
+			return err
 		}
+
+		var count int
+		if count, err = ub.Count(); err == nil && count > 0 {
+			return errors.Coded(misc.ErrSystemInitialized, "system was already initialized")
+		}
+
+		user.Admin = true
+		user.Type = biz.UserTypeInternal
+		_, err = ub.Create(user, nil)
 		return ajax(c, err)
 	}
 }

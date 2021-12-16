@@ -9,39 +9,6 @@ import (
 	"github.com/docker/docker/api/types/swarm"
 )
 
-type Secret struct {
-	ID         string       `json:"id"`
-	Name       string       `json:"name,omitempty"`
-	Version    uint64       `json:"version"`
-	Data       string       `json:"data"`
-	Labels     data.Options `json:"labels,omitempty"`
-	Driver     Driver       `json:"driver"`
-	Templating Driver       `json:"templating"`
-	CreatedAt  string       `json:"createdAt"`
-	UpdatedAt  string       `json:"updatedAt"`
-}
-
-func newSecret(c *swarm.Secret) *Secret {
-	secret := &Secret{
-		ID:        c.ID,
-		Name:      c.Spec.Name,
-		Version:   c.Version.Index,
-		Data:      string(c.Spec.Data),
-		Labels:    mapToOptions(c.Spec.Labels),
-		CreatedAt: formatTime(c.CreatedAt),
-		UpdatedAt: formatTime(c.UpdatedAt),
-	}
-	if c.Spec.Driver != nil {
-		secret.Driver.Name = c.Spec.Driver.Name
-		secret.Driver.Options = mapToOptions(c.Spec.Driver.Options)
-	}
-	if c.Spec.Templating != nil {
-		secret.Templating.Name = c.Spec.Templating.Name
-		secret.Templating.Options = mapToOptions(c.Spec.Templating.Options)
-	}
-	return secret
-}
-
 type SecretBiz interface {
 	Search(name string, pageIndex, pageSize int) (secrets []*Secret, total int, err error)
 	Find(id string) (secret *Secret, raw string, err error)
@@ -145,4 +112,37 @@ func (b *secretBiz) Update(c *Secret, user web.User) (err error) {
 		b.eb.CreateSecret(EventActionUpdate, c.ID, c.Name, user)
 	}
 	return
+}
+
+type Secret struct {
+	ID         string       `json:"id"`
+	Name       string       `json:"name,omitempty"`
+	Version    uint64       `json:"version"`
+	Data       string       `json:"data"`
+	Labels     data.Options `json:"labels,omitempty"`
+	Driver     Driver       `json:"driver"`
+	Templating Driver       `json:"templating"`
+	CreatedAt  string       `json:"createdAt"`
+	UpdatedAt  string       `json:"updatedAt"`
+}
+
+func newSecret(c *swarm.Secret) *Secret {
+	secret := &Secret{
+		ID:        c.ID,
+		Name:      c.Spec.Name,
+		Version:   c.Version.Index,
+		Data:      string(c.Spec.Data),
+		Labels:    mapToOptions(c.Spec.Labels),
+		CreatedAt: formatTime(c.CreatedAt),
+		UpdatedAt: formatTime(c.UpdatedAt),
+	}
+	if c.Spec.Driver != nil {
+		secret.Driver.Name = c.Spec.Driver.Name
+		secret.Driver.Options = mapToOptions(c.Spec.Driver.Options)
+	}
+	if c.Spec.Templating != nil {
+		secret.Templating.Name = c.Spec.Templating.Name
+		secret.Templating.Options = mapToOptions(c.Spec.Templating.Options)
+	}
+	return secret
 }

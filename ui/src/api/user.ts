@@ -17,8 +17,8 @@ export interface User {
     status: number;
     email: string;
     roles: string[];
-    createdAt: string;
-    updatedAt: string;
+    createdAt: number;
+    updatedAt: number;
     createdBy: {
         id: string;
         name: string;

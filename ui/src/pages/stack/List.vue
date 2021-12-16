@@ -38,8 +38,12 @@
               </n-tag>
             </n-space>
           </td>
-          <td>{{ r.createdAt }}</td>
-          <td>{{ r.updatedAt }}</td>
+          <td>
+            <n-time :time="r.createdAt" format="y-MM-dd HH:mm:ss" />
+          </td>
+          <td>
+            <n-time :time="r.updatedAt" format="y-MM-dd HH:mm:ss" />
+          </td>
           <td>
             <n-button
               size="tiny"
@@ -86,6 +90,7 @@ import {
   NTable,
   NPopconfirm,
   NTag,
+  NTime,
 } from "naive-ui";
 import { AddOutline as AddIcon } from "@vicons/ionicons5";
 import XPageHeader from "@/components/PageHeader.vue";

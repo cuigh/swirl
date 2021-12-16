@@ -8,6 +8,63 @@ import (
 	"github.com/docker/docker/api/types/swarm"
 )
 
+type TaskBiz interface {
+	Search(node, service, mode string, pageIndex, pageSize int) (tasks []*Task, total int, err error)
+	Find(id string) (task *Task, raw string, err error)
+	FetchLogs(id string, lines int, timestamps bool) (stdout, stderr string, err error)
+}
+
+func NewTask(d *docker.Docker) TaskBiz {
+	return &taskBiz{d: d}
+}
+
+type taskBiz struct {
+	d *docker.Docker
+}
+
+func (b *taskBiz) Find(id string) (task *Task, raw string, err error) {
+	var (
+		t swarm.Task
+		s swarm.Service
+		r []byte
+	)
+	t, r, err = b.d.TaskInspect(context.TODO(), id)
+	if err == nil {
+		raw, err = indentJSON(r)
+	}
+	if err == nil {
+		task = newTask(&t)
+		if s, _, _ = b.d.ServiceInspect(context.TODO(), t.ServiceID, false); s.Spec.Name == "" {
+			task.ServiceName = task.ServiceID
+		} else {
+			task.ServiceName = s.Spec.Name
+		}
+	}
+	return
+}
+
+func (b *taskBiz) Search(node, service, state string, pageIndex, pageSize int) (tasks []*Task, total int, err error) {
+	var list []swarm.Task
+	list, total, err = b.d.TaskList(context.TODO(), node, service, state, pageIndex, pageSize)
+	if err != nil {
+		return
+	}
+
+	tasks = make([]*Task, len(list))
+	for i, t := range list {
+		tasks[i] = newTask(&t)
+	}
+	return
+}
+
+func (b *taskBiz) FetchLogs(id string, lines int, timestamps bool) (string, string, error) {
+	stdout, stderr, err := b.d.TaskLogs(context.TODO(), id, lines, timestamps)
+	if err != nil {
+		return "", "", err
+	}
+	return stdout.String(), stderr.String(), nil
+}
+
 type Task struct {
 	ID          string          `json:"id"`
 	Name        string          `json:"name"`
@@ -66,61 +123,4 @@ func newTask(t *swarm.Task) *Task {
 		})
 	}
 	return task
-}
-
-type TaskBiz interface {
-	Search(node, service, mode string, pageIndex, pageSize int) (tasks []*Task, total int, err error)
-	Find(id string) (task *Task, raw string, err error)
-	FetchLogs(id string, lines int, timestamps bool) (stdout, stderr string, err error)
-}
-
-func NewTask(d *docker.Docker) TaskBiz {
-	return &taskBiz{d: d}
-}
-
-type taskBiz struct {
-	d *docker.Docker
-}
-
-func (b *taskBiz) Find(id string) (task *Task, raw string, err error) {
-	var (
-		t swarm.Task
-		s swarm.Service
-		r []byte
-	)
-	t, r, err = b.d.TaskInspect(context.TODO(), id)
-	if err == nil {
-		raw, err = indentJSON(r)
-	}
-	if err == nil {
-		task = newTask(&t)
-		if s, _, _ = b.d.ServiceInspect(context.TODO(), t.ServiceID, false); s.Spec.Name == "" {
-			task.ServiceName = task.ServiceID
-		} else {
-			task.ServiceName = s.Spec.Name
-		}
-	}
-	return
-}
-
-func (b *taskBiz) Search(node, service, state string, pageIndex, pageSize int) (tasks []*Task, total int, err error) {
-	var list []swarm.Task
-	list, total, err = b.d.TaskList(context.TODO(), node, service, state, pageIndex, pageSize)
-	if err != nil {
-		return
-	}
-
-	tasks = make([]*Task, len(list))
-	for i, t := range list {
-		tasks[i] = newTask(&t)
-	}
-	return
-}
-
-func (b *taskBiz) FetchLogs(id string, lines int, timestamps bool) (string, string, error) {
-	stdout, stderr, err := b.d.TaskLogs(context.TODO(), id, lines, timestamps)
-	if err != nil {
-		return "", "", err
-	}
-	return stdout.String(), stderr.String(), nil
 }

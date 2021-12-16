@@ -24,11 +24,15 @@
       <x-description-item :label="t('fields.created_by')">
         <x-anchor :url="`/system/users/${model.createdBy?.id}`">{{ model.createdBy?.name }}</x-anchor>
       </x-description-item>
-      <x-description-item :label="t('fields.created_at')">{{ model.createdAt }}</x-description-item>
+      <x-description-item :label="t('fields.created_at')">
+        <n-time :time="model.createdAt" format="y-MM-dd HH:mm:ss" />
+      </x-description-item>
       <x-description-item :label="t('fields.updated_by')">
         <x-anchor :url="`/system/users/${model.updatedBy?.id}`">{{ model.updatedBy?.name }}</x-anchor>
       </x-description-item>
-      <x-description-item :label="t('fields.updated_at')">{{ model.updatedAt }}</x-description-item>
+      <x-description-item :label="t('fields.updated_at')">
+        <n-time :time="model.updatedAt" format="y-MM-dd HH:mm:ss" />
+      </x-description-item>
       <x-description-item :span="2" :label="t('fields.perms')">
         <n-grid cols="1 480:2 960:3 1440:4" x-gap="6">
           <n-gi span="1" v-for="g in ps">
@@ -48,6 +52,7 @@ import {
   NIcon,
   NGrid,
   NGi,
+  NTime,
 } from "naive-ui";
 import { useRoute } from "vue-router";
 import { ArrowBackCircleOutline as BackIcon } from "@vicons/ionicons5";

@@ -2,13 +2,11 @@ package biz
 
 import (
 	"context"
-	"time"
 
 	"github.com/cuigh/auxo/log"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/dao"
 	"github.com/cuigh/swirl/model"
-	"github.com/jinzhu/copier"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -46,28 +44,8 @@ const (
 	EventActionPrune      EventAction = "Prune"
 )
 
-type Event struct {
-	ID       string      `json:"id"`
-	Type     EventType   `json:"type"`
-	Action   EventAction `json:"action"`
-	Code     string      `json:"code"`
-	Name     string      `json:"name"`
-	UserID   string      `json:"userId"`
-	Username string      `json:"username"`
-	Time     string      `json:"time"`
-}
-
-func newEvent(e *model.Event) *Event {
-	event := &Event{
-		Time: formatTime(e.Time),
-		ID:   e.ID.Hex(),
-	}
-	_ = copier.CopyWithOption(event, e, copier.Option{IgnoreEmpty: true})
-	return event
-}
-
 type EventBiz interface {
-	Search(args *model.EventSearchArgs) (events []*Event, total int, err error)
+	Search(args *model.EventSearchArgs) (events []*model.Event, total int, err error)
 	CreateRegistry(action EventAction, id, name string, user web.User)
 	CreateNode(action EventAction, id, name string, user web.User)
 	CreateNetwork(action EventAction, id, name string, user web.User)
@@ -91,16 +69,8 @@ type eventBiz struct {
 	d dao.Interface
 }
 
-func (b *eventBiz) Search(args *model.EventSearchArgs) (events []*Event, total int, err error) {
-	var list []*model.Event
-	list, total, err = b.d.EventSearch(context.TODO(), args)
-	if err == nil && len(list) > 0 {
-		events = make([]*Event, len(list))
-		for i, e := range list {
-			events[i] = newEvent(e)
-		}
-	}
-	return
+func (b *eventBiz) Search(args *model.EventSearchArgs) (events []*model.Event, total int, err error) {
+	return b.d.EventSearch(context.TODO(), args)
 }
 
 func (b *eventBiz) create(et EventType, ea EventAction, code, name string, user web.User) {
@@ -112,9 +82,8 @@ func (b *eventBiz) create(et EventType, ea EventAction, code, name string, user 
 		Name:     name,
 		UserID:   user.ID(),
 		Username: user.Name(),
-		Time:     time.Now(),
+		Time:     now(),
 	}
-
 	err := b.d.EventCreate(context.TODO(), event)
 	if err != nil {
 		log.Get("event").Errorf("failed to create event `%+v`: %v", event, err)

@@ -68,7 +68,7 @@ import XCode from "@/components/Code.vue";
 import XIcon from "@/components/Icon.vue";
 import chartApi from "@/api/chart";
 import type { Chart } from "@/api/chart";
-import { renderButtons, renderLink, renderTag } from "@/utils/render";
+import { renderButtons, renderLink, renderTag, renderTime } from "@/utils/render";
 import { useDataTable } from "@/utils/data-table";
 import { toTitle } from "@/utils";
 import { useI18n } from 'vue-i18n'
@@ -119,7 +119,8 @@ const columns = [
   },
   {
     title: t('fields.updated_at'),
-    key: "updatedAt"
+    key: "updatedAt",
+    render: (c: Chart) => renderTime(c.updatedAt),
   },
   {
     title: t('fields.actions'),
@@ -175,7 +176,7 @@ function importChart() {
 }
 
 function exportChart(c: Chart) {
-  const { id, createdAt, updatedAt, ...chart } = c
+  const { id, createdAt, updatedAt, createdBy, updatedBy, ...chart } = c
   window.dialog.success({
     showIcon: false,
     title: t('dialogs.export_chart.title'),

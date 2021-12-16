@@ -8,7 +8,7 @@ export interface Event {
     name: string;
     userId: string;
     username: string;
-    time: string;
+    time: number;
 }
 
 export interface SearchArgs {

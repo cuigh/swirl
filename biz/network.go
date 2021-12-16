@@ -10,77 +10,6 @@ import (
 	"github.com/docker/docker/api/types/network"
 )
 
-type Network struct {
-	ID         string `json:"id"`
-	Name       string `json:"name"`
-	Created    string `json:"created"`
-	Driver     string `json:"driver"`
-	Scope      string `json:"scope"`
-	Internal   bool   `json:"internal"`
-	Attachable bool   `json:"attachable"`
-	Ingress    bool   `json:"ingress"`
-	IPv6       bool   `json:"ipv6"`
-	IPAM       struct {
-		Driver  string        `json:"driver"`
-		Options data.Options  `json:"options"`
-		Config  []*IPAMConfig `json:"config"`
-	} `json:"ipam"`
-	Options    data.Options        `json:"options"`
-	Labels     data.Options        `json:"labels"`
-	Containers []*NetworkContainer `json:"containers"`
-}
-
-type IPAMConfig struct {
-	Subnet  string `json:"subnet,omitempty"`
-	Gateway string `json:"gateway,omitempty"`
-	Range   string `json:"range,omitempty"`
-}
-
-type NetworkContainer struct {
-	ID   string `json:"id"`   // container id
-	Name string `json:"name"` // container name
-	Mac  string `json:"mac"`  // mac address
-	IPv4 string `json:"ipv4"` // IPv4 address
-	IPv6 string `json:"ipv6"` // IPv6 address
-}
-
-func newNetwork(nr *types.NetworkResource) *Network {
-	n := &Network{
-		ID:         nr.ID,
-		Name:       nr.Name,
-		Created:    formatTime(nr.Created),
-		Driver:     nr.Driver,
-		Scope:      nr.Scope,
-		Internal:   nr.Internal,
-		Attachable: nr.Attachable,
-		Ingress:    nr.Ingress,
-		IPv6:       nr.EnableIPv6,
-		Options:    mapToOptions(nr.Options),
-		Labels:     mapToOptions(nr.Labels),
-	}
-	n.IPAM.Driver = nr.IPAM.Driver
-	n.IPAM.Options = mapToOptions(nr.IPAM.Options)
-	n.IPAM.Config = make([]*IPAMConfig, len(nr.IPAM.Config))
-	for i, c := range nr.IPAM.Config {
-		n.IPAM.Config[i] = &IPAMConfig{
-			Subnet:  c.Subnet,
-			Gateway: c.Gateway,
-			Range:   c.IPRange,
-		}
-	}
-	n.Containers = make([]*NetworkContainer, 0, len(nr.Containers))
-	for id, ep := range nr.Containers {
-		n.Containers = append(n.Containers, &NetworkContainer{
-			ID:   id,
-			Name: ep.Name,
-			Mac:  ep.MacAddress,
-			IPv4: ep.IPv4Address,
-			IPv6: ep.IPv6Address,
-		})
-	}
-	return n
-}
-
 type NetworkBiz interface {
 	Search() ([]*Network, error)
 	Find(name string) (network *Network, raw string, err error)
@@ -166,4 +95,75 @@ func (b *networkBiz) Disconnect(networkId, networkName, container string, user w
 		b.eb.CreateNetwork(EventActionDisconnect, networkId, networkName, user)
 	}
 	return
+}
+
+type Network struct {
+	ID         string `json:"id"`
+	Name       string `json:"name"`
+	Created    string `json:"created"`
+	Driver     string `json:"driver"`
+	Scope      string `json:"scope"`
+	Internal   bool   `json:"internal"`
+	Attachable bool   `json:"attachable"`
+	Ingress    bool   `json:"ingress"`
+	IPv6       bool   `json:"ipv6"`
+	IPAM       struct {
+		Driver  string        `json:"driver"`
+		Options data.Options  `json:"options"`
+		Config  []*IPAMConfig `json:"config"`
+	} `json:"ipam"`
+	Options    data.Options        `json:"options"`
+	Labels     data.Options        `json:"labels"`
+	Containers []*NetworkContainer `json:"containers"`
+}
+
+type IPAMConfig struct {
+	Subnet  string `json:"subnet,omitempty"`
+	Gateway string `json:"gateway,omitempty"`
+	Range   string `json:"range,omitempty"`
+}
+
+type NetworkContainer struct {
+	ID   string `json:"id"`   // container id
+	Name string `json:"name"` // container name
+	Mac  string `json:"mac"`  // mac address
+	IPv4 string `json:"ipv4"` // IPv4 address
+	IPv6 string `json:"ipv6"` // IPv6 address
+}
+
+func newNetwork(nr *types.NetworkResource) *Network {
+	n := &Network{
+		ID:         nr.ID,
+		Name:       nr.Name,
+		Created:    formatTime(nr.Created),
+		Driver:     nr.Driver,
+		Scope:      nr.Scope,
+		Internal:   nr.Internal,
+		Attachable: nr.Attachable,
+		Ingress:    nr.Ingress,
+		IPv6:       nr.EnableIPv6,
+		Options:    mapToOptions(nr.Options),
+		Labels:     mapToOptions(nr.Labels),
+	}
+	n.IPAM.Driver = nr.IPAM.Driver
+	n.IPAM.Options = mapToOptions(nr.IPAM.Options)
+	n.IPAM.Config = make([]*IPAMConfig, len(nr.IPAM.Config))
+	for i, c := range nr.IPAM.Config {
+		n.IPAM.Config[i] = &IPAMConfig{
+			Subnet:  c.Subnet,
+			Gateway: c.Gateway,
+			Range:   c.IPRange,
+		}
+	}
+	n.Containers = make([]*NetworkContainer, 0, len(nr.Containers))
+	for id, ep := range nr.Containers {
+		n.Containers = append(n.Containers, &NetworkContainer{
+			ID:   id,
+			Name: ep.Name,
+			Mac:  ep.MacAddress,
+			IPv4: ep.IPv4Address,
+			IPv6: ep.IPv6Address,
+		})
+	}
+	return n
 }

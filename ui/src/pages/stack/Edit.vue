@@ -152,6 +152,7 @@ async function fetchData() {
   if (name) {
     let tr = await stackApi.find(name);
     model.value = tr.data as Stack;
+    model.value.id = model.value.name
   }
 }
 

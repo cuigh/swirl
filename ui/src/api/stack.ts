@@ -6,8 +6,8 @@ export interface Stack {
     content: string;
     services?: string[];
     internal: boolean;
-    createdAt: string;
-    updatedAt: string;
+    createdAt: number;
+    updatedAt: number;
     createdBy: {
         id: string;
         name: string;

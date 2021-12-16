@@ -2,16 +2,13 @@ package biz
 
 import (
 	"context"
-	"time"
 
-	"github.com/cuigh/auxo/data/guid"
 	"github.com/cuigh/auxo/errors"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/auxo/security/passwd"
 	"github.com/cuigh/swirl/dao"
 	"github.com/cuigh/swirl/misc"
 	"github.com/cuigh/swirl/model"
-	"github.com/jinzhu/copier"
 )
 
 const (
@@ -29,17 +26,17 @@ const (
 )
 
 type UserBiz interface {
-	Search(name, loginName, filter string, pageIndex, pageSize int) (users []*User, total int, err error)
-	Create(user *User, ctxUser web.User) (id string, err error)
-	Update(user *User, ctxUser web.User) (err error)
-	FindByID(id string) (user *User, err error)
-	FindByName(loginName string) (user *User, err error)
+	Search(name, loginName, filter string, pageIndex, pageSize int) (users []*model.User, total int, err error)
+	Create(user *model.User, ctxUser web.User) (id string, err error)
+	Update(user *model.User, ctxUser web.User) (err error)
+	FindByID(id string) (user *model.User, err error)
+	FindByName(loginName string) (user *model.User, err error)
 	FindPrivacy(loginName string) (privacy *UserPrivacy, err error)
 	Count() (count int, err error)
 	Delete(id, name string, user web.User) (err error)
 	SetStatus(id string, status int32, user web.User) (err error)
 	ModifyPassword(oldPwd, newPwd string, user web.User) (err error)
-	ModifyProfile(user *User, ctxUser web.User) (err error)
+	ModifyProfile(user *model.User, ctxUser web.User) (err error)
 }
 
 func NewUser(d dao.Interface, eb EventBiz) UserBiz {
@@ -51,17 +48,14 @@ type userBiz struct {
 	eb EventBiz
 }
 
-func (b *userBiz) Search(name, loginName, filter string, pageIndex, pageSize int) (users []*User, total int, err error) {
-	var (
-		list []*model.User
-		args = &model.UserSearchArgs{
-			Name:      name,
-			LoginName: loginName,
-			Status:    -1,
-			PageIndex: pageIndex,
-			PageSize:  pageSize,
-		}
-	)
+func (b *userBiz) Search(name, loginName, filter string, pageIndex, pageSize int) (users []*model.User, total int, err error) {
+	var args = &model.UserSearchArgs{
+		Name:      name,
+		LoginName: loginName,
+		Status:    -1,
+		PageIndex: pageIndex,
+		PageSize:  pageSize,
+	}
 
 	switch filter {
 	case "admins":
@@ -72,31 +66,15 @@ func (b *userBiz) Search(name, loginName, filter string, pageIndex, pageSize int
 		args.Status = UserStatusBlocked
 	}
 
-	list, total, err = b.d.UserSearch(context.TODO(), args)
-	if err == nil {
-		for _, u := range list {
-			users = append(users, newUser(u))
-		}
-	}
-	return
+	return b.d.UserSearch(context.TODO(), args)
 }
 
-func (b *userBiz) FindByID(id string) (user *User, err error) {
-	var u *model.User
-	u, err = b.d.UserGet(context.TODO(), id)
-	if u != nil {
-		user = newUser(u)
-	}
-	return
+func (b *userBiz) FindByID(id string) (user *model.User, err error) {
+	return b.d.UserGet(context.TODO(), id)
 }
 
-func (b *userBiz) FindByName(loginName string) (user *User, err error) {
-	var u *model.User
-	u, err = b.d.UserGetByName(context.TODO(), loginName)
-	if u != nil {
-		user = newUser(u)
-	}
-	return
+func (b *userBiz) FindByName(loginName string) (user *model.User, err error) {
+	return b.d.UserGetByName(context.TODO(), loginName)
 }
 
 func (b *userBiz) FindPrivacy(loginName string) (privacy *UserPrivacy, err error) {
@@ -115,23 +93,17 @@ func (b *userBiz) FindPrivacy(loginName string) (privacy *UserPrivacy, err error
 	return
 }
 
-func (b *userBiz) Create(u *User, ctxUser web.User) (id string, err error) {
-	user := &model.User{
-		ID:        createId(),
-		Name:      u.Name,
-		LoginName: u.LoginName,
-		Email:     u.Email,
-		Admin:     u.Admin,
-		Type:      u.Type,
-		Status:    UserStatusActive,
-		Roles:     u.Roles,
-		CreatedAt: time.Now(),
-		CreatedBy: model.Operator{ID: ctxUser.ID(), Name: ctxUser.Name()},
+func (b *userBiz) Create(user *model.User, ctxUser web.User) (id string, err error) {
+	user.ID = createId()
+	user.Status = UserStatusActive
+	user.CreatedAt = now()
+	if ctxUser != nil {
+		user.CreatedBy = newOperator(ctxUser)
 	}
 	user.UpdatedAt = user.CreatedAt
 	user.UpdatedBy = user.CreatedBy
 	if user.Type == UserTypeInternal {
-		user.Password, user.Salt, err = passwd.Generate(u.Password)
+		user.Password, user.Salt, err = passwd.Generate(user.Password)
 		if err != nil {
 			return
 		}
@@ -144,21 +116,11 @@ func (b *userBiz) Create(u *User, ctxUser web.User) (id string, err error) {
 	return
 }
 
-func (b *userBiz) Update(u *User, ctxUser web.User) (err error) {
-	user := &model.User{
-		ID:        u.ID,
-		Name:      u.Name,
-		LoginName: u.LoginName,
-		Email:     u.Email,
-		Admin:     u.Admin,
-		Type:      u.Type,
-		Roles:     u.Roles,
-		UpdatedAt: time.Now(),
-	}
-	user.UpdatedBy.ID = ctxUser.ID()
-	user.UpdatedBy.Name = ctxUser.Name()
+func (b *userBiz) Update(user *model.User, ctxUser web.User) (err error) {
+	user.UpdatedAt = now()
+	user.UpdatedBy = newOperator(ctxUser)
 	if err = b.d.UserUpdate(context.TODO(), user); err == nil {
-		b.eb.CreateUser(EventActionUpdate, u.LoginName, u.Name, ctxUser)
+		b.eb.CreateUser(EventActionUpdate, user.LoginName, user.Name, ctxUser)
 	}
 	return
 }
@@ -167,8 +129,8 @@ func (b *userBiz) SetStatus(id string, status int32, user web.User) (err error) 
 	u := &model.User{
 		ID:        id,
 		Status:    status,
-		UpdatedAt: time.Now(),
-		UpdatedBy: model.Operator{ID: user.ID(), Name: user.Name()},
+		UpdatedAt: now(),
+		UpdatedBy: newOperator(user),
 	}
 	return b.d.UserUpdateStatus(context.TODO(), u)
 }
@@ -194,81 +156,49 @@ func (b *userBiz) ModifyPassword(oldPwd, newPwd string, user web.User) (err erro
 		return errors.Coded(misc.ErrOldPasswordIncorrect, "current password is incorrect")
 	}
 
-	u.Password, u.Salt, err = passwd.Generate(newPwd)
-	if err != nil {
+	if u.Password, u.Salt, err = passwd.Generate(newPwd); err != nil {
 		return
 	}
 
-	u.UpdatedAt = time.Now()
-	u.UpdatedBy.ID = user.ID()
-	u.UpdatedBy.Name = user.Name()
-	err = b.d.UserUpdatePassword(context.TODO(), u)
-	return
+	u.UpdatedAt = now()
+	u.UpdatedBy = newOperator(user)
+	return b.d.UserUpdatePassword(context.TODO(), u)
 }
 
-func (b *userBiz) ModifyProfile(u *User, user web.User) (err error) {
-	return b.d.UserUpdateProfile(context.TODO(), &model.User{
-		ID:        user.ID(),
-		Name:      u.Name,
-		LoginName: u.LoginName,
-		Email:     u.Email,
-		UpdatedAt: time.Now(),
-		UpdatedBy: model.Operator{ID: user.ID(), Name: user.Name()},
-	})
+func (b *userBiz) ModifyProfile(u *model.User, user web.User) (err error) {
+	u.ID = user.ID()
+	u.UpdatedAt = now()
+	u.UpdatedBy = newOperator(user)
+	return b.d.UserUpdateProfile(context.TODO(), u)
 }
 
 func (b *userBiz) Count() (count int, err error) {
 	return b.d.UserCount(context.TODO())
 }
 
-func (b *userBiz) UpdateSession(id string) (token string, err error) {
-	session := &model.Session{
-		UserID:    id,
-		Token:     guid.New().String(),
-		UpdatedAt: time.Now(),
-	}
-	session.Expires = session.UpdatedAt.Add(time.Hour * 24)
-	err = b.d.SessionUpdate(context.TODO(), session)
-	if err == nil {
-		token = session.Token
-	}
-	return
-}
+//func (b *userBiz) UpdateSession(id string) (token string, err error) {
+//	session := &model.Session{
+//		UserID:    id,
+//		Token:     guid.New().String(),
+//		UpdatedAt: time.Now(),
+//	}
+//	session.Expires = session.UpdatedAt.Add(time.Hour * 24)
+//	err = b.d.SessionUpdate(context.TODO(), session)
+//	if err == nil {
+//		token = session.Token
+//	}
+//	return
+//}
 
 func (b *userBiz) GetSession(token string) (session *model.Session, err error) {
 	return b.d.SessionGet(context.TODO(), token)
 }
 
-type User struct {
-	ID        string         `json:"id"`
-	Name      string         `json:"name" valid:"required"`
-	LoginName string         `json:"loginName" valid:"required"`
-	Password  string         `json:"password,omitempty"`
-	Email     string         `json:"email" valid:"required"`
-	Admin     bool           `json:"admin"`
-	Type      string         `json:"type"`
-	Status    int32          `json:"status,omitempty"`
-	Roles     []string       `json:"roles,omitempty"`
-	CreatedAt string         `json:"createdAt,omitempty"`
-	UpdatedAt string         `json:"updatedAt,omitempty"`
-	CreatedBy model.Operator `json:"createdBy"`
-	UpdatedBy model.Operator `json:"updatedBy"`
-}
-
 type UserPrivacy struct {
 	ID       string
 	Name     string
-	Password string
-	Salt     string
+	Password string `json:"-"`
+	Salt     string `json:"-"`
 	Type     string
 	Status   int32
-}
-
-func newUser(u *model.User) *User {
-	user := &User{
-		CreatedAt: formatTime(u.CreatedAt),
-		UpdatedAt: formatTime(u.UpdatedAt),
-	}
-	_ = copier.CopyWithOption(user, u, copier.Option{IgnoreEmpty: true, DeepCopy: true})
-	return user
 }

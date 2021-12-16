@@ -48,13 +48,17 @@
           :url="`/system/users/${model.user.createdBy?.id}`"
         >{{ model.user.createdBy?.name }}</x-anchor>
       </x-description-item>
-      <x-description-item :label="t('fields.created_at')">{{ model.user.createdAt }}</x-description-item>
+      <x-description-item :label="t('fields.created_at')">
+        <n-time :time="model.user.createdAt" format="y-MM-dd HH:mm:ss" />
+      </x-description-item>
       <x-description-item :label="t('fields.updated_by')">
         <x-anchor
           :url="`/system/users/${model.user.updatedBy?.id}`"
         >{{ model.user.updatedBy?.name }}</x-anchor>
       </x-description-item>
-      <x-description-item :label="t('fields.updated_at')">{{ model.user.updatedAt }}</x-description-item>
+      <x-description-item :label="t('fields.updated_at')">
+        <n-time :time="model.user.updatedAt" format="y-MM-dd HH:mm:ss" />
+      </x-description-item>
       <x-description-item
         :label="t('objects.role', 2)"
         :span="2"
@@ -80,6 +84,7 @@ import {
   NTag,
   NSpace,
   NIcon,
+  NTime,
 } from "naive-ui";
 import { useRoute } from "vue-router";
 import { ArrowBackCircleOutline as BackIcon } from "@vicons/ionicons5";

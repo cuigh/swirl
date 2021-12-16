@@ -8,6 +8,7 @@ import (
 	"github.com/cuigh/auxo/security/passwd"
 	"github.com/cuigh/swirl/biz"
 	"github.com/cuigh/swirl/misc"
+	"github.com/cuigh/swirl/model"
 )
 
 type Authenticator struct {
@@ -92,7 +93,7 @@ func ldapRealm(s *misc.Setting, ub biz.UserBiz) RealmFunc {
 			lu = user.(*ldap.User)
 		)
 		if u == nil {
-			id, err = ub.Create(&biz.User{
+			id, err = ub.Create(&model.User{
 				Type:      biz.UserTypeLDAP,
 				LoginName: loginName,
 				Name:      lu.Name(),

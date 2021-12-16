@@ -14,15 +14,22 @@ import (
 	"github.com/jinzhu/copier"
 )
 
+var builtins = []*model.Chart{
+	model.NewChart("service", "$cpu", "CPU", "${name}", `rate(container_cpu_user_seconds_total{container_label_com_docker_swarm_service_name="${service}"}[5m]) * 100`, "percent:100", 60),
+	model.NewChart("service", "$memory", "Memory", "${name}", `container_memory_usage_bytes{container_label_com_docker_swarm_service_name="${service}"}`, "size:bytes", 60),
+	model.NewChart("service", "$network_in", "Network Receive", "${name}", `sum(irate(container_network_receive_bytes_total{container_label_com_docker_swarm_service_name="${service}"}[5m])) by(name)`, "size:bytes", 60),
+	model.NewChart("service", "$network_out", "Network Send", "${name}", `sum(irate(container_network_transmit_bytes_total{container_label_com_docker_swarm_service_name="${service}"}[5m])) by(name)`, "size:bytes", 60),
+}
+
 type ChartBiz interface {
-	Search(args *model.ChartSearchArgs) (charts []*Chart, total int, err error)
+	Search(args *model.ChartSearchArgs) (charts []*model.Chart, total int, err error)
 	Delete(id, title string, user web.User) (err error)
-	Find(id string) (chart *Chart, err error)
+	Find(id string) (chart *model.Chart, err error)
 	Batch(ids ...string) (charts []*model.Chart, err error)
-	Create(chart *Chart, user web.User) (err error)
-	Update(chart *Chart, user web.User) (err error)
+	Create(chart *model.Chart, user web.User) (err error)
+	Update(chart *model.Chart, user web.User) (err error)
 	FetchData(key string, ids []string, period time.Duration) (data.Map, error)
-	FindDashboard(name, key string) (dashboard *Dashboard, err error)
+	FindDashboard(name, key string) (dashboard *model.Dashboard, err error)
 	UpdateDashboard(dashboard *model.Dashboard, user web.User) (err error)
 }
 
@@ -31,48 +38,28 @@ func NewChart(d dao.Interface, mb MetricBiz, eb EventBiz) ChartBiz {
 		d:  d,
 		mb: mb,
 		eb: eb,
-		builtin: []*model.Chart{
-			model.NewChart("service", "$cpu", "CPU", "${name}", `rate(container_cpu_user_seconds_total{container_label_com_docker_swarm_service_name="${service}"}[5m]) * 100`, "percent:100", 60),
-			model.NewChart("service", "$memory", "Memory", "${name}", `container_memory_usage_bytes{container_label_com_docker_swarm_service_name="${service}"}`, "size:bytes", 60),
-			model.NewChart("service", "$network_in", "Network Receive", "${name}", `sum(irate(container_network_receive_bytes_total{container_label_com_docker_swarm_service_name="${service}"}[5m])) by(name)`, "size:bytes", 60),
-			model.NewChart("service", "$network_out", "Network Send", "${name}", `sum(irate(container_network_transmit_bytes_total{container_label_com_docker_swarm_service_name="${service}"}[5m])) by(name)`, "size:bytes", 60),
-		},
 	}
 }
 
 type chartBiz struct {
-	builtin []*model.Chart
-	d       dao.Interface
-	mb      MetricBiz
-	eb      EventBiz
+	d  dao.Interface
+	mb MetricBiz
+	eb EventBiz
 }
 
-func (b *chartBiz) Search(args *model.ChartSearchArgs) (charts []*Chart, total int, err error) {
-	var list []*model.Chart
-	list, total, err = b.d.ChartSearch(context.TODO(), args)
-	if err == nil {
-		charts = make([]*Chart, len(list))
-		for i, c := range list {
-			charts[i] = newChart(c)
-		}
-	}
-	return
+func (b *chartBiz) Search(args *model.ChartSearchArgs) (charts []*model.Chart, total int, err error) {
+	return b.d.ChartSearch(context.TODO(), args)
 }
 
-func (b *chartBiz) Create(chart *Chart, user web.User) (err error) {
-	c := &model.Chart{
-		ID:        createId(),
-		CreatedAt: time.Now(),
-		CreatedBy: model.Operator{ID: user.ID(), Name: user.Name()},
-	}
-	c.UpdatedAt = c.CreatedAt
-	if err = copier.CopyWithOption(c, chart, copier.Option{IgnoreEmpty: true, DeepCopy: true}); err != nil {
-		return err
-	}
-
-	err = b.d.ChartCreate(context.TODO(), c)
+func (b *chartBiz) Create(chart *model.Chart, user web.User) (err error) {
+	chart.ID = createId()
+	chart.CreatedAt = now()
+	chart.CreatedBy = newOperator(user)
+	chart.UpdatedAt = chart.CreatedAt
+	chart.UpdatedBy = chart.CreatedBy
+	err = b.d.ChartCreate(context.TODO(), chart)
 	if err == nil {
-		b.eb.CreateChart(EventActionCreate, c.ID, c.Title, user)
+		b.eb.CreateChart(EventActionCreate, chart.ID, chart.Title, user)
 	}
 	return
 }
@@ -85,13 +72,8 @@ func (b *chartBiz) Delete(id, title string, user web.User) (err error) {
 	return
 }
 
-func (b *chartBiz) Find(id string) (chart *Chart, err error) {
-	var c *model.Chart
-	c, err = b.d.ChartGet(context.TODO(), id)
-	if err == nil {
-		chart = newChart(c)
-	}
-	return
+func (b *chartBiz) Find(id string) (chart *model.Chart, err error) {
+	return b.d.ChartGet(context.TODO(), id)
 }
 
 func (b *chartBiz) Batch(ids ...string) (charts []*model.Chart, err error) {
@@ -99,43 +81,30 @@ func (b *chartBiz) Batch(ids ...string) (charts []*model.Chart, err error) {
 	return
 }
 
-func (b *chartBiz) Update(chart *Chart, user web.User) (err error) {
-	c := &model.Chart{
-		UpdatedAt: time.Now(),
-	}
-	if err = copier.CopyWithOption(c, chart, copier.Option{IgnoreEmpty: true, DeepCopy: true}); err != nil {
-		return err
-	}
-	c.UpdatedBy.ID = user.ID()
-	c.UpdatedBy.Name = user.Name()
-
-	err = b.d.ChartUpdate(context.TODO(), c)
+func (b *chartBiz) Update(chart *model.Chart, user web.User) (err error) {
+	chart.UpdatedAt = now()
+	chart.UpdatedBy = newOperator(user)
+	err = b.d.ChartUpdate(context.TODO(), chart)
 	if err == nil {
 		b.eb.CreateChart(EventActionUpdate, chart.ID, chart.Title, user)
 	}
 	return
 }
 
-func (b *chartBiz) FindDashboard(name, key string) (dashboard *Dashboard, err error) {
-	var d *model.Dashboard
-	d, err = b.d.DashboardGet(context.TODO(), name, key)
-	if err != nil {
+func (b *chartBiz) FindDashboard(name, key string) (dashboard *model.Dashboard, err error) {
+	if dashboard, err = b.d.DashboardGet(context.TODO(), name, key); err != nil {
 		return
 	}
-
-	if d == nil {
+	if dashboard == nil {
 		dashboard = defaultDashboard(name, key)
-	} else {
-		dashboard = newDashboard(d)
 	}
 	err = b.fillCharts(dashboard)
 	return
 }
 
 func (b *chartBiz) UpdateDashboard(dashboard *model.Dashboard, user web.User) (err error) {
-	dashboard.UpdatedAt = time.Now()
-	dashboard.UpdatedBy.ID = user.ID()
-	dashboard.UpdatedBy.Name = user.Name()
+	dashboard.UpdatedAt = now()
+	dashboard.UpdatedBy = newOperator(user)
 	return b.d.DashboardUpdate(context.TODO(), dashboard)
 }
 
@@ -280,7 +249,7 @@ func (b *chartBiz) getCharts(ids []string) (charts map[string]*model.Chart, err 
 	charts = make(map[string]*model.Chart)
 	for _, id := range ids {
 		if id[0] == '$' {
-			for _, c := range b.builtin {
+			for _, c := range builtins {
 				if c.ID == id {
 					charts[id] = c
 				}
@@ -300,7 +269,7 @@ func (b *chartBiz) getCharts(ids []string) (charts map[string]*model.Chart, err 
 	return
 }
 
-func (b *chartBiz) fillCharts(d *Dashboard) (err error) {
+func (b *chartBiz) fillCharts(d *model.Dashboard) (err error) {
 	if len(d.Charts) == 0 {
 		return
 	}
@@ -319,77 +288,23 @@ func (b *chartBiz) fillCharts(d *Dashboard) (err error) {
 		return err
 	}
 
-	for _, info := range d.Charts {
-		if c := m[info.ID]; c != nil {
-			info.Type = c.Type
-			info.Title = c.Title
-			info.Unit = c.Unit
-			if info.Width == 0 {
-				info.Width = c.Width
-			}
-			if info.Height == 0 {
-				info.Height = c.Height
-			}
-			info.Margin.Left = c.Margin.Left
-			info.Margin.Right = c.Margin.Right
-			info.Margin.Top = c.Margin.Top
-			info.Margin.Bottom = c.Margin.Bottom
+	for i := range d.Charts {
+		if c := m[d.Charts[i].ID]; c != nil {
+			_ = copier.CopyWithOption(&d.Charts[i], c, copier.Option{IgnoreEmpty: true})
 		}
 	}
 	return nil
 }
 
-type Dashboard struct {
-	Name     string   `json:"name"`
-	Key      string   `json:"key,omitempty"`
-	Period   int32    `json:"period,omitempty"`   // data range in minutes
-	Interval int32    `json:"interval,omitempty"` // refresh interval in seconds, 0 means disabled.
-	Charts   []*Chart `json:"charts,omitempty"`
-}
-
-type Chart struct {
-	ID          string `json:"id"`
-	Title       string `json:"title" valid:"required"`
-	Description string `json:"desc,omitempty"`
-	Dashboard   string `json:"dashboard,omitempty"`
-	Type        string `json:"type" valid:"required"`
-	Unit        string `json:"unit"`
-	Width       int32  `json:"width" valid:"required"`
-	Height      int32  `json:"height" valid:"required"`
-	Margin      struct {
-		Left   int32 `json:"left,omitempty"`
-		Right  int32 `json:"right,omitempty"`
-		Top    int32 `json:"top,omitempty"`
-		Bottom int32 `json:"bottom,omitempty"`
-	} `json:"margin"`
-	Metrics   []model.ChartMetric `json:"metrics" valid:"required"`
-	Options   data.Map            `json:"options,omitempty"`
-	CreatedAt string              `json:"createdAt,omitempty" copier:"-"`
-	UpdatedAt string              `json:"updatedAt,omitempty" copier:"-"`
-	CreatedBy model.Operator      `json:"createdBy"`
-	UpdatedBy model.Operator      `json:"updatedBy"`
-}
-
-func newChart(c *model.Chart) *Chart {
-	chart := &Chart{
-		CreatedAt: formatTime(c.CreatedAt),
-		UpdatedAt: formatTime(c.UpdatedAt),
-	}
-	if err := copier.CopyWithOption(chart, c, copier.Option{IgnoreEmpty: true, DeepCopy: true}); err != nil {
-		panic(err)
-	}
-	return chart
-}
-
-func defaultDashboard(name, key string) *Dashboard {
-	d := &Dashboard{
+func defaultDashboard(name, key string) *model.Dashboard {
+	d := &model.Dashboard{
 		Name:     name,
 		Key:      key,
 		Period:   30,
 		Interval: 15,
 	}
 	if name == "service" {
-		d.Charts = []*Chart{
+		d.Charts = []model.ChartInfo{
 			{ID: "$cpu"},
 			{ID: "$memory"},
 			{ID: "$network_in"},
@@ -397,24 +312,4 @@ func defaultDashboard(name, key string) *Dashboard {
 		}
 	}
 	return d
-}
-
-func newDashboard(d *model.Dashboard) *Dashboard {
-	dashboard := &Dashboard{
-		Name:     d.Name,
-		Key:      d.Key,
-		Period:   d.Period,
-		Interval: d.Interval,
-	}
-	if len(d.Charts) > 0 {
-		dashboard.Charts = make([]*Chart, len(d.Charts))
-		for i, c := range d.Charts {
-			dashboard.Charts[i] = &Chart{
-				ID:     c.ID,
-				Width:  c.Width,
-				Height: c.Height,
-			}
-		}
-	}
-	return dashboard
 }
