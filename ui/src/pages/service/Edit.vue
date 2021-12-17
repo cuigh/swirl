@@ -31,7 +31,7 @@
         <n-form-item-gi
           :label="t('fields.replicas')"
           path="replicas"
-          v-show="['replicated', 'replicated-job'].includes(model.mode)"
+          v-if="['replicated', 'replicated-job'].includes(model.mode)"
         >
           <n-input-number
             :placeholder="t('fields.replicas')"
@@ -564,13 +564,13 @@ const showMore = ref(false);
 const rules: any = {
   name: requiredRule(),
   mounts: customRule((rule: any, value: any[]) => {
-    return value.every(v => v.source && v.target)
+    return value?.every(v => v.source && v.target)
   }, t('tips.mounts_rule')),
   configs: customRule((rule: any, value: any[]) => {
-    return value.every(v => v.key && v.path)
+    return value?.every(v => v.key && v.path)
   }, t('tips.files_rule')),
   secrets: customRule((rule: any, value: any[]) => {
-    return value.every(v => v.key && v.path)
+    return value?.every(v => v.key && v.path)
   }, t('tips.files_rule')),
 };
 const mountTypeOptions = [

@@ -1,7 +1,7 @@
 import { isRef, onMounted, reactive } from "vue"
 import { t } from "@/locales";
 
-export function useDataTable(loader: Function, filter: Object | Function) {
+export function useDataTable(loader: Function, filter: Object | Function, autoFetch: boolean = true) {
     const state = reactive({
         loading: false,
         data: [],
@@ -42,7 +42,9 @@ export function useDataTable(loader: Function, filter: Object | Function) {
         fetchData()
     }
 
-    onMounted(fetchData)
+    if (autoFetch) {
+        onMounted(fetchData)
+    }
 
     return { state, pagination, fetchData, changePageSize }
 }
