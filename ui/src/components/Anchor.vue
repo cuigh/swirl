@@ -9,11 +9,11 @@
 <script setup lang="ts">
 import { NA } from "naive-ui";
 import { RouterLink } from "vue-router";
+import type { RouteLocationRaw } from "vue-router";
 
-const props = defineProps({
-  url: {
-    type: String,
-    required: true,
-  }
-})
+interface Props {
+  url: RouteLocationRaw
+}
+
+const props = defineProps<Props>()
 </script>

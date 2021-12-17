@@ -14,8 +14,6 @@ import (
 	"github.com/cuigh/swirl/model"
 )
 
-//var ErrSystemInitialized = errors.New("system was already initialized")
-
 // SystemHandler encapsulates system related handlers.
 type SystemHandler struct {
 	CheckState  web.HandlerFunc `path:"/check-state" auth:"*" desc:"check system state"`

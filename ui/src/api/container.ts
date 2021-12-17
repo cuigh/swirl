@@ -36,6 +36,7 @@ export interface Container {
 }
 
 export interface SearchArgs {
+    node?: string;
     name?: string;
     status?: string;
     pageIndex: number;
@@ -53,21 +54,22 @@ export interface FindResult {
 }
 
 export interface FetchLogsArgs {
+    node: string;
     id: string;
     lines: number;
     timestamps: boolean;
 }
 
 export class ContainerApi {
-    find(id: string) {
-        return ajax.get<FindResult>('/container/find', { id })
+    find(node: string, id: string) {
+        return ajax.get<FindResult>('/container/find', { node, id })
     }
 
     search(args: SearchArgs) {
         return ajax.get<SearchResult>('/container/search', args)
     }
 
-    delete(id: string, name: string) {
+    delete(node: string, id: string, name: string) {
         return ajax.post<Result<Object>>('/container/delete', { id, name })
     }
 

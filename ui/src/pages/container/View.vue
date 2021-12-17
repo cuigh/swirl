@@ -52,10 +52,10 @@
         <x-code :code="raw" language="json" />
       </n-tab-pane>
       <n-tab-pane name="logs" :tab="t('fields.logs')" display-directive="show:lazy">
-        <x-logs type="container" :id="model.id"></x-logs>
+        <x-logs type="container" :node="node" :id="model.id"></x-logs>
       </n-tab-pane>
       <n-tab-pane name="exec" :tab="t('fields.execute')" display-directive="show:lazy">
-        <execute :container-id="model.id"></execute>
+        <execute :node="node" :id="model.id"></execute>
       </n-tab-pane>
     </n-tabs>
   </div>
@@ -88,10 +88,11 @@ const { t } = useI18n()
 const route = useRoute();
 const model = ref({} as Container);
 const raw = ref('');
+const node = route.params.node as string || '';
 
 async function fetchData() {
   const id = route.params.id as string;
-  let r = await containerApi.find(id);
+  let r = await containerApi.find(node, id);
   model.value = r.data?.container as Container;
   raw.value = r.data?.raw as string;
 }

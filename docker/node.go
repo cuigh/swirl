@@ -59,3 +59,16 @@ func (d *Docker) NodeInspect(ctx context.Context, id string) (node swarm.Node, r
 	})
 	return
 }
+
+func (d *Docker) NodeListCache() ([]*Node, error) {
+	m, err := d.getNodes()
+	if err != nil {
+		return nil, err
+	}
+
+	nodes := make([]*Node, 0, len(m))
+	for _, n := range m {
+		nodes = append(nodes, n)
+	}
+	return nodes, nil
+}

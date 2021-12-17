@@ -21,7 +21,7 @@
           <n-input :placeholder="t('objects.image')" v-model:value="model.image" />
         </n-form-item-gi>
         <n-form-item-gi :label="t('fields.mode')" path="mode">
-          <n-radio-group v-model:value="model.mode">
+          <n-radio-group v-model:value="model.mode" :disabled="Boolean(model.id)">
             <n-radio key="replicated" value="replicated">Replicated</n-radio>
             <n-radio key="global" value="global">Global</n-radio>
             <n-radio key="replicated-job" value="replicated-job">Replicated Job</n-radio>

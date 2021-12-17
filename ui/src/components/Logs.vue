@@ -60,6 +60,9 @@ const props = defineProps({
     type: String as PropType<'task' | 'container' | 'service'>,
     required: true,
   },
+  node: {
+    type: String,
+  },
   id: {
     type: String,
     required: true,
@@ -88,7 +91,7 @@ async function fetchData() {
   var r: Result<Logs>;
   switch (props.type) {
     case 'container':
-      r = await containerApi.fetchLogs({ id: props.id, lines: filters.lines, timestamps: filters.timestamps });
+      r = await containerApi.fetchLogs({ node: props.node || '', id: props.id, lines: filters.lines, timestamps: filters.timestamps });
       break
     case 'task':
       r = await taskApi.fetchLogs({ id: props.id, lines: filters.lines, timestamps: filters.timestamps });

@@ -12,13 +12,13 @@ import (
 )
 
 type ContainerBiz interface {
-	Search(name, status string, pageIndex, pageSize int) ([]*Container, int, error)
-	Find(id string) (container *Container, raw string, err error)
-	Delete(id string, user web.User) (err error)
-	FetchLogs(id string, lines int, timestamps bool) (stdout, stderr string, err error)
-	ExecCreate(id string, cmd string) (resp types.IDResponse, err error)
-	ExecAttach(id string) (resp types.HijackedResponse, err error)
-	ExecStart(id string) error
+	Search(node, name, status string, pageIndex, pageSize int) ([]*Container, int, error)
+	Find(node, id string) (container *Container, raw string, err error)
+	Delete(node, id string, user web.User) (err error)
+	FetchLogs(node, id string, lines int, timestamps bool) (stdout, stderr string, err error)
+	ExecCreate(node, id string, cmd string) (resp types.IDResponse, err error)
+	ExecAttach(node, id string) (resp types.HijackedResponse, err error)
+	ExecStart(node, id string) error
 }
 
 func NewContainer(d *docker.Docker) ContainerBiz {
@@ -29,13 +29,13 @@ type containerBiz struct {
 	d *docker.Docker
 }
 
-func (b *containerBiz) Find(id string) (c *Container, raw string, err error) {
+func (b *containerBiz) Find(node, id string) (c *Container, raw string, err error) {
 	var (
 		cj types.ContainerJSON
 		r  []byte
 	)
 
-	if cj, r, err = b.d.ContainerInspect(context.TODO(), id); err == nil {
+	if cj, r, err = b.d.ContainerInspect(context.TODO(), node, id); err == nil {
 		raw, err = indentJSON(r)
 	}
 
@@ -45,8 +45,8 @@ func (b *containerBiz) Find(id string) (c *Container, raw string, err error) {
 	return
 }
 
-func (b *containerBiz) Search(name, status string, pageIndex, pageSize int) (containers []*Container, total int, err error) {
-	list, total, err := b.d.ContainerList(context.TODO(), name, status, pageIndex, pageSize)
+func (b *containerBiz) Search(node, name, status string, pageIndex, pageSize int) (containers []*Container, total int, err error) {
+	list, total, err := b.d.ContainerList(context.TODO(), node, name, status, pageIndex, pageSize)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -58,28 +58,28 @@ func (b *containerBiz) Search(name, status string, pageIndex, pageSize int) (con
 	return containers, total, nil
 }
 
-func (b *containerBiz) Delete(id string, user web.User) (err error) {
-	err = b.d.ContainerRemove(context.TODO(), id)
+func (b *containerBiz) Delete(node, id string, user web.User) (err error) {
+	err = b.d.ContainerRemove(context.TODO(), node, id)
 	//if err == nil {
 	//	Event.CreateContainer(model.EventActionDelete, id, user)
 	//}
 	return
 }
 
-func (b *containerBiz) ExecCreate(id, cmd string) (resp types.IDResponse, err error) {
-	return b.d.ContainerExecCreate(context.TODO(), id, cmd)
+func (b *containerBiz) ExecCreate(node, id, cmd string) (resp types.IDResponse, err error) {
+	return b.d.ContainerExecCreate(context.TODO(), node, id, cmd)
 }
 
-func (b *containerBiz) ExecAttach(id string) (resp types.HijackedResponse, err error) {
-	return b.d.ContainerExecAttach(context.TODO(), id)
+func (b *containerBiz) ExecAttach(node, id string) (resp types.HijackedResponse, err error) {
+	return b.d.ContainerExecAttach(context.TODO(), node, id)
 }
 
-func (b *containerBiz) ExecStart(id string) error {
-	return b.d.ContainerExecStart(context.TODO(), id)
+func (b *containerBiz) ExecStart(node, id string) error {
+	return b.d.ContainerExecStart(context.TODO(), node, id)
 }
 
-func (b *containerBiz) FetchLogs(id string, lines int, timestamps bool) (string, string, error) {
-	stdout, stderr, err := b.d.ContainerLogs(context.TODO(), id, lines, timestamps)
+func (b *containerBiz) FetchLogs(node, id string, lines int, timestamps bool) (string, string, error) {
+	stdout, stderr, err := b.d.ContainerLogs(context.TODO(), node, id, lines, timestamps)
 	if err != nil {
 		return "", "", err
 	}

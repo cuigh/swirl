@@ -133,6 +133,16 @@ func (b *serviceBiz) Create(s *Service, user web.User) (err error) {
 		return
 	}
 
+	if s.Mode == "replicated" {
+		spec.Mode.Replicated = &swarm.ReplicatedService{Replicas: &s.Replicas}
+	} else if s.Mode == "replicated-job" {
+		spec.Mode.ReplicatedJob = &swarm.ReplicatedJob{TotalCompletions: &s.Replicas}
+	} else if s.Mode == "global" {
+		spec.Mode.Global = &swarm.GlobalService{}
+	} else if s.Mode == "global-job" {
+		spec.Mode.GlobalJob = &swarm.GlobalJob{}
+	}
+
 	auth := ""
 	if i := strings.Index(s.Image, "/"); i > 0 {
 		if host := s.Image[:i]; strings.Contains(host, ".") {
@@ -159,6 +169,12 @@ func (b *serviceBiz) Update(s *Service, user web.User) (err error) {
 	err = s.MergeTo(spec)
 	if err != nil {
 		return
+	}
+
+	if s.Mode == "replicated" && spec.Mode.Replicated != nil {
+		spec.Mode.Replicated.Replicas = &s.Replicas
+	} else if s.Mode == "replicated-job" && spec.Mode.ReplicatedJob != nil {
+		spec.Mode.ReplicatedJob.TotalCompletions = &s.Replicas
 	}
 
 	if err = b.d.ServiceUpdate(context.TODO(), spec, s.Version); err == nil {
@@ -490,9 +506,7 @@ func newServiceBase(s *swarm.Service) *ServiceBase {
 		UpdatedAt: formatTime(s.UpdatedAt),
 	}
 
-	if s.ServiceStatus == nil {
-		// TODO: ServiceStatus is valid from docker api v1.41, so we should calculate count manually here.
-	} else {
+	if s.ServiceStatus != nil {
 		service.RunningTasks = s.ServiceStatus.RunningTasks
 		service.DesiredTasks = s.ServiceStatus.DesiredTasks
 		service.CompletedTasks = s.ServiceStatus.CompletedTasks
@@ -624,25 +638,6 @@ func (s *Service) MergeTo(spec *swarm.ServiceSpec) (err error) {
 	spec.TaskTemplate.ContainerSpec.Env = toEnv(s.Env)
 	spec.TaskTemplate.ContainerSpec.Command = parseArgs(s.Command)
 	spec.TaskTemplate.ContainerSpec.Args = parseArgs(s.Args)
-
-	// Mode
-	if s.Mode == "replicated" {
-		if spec.Mode.Replicated == nil {
-			spec.Mode.Replicated = &swarm.ReplicatedService{Replicas: &s.Replicas}
-		} else {
-			spec.Mode.Replicated.Replicas = &s.Replicas
-		}
-	} else if s.Mode == "replicated-job" {
-		if spec.Mode.ReplicatedJob == nil {
-			spec.Mode.ReplicatedJob = &swarm.ReplicatedJob{TotalCompletions: &s.Replicas}
-		} else {
-			spec.Mode.ReplicatedJob.TotalCompletions = &s.Replicas
-		}
-	} else if s.Mode == "global" && spec.Mode.Global != nil {
-		spec.Mode.Global = &swarm.GlobalService{}
-	} else if s.Mode == "global-job" && spec.Mode.GlobalJob != nil {
-		spec.Mode.GlobalJob = &swarm.GlobalJob{}
-	}
 
 	// Networks
 	spec.TaskTemplate.Networks = nil

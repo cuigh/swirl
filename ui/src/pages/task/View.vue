@@ -22,7 +22,7 @@
               <x-anchor :url="`/swarm/services/${model.serviceName}`">{{ model.serviceName }}</x-anchor>
             </x-description-item>
             <x-description-item :label="t('objects.container')" :span="2">
-              <x-anchor :url="`/local/containers/${model.containerId}`">{{ model.containerId }}</x-anchor>
+              <x-anchor :url="`/local/containers/${model.nodeId}/${model.containerId}`">{{ model.containerId }}</x-anchor>
             </x-description-item>
             <x-description-item :label="t('objects.node')" :span="2">
               <x-anchor :url="`/swarm/nodes/${model.nodeId}`">{{ model.nodeId }}</x-anchor>

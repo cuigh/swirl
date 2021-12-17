@@ -1,6 +1,7 @@
 import { h } from "vue";
-import Anchor from "../components/Anchor.vue";
+import type { RouteLocationRaw } from "vue-router";
 import { NButton, NPopconfirm, NSpace, NTag, NTime } from "naive-ui";
+import Anchor from "../components/Anchor.vue";
 
 /**
  * Format duration
@@ -59,7 +60,7 @@ export function formatSize(value: number) {
     return size.toFixed(2) + ' ' + units[index];
 }
 
-export function renderLink(url: string, text: string) {
+export function renderLink(url: RouteLocationRaw, text: string) {
     return h(Anchor, { url }, { default: () => text })
 }
 

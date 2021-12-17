@@ -76,13 +76,13 @@ func (d *Docker) ServiceInspect(ctx context.Context, name string, status bool) (
 
 func (d *Docker) fillStatus(ctx context.Context, c *client.Client, services []swarm.Service) (err error) {
 	var (
-		activeNodes map[string]struct{}
-		m           = make(map[string]*swarm.Service)
-		tasks       []swarm.Task
-		opts        = types.TaskListOptions{Filters: filters.NewArgs()}
+		nodes map[string]*Node
+		m     = make(map[string]*swarm.Service)
+		tasks []swarm.Task
+		opts  = types.TaskListOptions{Filters: filters.NewArgs()}
 	)
 
-	activeNodes, err = d.findActiveNodes(ctx, c)
+	nodes, err = d.getNodes()
 	if err != nil {
 		return
 	}
@@ -109,7 +109,7 @@ func (d *Docker) fillStatus(ctx context.Context, c *client.Client, services []sw
 		if s.Spec.Mode.Global != nil && task.DesiredState != swarm.TaskStateShutdown {
 			s.ServiceStatus.DesiredTasks++
 		}
-		if _, ok := activeNodes[task.NodeID]; ok && task.Status.State == swarm.TaskStateRunning {
+		if n, ok := nodes[task.NodeID]; ok && n.State != swarm.NodeStateDown && task.Status.State == swarm.TaskStateRunning {
 			s.ServiceStatus.RunningTasks++
 		}
 	}
@@ -264,19 +264,4 @@ func (d *Docker) ServiceSearch(ctx context.Context, args filters.Args) (services
 		return
 	})
 	return
-}
-
-func (d *Docker) findActiveNodes(ctx context.Context, c *client.Client) (map[string]struct{}, error) {
-	nodes, err := c.NodeList(ctx, types.NodeListOptions{})
-	if err != nil {
-		return nil, err
-	}
-
-	active := make(map[string]struct{})
-	for _, n := range nodes {
-		if n.Status.State != swarm.NodeStateDown {
-			active[n.ID] = struct{}{}
-		}
-	}
-	return active, nil
 }

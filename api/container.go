@@ -33,6 +33,7 @@ func NewContainer(b biz.ContainerBiz) *ContainerHandler {
 
 func containerSearch(b biz.ContainerBiz) web.HandlerFunc {
 	type Args struct {
+		Node      string `json:"node" bind:"node"`
 		Name      string `json:"name" bind:"name"`
 		Status    string `json:"status" bind:"status"`
 		PageIndex int    `json:"pageIndex" bind:"pageIndex"`
@@ -47,7 +48,7 @@ func containerSearch(b biz.ContainerBiz) web.HandlerFunc {
 		)
 
 		if err = ctx.Bind(args); err == nil {
-			containers, total, err = b.Search(args.Name, args.Status, args.PageIndex, args.PageSize)
+			containers, total, err = b.Search(args.Node, args.Name, args.Status, args.PageIndex, args.PageSize)
 		}
 
 		if err != nil {
@@ -63,8 +64,9 @@ func containerSearch(b biz.ContainerBiz) web.HandlerFunc {
 
 func containerFind(b biz.ContainerBiz) web.HandlerFunc {
 	return func(ctx web.Context) error {
+		node := ctx.Query("node")
 		id := ctx.Query("id")
-		container, raw, err := b.Find(id)
+		container, raw, err := b.Find(node, id)
 		if err != nil {
 			return err
 		}
@@ -74,12 +76,13 @@ func containerFind(b biz.ContainerBiz) web.HandlerFunc {
 
 func containerDelete(b biz.ContainerBiz) web.HandlerFunc {
 	type Args struct {
-		ID string `json:"id"`
+		Node string `json:"node"`
+		ID   string `json:"id"`
 	}
 	return func(ctx web.Context) (err error) {
 		args := &Args{}
 		if err = ctx.Bind(args); err == nil {
-			err = b.Delete(args.ID, ctx.User())
+			err = b.Delete(args.Node, args.ID, ctx.User())
 		}
 		return ajax(ctx, err)
 	}
@@ -87,6 +90,7 @@ func containerDelete(b biz.ContainerBiz) web.HandlerFunc {
 
 func containerFetchLogs(b biz.ContainerBiz) web.HandlerFunc {
 	type Args struct {
+		Node       string `json:"node" bind:"node"`
 		ID         string `json:"id" bind:"id"`
 		Lines      int    `json:"lines" bind:"lines"`
 		Timestamps bool   `json:"timestamps" bind:"timestamps"`
@@ -98,7 +102,7 @@ func containerFetchLogs(b biz.ContainerBiz) web.HandlerFunc {
 			stdout, stderr string
 		)
 		if err = ctx.Bind(args); err == nil {
-			stdout, stderr, err = b.FetchLogs(args.ID, args.Lines, args.Timestamps)
+			stdout, stderr, err = b.FetchLogs(args.Node, args.ID, args.Lines, args.Timestamps)
 		}
 		if err != nil {
 			return err
@@ -110,11 +114,12 @@ func containerFetchLogs(b biz.ContainerBiz) web.HandlerFunc {
 func containerConnect(b biz.ContainerBiz) web.HandlerFunc {
 	return func(ctx web.Context) error {
 		var (
-			id  = ctx.Query("id")
-			cmd = ctx.Query("cmd")
+			node = ctx.Query("node")
+			id   = ctx.Query("id")
+			cmd  = ctx.Query("cmd")
 		)
 
-		_, _, err := b.Find(id)
+		_, _, err := b.Find(node, id)
 		if err != nil {
 			return err
 		}
@@ -124,17 +129,17 @@ func containerConnect(b biz.ContainerBiz) web.HandlerFunc {
 			return err
 		}
 
-		idResp, err := b.ExecCreate(id, cmd)
+		idResp, err := b.ExecCreate(node, id, cmd)
 		if err != nil {
 			return err
 		}
 
-		resp, err := b.ExecAttach(idResp.ID)
+		resp, err := b.ExecAttach(node, idResp.ID)
 		if err != nil {
 			return err
 		}
 
-		err = b.ExecStart(idResp.ID)
+		err = b.ExecStart(node, idResp.ID)
 		if err != nil {
 			return err
 		}

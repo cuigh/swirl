@@ -10,6 +10,7 @@ import (
 )
 
 type NodeBiz interface {
+	List() ([]*docker.Node, error)
 	Search() ([]*Node, error)
 	Find(id string) (node *Node, raw string, err error)
 	Delete(id, name string, user web.User) (err error)
@@ -38,6 +39,10 @@ func (b *nodeBiz) Find(id string) (node *Node, raw string, err error) {
 		node = newNode(&sn)
 	}
 	return
+}
+
+func (b *nodeBiz) List() ([]*docker.Node, error) {
+	return b.d.NodeListCache()
 }
 
 func (b *nodeBiz) Search() ([]*Node, error) {

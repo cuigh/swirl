@@ -27,7 +27,11 @@ import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 const props = defineProps({
-  containerId: {
+  node: {
+    type: String,
+    required: true,
+  },
+  id: {
     type: String,
     required: true,
   },
@@ -47,7 +51,7 @@ function connect() {
   let protocol = (location.protocol === "https:") ? "wss://" : "ws://";
   let host = import.meta.env.DEV ? 'localhost:8002' : location.host;
   let cmd = encodeURIComponent(command.value)
-  socket = new WebSocket(`${protocol}${host}/api/container/connect?id=${props.containerId}&cmd=${cmd}`);
+  socket = new WebSocket(`${protocol}${host}/api/container/connect?node=${props.node}&id=${props.id}&cmd=${cmd}`);
   socket.onopen = () => {
     const fit = new FitAddon();
     term = new Terminal({ fontSize: 14, cursorBlink: true });
@@ -57,9 +61,9 @@ function connect() {
     fit.fit();
     term.focus();
   };
-  socket.onclose = () => {
-    console.log('close socket')
-  };
+  // socket.onclose = () => {
+  //   console.log('close socket')
+  // };
   socket.onerror = (e) => {
     console.log('socket error: ' + e)
   }

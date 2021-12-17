@@ -16,6 +16,7 @@ var Options = &struct {
 	DBAddress        string
 	TokenKey         string
 	TokenExpiry      time.Duration
+	Agents           []string
 }{
 	DBType:      "mongo",
 	DBAddress:   "mongodb://localhost:27017/swirl",
@@ -30,6 +31,7 @@ func bindOptions() {
 		"db_address",
 		"token_key",
 		"token_expiry",
+		"agents",
 	}
 	for _, key := range keys {
 		config.BindEnv("swirl."+key, strings.ToUpper(key))

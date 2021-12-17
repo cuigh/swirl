@@ -213,7 +213,7 @@ const routes: RouteRecordRaw[] = [
   },
   {
     name: "container_detail",
-    path: "/local/containers/:id",
+    path: "/local/containers/:node/:id",
     component: () => import('../pages/container/View.vue'),
   },
   {

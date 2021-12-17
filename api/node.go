@@ -8,6 +8,7 @@ import (
 
 // NodeHandler encapsulates node related handlers.
 type NodeHandler struct {
+	List   web.HandlerFunc `path:"/list" auth:"node.view" desc:"list nodes"`
 	Search web.HandlerFunc `path:"/search" auth:"node.view" desc:"search nodes"`
 	Find   web.HandlerFunc `path:"/find" auth:"node.view" desc:"find node by name"`
 	Delete web.HandlerFunc `path:"/delete" method:"post" auth:"node.delete" desc:"delete node"`
@@ -17,10 +18,22 @@ type NodeHandler struct {
 // NewNode creates an instance of NodeHandler
 func NewNode(nb biz.NodeBiz) *NodeHandler {
 	return &NodeHandler{
+		List:   nodeList(nb),
 		Search: nodeSearch(nb),
 		Find:   nodeFind(nb),
 		Delete: nodeDelete(nb),
 		Save:   nodeSave(nb),
+	}
+}
+
+func nodeList(nb biz.NodeBiz) web.HandlerFunc {
+	return func(ctx web.Context) error {
+		nodes, err := nb.List()
+		if err != nil {
+			return err
+		}
+
+		return success(ctx, nodes)
 	}
 }
 

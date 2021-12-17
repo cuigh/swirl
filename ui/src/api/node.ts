@@ -37,6 +37,10 @@ export class NodeApi {
         return ajax.get<FindResult>('/node/find', { id })
     }
 
+    list() {
+        return ajax.get<Node[]>('/node/list')
+    }
+
     search() {
         return ajax.get<Node[]>('/node/search')
     }
