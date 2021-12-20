@@ -203,7 +203,7 @@ const routes: RouteRecordRaw[] = [
   },
   {
     name: "image_detail",
-    path: "/local/images/:id",
+    path: "/local/images/:node/:id",
     component: () => import('../pages/image/View.vue'),
   },
   {
@@ -223,12 +223,12 @@ const routes: RouteRecordRaw[] = [
   },
   {
     name: "volume_detail",
-    path: "/local/volumes/:name",
+    path: "/local/volumes/:node/:name",
     component: () => import('../pages/volume/View.vue'),
   },
   {
     name: "volume_new",
-    path: "/local/volumes/new",
+    path: "/local/volumes/:node/new",
     component: () => import('../pages/volume/New.vue'),
   },
   {

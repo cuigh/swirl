@@ -9,7 +9,7 @@
         </template>
         {{ t('buttons.prune') }}
       </n-button>
-      <n-button secondary size="small" @click="$router.push('/local/volumes/new')">
+      <n-button secondary size="small" @click="$router.push({name: 'volume_new', params: {node: filter.node || '-'}})">
         <template #icon>
           <n-icon>
             <add-icon />
@@ -21,6 +21,16 @@
   </x-page-header>
   <n-space class="page-body" vertical :size="12">
     <n-space :size="12">
+      <n-select
+        filterable
+        size="small"
+        :consistent-menu-width="false"
+        :placeholder="t('objects.node')"
+        v-model:value="filter.node"
+        :options="nodes"
+        style="width: 200px"
+        v-if="nodes && nodes.length"
+      />
       <n-input size="small" v-model:value="filter.name" :placeholder="t('fields.name')" clearable />
       <n-button size="small" type="primary" @click="() => fetchData()">{{ t('buttons.search') }}</n-button>
     </n-space>
@@ -40,32 +50,36 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from "vue";
+import { onMounted, reactive, ref } from "vue";
 import {
   NSpace,
   NButton,
   NDataTable,
   NInput,
   NIcon,
+  NSelect,
 } from "naive-ui";
 import { AddOutline as AddIcon, CloseOutline as CloseIcon } from "@vicons/ionicons5";
 import XPageHeader from "@/components/PageHeader.vue";
 import volumeApi from "@/api/volume";
 import type { Volume } from "@/api/volume";
+import nodeApi from "@/api/node";
 import { useDataTable } from "@/utils/data-table";
 import { formatSize, renderButton, renderLink, renderTag } from "@/utils/render";
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 const filter = reactive({
-  name: "",
+  node: '',
+  name: '',
 });
+const nodes: any = ref([])
 const columns = [
   {
     title: t('fields.name'),
     key: "name",
     fixed: "left" as const,
-    render: (v: Volume) => renderLink(`/local/volumes/${v.name}`, v.name),
+    render: (v: Volume) => renderLink({ name: 'volume_detail', params: { node: filter.node || '-', name: v.name } }, v.name),
   },
   {
     title: t('fields.driver'),
@@ -97,10 +111,10 @@ const columns = [
     },
   },
 ];
-const { state, pagination, fetchData, changePageSize } = useDataTable(volumeApi.search, filter)
+const { state, pagination, fetchData, changePageSize } = useDataTable(volumeApi.search, filter, false)
 
 async function deleteVolume(name: string, index: number) {
-  await volumeApi.delete(name);
+  await volumeApi.delete(filter.node, name);
   state.data.splice(index, 1)
 }
 
@@ -111,7 +125,7 @@ async function pruneVolume() {
     positiveText: t('buttons.confirm'),
     negativeText: t('buttons.cancel'),
     onPositiveClick: async () => {
-      const r = await volumeApi.prune();
+      const r = await volumeApi.prune(filter.node);
       window.message.info(t('texts.prune_volume_success', {
         count: r.data?.deletedVolumes.length,
         size: formatSize(r.data?.reclaimedSpace as number)
@@ -120,4 +134,13 @@ async function pruneVolume() {
     }
   })
 }
+
+onMounted(async () => {
+  const r = await nodeApi.list(true)
+  nodes.value = r.data?.map(n => ({ label: n.name, value: n.id }))
+  if (r.data?.length) {
+    filter.node = r.data[0].id
+  }
+  fetchData()
+})
 </script>

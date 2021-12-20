@@ -12,13 +12,13 @@ import (
 )
 
 // VolumeList return volumes on the host.
-func (d *Docker) VolumeList(ctx context.Context, name string, pageIndex, pageSize int) (volumes []*types.Volume, total int, err error) {
+func (d *Docker) VolumeList(ctx context.Context, node, name string, pageIndex, pageSize int) (volumes []*types.Volume, total int, err error) {
 	var (
 		c    *client.Client
 		resp volume.VolumeListOKBody
 	)
 
-	c, err = d.client()
+	c, err = d.agent(node)
 	if err != nil {
 		return
 	}
@@ -44,34 +44,37 @@ func (d *Docker) VolumeList(ctx context.Context, name string, pageIndex, pageSiz
 }
 
 // VolumeCreate create a volume.
-func (d *Docker) VolumeCreate(ctx context.Context, options *volume.VolumeCreateBody) error {
-	return d.call(func(c *client.Client) (err error) {
+func (d *Docker) VolumeCreate(ctx context.Context, node string, options *volume.VolumeCreateBody) (err error) {
+	var c *client.Client
+	if c, err = d.agent(node); err == nil {
 		_, err = c.VolumeCreate(ctx, *options)
-		return
-	})
+	}
+	return
 }
 
 // VolumeRemove remove a volume.
-func (d *Docker) VolumeRemove(ctx context.Context, name string) error {
-	return d.call(func(c *client.Client) (err error) {
-		return c.VolumeRemove(ctx, name, false)
-	})
+func (d *Docker) VolumeRemove(ctx context.Context, node, name string) (err error) {
+	c, err := d.agent(node)
+	if err == nil {
+		err = c.VolumeRemove(ctx, name, false)
+	}
+	return err
 }
 
 // VolumePrune remove all unused volumes.
-func (d *Docker) VolumePrune(ctx context.Context, ) (report types.VolumesPruneReport, err error) {
-	err = d.call(func(c *client.Client) (err error) {
+func (d *Docker) VolumePrune(ctx context.Context, node string) (report types.VolumesPruneReport, err error) {
+	var c *client.Client
+	if c, err = d.agent(node); err == nil {
 		report, err = c.VolumesPrune(ctx, filters.NewArgs())
-		return
-	})
+	}
 	return
 }
 
 // VolumeInspect return volume raw information.
-func (d *Docker) VolumeInspect(ctx context.Context, name string) (vol types.Volume, raw []byte, err error) {
-	err = d.call(func(c *client.Client) error {
+func (d *Docker) VolumeInspect(ctx context.Context, node, name string) (vol types.Volume, raw []byte, err error) {
+	var c *client.Client
+	if c, err = d.agent(node); err == nil {
 		vol, raw, err = c.VolumeInspectWithRaw(ctx, name)
-		return err
-	})
+	}
 	return
 }

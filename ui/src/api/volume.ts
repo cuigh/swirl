@@ -20,6 +20,7 @@ export interface Volume {
 }
 
 export interface SearchArgs {
+    node?: string;
     name?: string;
     pageIndex: number;
     pageSize: number;
@@ -41,24 +42,24 @@ export interface PruneResult {
 }
 
 export class VolumeApi {
-    find(name: string) {
-        return ajax.get<FindResult>('/volume/find', { name })
+    find(node: string, name: string) {
+        return ajax.get<FindResult>('/volume/find', { node, name })
     }
 
     search(args: SearchArgs) {
         return ajax.get<SearchResult>('/volume/search', args)
     }
 
-    delete(name: string) {
-        return ajax.post<Result<Object>>('/volume/delete', { name })
+    delete(node: string, name: string) {
+        return ajax.post<Result<Object>>('/volume/delete', { node, name })
     }
 
     save(v: Volume) {
         return ajax.post<Result<Object>>('/volume/save', v)
     }
 
-    prune() {
-        return ajax.post<PruneResult>('/volume/prune')
+    prune(node: string) {
+        return ajax.post<PruneResult>('/volume/prune', { node })
     }
 }
 

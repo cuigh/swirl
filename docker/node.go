@@ -3,7 +3,9 @@ package docker
 import (
 	"context"
 	"sort"
+	"time"
 
+	"github.com/cuigh/auxo/cache"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/swarm"
 	"github.com/docker/docker/client"
@@ -60,15 +62,14 @@ func (d *Docker) NodeInspect(ctx context.Context, id string) (node swarm.Node, r
 	return
 }
 
-func (d *Docker) NodeListCache() ([]*Node, error) {
-	m, err := d.getNodes()
+func (d *Docker) NodeMap() (map[string]*Node, error) {
+	v := cache.Value{
+		TTL:  30 * time.Minute,
+		Load: func() (interface{}, error) { return d.loadCache() },
+	}
+	value, err := v.Get(true)
 	if err != nil {
 		return nil, err
 	}
-
-	nodes := make([]*Node, 0, len(m))
-	for _, n := range m {
-		nodes = append(nodes, n)
-	}
-	return nodes, nil
+	return value.(map[string]*Node), nil
 }

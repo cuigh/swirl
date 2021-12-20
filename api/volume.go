@@ -28,6 +28,7 @@ func NewVolume(b biz.VolumeBiz) *VolumeHandler {
 
 func volumeSearch(b biz.VolumeBiz) web.HandlerFunc {
 	type Args struct {
+		Node      string `json:"node" bind:"node"`
 		Name      string `json:"name" bind:"name"`
 		PageIndex int    `json:"pageIndex" bind:"pageIndex"`
 		PageSize  int    `json:"pageSize" bind:"pageSize"`
@@ -41,7 +42,7 @@ func volumeSearch(b biz.VolumeBiz) web.HandlerFunc {
 		)
 
 		if err = ctx.Bind(args); err == nil {
-			volumes, total, err = b.Search(args.Name, args.PageIndex, args.PageSize)
+			volumes, total, err = b.Search(args.Node, args.Name, args.PageIndex, args.PageSize)
 		}
 
 		if err != nil {
@@ -57,8 +58,9 @@ func volumeSearch(b biz.VolumeBiz) web.HandlerFunc {
 
 func volumeFind(b biz.VolumeBiz) web.HandlerFunc {
 	return func(ctx web.Context) error {
+		node := ctx.Query("node")
 		name := ctx.Query("name")
-		volume, raw, err := b.Find(name)
+		volume, raw, err := b.Find(node, name)
 		if err != nil {
 			return err
 		}
@@ -68,12 +70,13 @@ func volumeFind(b biz.VolumeBiz) web.HandlerFunc {
 
 func volumeDelete(b biz.VolumeBiz) web.HandlerFunc {
 	type Args struct {
+		Node string `json:"node"`
 		Name string `json:"name"`
 	}
 	return func(ctx web.Context) (err error) {
 		args := &Args{}
 		if err = ctx.Bind(args); err == nil {
-			err = b.Delete(args.Name, ctx.User())
+			err = b.Delete(args.Node, args.Name, ctx.User())
 		}
 		return ajax(ctx, err)
 	}
@@ -91,11 +94,20 @@ func volumeSave(b biz.VolumeBiz) web.HandlerFunc {
 }
 
 func volumePrune(b biz.VolumeBiz) web.HandlerFunc {
-	return func(ctx web.Context) error {
-		deletedVolumes, reclaimedSpace, err := b.Prune(ctx.User())
+	type Args struct {
+		Node string `json:"node"`
+	}
+	return func(ctx web.Context) (err error) {
+		args := &Args{}
+		if err = ctx.Bind(args); err != nil {
+			return err
+		}
+
+		deletedVolumes, reclaimedSpace, err := b.Prune(args.Node, ctx.User())
 		if err != nil {
 			return err
 		}
+
 		return success(ctx, data.Map{
 			"deletedVolumes": deletedVolumes,
 			"reclaimedSpace": reclaimedSpace,

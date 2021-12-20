@@ -97,10 +97,11 @@ const { t } = useI18n()
 const route = useRoute();
 const model = ref({} as Volume);
 const raw = ref('');
+const node = route.params.node as string || '';
 
 async function fetchData() {
   const name = route.params.name as string;
-  let r = await volumeApi.find(name);
+  let r = await volumeApi.find(node, name);
   model.value = r.data?.volume as Volume;
   raw.value = r.data?.raw as string;
 }

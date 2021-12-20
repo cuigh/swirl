@@ -12,11 +12,11 @@ import (
 )
 
 type VolumeBiz interface {
-	Search(name string, pageIndex, pageSize int) ([]*Volume, int, error)
-	Find(name string) (volume *Volume, raw string, err error)
-	Delete(name string, user web.User) (err error)
+	Search(node, name string, pageIndex, pageSize int) ([]*Volume, int, error)
+	Find(node, name string) (volume *Volume, raw string, err error)
+	Delete(node, name string, user web.User) (err error)
 	Create(volume *Volume, user web.User) (err error)
-	Prune(user web.User) (deletedVolumes []string, reclaimedSpace uint64, err error)
+	Prune(node string, user web.User) (deletedVolumes []string, reclaimedSpace uint64, err error)
 }
 
 func NewVolume(d *docker.Docker, eb EventBiz) VolumeBiz {
@@ -28,13 +28,13 @@ type volumeBiz struct {
 	eb EventBiz
 }
 
-func (b *volumeBiz) Find(name string) (volume *Volume, raw string, err error) {
+func (b *volumeBiz) Find(node, name string) (volume *Volume, raw string, err error) {
 	var (
 		v types.Volume
 		r []byte
 	)
 
-	if v, r, err = b.d.VolumeInspect(context.TODO(), name); err == nil {
+	if v, r, err = b.d.VolumeInspect(context.TODO(), node, name); err == nil {
 		raw, err = indentJSON(r)
 	}
 
@@ -44,8 +44,8 @@ func (b *volumeBiz) Find(name string) (volume *Volume, raw string, err error) {
 	return
 }
 
-func (b *volumeBiz) Search(name string, pageIndex, pageSize int) (volumes []*Volume, total int, err error) {
-	list, total, err := b.d.VolumeList(context.TODO(), name, pageIndex, pageSize)
+func (b *volumeBiz) Search(node, name string, pageIndex, pageSize int) (volumes []*Volume, total int, err error) {
+	list, total, err := b.d.VolumeList(context.TODO(), node, name, pageIndex, pageSize)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -57,8 +57,8 @@ func (b *volumeBiz) Search(name string, pageIndex, pageSize int) (volumes []*Vol
 	return volumes, total, nil
 }
 
-func (b *volumeBiz) Delete(name string, user web.User) (err error) {
-	err = b.d.VolumeRemove(context.TODO(), name)
+func (b *volumeBiz) Delete(node, name string, user web.User) (err error) {
+	err = b.d.VolumeRemove(context.TODO(), node, name)
 	if err == nil {
 		b.eb.CreateVolume(EventActionDelete, name, user)
 	}
@@ -78,16 +78,16 @@ func (b *volumeBiz) Create(vol *Volume, user web.User) (err error) {
 		options.Driver = vol.Driver
 	}
 
-	err = b.d.VolumeCreate(context.TODO(), options)
+	err = b.d.VolumeCreate(context.TODO(), vol.Node, options)
 	if err != nil {
 		b.eb.CreateVolume(EventActionDelete, vol.Name, user)
 	}
 	return
 }
 
-func (b *volumeBiz) Prune(user web.User) (deletedVolumes []string, reclaimedSpace uint64, err error) {
+func (b *volumeBiz) Prune(node string, user web.User) (deletedVolumes []string, reclaimedSpace uint64, err error) {
 	var report types.VolumesPruneReport
-	report, err = b.d.VolumePrune(context.TODO())
+	report, err = b.d.VolumePrune(context.TODO(), node)
 	if err == nil {
 		deletedVolumes, reclaimedSpace = report.VolumesDeleted, report.SpaceReclaimed
 		b.eb.CreateVolume(EventActionPrune, "", user)
@@ -96,6 +96,7 @@ func (b *volumeBiz) Prune(user web.User) (deletedVolumes []string, reclaimedSpac
 }
 
 type Volume struct {
+	Node         string                 `json:"node"`
 	Name         string                 `json:"name"`
 	Driver       string                 `json:"driver,omitempty"`
 	CustomDriver string                 `json:"customDriver,omitempty"`

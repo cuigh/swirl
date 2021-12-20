@@ -37,8 +37,8 @@ export class NodeApi {
         return ajax.get<FindResult>('/node/find', { id })
     }
 
-    list() {
-        return ajax.get<Node[]>('/node/list')
+    list(agent: boolean) {
+        return ajax.get<Node[]>('/node/list', { agent })
     }
 
     search() {

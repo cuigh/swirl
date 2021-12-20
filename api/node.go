@@ -33,6 +33,17 @@ func nodeList(nb biz.NodeBiz) web.HandlerFunc {
 			return err
 		}
 
+		if ctx.Query("agent") == "true" {
+			i := 0
+			for j := 0; j < len(nodes); j++ {
+				if nodes[j].Agent != "" {
+					nodes[i] = nodes[j]
+					i++
+				}
+			}
+			nodes = nodes[:i]
+		}
+
 		return success(ctx, nodes)
 	}
 }

@@ -2,6 +2,16 @@
   <x-page-header />
   <n-space class="page-body" vertical :size="12">
     <n-space :size="12">
+      <n-select
+        filterable
+        size="small"
+        :consistent-menu-width="false"
+        :placeholder="t('objects.node')"
+        v-model:value="filter.node"
+        :options="nodes"
+        style="width: 200px"
+        v-if="nodes && nodes.length"
+      />
       <n-input size="small" v-model:value="filter.name" :placeholder="t('fields.name')" clearable />
       <n-button size="small" type="primary" @click="() => fetchData()">{{ t('buttons.search') }}</n-button>
     </n-space>
@@ -21,30 +31,34 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from "vue";
+import { onMounted, reactive, ref } from "vue";
 import {
   NSpace,
   NButton,
   NDataTable,
   NInput,
+  NSelect,
 } from "naive-ui";
 import XPageHeader from "@/components/PageHeader.vue";
 import imageApi from "@/api/image";
 import type { Image } from "@/api/image";
+import nodeApi from "@/api/node";
 import { useDataTable } from "@/utils/data-table";
 import { formatSize, renderButton, renderLink, renderTags } from "@/utils/render";
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 const filter = reactive({
-  name: "",
+  node: '',
+  name: '',
 });
+const nodes: any = ref([])
 const columns = [
   {
     title: t('fields.id'),
     key: "id",
     fixed: "left" as const,
-    render: (i: Image) => renderLink(`/local/images/${i.id}`, i.id.substring(7, 19)),
+    render: (i: Image) => renderLink({ name: 'image_detail', params: { node: filter.node || '-', id: i.id } }, i.id.substring(7, 19)),
   },
   {
     title: t('fields.tags'),
@@ -76,10 +90,19 @@ const columns = [
     },
   },
 ];
-const { state, pagination, fetchData, changePageSize } = useDataTable(imageApi.search, filter)
+const { state, pagination, fetchData, changePageSize } = useDataTable(imageApi.search, filter, false)
 
 async function deleteImage(id: string, index: number) {
-  await imageApi.delete(id, "");
+  await imageApi.delete(filter.node, id, "");
   state.data.splice(index, 1)
 }
+
+onMounted(async () => {
+  const r = await nodeApi.list(true)
+  nodes.value = r.data?.map(n => ({ label: n.name, value: n.id }))
+  if (r.data?.length) {
+    filter.node = r.data[0].id
+  }
+  fetchData()
+})
 </script>

@@ -2,6 +2,7 @@ package biz
 
 import (
 	"context"
+	"sort"
 
 	"github.com/cuigh/auxo/data"
 	"github.com/cuigh/auxo/net/web"
@@ -42,7 +43,19 @@ func (b *nodeBiz) Find(id string) (node *Node, raw string, err error) {
 }
 
 func (b *nodeBiz) List() ([]*docker.Node, error) {
-	return b.d.NodeListCache()
+	m, err := b.d.NodeMap()
+	if err != nil {
+		return nil, err
+	}
+
+	nodes := make([]*docker.Node, 0, len(m))
+	for _, n := range m {
+		nodes = append(nodes, n)
+	}
+	sort.Slice(nodes, func(i, j int) bool {
+		return nodes[i].Name < nodes[j].Name
+	})
+	return nodes, nil
 }
 
 func (b *nodeBiz) Search() ([]*Node, error) {

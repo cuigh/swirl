@@ -28,12 +28,17 @@ func (b *taskBiz) Find(id string) (task *Task, raw string, err error) {
 		s swarm.Service
 		r []byte
 	)
+
 	t, r, err = b.d.TaskInspect(context.TODO(), id)
 	if err == nil {
 		raw, err = indentJSON(r)
 	}
+
 	if err == nil {
-		task = newTask(&t)
+		m, _ := b.d.NodeMap()
+		task = newTask(&t, m)
+
+		// Fill service name
 		if s, _, _ = b.d.ServiceInspect(context.TODO(), t.ServiceID, false); s.Spec.Name == "" {
 			task.ServiceName = task.ServiceID
 		} else {
@@ -50,9 +55,15 @@ func (b *taskBiz) Search(node, service, state string, pageIndex, pageSize int) (
 		return
 	}
 
+	m, _ := b.d.NodeMap()
 	tasks = make([]*Task, len(list))
 	for i, t := range list {
-		tasks[i] = newTask(&t)
+		tasks[i] = newTask(&t, m)
+		if m != nil {
+			if n, ok := m[t.NodeID]; ok {
+				tasks[i].NodeName = n.Name
+			}
+		}
 	}
 	return
 }
@@ -75,6 +86,7 @@ type Task struct {
 	ServiceID   string          `json:"serviceId"`
 	ServiceName string          `json:"serviceName"`
 	NodeID      string          `json:"nodeId"`
+	NodeName    string          `json:"nodeName"`
 	ContainerID string          `json:"containerId"`
 	PID         int             `json:"pid"`
 	ExitCode    int             `json:"exitCode"`
@@ -93,7 +105,7 @@ type TaskNetwork struct {
 	IPs  []string `json:"ips"`
 }
 
-func newTask(t *swarm.Task) *Task {
+func newTask(t *swarm.Task, nodes map[string]*docker.Node) *Task {
 	task := &Task{
 		ID:        t.ID,
 		Name:      t.Name,
@@ -103,6 +115,7 @@ func newTask(t *swarm.Task) *Task {
 		State:     t.Status.State,
 		ServiceID: t.ServiceID,
 		NodeID:    t.NodeID,
+		NodeName:  t.NodeID,
 		Message:   t.Status.Message,
 		Error:     t.Status.Err,
 		Env:       envToOptions(t.Spec.ContainerSpec.Env),
@@ -121,6 +134,12 @@ func newTask(t *swarm.Task) *Task {
 			Name: n.Network.Spec.Name,
 			IPs:  n.Addresses,
 		})
+	}
+	// Fill node name
+	if nodes != nil {
+		if n, ok := nodes[t.NodeID]; ok {
+			task.NodeName = n.Name
+		}
 	}
 	return task
 }

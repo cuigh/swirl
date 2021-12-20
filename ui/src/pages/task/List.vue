@@ -2,7 +2,12 @@
   <x-page-header />
   <n-space class="page-body" vertical :size="12">
     <n-space :size="12">
-      <n-input size="small" v-model:value="filter.service" :placeholder="t('fields.name')" clearable />
+      <n-input
+        size="small"
+        v-model:value="filter.service"
+        :placeholder="t('fields.name')"
+        clearable
+      />
       <n-select
         size="small"
         :placeholder="t('fields.state')"
@@ -60,12 +65,12 @@ const columns = [
     title: t('fields.id'),
     key: "id",
     fixed: "left" as const,
-    render: (s: Task) => renderLink(`/swarm/tasks/${s.id}`, s.id),
+    render: (s: Task) => renderLink({ name: 'task_detail', params: { id: s.id } }, s.id),
   },
   {
     title: t('fields.service_id'),
     key: "service",
-    render: (s: Task) => renderLink(`/swarm/services/${s.serviceId}`, s.serviceId),
+    render: (s: Task) => renderLink({ name: 'service_detail', params: { name: s.serviceId } }, s.serviceId),
   },
   {
     title: t('objects.image'),
@@ -74,7 +79,7 @@ const columns = [
   {
     title: t('fields.node_id'),
     key: "image",
-    render: (s: Task) => renderLink(`/swarm/nodes/${s.nodeId}`, s.nodeId),
+    render: (s: Task) => renderLink({ name: 'node_detail', params: { id: s.nodeId } }, s.nodeName),
   },
   {
     title: t('fields.state'),

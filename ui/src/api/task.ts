@@ -10,6 +10,7 @@ export interface Task {
     serviceId: string;
     serviceName: string;
     nodeId: string;
+    nodeName: string;
     containerId?: string;
     pid?: number;
     exitCode?: number;

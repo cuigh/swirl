@@ -11,8 +11,8 @@ import (
 )
 
 // ImageList return images on the host.
-func (d *Docker) ImageList(ctx context.Context, name string, pageIndex, pageSize int) (images []types.ImageSummary, total int, err error) {
-	c, err := d.client()
+func (d *Docker) ImageList(ctx context.Context, node, name string, pageIndex, pageSize int) (images []types.ImageSummary, total int, err error) {
+	c, err := d.agent(node)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -34,27 +34,28 @@ func (d *Docker) ImageList(ctx context.Context, name string, pageIndex, pageSize
 }
 
 // ImageInspect returns image information.
-func (d *Docker) ImageInspect(ctx context.Context, id string) (image types.ImageInspect, raw []byte, err error) {
+func (d *Docker) ImageInspect(ctx context.Context, node, id string) (image types.ImageInspect, raw []byte, err error) {
 	var c *client.Client
-	if c, err = d.client(); err == nil {
+	if c, err = d.agent(node); err == nil {
 		return c.ImageInspectWithRaw(ctx, id)
 	}
 	return
 }
 
 // ImageHistory returns the changes in an image in history format.
-func (d *Docker) ImageHistory(ctx context.Context, id string) (histories []image.HistoryResponseItem, err error) {
+func (d *Docker) ImageHistory(ctx context.Context, node, id string) (histories []image.HistoryResponseItem, err error) {
 	var c *client.Client
-	if c, err = d.client(); err == nil {
+	if c, err = d.agent(node); err == nil {
 		return c.ImageHistory(ctx, id)
 	}
 	return
 }
 
 // ImageRemove remove a image.
-func (d *Docker) ImageRemove(ctx context.Context, id string) error {
-	return d.call(func(c *client.Client) (err error) {
+func (d *Docker) ImageRemove(ctx context.Context, node, id string) error {
+	c, err := d.agent(node)
+	if err == nil {
 		_, err = c.ImageRemove(ctx, id, types.ImageRemoveOptions{})
-		return
-	})
+	}
+	return err
 }

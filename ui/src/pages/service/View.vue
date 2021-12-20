@@ -444,7 +444,7 @@
           <tbody>
             <tr v-for="t in tasks">
               <td>
-                <x-anchor :url="`/swarm/tasks/${t.id}`">{{ t.id }}</x-anchor>
+                <x-anchor :url="{ name: 'task_detail', params: { id: t.id } }">{{ t.id }}</x-anchor>
               </td>
               <td>
                 <n-tag
@@ -454,7 +454,7 @@
                 >{{ t.state }}</n-tag>
               </td>
               <td>
-                <x-anchor :url="`/swarm/nodes/${t.nodeId}`">{{ t.nodeId }}</x-anchor>
+                <x-anchor :url="{ name: 'node_detail', params: { id: t.nodeId } }">{{ t.nodeName }}</x-anchor>
               </td>
               <td>
                 <n-space :size="4">
@@ -481,7 +481,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref, h, computed } from "vue";
+import { onMounted, ref, h, computed } from "vue";
 import {
   NButton,
   NTag,

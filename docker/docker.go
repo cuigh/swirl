@@ -4,10 +4,8 @@ import (
 	"context"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/cuigh/auxo/app/container"
-	"github.com/cuigh/auxo/cache"
 	"github.com/cuigh/auxo/errors"
 	"github.com/cuigh/auxo/log"
 	"github.com/cuigh/auxo/util/lazy"
@@ -91,11 +89,11 @@ func (d *Docker) agent(node string) (*client.Client, error) {
 }
 
 func (d *Docker) getAgent(node string) (agent string, err error) {
-	if node == "" || node == "@" {
+	if node == "" || node == "-" {
 		return "", nil
 	}
 
-	nodes, err := d.getNodes()
+	nodes, err := d.NodeMap()
 	if err != nil {
 		return
 	}
@@ -104,18 +102,6 @@ func (d *Docker) getAgent(node string) (agent string, err error) {
 		agent = n.Agent
 	}
 	return
-}
-
-func (d *Docker) getNodes() (map[string]*Node, error) {
-	v := cache.Value{
-		TTL:  30 * time.Minute,
-		Load: func() (interface{}, error) { return d.loadCache() },
-	}
-	value, err := v.Get(true)
-	if err != nil {
-		return nil, err
-	}
-	return value.(map[string]*Node), nil
 }
 
 func (d *Docker) loadCache() (interface{}, error) {

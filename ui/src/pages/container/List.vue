@@ -3,7 +3,9 @@
   <n-space class="page-body" vertical :size="12">
     <n-space :size="12">
       <n-select
+        filterable
         size="small"
+        :consistent-menu-width="false"
         :placeholder="t('objects.node')"
         v-model:value="filter.node"
         :options="nodes"
@@ -58,7 +60,7 @@ const columns = [
     fixed: "left" as const,
     render: (c: Container) => {
       const node = c.labels?.find(l => l.name === 'com.docker.swarm.node.id')
-      return renderLink({ name: 'container_detail', params: { id: c.id, node: node?.value || '@' } }, c.name)
+      return renderLink({ name: 'container_detail', params: { id: c.id, node: node?.value || '-' } }, c.name)
     },
   },
   {
@@ -93,7 +95,7 @@ async function deleteContainer(c: Container, index: number) {
 }
 
 onMounted(async () => {
-  const r = await nodeApi.list()
+  const r = await nodeApi.list(true)
   nodes.value = r.data?.map(n => ({ label: n.name, value: n.id }))
   if (r.data?.length) {
     filter.node = r.data[0].id

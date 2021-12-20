@@ -92,6 +92,7 @@ const { t } = useI18n()
 const route = useRoute();
 const model = ref({} as Image);
 const raw = ref('');
+const node = route.params.node as string || '';
 const columns = [
   {
     title: t('fields.sn'),
@@ -137,7 +138,7 @@ const columns = [
 
 async function fetchData() {
   const id = route.params.id as string;
-  let r = await imageApi.find(id);
+  let r = await imageApi.find(node, id);
   model.value = r.data?.image as Image;
   raw.value = r.data?.raw as string;
 }

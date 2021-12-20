@@ -82,7 +82,7 @@ func (d *Docker) fillStatus(ctx context.Context, c *client.Client, services []sw
 		opts  = types.TaskListOptions{Filters: filters.NewArgs()}
 	)
 
-	nodes, err = d.getNodes()
+	nodes, err = d.NodeMap()
 	if err != nil {
 		return
 	}

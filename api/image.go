@@ -8,22 +8,23 @@ import (
 
 // ImageHandler encapsulates image related handlers.
 type ImageHandler struct {
-	Search     web.HandlerFunc `path:"/search" auth:"image.view" desc:"search images"`
-	Find       web.HandlerFunc `path:"/find" auth:"image.view" desc:"find image by id"`
-	Delete     web.HandlerFunc `path:"/delete" method:"post" auth:"image.delete" desc:"delete image"`
+	Search web.HandlerFunc `path:"/search" auth:"image.view" desc:"search images"`
+	Find   web.HandlerFunc `path:"/find" auth:"image.view" desc:"find image by id"`
+	Delete web.HandlerFunc `path:"/delete" method:"post" auth:"image.delete" desc:"delete image"`
 }
 
 // NewImage creates an instance of ImageHandler
 func NewImage(b biz.ImageBiz) *ImageHandler {
 	return &ImageHandler{
-		Search:     imageSearch(b),
-		Find:       imageFind(b),
-		Delete:     imageDelete(b),
+		Search: imageSearch(b),
+		Find:   imageFind(b),
+		Delete: imageDelete(b),
 	}
 }
 
 func imageSearch(b biz.ImageBiz) web.HandlerFunc {
 	type Args struct {
+		Node      string `json:"node" bind:"node"`
 		Name      string `json:"name" bind:"name"`
 		PageIndex int    `json:"pageIndex" bind:"pageIndex"`
 		PageSize  int    `json:"pageSize" bind:"pageSize"`
@@ -37,7 +38,7 @@ func imageSearch(b biz.ImageBiz) web.HandlerFunc {
 		)
 
 		if err = ctx.Bind(args); err == nil {
-			images, total, err = b.Search(args.Name, args.PageIndex, args.PageSize)
+			images, total, err = b.Search(args.Node, args.Name, args.PageIndex, args.PageSize)
 		}
 
 		if err != nil {
@@ -53,8 +54,9 @@ func imageSearch(b biz.ImageBiz) web.HandlerFunc {
 
 func imageFind(b biz.ImageBiz) web.HandlerFunc {
 	return func(ctx web.Context) error {
+		node := ctx.Query("node")
 		id := ctx.Query("id")
-		image, raw, err := b.Find(id)
+		image, raw, err := b.Find(node, id)
 		if err != nil {
 			return err
 		}
@@ -64,12 +66,13 @@ func imageFind(b biz.ImageBiz) web.HandlerFunc {
 
 func imageDelete(b biz.ImageBiz) web.HandlerFunc {
 	type Args struct {
+		Node string `json:"node"`
 		ID   string `json:"id"`
 	}
 	return func(ctx web.Context) (err error) {
 		args := &Args{}
 		if err = ctx.Bind(args); err == nil {
-			err = b.Delete(args.ID, ctx.User())
+			err = b.Delete(args.Node, args.ID, ctx.User())
 		}
 		return ajax(ctx, err)
 	}

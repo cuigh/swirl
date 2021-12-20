@@ -12,9 +12,9 @@ import (
 )
 
 type ImageBiz interface {
-	Search(name string, pageIndex, pageSize int) ([]*Image, int, error)
-	Find(name string) (image *Image, raw string, err error)
-	Delete(id string, user web.User) (err error)
+	Search(node, name string, pageIndex, pageSize int) ([]*Image, int, error)
+	Find(node, name string) (image *Image, raw string, err error)
+	Delete(node, id string, user web.User) (err error)
 }
 
 func NewImage(d *docker.Docker) ImageBiz {
@@ -25,7 +25,7 @@ type imageBiz struct {
 	d *docker.Docker
 }
 
-func (b *imageBiz) Find(id string) (img *Image, raw string, err error) {
+func (b *imageBiz) Find(node, id string) (img *Image, raw string, err error) {
 	var (
 		i         types.ImageInspect
 		r         []byte
@@ -33,12 +33,12 @@ func (b *imageBiz) Find(id string) (img *Image, raw string, err error) {
 		ctx       = context.TODO()
 	)
 
-	if i, r, err = b.d.ImageInspect(ctx, id); err == nil {
+	if i, r, err = b.d.ImageInspect(ctx, node, id); err == nil {
 		raw, err = indentJSON(r)
 	}
 
 	if err == nil {
-		histories, err = b.d.ImageHistory(ctx, id)
+		histories, err = b.d.ImageHistory(ctx, node, id)
 	}
 
 	if err == nil {
@@ -47,8 +47,8 @@ func (b *imageBiz) Find(id string) (img *Image, raw string, err error) {
 	return
 }
 
-func (b *imageBiz) Search(name string, pageIndex, pageSize int) (images []*Image, total int, err error) {
-	list, total, err := b.d.ImageList(context.TODO(), name, pageIndex, pageSize)
+func (b *imageBiz) Search(node, name string, pageIndex, pageSize int) (images []*Image, total int, err error) {
+	list, total, err := b.d.ImageList(context.TODO(), node, name, pageIndex, pageSize)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -60,8 +60,8 @@ func (b *imageBiz) Search(name string, pageIndex, pageSize int) (images []*Image
 	return images, total, nil
 }
 
-func (b *imageBiz) Delete(id string, user web.User) (err error) {
-	err = b.d.ImageRemove(context.TODO(), id)
+func (b *imageBiz) Delete(node, id string, user web.User) (err error) {
+	err = b.d.ImageRemove(context.TODO(), node, id)
 	//if err == nil {
 	//	Event.CreateImage(model.EventActionDelete, id, user)
 	//}

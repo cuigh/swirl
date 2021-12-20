@@ -18,14 +18,20 @@
           <x-description label-placement="left" label-align="right" :label-width="90">
             <x-description-item :label="t('fields.id')">{{ model.id }}</x-description-item>
             <x-description-item :label="t('objects.image')">{{ model.image }}</x-description-item>
-            <x-description-item :label="t('objects.service')" :span="2">
-              <x-anchor :url="`/swarm/services/${model.serviceName}`">{{ model.serviceName }}</x-anchor>
+            <x-description-item :label="t('objects.service')" :span="2" v-if="model.serviceName">
+              <x-anchor
+                :url="{ name: 'service_detail', params: { name: model.serviceName } }"
+              >{{ model.serviceName }}</x-anchor>
             </x-description-item>
-            <x-description-item :label="t('objects.container')" :span="2">
-              <x-anchor :url="`/local/containers/${model.nodeId}/${model.containerId}`">{{ model.containerId }}</x-anchor>
+            <x-description-item :label="t('objects.container')" :span="2" v-if="model.containerId">
+              <x-anchor
+                :url="{ name: 'container_detail', params: { id: model.containerId, node: model.nodeId || '-' } }"
+              >{{ model.containerId }}</x-anchor>
             </x-description-item>
-            <x-description-item :label="t('objects.node')" :span="2">
-              <x-anchor :url="`/swarm/nodes/${model.nodeId}`">{{ model.nodeId }}</x-anchor>
+            <x-description-item :label="t('objects.node')" :span="2" v-if="model.nodeId">
+              <x-anchor
+                :url="{ name: 'node_detail', params: { id: model.nodeId } }"
+              >{{ model.nodeName }}</x-anchor>
             </x-description-item>
             <x-description-item :label="t('fields.created_at')">{{ model.createdAt }}</x-description-item>
             <x-description-item :label="t('fields.updated_at')">{{ model.updatedAt }}</x-description-item>
@@ -70,7 +76,7 @@
               <tbody>
                 <tr v-for="n in model.networks">
                   <td>
-                    <x-anchor :url="`/swarm/networks/${n.name}`">{{ n.name }}</x-anchor>
+                    <x-anchor :url="{ name: 'network_detail', params: { name: n.name } }">{{ n.name }}</x-anchor>
                   </td>
                   <td>
                     <n-space :size="4">

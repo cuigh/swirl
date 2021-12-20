@@ -46,6 +46,7 @@ export interface Image {
 }
 
 export interface SearchArgs {
+    node?: string;
     name?: string;
     pageIndex: number;
     pageSize: number;
@@ -62,16 +63,16 @@ export interface FindResult {
 }
 
 export class ImageApi {
-    find(id: string) {
-        return ajax.get<FindResult>('/image/find', { id })
+    find(node: string, id: string) {
+        return ajax.get<FindResult>('/image/find', { node, id })
     }
 
     search(args: SearchArgs) {
         return ajax.get<SearchResult>('/image/search', args)
     }
 
-    delete(id: string, name: string) {
-        return ajax.post<Result<Object>>('/image/delete', { id, name })
+    delete(node: string, id: string, name: string) {
+        return ajax.post<Result<Object>>('/image/delete', { node, id, name })
     }
 }
 
