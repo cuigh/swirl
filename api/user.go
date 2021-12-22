@@ -1,7 +1,6 @@
 package api
 
 import (
-	"github.com/cuigh/auxo/app/container"
 	"github.com/cuigh/auxo/data"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/biz"
@@ -22,7 +21,7 @@ type UserHandler struct {
 }
 
 // NewUser creates an instance of UserHandler
-func NewUser(b biz.UserBiz, eb biz.EventBiz, auth *security.Authenticator) *UserHandler {
+func NewUser(b biz.UserBiz, eb biz.EventBiz, auth *security.Identifier) *UserHandler {
 	return &UserHandler{
 		SignIn:         userSignIn(auth, eb),
 		Search:         userSearch(b),
@@ -35,7 +34,7 @@ func NewUser(b biz.UserBiz, eb biz.EventBiz, auth *security.Authenticator) *User
 	}
 }
 
-func userSignIn(auth *security.Authenticator, eb biz.EventBiz) web.HandlerFunc {
+func userSignIn(auth *security.Identifier, eb biz.EventBiz) web.HandlerFunc {
 	type SignInArgs struct {
 		Name     string `json:"name"`
 		Password string `json:"password"`
@@ -43,27 +42,24 @@ func userSignIn(auth *security.Authenticator, eb biz.EventBiz) web.HandlerFunc {
 
 	return func(ctx web.Context) (err error) {
 		var (
-			args  = &SignInArgs{}
-			user  web.User
-			token string
+			args = &SignInArgs{}
+			user security.Identity
 		)
 
-		if err = ctx.Bind(args); err == nil {
-			if user, err = auth.Login(args.Name, args.Password); err == nil {
-				jwt := container.Find("identifier").(*security.JWT)
-				token, err = jwt.CreateToken(user.ID(), user.Name())
-			}
+		if err = ctx.Bind(args); err != nil {
+			return err
 		}
 
-		if err != nil {
+		if user, err = auth.Identify(args.Name, args.Password); err != nil {
 			return err
 		}
 
 		eb.CreateUser(biz.EventActionLogin, user.ID(), user.Name(), user)
+
 		return success(ctx, data.Map{
-			"token": token,
-			"id":    user.ID(),
 			"name":  user.Name(),
+			"token": user.Token(),
+			"perms": user.Perms(),
 		})
 	}
 }

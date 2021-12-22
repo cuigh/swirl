@@ -3,6 +3,7 @@ package api
 import (
 	"github.com/cuigh/auxo/data"
 	"github.com/cuigh/auxo/net/web"
+	"github.com/cuigh/auxo/util/cast"
 	"github.com/cuigh/swirl/biz"
 )
 
@@ -28,22 +29,11 @@ func NewNode(nb biz.NodeBiz) *NodeHandler {
 
 func nodeList(nb biz.NodeBiz) web.HandlerFunc {
 	return func(ctx web.Context) error {
-		nodes, err := nb.List()
+		agent := cast.ToBool(ctx.Query("agent"))
+		nodes, err := nb.List(agent)
 		if err != nil {
 			return err
 		}
-
-		if ctx.Query("agent") == "true" {
-			i := 0
-			for j := 0; j < len(nodes); j++ {
-				if nodes[j].Agent != "" {
-					nodes[i] = nodes[j]
-					i++
-				}
-			}
-			nodes = nodes[:i]
-		}
-
 		return success(ctx, nodes)
 	}
 }

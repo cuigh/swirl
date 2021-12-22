@@ -19,6 +19,7 @@ import {
   NInputGroup,
   NInputGroupLabel,
 } from "naive-ui";
+import { useStore } from "vuex";
 import 'xterm/css/xterm.css'
 import { Terminal } from 'xterm'
 import { FitAddon } from 'xterm-addon-fit'
@@ -26,6 +27,7 @@ import { AttachAddon } from 'xterm-addon-attach'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
+const store = useStore()
 const props = defineProps({
   node: {
     type: String,
@@ -49,9 +51,9 @@ function connect() {
 
   active.value = true
   let protocol = (location.protocol === "https:") ? "wss://" : "ws://";
-  let host = import.meta.env.DEV ? 'localhost:8002' : location.host;
+  let host = import.meta.env.DEV ? 'localhost:8001' : location.host;
   let cmd = encodeURIComponent(command.value)
-  socket = new WebSocket(`${protocol}${host}/api/container/connect?node=${props.node}&id=${props.id}&cmd=${cmd}`);
+  socket = new WebSocket(`${protocol}${host}/api/container/connect?token=${store.state.user.token}&node=${props.node}&id=${props.id}&cmd=${cmd}`);
   socket.onopen = () => {
     const fit = new FitAddon();
     term = new Terminal({ fontSize: 14, cursorBlink: true });

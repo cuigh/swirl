@@ -3,9 +3,14 @@ import { Mutations } from "./mutations";
 
 const debug = import.meta.env.DEV
 
+interface User {
+    name: string;
+    token: string;
+    perms: Set<string>;
+}
+
 export interface State {
-    name: string | null;
-    token: string | null;
+    user?: User | null;
     preference: {
         theme: string | null;
         locale: string | null;
@@ -13,21 +18,23 @@ export interface State {
     ajaxLoading: boolean;
 }
 
-function initState(): State {
-    const state: any = {
-        name: localStorage.getItem("name"),
-        token: localStorage.getItem("token"),
-        ajaxLoading: false,
-    }
-
-    const locale = navigator.language.startsWith('zh') ? 'zh' : 'en'
-    state.preference = { theme: 'light', locale: locale }
+function loadObject(key: string) {
+    let value = null
     try {
-        state.preference = Object.assign(state.preference, JSON.parse(localStorage.getItem("preference") as string))
+        value = JSON.parse(localStorage.getItem(key) as string)
     } catch {
     }
-    
-    return state
+    return value
+}
+
+function initState(): State {
+    const user = Object.assign({}, loadObject('user'))
+    const locale = navigator.language.startsWith('zh') ? 'zh' : 'en'
+    return {
+        user: { perms: new Set(user.perms), name: user.name, token: user.token },
+        preference: Object.assign({ theme: 'light', locale: locale }, loadObject('preference')),
+        ajaxLoading: false,
+    }
 }
 
 export const store = createStore<State>({
@@ -35,25 +42,20 @@ export const store = createStore<State>({
     state: initState(),
     getters: {
         anonymous(state) {
-            return !state.token
-        }
+            return !state.user?.token
+        },
+        allow(state) {
+            return (perm: string) => state.user?.perms?.has('*') || state.user?.perms?.has(perm)
+        },
     },
     mutations: {
-        [Mutations.Login](state, user) {
-            localStorage.setItem("name", user.name);
-            localStorage.setItem("token", user.token);
-            state.name = user.name;
-            state.token = user.token;
-        },
         [Mutations.Logout](state) {
-            localStorage.removeItem("name");
-            localStorage.removeItem("token");
-            state.name = null;
-            state.token = null;
+            localStorage.removeItem("user");
+            state.user = null;
         },
-        [Mutations.SetToken](state, token) {
-            localStorage.setItem("token", token);
-            state.token = token;
+        [Mutations.SetUser](state, user) {
+            localStorage.setItem("user", JSON.stringify(user));
+            state.user = { perms: new Set(user.perms), name: user.name, token: user.token };
         },
         [Mutations.SetPreference](state, preference) {
             localStorage.setItem("preference", JSON.stringify(preference));

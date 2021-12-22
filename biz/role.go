@@ -14,6 +14,7 @@ type RoleBiz interface {
 	Create(role *model.Role, user web.User) (err error)
 	Delete(id, name string, user web.User) (err error)
 	Update(r *model.Role, user web.User) (err error)
+	GetPerms(ids []string) ([]string, error)
 }
 
 func NewRole(d dao.Interface, eb EventBiz) RoleBiz {
@@ -73,4 +74,25 @@ func (b *roleBiz) Update(role *model.Role, user web.User) (err error) {
 		b.eb.CreateRole(EventActionUpdate, role.ID, role.Name, user)
 	}
 	return
+}
+
+func (b *roleBiz) GetPerms(ids []string) ([]string, error) {
+	m := make(map[string]struct{})
+
+	for _, id := range ids {
+		r, err := b.d.RoleGet(context.TODO(), id)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, p := range r.Perms {
+			m[p] = struct{}{}
+		}
+	}
+
+	perms := make([]string, 0, len(m))
+	for p := range m {
+		perms = append(perms, p)
+	}
+	return perms, nil
 }

@@ -52,10 +52,12 @@
         <x-code :code="raw" language="json" />
       </n-tab-pane>
       <n-tab-pane name="logs" :tab="t('fields.logs')" display-directive="show:lazy">
-        <x-logs type="container" :node="node" :id="model.id"></x-logs>
+        <x-logs type="container" :node="node" :id="model.id" v-if="store.getters.allow('container.logs')"></x-logs>
+        <n-alert type="info" v-else>{{ t('texts.403') }}</n-alert>
       </n-tab-pane>
       <n-tab-pane name="exec" :tab="t('fields.execute')" display-directive="show:lazy">
-        <execute :node="node" :id="model.id"></execute>
+        <execute :node="node" :id="model.id" v-if="store.getters.allow('container.execute')"></execute>
+        <n-alert type="info" v-else>{{ t('texts.403') }}</n-alert>
       </n-tab-pane>
     </n-tabs>
   </div>
@@ -71,8 +73,10 @@ import {
   NTable,
   NTabs,
   NTabPane,
+  NAlert,
 } from "naive-ui";
 import { ArrowBackCircleOutline as BackIcon } from "@vicons/ionicons5";
+import { useStore } from "vuex";
 import XPageHeader from "@/components/PageHeader.vue";
 import XCode from "@/components/Code.vue";
 import XPanel from "@/components/Panel.vue";
@@ -86,6 +90,7 @@ import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 const route = useRoute();
+const store = useStore();
 const model = ref({} as Container);
 const raw = ref('');
 const node = route.params.node as string || '';

@@ -17,7 +17,7 @@ type ContainerHandler struct {
 	Find      web.HandlerFunc `path:"/find" auth:"container.view" desc:"find container by name"`
 	Delete    web.HandlerFunc `path:"/delete" method:"post" auth:"container.delete" desc:"delete container"`
 	FetchLogs web.HandlerFunc `path:"/fetch-logs" auth:"container.logs" desc:"fetch logs of container"`
-	Connect   web.HandlerFunc `path:"/connect" auth:"*" desc:"connect to a running container"`
+	Connect   web.HandlerFunc `path:"/connect" auth:"container.execute" desc:"connect to a running container"`
 }
 
 // NewContainer creates an instance of ContainerHandler

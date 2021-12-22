@@ -3,10 +3,12 @@ package bolt
 import (
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/boltdb/bolt"
 	"github.com/cuigh/auxo/errors"
 	"github.com/cuigh/auxo/log"
+	"github.com/cuigh/auxo/util/run"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
@@ -41,6 +43,9 @@ func New(addr string) (*Dao, error) {
 		logger: log.Get("bolt"),
 		db:     db,
 	}
+	run.Schedule(time.Hour, d.SessionPrune, func(err interface{}) {
+		d.logger.Error("failed to clean up expired sessions: ", err)
+	})
 	return d, nil
 }
 

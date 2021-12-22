@@ -8,7 +8,6 @@ import (
 )
 
 const User = "user"
-const Session = "session"
 
 func (d *Dao) UserCount(ctx context.Context) (count int, err error) {
 	return d.count(User)
@@ -123,19 +122,4 @@ func (d *Dao) UserUpdatePassword(ctx context.Context, user *model.User) (err err
 		old.UpdatedBy = user.UpdatedBy
 		return old
 	})
-}
-
-func (d *Dao) SessionGet(ctx context.Context, token string) (session *model.Session, err error) {
-	s := &model.Session{}
-	err = d.get(Session, token, s)
-	if err == ErrNoRecords {
-		return nil, nil
-	} else if err != nil {
-		s = nil
-	}
-	return
-}
-
-func (d *Dao) SessionUpdate(ctx context.Context, session *model.Session) (err error) {
-	return d.replace(Session, session.UserID, session)
 }

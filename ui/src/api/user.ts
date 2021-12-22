@@ -2,8 +2,8 @@ import ajax, { Result } from './ajax'
 
 export interface AuthUser {
     token: string;
-    id: string;
     name: string;
+    perms: string[];
 }
 
 export interface User {

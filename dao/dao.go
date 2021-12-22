@@ -2,6 +2,7 @@ package dao
 
 import (
 	"context"
+	"time"
 
 	"github.com/cuigh/auxo/app/container"
 	"github.com/cuigh/auxo/errors"
@@ -32,8 +33,10 @@ type Interface interface {
 	UserUpdatePassword(ctx context.Context, user *model.User) error
 	UserDelete(ctx context.Context, id string) error
 
-	SessionGet(ctx context.Context, token string) (*model.Session, error)
+	SessionGet(ctx context.Context, id string) (*model.Session, error)
+	SessionCreate(ctx context.Context, session *model.Session) error
 	SessionUpdate(ctx context.Context, session *model.Session) error
+	SessionUpdateExpiry(ctx context.Context, id string, expiry time.Time) (err error)
 
 	RegistryGet(ctx context.Context, id string) (*model.Registry, error)
 	RegistryGetByURL(ctx context.Context, url string) (registry *model.Registry, err error)

@@ -3,7 +3,7 @@ banner: false
 
 web:
   entries:
-  - address: :8002
+  - address: :8001
   authorize: '?'
 
 swirl:

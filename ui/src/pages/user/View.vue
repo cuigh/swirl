@@ -78,7 +78,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive } from "vue";
+import { onMounted, reactive, watch } from "vue";
 import {
   NButton,
   NTag,
@@ -109,6 +109,8 @@ async function fetchData() {
   model.user = user.data as User
   roles.data?.forEach(r => model.roles.set(r.id, r.name))
 }
+
+watch(() => route.params.id, fetchData)
 
 onMounted(fetchData);
 </script>

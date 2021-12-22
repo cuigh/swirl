@@ -34,12 +34,12 @@ var indexes = map[string][]mongo.IndexModel{
 		mongo.IndexModel{Keys: bson.D{{"type", 1}}},
 		mongo.IndexModel{Keys: bson.D{{"name", 1}}},
 	},
-	//"session": {
-	//	mongo.IndexModel{
-	//		Keys:    bson.D{{"token", 1}},
-	//		Options: options.Index().SetUnique(true),
-	//	},
-	//},
+	"session": {
+		mongo.IndexModel{
+			Keys:    bson.D{{"expiry", 1}},
+			Options: options.Index().SetExpireAfterSeconds(3600),
+		},
+	},
 }
 
 type Dao struct {

@@ -11,7 +11,7 @@ import (
 )
 
 type NodeBiz interface {
-	List() ([]*docker.Node, error)
+	List(agent bool) ([]*docker.Node, error)
 	Search() ([]*Node, error)
 	Find(id string) (node *Node, raw string, err error)
 	Delete(id, name string, user web.User) (err error)
@@ -42,15 +42,17 @@ func (b *nodeBiz) Find(id string) (node *Node, raw string, err error) {
 	return
 }
 
-func (b *nodeBiz) List() ([]*docker.Node, error) {
+func (b *nodeBiz) List(agent bool) ([]*docker.Node, error) {
 	m, err := b.d.NodeMap()
 	if err != nil {
 		return nil, err
 	}
 
-	nodes := make([]*docker.Node, 0, len(m))
+	var nodes []*docker.Node
 	for _, n := range m {
-		nodes = append(nodes, n)
+		if !agent || n.Agent != "" {
+			nodes = append(nodes, n)
+		}
 	}
 	sort.Slice(nodes, func(i, j int) bool {
 		return nodes[i].Name < nodes[j].Name

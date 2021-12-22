@@ -40,7 +40,7 @@ export default {
         "logs": "查看日志",
         "deploy": "发布",
         "shutdown": "下线",
-        "dashboard": "仪表盘",
+        "execute": "执行",
     },
     "fields": {
         "home": "首页",
@@ -253,6 +253,7 @@ export default {
         "user": "用户",
         "role": "角色",
         "chart": "图表",
+        "dashboard": "仪表盘",
         "event": "事件",
         "setting": "设置",
     },

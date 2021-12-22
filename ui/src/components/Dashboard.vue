@@ -89,8 +89,10 @@ import {
 import { XChart } from "@/components/chart";
 import dragula from 'dragula'
 import 'dragula/dist/dragula.css'
-import chartApi, { ChartInfo } from "@/api/chart";
-import type { Chart, Dashboard } from "@/api/chart";
+import dashboardApi from "@/api/dashboard";
+import type { Dashboard, ChartInfo } from "@/api/dashboard";
+import chartApi from "@/api/chart";
+import type { Chart } from "@/api/chart";
 import { isEmpty, useTimer } from "@/utils";
 import { useI18n } from 'vue-i18n'
 
@@ -170,7 +172,7 @@ const setChartRefs = (c: any) => c && charts.set(c.id, c)
 var stop: () => void
 
 async function saveDashboard() {
-  await chartApi.saveDashboard(dashboard.value);
+  await dashboardApi.save(dashboard.value);
   window.message.success(t('texts.action_success'))
 }
 
@@ -219,7 +221,7 @@ function removeChart(id: string) {
 async function refreshData() {
   if (dashboard.value != null && !isEmpty(dashboard.value.charts)) {
     const ids = dashboard.value.charts.map(i => i.id)
-    const r = await chartApi.fetchData(props.name, ids, dashboard.value.period || 30);
+    const r = await dashboardApi.fetchData(props.name, ids, dashboard.value.period || 30);
     charts.forEach((v, k) => {
       r.data[k] && v.setData(r.data[k])
     })
@@ -258,7 +260,7 @@ function sortCharts() {
 }
 
 onMounted(() => {
-  chartApi.findDashboard(props.type, props.name).then(r => {
+  dashboardApi.find(props.type, props.name).then(r => {
     dashboard.value = r.data as Dashboard
     initDrag()
     stop = useTimer(refreshData, (dashboard.value.interval || 10) * 1000)

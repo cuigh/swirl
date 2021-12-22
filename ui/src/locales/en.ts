@@ -40,7 +40,7 @@ export default {
         "logs": "View logs",
         "deploy": "Deploy",
         "shutdown": "Shutdown",
-        "dashboard": "Dashboard",
+        "execute": "Execute",
     },
     "fields": {
         "home": "Home",
@@ -253,6 +253,7 @@ export default {
         "user": "User | Users",
         "role": "Role | Roles",
         "chart": "Chart | Charts",
+        "dashboard": "Dashboard | Dashboards",
         "event": "Event | Events",
         "setting": "Setting | Settings",
     },

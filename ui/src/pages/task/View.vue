@@ -93,7 +93,8 @@
         <x-code :code="raw" language="json" />
       </n-tab-pane>
       <n-tab-pane name="logs" :tab="t('fields.logs')" display-directive="show:lazy">
-        <x-logs type="task" :id="route.params.id as string"></x-logs>
+        <x-logs type="task" :id="route.params.id as string" v-if="store.getters.allow('task.logs')"></x-logs>
+        <n-alert type="info" v-else>{{ t('texts.403') }}</n-alert>
       </n-tab-pane>
     </n-tabs>
   </div>
@@ -110,8 +111,10 @@ import {
   NTabs,
   NTabPane,
   NText,
+  NAlert,
 } from "naive-ui";
 import { ArrowBackCircleOutline as BackIcon } from "@vicons/ionicons5";
+import { useStore } from "vuex";
 import XPageHeader from "@/components/PageHeader.vue";
 import XAnchor from "@/components/Anchor.vue";
 import XCode from "@/components/Code.vue";
@@ -125,6 +128,7 @@ import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 const route = useRoute();
+const store = useStore();
 const model = ref({} as Task);
 const raw = ref('');
 

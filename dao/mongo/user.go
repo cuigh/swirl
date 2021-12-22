@@ -6,13 +6,9 @@ import (
 	"github.com/cuigh/swirl/model"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-const (
-	User    = "user"
-	Session = "session"
-)
+const User = "user"
 
 func (d *Dao) UserCount(ctx context.Context) (int, error) {
 	count, err := d.db.Collection(User).CountDocuments(ctx, bson.M{})
@@ -117,20 +113,4 @@ func (d *Dao) UserUpdatePassword(ctx context.Context, user *model.User) (err err
 		},
 	}
 	return d.update(ctx, User, user.ID, update)
-}
-
-func (d *Dao) SessionGet(ctx context.Context, token string) (session *model.Session, err error) {
-	session = &model.Session{}
-	err = d.db.Collection(Session).FindOne(ctx, bson.M{"token": token}).Decode(session)
-	if err == mongo.ErrNoDocuments {
-		return nil, nil
-	} else if err != nil {
-		return nil, err
-	}
-	return
-}
-
-func (d *Dao) SessionUpdate(ctx context.Context, session *model.Session) (err error) {
-	_, err = d.db.Collection(Session).UpdateByID(ctx, session.UserID, session, options.Update().SetUpsert(true))
-	return
 }

@@ -1,7 +1,6 @@
 export enum Mutations {
-    Login = "LOGIN",
     Logout = "LOGOUT",
-    SetToken = "SET_TOKEN",
-    SetPreference = "SET_THEME",
+    SetUser = "SET_USER",
+    SetPreference = "SET_PREFERENCE",
     SetAjaxLoading = "SET_AJAX_LOADING",
 }

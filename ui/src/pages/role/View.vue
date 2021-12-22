@@ -33,14 +33,14 @@
       <x-description-item :label="t('fields.updated_at')">
         <n-time :time="model.updatedAt" format="y-MM-dd HH:mm:ss" />
       </x-description-item>
-      <x-description-item :span="2" :label="t('fields.perms')">
-        <n-grid cols="1 480:2 960:3 1440:4" x-gap="6">
+    </x-description>
+    <x-panel :title="t('fields.perms')">
+        <n-grid cols="1 640:2 960:3 1440:4" x-gap="6" y-gap="6">
           <n-gi span="1" v-for="g in ps">
             <x-pair-tag type="warning" :label="g.group" :value="g.items" />
           </n-gi>
         </n-grid>
-      </x-description-item>
-    </x-description>
+    </x-panel>
   </n-space>
 </template>
 
@@ -57,6 +57,7 @@ import {
 import { useRoute } from "vue-router";
 import { ArrowBackCircleOutline as BackIcon } from "@vicons/ionicons5";
 import XPageHeader from "@/components/PageHeader.vue";
+import XPanel from "@/components/Panel.vue";
 import XPairTag from "@/components/PairTag.vue";
 import XAnchor from "@/components/Anchor.vue";
 import { XDescription, XDescriptionItem } from "@/components/description";
@@ -72,7 +73,7 @@ const ps = computed(() => {
   const set = new Set(model.value.perms)
   const arr: any = []
   perms.forEach(g => {
-    const items = g.items.filter(p => set.has(p.key)).map(p => t('perms.' + p.perm))
+    const items = g.actions.filter(action => set.has(g.key + '.' + action)).map(p => t('perms.' + p))
     items.length && arr.push({ group: t('objects.' + g.key), items: items })
   })
   return arr

@@ -25,23 +25,19 @@ class Ajax {
 
         this.ajax.interceptors.request.use(
             (config: any) => {
-                if (store.state.token) {
-                    config.headers.Authorization = "Bearer " + store.state.token
+                if (store.state.user?.token) {
+                    config.headers.Authorization = "Bearer " + store.state.user.token
                 }
                 // store.commit(Mutations.SetAjaxLoading, true);
                 return config;
             },
             (error: any) => {
-                console.error(error); // for debug
                 return Promise.reject(error);
             }
         )
 
         this.ajax.interceptors.response.use(
             (response: any) => {
-                if (response.headers.authorization) {
-                    store.commit(Mutations.SetToken, response.headers.authorization)
-                }
                 // store.commit(Mutations.SetAjaxLoading, false);
                 return response;
             },

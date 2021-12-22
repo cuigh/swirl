@@ -130,4 +130,6 @@ func init() {
 	container.Put(NewMetric)
 	container.Put(NewChart)
 	container.Put(NewSystem)
+	container.Put(NewSession)
+	container.Put(NewDashboard)
 }

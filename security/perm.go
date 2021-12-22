@@ -2,34 +2,79 @@ package security
 
 import (
 	"net/http"
-	"time"
+	"strings"
 
-	"github.com/cuigh/auxo/cache"
-	"github.com/cuigh/auxo/log"
 	"github.com/cuigh/auxo/net/web"
-	"github.com/cuigh/swirl/biz"
 )
 
-type Authorizer struct {
-	ub     biz.UserBiz
-	perms  *cache.Value
-	logger log.Logger
+const ActionBits = 24
+
+// Resources holds all resources requiring authorization. Up to 40 resources are supported.
+// WARN: DO NOT CHANGE VALUES!!!
+var Resources = map[string]uint64{
+	"registry":  1,
+	"node":      1 << 1,
+	"network":   1 << 2,
+	"service":   1 << 3,
+	"task":      1 << 4,
+	"stack":     1 << 5,
+	"config":    1 << 6,
+	"secret":    1 << 7,
+	"image":     1 << 8,
+	"container": 1 << 9,
+	"volume":    1 << 10,
+	"user":      1 << 11,
+	"role":      1 << 12,
+	"chart":     1 << 13,
+	"dashboard": 1 << 14,
+	"event":     1 << 15,
+	"setting":   1 << 16,
 }
 
-func NewAuthorizer(ub biz.UserBiz, rb biz.RoleBiz) web.Filter {
-	v := cache.Value{
-		TTL:  5 * time.Minute,
-		Load: func() (interface{}, error) { return loadPerms(rb) },
-	}
-	return &Authorizer{
-		ub:     ub,
-		perms:  &v,
-		logger: log.Get("security"),
-	}
+// Actions holds all actions requiring authorization. Up to 24 actions are supported.
+// WARN: DO NOT CHANGE VALUES!!!
+var Actions = map[string]uint64{
+	"view":       1,
+	"edit":       1 << 1,
+	"delete":     1 << 2,
+	"disconnect": 1 << 3,
+	"restart":    1 << 4,
+	"rollback":   1 << 5,
+	"logs":       1 << 6,
+	"deploy":     1 << 7,
+	"shutdown":   1 << 8,
+	"execute":    1 << 9,
+}
+
+var Perms = map[string][]string{
+	"registry":  {"view", "edit", "delete"},
+	"node":      {"view", "edit", "delete"},
+	"network":   {"view", "edit", "delete", "disconnect"},
+	"service":   {"view", "edit", "delete", "restart", "rollback", "logs"},
+	"task":      {"view", "logs"},
+	"stack":     {"view", "edit", "delete", "deploy", "shutdown"},
+	"config":    {"view", "edit", "delete"},
+	"secret":    {"view", "edit", "delete"},
+	"image":     {"view", "delete"},
+	"container": {"view", "delete", "logs", "execute"},
+	"volume":    {"view", "edit", "delete"},
+	"user":      {"view", "edit", "delete"},
+	"role":      {"view", "edit", "delete"},
+	"chart":     {"view", "edit", "delete"},
+	"dashboard": {"edit"},
+	"event":     {"view"},
+	"setting":   {"view", "edit"},
+}
+
+type Authorizer struct {
+}
+
+func NewAuthorizer() Authorizer {
+	return Authorizer{}
 }
 
 // Apply implements `web.Filter` interface.
-func (a *Authorizer) Apply(next web.HandlerFunc) web.HandlerFunc {
+func (p Authorizer) Apply(next web.HandlerFunc) web.HandlerFunc {
 	return func(ctx web.Context) error {
 		auth := ctx.Handler().Authorize()
 
@@ -43,65 +88,65 @@ func (a *Authorizer) Apply(next web.HandlerFunc) web.HandlerFunc {
 			return web.NewError(http.StatusUnauthorized, "You are not logged in")
 		}
 
-		if auth != web.AuthAuthenticated && !a.check(user, auth) {
+		if auth != web.AuthAuthenticated && !p.check(user, auth) {
 			return web.NewError(http.StatusForbidden, "You do not have access to this resource")
 		}
 		return next(ctx)
 	}
 }
 
-func (a *Authorizer) check(user web.User, auth string) bool {
-	u, err := a.ub.FindByID(user.ID())
-	if err != nil {
-		a.logger.Errorf("failed to query user '%s': %s", user.ID(), err)
-		return false
-	}
-
-	if u == nil || u.Status == biz.UserStatusBlocked {
-		return false
-	} else if u.Admin {
+func (p Authorizer) check(user web.User, auth string) bool {
+	u := user.(*User)
+	if u.admin {
 		return true
-	} else if auth == web.AuthAdministrator {
-		return u.Admin
 	}
+	return u.perm.Contains(auth)
+}
 
-	v, err := a.perms.Get(true)
-	if err != nil {
-		a.logger.Error("failed to load role perms: ", err)
-		return false
-	}
+type PermMap uint64
 
-	perms := v.(map[string]PermSet)
-	for _, r := range u.Roles {
-		if set, ok := perms[r]; ok {
-			if set.Contains(auth) {
-				return true
-			}
+func NewPermMap(perms []string) PermMap {
+	var p uint64
+	for _, perm := range perms {
+		pair := strings.SplitN(perm, ".", 2)
+		if len(pair) == 2 {
+			r, a := Resources[pair[0]], Actions[pair[1]]
+			p |= r << ActionBits
+			p |= a
 		}
+	}
+	return PermMap(p)
+}
+
+func (p PermMap) Contains(perm string) bool {
+	pair := strings.SplitN(perm, ".", 2)
+	if len(pair) == 2 {
+		r, a := Resources[pair[0]], Actions[pair[1]]
+		return uint64(p)&(r<<ActionBits) > 0 && uint64(p)&a > 0
 	}
 	return false
 }
 
-func loadPerms(rb biz.RoleBiz) (interface{}, error) {
-	roles, err := rb.Search("")
-	if err != nil {
-		return nil, err
-	}
-
-	perms := make(map[string]PermSet)
-	for _, role := range roles {
-		set := make(PermSet)
-		for _, p := range role.Perms {
-			set[p] = struct{}{}
-		}
-		perms[role.ID] = set
-	}
-	return perms, nil
+type User struct {
+	token string
+	id    string
+	name  string
+	admin bool
+	perm  PermMap
 }
 
-type PermSet map[string]struct{}
+func (u *User) Token() string {
+	return u.token
+}
 
-func (s PermSet) Contains(perm string) (ok bool) {
-	_, ok = s[perm]
-	return
+func (u *User) ID() string {
+	return u.id
+}
+
+func (u *User) Name() string {
+	return u.name
+}
+
+func (u *User) Anonymous() bool {
+	return u.id == ""
 }

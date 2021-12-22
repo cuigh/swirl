@@ -63,7 +63,9 @@ func (b *settingBiz) Save(id string, options data.Map, user web.User) (err error
 		ID:        id,
 		Options:   b.toOptions(options),
 		UpdatedAt: time.Now(),
-		UpdatedBy: model.Operator{ID: user.ID(), Name: user.Name()},
+	}
+	if user != nil {
+		setting.UpdatedBy = model.Operator{ID: user.ID(), Name: user.Name()}
 	}
 	err = b.d.SettingUpdate(context.TODO(), setting)
 	if err == nil && user != nil {

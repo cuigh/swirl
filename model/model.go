@@ -253,10 +253,14 @@ func (cd *Dashboard) ID() string {
 type Session struct {
 	ID        string    `json:"id" bson:"_id"` // token
 	UserID    string    `json:"userId" bson:"user_id"`
+	Username  string    `json:"username" bson:"username"`
+	Admin     bool      `json:"admin" bson:"admin"`
 	Roles     []string  `json:"roles" bson:"roles"`
-	Perm      int64     `json:"perm" bson:"perm"`
+	Perm      uint64    `json:"perm" bson:"perm"`
+	Perms     []string  `json:"-" bson:"-"`
 	Dirty     bool      `json:"dirty" bson:"dirty"`
 	Expiry    time.Time `json:"expiry" bson:"expiry"`
 	MaxExpiry time.Time `json:"maxExpiry" bson:"max_expiry"`
+	CreatedAt time.Time `json:"createdAt" bson:"created_at"`
 	UpdatedAt time.Time `json:"updatedAt" bson:"updated_at"`
 }

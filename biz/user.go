@@ -176,24 +176,6 @@ func (b *userBiz) Count() (count int, err error) {
 	return b.d.UserCount(context.TODO())
 }
 
-//func (b *userBiz) UpdateSession(id string) (token string, err error) {
-//	session := &model.Session{
-//		UserID:    id,
-//		Token:     guid.New().String(),
-//		UpdatedAt: time.Now(),
-//	}
-//	session.Expires = session.UpdatedAt.Add(time.Hour * 24)
-//	err = b.d.SessionUpdate(context.TODO(), session)
-//	if err == nil {
-//		token = session.Token
-//	}
-//	return
-//}
-
-func (b *userBiz) GetSession(token string) (session *model.Session, err error) {
-	return b.d.SessionGet(context.TODO(), token)
-}
-
 type UserPrivacy struct {
 	ID       string
 	Name     string

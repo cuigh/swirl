@@ -74,7 +74,7 @@ const rules = {
   password: requiredRule(),
 };
 const { submit, submiting } = useForm<AuthUser>(form, () => userApi.login(model), (user: AuthUser) => {
-  store.commit(Mutations.Login, user);
+  store.commit(Mutations.SetUser, user);
   let redirect = decodeURIComponent(<string>route.query.redirect || "/");
   router.push({ path: redirect });
 })

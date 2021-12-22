@@ -27,7 +27,11 @@
                 <td width="75" style="font-weight: 500">{{ t('objects.' + g.key) }}</td>
                 <td>
                   <n-space item-style="display: flex;">
-                    <n-checkbox :value="p.key" :label="t('perms.' + p.perm)" v-for="p in g.items" />
+                    <n-checkbox
+                      :value="g.key + '.' + action"
+                      :label="t('perms.' + action)"
+                      v-for="action in g.actions"
+                    />
                   </n-space>
                 </td>
                 <td width="100">
@@ -112,18 +116,21 @@ const { submit, submiting } = useForm(form, () => roleApi.save(model.value), () 
 
 function checkGroup(key: string, checked: boolean = true) {
   const g = perms.find(g => g.key === key)
-  if (g) {
-    g.items.forEach(p => {
-      if (checked) {
-        !model.value.perms.includes(p.key) && model.value.perms.push(p.key)
-      } else {
-        const index = model.value.perms.indexOf(p.key)
-        if (index !== -1) {
-          model.value.perms.splice(index, 1)
-        }
-      }
-    })
+  if (!g) {
+    return
   }
+
+  g.actions.forEach(action => {
+    const perm = g.key + '.' + action
+    if (checked) {
+      !model.value.perms.includes(perm) && model.value.perms.push(perm)
+    } else {
+      const index = model.value.perms.indexOf(perm)
+      if (index !== -1) {
+        model.value.perms.splice(index, 1)
+      }
+    }
+  })
 }
 
 async function fetchData() {

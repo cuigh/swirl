@@ -64,7 +64,7 @@
                 <PersonOutline />
               </n-icon>
             </template>
-            {{ store.state.name }}
+            {{ store.state.user?.name }}
           </n-button>
         </n-dropdown>
         <n-tooltip trigger="hover">

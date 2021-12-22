@@ -471,7 +471,8 @@
         </n-table>
       </n-tab-pane>
       <n-tab-pane name="logs" :tab="t('fields.logs')" display-directive="show:lazy">
-        <x-logs type="service" :id="service.name"></x-logs>
+        <x-logs type="service" :id="service.name" v-if="store.getters.allow('service.logs')"></x-logs>
+        <n-alert type="info" v-else>{{ t('texts.403') }}</n-alert>
       </n-tab-pane>
       <n-tab-pane name="status" :tab="t('fields.status')">
         <x-dashboard type="service" :name="service.name" />
@@ -491,8 +492,10 @@ import {
   NTabs,
   NTabPane,
   NInputNumber,
+  NAlert,
 } from "naive-ui";
 import { ArrowBackCircleOutline as BackIcon } from "@vicons/ionicons5";
+import { useStore } from "vuex";
 import XPageHeader from "@/components/PageHeader.vue";
 import XAnchor from "@/components/Anchor.vue";
 import XPairTag from "@/components/PairTag.vue";
@@ -513,6 +516,7 @@ import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 const route = useRoute();
+const store = useStore();
 const service = ref({
   resource: {
     limit: {},
