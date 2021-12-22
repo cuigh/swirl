@@ -51,7 +51,7 @@ function connect() {
 
   active.value = true
   let protocol = (location.protocol === "https:") ? "wss://" : "ws://";
-  let host = import.meta.env.DEV ? 'localhost:8001' : location.host;
+  let host = import.meta.env.DEV ? import.meta.env.VITE_PROXY_URL : location.host;
   let cmd = encodeURIComponent(command.value)
   socket = new WebSocket(`${protocol}${host}/api/container/connect?token=${store.state.user.token}&node=${props.node}&id=${props.id}&cmd=${cmd}`);
   socket.onopen = () => {
