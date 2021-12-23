@@ -1,5 +1,16 @@
 <template>
-  <x-page-header />
+  <x-page-header>
+    <template #action>
+      <n-button secondary size="small" type="warning" @click="prune">
+        <template #icon>
+          <n-icon>
+            <close-icon />
+          </n-icon>
+        </template>
+        {{ t('buttons.prune') }}
+      </n-button>
+    </template>
+  </x-page-header>
   <n-space class="page-body" vertical :size="12">
     <n-space :size="12">
       <n-select
@@ -38,7 +49,9 @@ import {
   NDataTable,
   NInput,
   NSelect,
+  NIcon,
 } from "naive-ui";
+import { CloseOutline as CloseIcon } from "@vicons/ionicons5";
 import XPageHeader from "@/components/PageHeader.vue";
 import imageApi from "@/api/image";
 import type { Image } from "@/api/image";
@@ -86,15 +99,32 @@ const columns = [
     title: t('fields.actions'),
     key: "actions",
     render(i: Image, index: number) {
-      return renderButton('error', t('buttons.delete'), () => deleteImage(i.id, index), t('prompts.delete'))
+      return renderButton('error', t('buttons.delete'), () => remove(i.id, index), t('prompts.delete'))
     },
   },
 ];
 const { state, pagination, fetchData, changePageSize } = useDataTable(imageApi.search, filter, false)
 
-async function deleteImage(id: string, index: number) {
+async function remove(id: string, index: number) {
   await imageApi.delete(filter.node, id, "");
   state.data.splice(index, 1)
+}
+
+async function prune() {
+  window.dialog.warning({
+    title: t('dialogs.prune_image.title'),
+    content: t('dialogs.prune_image.body'),
+    positiveText: t('buttons.confirm'),
+    negativeText: t('buttons.cancel'),
+    onPositiveClick: async () => {
+      const r = await imageApi.prune(filter.node);
+      window.message.info(t('texts.prune_image_success', {
+        count: r.data?.count,
+        size: formatSize(r.data?.size as number),
+      }));
+      fetchData();
+    }
+  })
 }
 
 onMounted(async () => {

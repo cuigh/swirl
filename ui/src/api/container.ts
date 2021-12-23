@@ -79,6 +79,13 @@ export class ContainerApi {
             stderr: string;
         }>('/container/fetch-logs', args)
     }
+
+    prune(node: string) {
+        return ajax.post<{
+            count: number;
+            size: number;
+        }>('/container/prune', { node })
+    }
 }
 
 export default new ContainerApi

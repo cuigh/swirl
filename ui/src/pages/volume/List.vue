@@ -1,7 +1,7 @@
 <template>
   <x-page-header>
     <template #action>
-      <n-button secondary size="small" type="warning" @click="pruneVolume">
+      <n-button secondary size="small" type="warning" @click="prune">
         <template #icon>
           <n-icon>
             <close-icon />
@@ -107,18 +107,18 @@ const columns = [
     title: t('fields.actions'),
     key: "actions",
     render(v: Volume, index: number) {
-      return renderButton('error', t('buttons.delete'), () => deleteVolume(v.name, index), t('prompts.delete'))
+      return renderButton('error', t('buttons.delete'), () => remove(v.name, index), t('prompts.delete'))
     },
   },
 ];
 const { state, pagination, fetchData, changePageSize } = useDataTable(volumeApi.search, filter, false)
 
-async function deleteVolume(name: string, index: number) {
+async function remove(name: string, index: number) {
   await volumeApi.delete(filter.node, name);
   state.data.splice(index, 1)
 }
 
-async function pruneVolume() {
+async function prune() {
   window.dialog.warning({
     title: t('dialogs.prune_volume.title'),
     content: t('dialogs.prune_volume.body'),
@@ -127,8 +127,8 @@ async function pruneVolume() {
     onPositiveClick: async () => {
       const r = await volumeApi.prune(filter.node);
       window.message.info(t('texts.prune_volume_success', {
-        count: r.data?.deletedVolumes.length,
-        size: formatSize(r.data?.reclaimedSpace as number)
+        count: r.data?.count,
+        size: formatSize(r.data?.size as number)
       }));
       fetchData();
     }

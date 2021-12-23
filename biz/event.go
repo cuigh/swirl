@@ -21,6 +21,8 @@ const (
 	EventTypeStack           EventType = "Stack"
 	EventTypeConfig          EventType = "Config"
 	EventTypeSecret          EventType = "Secret"
+	EventTypeImage           EventType = "Image"
+	EventTypeContainer       EventType = "Container"
 	EventTypeVolume          EventType = "Volume"
 	EventTypeUser            EventType = "User"
 	EventTypeRole            EventType = "Role"
@@ -54,6 +56,8 @@ type EventBiz interface {
 	CreateConfig(action EventAction, id, name string, user web.User)
 	CreateSecret(action EventAction, id, name string, user web.User)
 	CreateStack(action EventAction, name string, user web.User)
+	CreateImage(action EventAction, id string, user web.User)
+	CreateContainer(action EventAction, id, name string, user web.User)
 	CreateVolume(action EventAction, name string, user web.User)
 	CreateUser(action EventAction, id, name string, user web.User)
 	CreateRole(action EventAction, id, name string, user web.User)
@@ -108,6 +112,14 @@ func (b *eventBiz) CreateNetwork(action EventAction, id, name string, user web.U
 
 func (b *eventBiz) CreateNode(action EventAction, id, name string, user web.User) {
 	b.create(EventTypeNode, action, id, name, user)
+}
+
+func (b *eventBiz) CreateImage(action EventAction, id string, user web.User) {
+	b.create(EventTypeImage, action, id, "", user)
+}
+
+func (b *eventBiz) CreateContainer(action EventAction, id, name string, user web.User) {
+	b.create(EventTypeContainer, action, id, name, user)
 }
 
 func (b *eventBiz) CreateVolume(action EventAction, name string, user web.User) {

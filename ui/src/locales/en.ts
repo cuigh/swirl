@@ -233,6 +233,14 @@ export default {
         "export_chart": {
             "title": "Export chart",
         },
+        "prune_image": {
+            "title": "Prune image",
+            "body": "Are you sure you want to clean up unused images?",
+        },
+        "prune_container": {
+            "title": "Prune container",
+            "body": "Are you sure you want to clean up stopped containers?",
+        },
         "prune_volume": {
             "title": "Prune volume",
             "body": "Are you sure you want to clean up unused data volumes?",
@@ -384,6 +392,8 @@ export default {
         "service_notice": "This service belong to '%s' stack, usually you should modify original compose instead of updating it directly.",
         "password_notice": "You are a LDAP user, can not modify password here.",
         "setting_notice": "You must restart Swirl to activate modifications.",
+        "prune_image_success": "A total of {count} images are cleaned up to free up {size} of space.",
+        "prune_container_success": "A total of {count} containers are cleaned up to free up {size} of space.",
         "prune_volume_success": "A total of {count} data volumes are cleaned up to free up {size} of space.",
         "403": "Sorry, you don't have permission to access this page",
         "404": "The page you are requesting has been moved, deleted, renamed, or may not exist",

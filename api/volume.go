@@ -103,14 +103,14 @@ func volumePrune(b biz.VolumeBiz) web.HandlerFunc {
 			return err
 		}
 
-		deletedVolumes, reclaimedSpace, err := b.Prune(args.Node, ctx.User())
+		count, size, err := b.Prune(args.Node, ctx.User())
 		if err != nil {
 			return err
 		}
 
 		return success(ctx, data.Map{
-			"deletedVolumes": deletedVolumes,
-			"reclaimedSpace": reclaimedSpace,
+			"count": count,
+			"size":  size,
 		})
 	}
 }

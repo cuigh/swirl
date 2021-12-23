@@ -15,14 +15,16 @@ type ImageBiz interface {
 	Search(node, name string, pageIndex, pageSize int) ([]*Image, int, error)
 	Find(node, name string) (image *Image, raw string, err error)
 	Delete(node, id string, user web.User) (err error)
+	Prune(node string, user web.User) (count int, size uint64, err error)
 }
 
-func NewImage(d *docker.Docker) ImageBiz {
-	return &imageBiz{d: d}
+func NewImage(d *docker.Docker, eb EventBiz) ImageBiz {
+	return &imageBiz{d: d, eb: eb}
 }
 
 type imageBiz struct {
-	d *docker.Docker
+	d  *docker.Docker
+	eb EventBiz
 }
 
 func (b *imageBiz) Find(node, id string) (img *Image, raw string, err error) {
@@ -62,9 +64,18 @@ func (b *imageBiz) Search(node, name string, pageIndex, pageSize int) (images []
 
 func (b *imageBiz) Delete(node, id string, user web.User) (err error) {
 	err = b.d.ImageRemove(context.TODO(), node, id)
-	//if err == nil {
-	//	Event.CreateImage(model.EventActionDelete, id, user)
-	//}
+	if err == nil {
+		b.eb.CreateImage(EventActionDelete, id, user)
+	}
+	return
+}
+
+func (b *imageBiz) Prune(node string, user web.User) (count int, size uint64, err error) {
+	var report types.ImagesPruneReport
+	if report, err = b.d.ImagePrune(context.TODO(), node); err == nil {
+		count, size = len(report.ImagesDeleted), report.SpaceReclaimed
+		b.eb.CreateImage(EventActionPrune, "", user)
+	}
 	return
 }
 

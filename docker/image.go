@@ -59,3 +59,12 @@ func (d *Docker) ImageRemove(ctx context.Context, node, id string) error {
 	}
 	return err
 }
+
+// ImagePrune remove all unused images.
+func (d *Docker) ImagePrune(ctx context.Context, node string) (report types.ImagesPruneReport, err error) {
+	var c *client.Client
+	if c, err = d.agent(node); err == nil {
+		report, err = c.ImagesPrune(ctx, filters.NewArgs(filters.Arg("dangling", "false")))
+	}
+	return
+}

@@ -16,7 +16,7 @@ type VolumeBiz interface {
 	Find(node, name string) (volume *Volume, raw string, err error)
 	Delete(node, name string, user web.User) (err error)
 	Create(volume *Volume, user web.User) (err error)
-	Prune(node string, user web.User) (deletedVolumes []string, reclaimedSpace uint64, err error)
+	Prune(node string, user web.User) (count int, size uint64, err error)
 }
 
 func NewVolume(d *docker.Docker, eb EventBiz) VolumeBiz {
@@ -85,11 +85,11 @@ func (b *volumeBiz) Create(vol *Volume, user web.User) (err error) {
 	return
 }
 
-func (b *volumeBiz) Prune(node string, user web.User) (deletedVolumes []string, reclaimedSpace uint64, err error) {
+func (b *volumeBiz) Prune(node string, user web.User) (count int, size uint64, err error) {
 	var report types.VolumesPruneReport
 	report, err = b.d.VolumePrune(context.TODO(), node)
 	if err == nil {
-		deletedVolumes, reclaimedSpace = report.VolumesDeleted, report.SpaceReclaimed
+		count, size = len(report.VolumesDeleted), report.SpaceReclaimed
 		b.eb.CreateVolume(EventActionPrune, "", user)
 	}
 	return

@@ -1,5 +1,16 @@
 <template>
-  <x-page-header />
+    <x-page-header>
+    <template #action>
+      <n-button secondary size="small" type="warning" @click="prune">
+        <template #icon>
+          <n-icon>
+            <close-icon />
+          </n-icon>
+        </template>
+        {{ t('buttons.prune') }}
+      </n-button>
+    </template>
+  </x-page-header>
   <n-space class="page-body" vertical :size="12">
     <n-space :size="12">
       <n-select
@@ -38,13 +49,15 @@ import {
   NDataTable,
   NInput,
   NSelect,
+  NIcon,
 } from "naive-ui";
+import { CloseOutline as CloseIcon } from "@vicons/ionicons5";
 import XPageHeader from "@/components/PageHeader.vue";
 import containerApi from "@/api/container";
 import type { Container } from "@/api/container";
 import nodeApi from "@/api/node";
 import { useDataTable } from "@/utils/data-table";
-import { renderButton, renderLink, renderTag } from "@/utils/render";
+import { formatSize, renderButton, renderLink, renderTag } from "@/utils/render";
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
@@ -82,16 +95,33 @@ const columns = [
     title: t('fields.actions'),
     key: "actions",
     render(i: Container, index: number) {
-      return renderButton('error', t('buttons.delete'), () => deleteContainer(i, index), t('prompts.delete'))
+      return renderButton('error', t('buttons.delete'), () => remove(i, index), t('prompts.delete'))
     },
   },
 ];
 const { state, pagination, fetchData, changePageSize } = useDataTable(containerApi.search, filter, false)
 
-async function deleteContainer(c: Container, index: number) {
+async function remove(c: Container, index: number) {
   const node = c.labels?.find(l => l.name === 'com.docker.swarm.node.id')
-  await containerApi.delete(node?.value || '', c.id, '');
+  await containerApi.delete(node?.value || '', c.id, c.name);
   state.data.splice(index, 1)
+}
+
+async function prune() {
+  window.dialog.warning({
+    title: t('dialogs.prune_container.title'),
+    content: t('dialogs.prune_container.body'),
+    positiveText: t('buttons.confirm'),
+    negativeText: t('buttons.cancel'),
+    onPositiveClick: async () => {
+      const r = await containerApi.prune(filter.node);
+      window.message.info(t('texts.prune_container_success', {
+        count: r.data?.count,
+        size: formatSize(r.data?.size as number),
+      }));
+      fetchData();
+    }
+  })
 }
 
 onMounted(async () => {

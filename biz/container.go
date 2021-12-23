@@ -14,19 +14,21 @@ import (
 type ContainerBiz interface {
 	Search(node, name, status string, pageIndex, pageSize int) ([]*Container, int, error)
 	Find(node, id string) (container *Container, raw string, err error)
-	Delete(node, id string, user web.User) (err error)
+	Delete(node, id, name string, user web.User) (err error)
 	FetchLogs(node, id string, lines int, timestamps bool) (stdout, stderr string, err error)
 	ExecCreate(node, id string, cmd string) (resp types.IDResponse, err error)
 	ExecAttach(node, id string) (resp types.HijackedResponse, err error)
 	ExecStart(node, id string) error
+	Prune(node string, user web.User) (count int, size uint64, err error)
 }
 
-func NewContainer(d *docker.Docker) ContainerBiz {
-	return &containerBiz{d: d}
+func NewContainer(d *docker.Docker, eb EventBiz) ContainerBiz {
+	return &containerBiz{d: d, eb: eb}
 }
 
 type containerBiz struct {
-	d *docker.Docker
+	d  *docker.Docker
+	eb EventBiz
 }
 
 func (b *containerBiz) Find(node, id string) (c *Container, raw string, err error) {
@@ -58,11 +60,11 @@ func (b *containerBiz) Search(node, name, status string, pageIndex, pageSize int
 	return containers, total, nil
 }
 
-func (b *containerBiz) Delete(node, id string, user web.User) (err error) {
+func (b *containerBiz) Delete(node, id, name string, user web.User) (err error) {
 	err = b.d.ContainerRemove(context.TODO(), node, id)
-	//if err == nil {
-	//	Event.CreateContainer(model.EventActionDelete, id, user)
-	//}
+	if err == nil {
+		b.eb.CreateContainer(EventActionDelete, id, name, user)
+	}
 	return
 }
 
@@ -84,6 +86,15 @@ func (b *containerBiz) FetchLogs(node, id string, lines int, timestamps bool) (s
 		return "", "", err
 	}
 	return stdout.String(), stderr.String(), nil
+}
+
+func (b *containerBiz) Prune(node string, user web.User) (count int, size uint64, err error) {
+	var report types.ContainersPruneReport
+	if report, err = b.d.ContainerPrune(context.TODO(), node); err == nil {
+		count, size = len(report.ContainersDeleted), report.SpaceReclaimed
+		b.eb.CreateContainer(EventActionPrune, "", "", user)
+	}
+	return
 }
 
 type Container struct {

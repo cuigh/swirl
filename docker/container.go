@@ -136,3 +136,12 @@ func (d *Docker) ContainerLogs(ctx context.Context, node, id string, lines int, 
 	}
 	return
 }
+
+// ContainerPrune remove all unused containers.
+func (d *Docker) ContainerPrune(ctx context.Context, node string) (report types.ContainersPruneReport, err error) {
+	var c *client.Client
+	if c, err = d.agent(node); err == nil {
+		report, err = c.ContainersPrune(ctx, filters.NewArgs())
+	}
+	return
+}

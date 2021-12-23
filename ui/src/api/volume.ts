@@ -36,11 +36,6 @@ export interface FindResult {
     raw: string;
 }
 
-export interface PruneResult {
-    deletedVolumes: string[];
-    reclaimedSpace: number;
-}
-
 export class VolumeApi {
     find(node: string, name: string) {
         return ajax.get<FindResult>('/volume/find', { node, name })
@@ -59,7 +54,10 @@ export class VolumeApi {
     }
 
     prune(node: string) {
-        return ajax.post<PruneResult>('/volume/prune', { node })
+        return ajax.post<{
+            count: number;
+            size: number;
+        }>('/volume/prune', { node })
     }
 }
 

@@ -74,6 +74,13 @@ export class ImageApi {
     delete(node: string, id: string, name: string) {
         return ajax.post<Result<Object>>('/image/delete', { node, id, name })
     }
+
+    prune(node: string) {
+        return ajax.post<{
+            count: number;
+            size: number;
+        }>('/image/prune', { node })
+    }
 }
 
 export default new ImageApi

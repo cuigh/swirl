@@ -18,6 +18,7 @@ type ContainerHandler struct {
 	Delete    web.HandlerFunc `path:"/delete" method:"post" auth:"container.delete" desc:"delete container"`
 	FetchLogs web.HandlerFunc `path:"/fetch-logs" auth:"container.logs" desc:"fetch logs of container"`
 	Connect   web.HandlerFunc `path:"/connect" auth:"container.execute" desc:"connect to a running container"`
+	Prune     web.HandlerFunc `path:"/prune" method:"post" auth:"container.delete" desc:"delete unused containers"`
 }
 
 // NewContainer creates an instance of ContainerHandler
@@ -28,6 +29,7 @@ func NewContainer(b biz.ContainerBiz) *ContainerHandler {
 		Delete:    containerDelete(b),
 		FetchLogs: containerFetchLogs(b),
 		Connect:   containerConnect(b),
+		Prune:     containerPrune(b),
 	}
 }
 
@@ -78,11 +80,12 @@ func containerDelete(b biz.ContainerBiz) web.HandlerFunc {
 	type Args struct {
 		Node string `json:"node"`
 		ID   string `json:"id"`
+		Name string `json:"name"`
 	}
 	return func(ctx web.Context) (err error) {
 		args := &Args{}
 		if err = ctx.Bind(args); err == nil {
-			err = b.Delete(args.Node, args.ID, ctx.User())
+			err = b.Delete(args.Node, args.ID, args.Name, ctx.User())
 		}
 		return ajax(ctx, err)
 	}
@@ -212,5 +215,27 @@ func containerConnect(b biz.ContainerBiz) web.HandlerFunc {
 			}
 		}()
 		return nil
+	}
+}
+
+func containerPrune(b biz.ContainerBiz) web.HandlerFunc {
+	type Args struct {
+		Node string `json:"node"`
+	}
+	return func(ctx web.Context) (err error) {
+		args := &Args{}
+		if err = ctx.Bind(args); err != nil {
+			return err
+		}
+
+		count, size, err := b.Prune(args.Node, ctx.User())
+		if err != nil {
+			return err
+		}
+
+		return success(ctx, data.Map{
+			"count": count,
+			"size":  size,
+		})
 	}
 }

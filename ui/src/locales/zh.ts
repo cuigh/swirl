@@ -233,6 +233,14 @@ export default {
         "export_chart": {
             "title": "导出图表",
         },
+        "prune_image": {
+            "title": "清理镜像",
+            "body": "是否确实要清理未使用的镜像？",
+        },
+        "prune_container": {
+            "title": "清理容器",
+            "body": "是否确实要清理已停止的容器？",
+        },
         "prune_volume": {
             "title": "清理数据卷",
             "body": "是否确实要清理未使用的数据卷？",
@@ -384,6 +392,8 @@ export default {
         "service_notice": "这个服务属于编排 {stack}，通常你应该修改原始的编排而不是直接修改此服务信息，否则后续重新部署编排时这些修改将会丢失。",
         "password_notice": "你是 LDAP 用户，不能在这里修改密码。",
         "setting_notice": "你必须重启 Swirl 才能让设置生效。",
+        "prune_image_success": "共清理 {count} 个镜像，释放 {size} 空间。",
+        "prune_container_success": "共清理 {count} 个容器，释放 {size} 空间。",
         "prune_volume_success": "共清理 {count} 个数据卷，释放 {size} 空间。",
         "403": "很抱歉，你没有权限访问此页面",
         "404": "您要请求的页面已被移动、删除、重命名或可能不存在",
