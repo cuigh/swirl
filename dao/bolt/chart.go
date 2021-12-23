@@ -5,8 +5,8 @@ import (
 	"sort"
 	"time"
 
+	"github.com/cuigh/swirl/dao"
 	"github.com/cuigh/swirl/misc"
-	"github.com/cuigh/swirl/model"
 )
 
 const (
@@ -14,9 +14,9 @@ const (
 	Dashboard = "dashboard"
 )
 
-func (d *Dao) ChartSearch(ctx context.Context, args *model.ChartSearchArgs) (charts []*model.Chart, count int, err error) {
+func (d *Dao) ChartSearch(ctx context.Context, args *dao.ChartSearchArgs) (charts []*dao.Chart, count int, err error) {
 	err = d.each(Chart, func(v []byte) error {
-		chart := &model.Chart{}
+		chart := &dao.Chart{}
 		if err = decode(v, chart); err == nil {
 			match := true
 			if args.Title != "" {
@@ -42,12 +42,12 @@ func (d *Dao) ChartSearch(ctx context.Context, args *model.ChartSearchArgs) (cha
 	return
 }
 
-func (d *Dao) ChartCreate(ctx context.Context, chart *model.Chart) (err error) {
+func (d *Dao) ChartCreate(ctx context.Context, chart *dao.Chart) (err error) {
 	return d.replace(Chart, chart.ID, chart)
 }
 
-func (d *Dao) ChartGet(ctx context.Context, name string) (chart *model.Chart, err error) {
-	chart = &model.Chart{}
+func (d *Dao) ChartGet(ctx context.Context, name string) (chart *dao.Chart, err error) {
+	chart = &dao.Chart{}
 	err = d.get(Chart, name, chart)
 	if err == ErrNoRecords {
 		return nil, nil
@@ -57,9 +57,9 @@ func (d *Dao) ChartGet(ctx context.Context, name string) (chart *model.Chart, er
 	return
 }
 
-func (d *Dao) ChartGetBatch(ctx context.Context, ids ...string) (charts []*model.Chart, err error) {
+func (d *Dao) ChartGetBatch(ctx context.Context, ids ...string) (charts []*dao.Chart, err error) {
 	err = d.slice(Chart, func(v []byte) error {
-		chart := &model.Chart{}
+		chart := &dao.Chart{}
 		if err = decode(v, chart); err == nil {
 			charts = append(charts, chart)
 		}
@@ -68,8 +68,8 @@ func (d *Dao) ChartGetBatch(ctx context.Context, ids ...string) (charts []*model
 	return
 }
 
-func (d *Dao) ChartUpdate(ctx context.Context, chart *model.Chart) (err error) {
-	old := &model.Chart{}
+func (d *Dao) ChartUpdate(ctx context.Context, chart *dao.Chart) (err error) {
+	old := &dao.Chart{}
 	return d.update(Chart, chart.ID, old, func() interface{} {
 		chart.CreatedAt = old.CreatedAt
 		chart.CreatedBy = old.CreatedBy
@@ -81,8 +81,8 @@ func (d *Dao) ChartDelete(ctx context.Context, name string) (err error) {
 	return d.delete(Chart, name)
 }
 
-func (d *Dao) DashboardGet(ctx context.Context, name, key string) (dashboard *model.Dashboard, err error) {
-	dashboard = &model.Dashboard{
+func (d *Dao) DashboardGet(ctx context.Context, name, key string) (dashboard *dao.Dashboard, err error) {
+	dashboard = &dao.Dashboard{
 		Name: name,
 		Key:  key,
 	}
@@ -95,6 +95,6 @@ func (d *Dao) DashboardGet(ctx context.Context, name, key string) (dashboard *mo
 	return
 }
 
-func (d *Dao) DashboardUpdate(ctx context.Context, dashboard *model.Dashboard) (err error) {
+func (d *Dao) DashboardUpdate(ctx context.Context, dashboard *dao.Dashboard) (err error) {
 	return d.replace(Dashboard, dashboard.ID(), dashboard)
 }

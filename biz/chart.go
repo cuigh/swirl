@@ -5,16 +5,15 @@ import (
 
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/dao"
-	"github.com/cuigh/swirl/model"
 )
 
 type ChartBiz interface {
-	Search(args *model.ChartSearchArgs) (charts []*model.Chart, total int, err error)
+	Search(args *dao.ChartSearchArgs) (charts []*dao.Chart, total int, err error)
 	Delete(id, title string, user web.User) (err error)
-	Find(id string) (chart *model.Chart, err error)
-	Batch(ids ...string) (charts []*model.Chart, err error)
-	Create(chart *model.Chart, user web.User) (err error)
-	Update(chart *model.Chart, user web.User) (err error)
+	Find(id string) (chart *dao.Chart, err error)
+	Batch(ids ...string) (charts []*dao.Chart, err error)
+	Create(chart *dao.Chart, user web.User) (err error)
+	Update(chart *dao.Chart, user web.User) (err error)
 }
 
 func NewChart(d dao.Interface, mb MetricBiz, eb EventBiz) ChartBiz {
@@ -31,11 +30,11 @@ type chartBiz struct {
 	eb EventBiz
 }
 
-func (b *chartBiz) Search(args *model.ChartSearchArgs) (charts []*model.Chart, total int, err error) {
+func (b *chartBiz) Search(args *dao.ChartSearchArgs) (charts []*dao.Chart, total int, err error) {
 	return b.d.ChartSearch(context.TODO(), args)
 }
 
-func (b *chartBiz) Create(chart *model.Chart, user web.User) (err error) {
+func (b *chartBiz) Create(chart *dao.Chart, user web.User) (err error) {
 	chart.ID = createId()
 	chart.CreatedAt = now()
 	chart.CreatedBy = newOperator(user)
@@ -56,16 +55,16 @@ func (b *chartBiz) Delete(id, title string, user web.User) (err error) {
 	return
 }
 
-func (b *chartBiz) Find(id string) (chart *model.Chart, err error) {
+func (b *chartBiz) Find(id string) (chart *dao.Chart, err error) {
 	return b.d.ChartGet(context.TODO(), id)
 }
 
-func (b *chartBiz) Batch(ids ...string) (charts []*model.Chart, err error) {
+func (b *chartBiz) Batch(ids ...string) (charts []*dao.Chart, err error) {
 	charts, err = b.d.ChartGetBatch(context.TODO(), ids...)
 	return
 }
 
-func (b *chartBiz) Update(chart *model.Chart, user web.User) (err error) {
+func (b *chartBiz) Update(chart *dao.Chart, user web.User) (err error) {
 	chart.UpdatedAt = now()
 	chart.UpdatedBy = newOperator(user)
 	err = b.d.ChartUpdate(context.TODO(), chart)

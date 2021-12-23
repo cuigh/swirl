@@ -4,7 +4,7 @@ import (
 	"github.com/cuigh/auxo/data"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/biz"
-	"github.com/cuigh/swirl/model"
+	"github.com/cuigh/swirl/dao"
 	"github.com/cuigh/swirl/security"
 )
 
@@ -66,7 +66,7 @@ func userSignIn(auth *security.Identifier, eb biz.EventBiz) web.HandlerFunc {
 
 func userSave(b biz.UserBiz) web.HandlerFunc {
 	return func(ctx web.Context) error {
-		user := &model.User{}
+		user := &dao.User{}
 		err := ctx.Bind(user, true)
 		if err == nil {
 			if user.ID == "" {
@@ -167,7 +167,7 @@ func userModifyPassword(b biz.UserBiz) web.HandlerFunc {
 
 func userModifyProfile(b biz.UserBiz) web.HandlerFunc {
 	return func(ctx web.Context) error {
-		u := &model.User{}
+		u := &dao.User{}
 		err := ctx.Bind(u, true)
 		if err == nil {
 			err = b.ModifyProfile(u, ctx.User())

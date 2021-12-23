@@ -9,6 +9,7 @@ import (
 	"github.com/cuigh/auxo/errors"
 	"github.com/cuigh/auxo/log"
 	"github.com/cuigh/auxo/util/run"
+	"github.com/cuigh/swirl/dao"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
@@ -29,7 +30,7 @@ type Dao struct {
 }
 
 // New creates a Dao instance.
-func New(addr string) (*Dao, error) {
+func New(addr string) (dao.Interface, error) {
 	if addr == "" {
 		addr = "/data/swirl"
 	}
@@ -170,4 +171,8 @@ func matchAny(s string, list ...string) bool {
 		}
 	}
 	return false
+}
+
+func init() {
+	dao.Register("bolt", New)
 }

@@ -6,7 +6,6 @@ import (
 	"github.com/cuigh/auxo/log"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/dao"
-	"github.com/cuigh/swirl/model"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -47,7 +46,7 @@ const (
 )
 
 type EventBiz interface {
-	Search(args *model.EventSearchArgs) (events []*model.Event, total int, err error)
+	Search(args *dao.EventSearchArgs) (events []*dao.Event, total int, err error)
 	CreateRegistry(action EventAction, id, name string, user web.User)
 	CreateNode(action EventAction, id, name string, user web.User)
 	CreateNetwork(action EventAction, id, name string, user web.User)
@@ -73,12 +72,12 @@ type eventBiz struct {
 	d dao.Interface
 }
 
-func (b *eventBiz) Search(args *model.EventSearchArgs) (events []*model.Event, total int, err error) {
+func (b *eventBiz) Search(args *dao.EventSearchArgs) (events []*dao.Event, total int, err error) {
 	return b.d.EventSearch(context.TODO(), args)
 }
 
 func (b *eventBiz) create(et EventType, ea EventAction, code, name string, user web.User) {
-	event := &model.Event{
+	event := &dao.Event{
 		ID:       primitive.NewObjectID(),
 		Type:     string(et),
 		Action:   string(ea),

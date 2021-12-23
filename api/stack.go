@@ -5,8 +5,8 @@ import (
 
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/biz"
+	"github.com/cuigh/swirl/dao"
 	"github.com/cuigh/swirl/docker/compose"
-	"github.com/cuigh/swirl/model"
 )
 
 // StackHandler encapsulates stack related handlers.
@@ -54,7 +54,7 @@ func stackSearch(b biz.StackBiz) web.HandlerFunc {
 	return func(ctx web.Context) (err error) {
 		var (
 			args   = &Args{}
-			stacks []*model.Stack
+			stacks []*dao.Stack
 		)
 
 		if err = ctx.Bind(args); err == nil {
@@ -122,7 +122,7 @@ func stackDeploy(b biz.StackBiz) web.HandlerFunc {
 func stackSave(b biz.StackBiz) web.HandlerFunc {
 	type Args struct {
 		ID string `json:"id"`
-		model.Stack
+		dao.Stack
 	}
 
 	return func(ctx web.Context) error {

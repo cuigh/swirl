@@ -4,7 +4,7 @@ import (
 	"github.com/cuigh/auxo/data"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/biz"
-	"github.com/cuigh/swirl/model"
+	"github.com/cuigh/swirl/dao"
 )
 
 // ChartHandler encapsulates chart related handlers.
@@ -28,8 +28,8 @@ func NewChart(b biz.ChartBiz) *ChartHandler {
 func chartSearch(b biz.ChartBiz) web.HandlerFunc {
 	return func(ctx web.Context) (err error) {
 		var (
-			args   = &model.ChartSearchArgs{}
-			charts []*model.Chart
+			args   = &dao.ChartSearchArgs{}
+			charts []*dao.Chart
 			total  int
 		)
 
@@ -75,7 +75,7 @@ func chartDelete(b biz.ChartBiz) web.HandlerFunc {
 
 func chartSave(b biz.ChartBiz) web.HandlerFunc {
 	return func(ctx web.Context) error {
-		r := &model.Chart{}
+		r := &dao.Chart{}
 		err := ctx.Bind(r, true)
 		if err == nil {
 			if r.ID == "" {

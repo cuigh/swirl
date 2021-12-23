@@ -8,7 +8,7 @@ import (
 	"github.com/cuigh/auxo/ext/times"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/biz"
-	"github.com/cuigh/swirl/model"
+	"github.com/cuigh/swirl/dao"
 )
 
 // DashboardHandler encapsulates dashboard related handlers.
@@ -30,7 +30,7 @@ func NewDashboard(b biz.DashboardBiz) *DashboardHandler {
 func dashboardFind(b biz.DashboardBiz) web.HandlerFunc {
 	return func(ctx web.Context) (err error) {
 		var (
-			d    *model.Dashboard
+			d    *dao.Dashboard
 			name = ctx.Query("name")
 			key  = ctx.Query("key")
 		)
@@ -44,7 +44,7 @@ func dashboardFind(b biz.DashboardBiz) web.HandlerFunc {
 
 func dashboardSave(b biz.DashboardBiz) web.HandlerFunc {
 	return func(ctx web.Context) error {
-		dashboard := &model.Dashboard{}
+		dashboard := &dao.Dashboard{}
 		err := ctx.Bind(dashboard)
 		if err != nil {
 			return err

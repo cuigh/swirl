@@ -4,14 +4,14 @@ import (
 	"context"
 	"time"
 
-	"github.com/cuigh/swirl/model"
+	"github.com/cuigh/swirl/dao"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
 const Session = "session"
 
-func (d *Dao) SessionGet(ctx context.Context, id string) (session *model.Session, err error) {
-	session = &model.Session{}
+func (d *Dao) SessionGet(ctx context.Context, id string) (session *dao.Session, err error) {
+	session = &dao.Session{}
 	found, err := d.find(ctx, Session, id, session)
 	if !found {
 		return nil, err
@@ -19,11 +19,11 @@ func (d *Dao) SessionGet(ctx context.Context, id string) (session *model.Session
 	return
 }
 
-func (d *Dao) SessionCreate(ctx context.Context, session *model.Session) (err error) {
+func (d *Dao) SessionCreate(ctx context.Context, session *dao.Session) (err error) {
 	return d.create(ctx, Session, session)
 }
 
-func (d *Dao) SessionUpdate(ctx context.Context, session *model.Session) (err error) {
+func (d *Dao) SessionUpdate(ctx context.Context, session *dao.Session) (err error) {
 	return d.update(ctx, Session, session.ID, session)
 }
 

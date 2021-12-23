@@ -12,8 +12,8 @@ import (
 	"github.com/cuigh/auxo/security/certify/ldap"
 	"github.com/cuigh/auxo/security/passwd"
 	"github.com/cuigh/swirl/biz"
+	"github.com/cuigh/swirl/dao"
 	"github.com/cuigh/swirl/misc"
-	"github.com/cuigh/swirl/model"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -52,7 +52,7 @@ func (c *Identifier) Apply(next web.HandlerFunc) web.HandlerFunc {
 func (c *Identifier) Identify(loginName, password string) (identify Identity, err error) {
 	var (
 		u security.User
-		s *model.Session
+		s *dao.Session
 	)
 
 	u, err = c.signIn(loginName, password)
@@ -126,7 +126,7 @@ func (c *Identifier) identifyUser(token string) web.User {
 	return c.createUser(session)
 }
 
-func (c *Identifier) createUser(s *model.Session) web.User {
+func (c *Identifier) createUser(s *dao.Session) web.User {
 	return &User{
 		token: s.ID,
 		id:    s.UserID,
@@ -136,8 +136,8 @@ func (c *Identifier) createUser(s *model.Session) web.User {
 	}
 }
 
-func (c *Identifier) createSession(user security.User) (s *model.Session, err error) {
-	s = &model.Session{
+func (c *Identifier) createSession(user security.User) (s *dao.Session, err error) {
+	s = &dao.Session{
 		ID:       primitive.NewObjectID().Hex(),
 		UserID:   user.ID(),
 		Username: user.Name(),
@@ -150,14 +150,14 @@ func (c *Identifier) createSession(user security.User) (s *model.Session, err er
 	return
 }
 
-func (c *Identifier) updateSession(s *model.Session) (err error) {
+func (c *Identifier) updateSession(s *dao.Session) (err error) {
 	if err = c.fillSession(s); err == nil {
 		err = c.sb.Update(s)
 	}
 	return
 }
 
-func (c *Identifier) fillSession(s *model.Session) (err error) {
+func (c *Identifier) fillSession(s *dao.Session) (err error) {
 	u, err := c.ub.FindByID(s.UserID)
 	if err != nil {
 		return err
@@ -181,7 +181,7 @@ func (c *Identifier) fillSession(s *model.Session) (err error) {
 	return nil
 }
 
-func (c *Identifier) renewSession(s *model.Session) {
+func (c *Identifier) renewSession(s *dao.Session) {
 	expiry := time.Now().Add(misc.Options.TokenExpiry)
 	if expiry.After(s.MaxExpiry) {
 		expiry = s.MaxExpiry
@@ -253,7 +253,7 @@ func ldapRealm(s *misc.Setting, ub biz.UserBiz) RealmFunc {
 			lu = user.(*ldap.User)
 		)
 		if u == nil {
-			id, err = ub.Create(&model.User{
+			id, err = ub.Create(&dao.User{
 				Type:      biz.UserTypeLDAP,
 				LoginName: loginName,
 				Name:      lu.Name(),

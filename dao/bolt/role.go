@@ -3,14 +3,14 @@ package bolt
 import (
 	"context"
 
-	"github.com/cuigh/swirl/model"
+	"github.com/cuigh/swirl/dao"
 )
 
 const Role = "role"
 
-func (d *Dao) RoleSearch(ctx context.Context, name string) (roles []*model.Role, err error) {
+func (d *Dao) RoleSearch(ctx context.Context, name string) (roles []*dao.Role, err error) {
 	err = d.each(Role, func(v []byte) error {
-		role := &model.Role{}
+		role := &dao.Role{}
 		err = decode(v, role)
 		if err != nil {
 			return err
@@ -24,12 +24,12 @@ func (d *Dao) RoleSearch(ctx context.Context, name string) (roles []*model.Role,
 	return
 }
 
-func (d *Dao) RoleCreate(ctx context.Context, role *model.Role) (err error) {
+func (d *Dao) RoleCreate(ctx context.Context, role *dao.Role) (err error) {
 	return d.replace(Role, role.ID, role)
 }
 
-func (d *Dao) RoleGet(ctx context.Context, id string) (role *model.Role, err error) {
-	role = &model.Role{}
+func (d *Dao) RoleGet(ctx context.Context, id string) (role *dao.Role, err error) {
+	role = &dao.Role{}
 	err = d.get(Role, id, role)
 	if err == ErrNoRecords {
 		return nil, nil
@@ -39,8 +39,8 @@ func (d *Dao) RoleGet(ctx context.Context, id string) (role *model.Role, err err
 	return
 }
 
-func (d *Dao) RoleUpdate(ctx context.Context, role *model.Role) (err error) {
-	old := &model.Role{}
+func (d *Dao) RoleUpdate(ctx context.Context, role *dao.Role) (err error) {
+	old := &dao.Role{}
 	return d.update(Role, role.ID, old, func() interface{} {
 		role.CreatedAt = old.CreatedAt
 		role.CreatedBy = old.CreatedBy

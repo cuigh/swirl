@@ -5,15 +5,15 @@ import (
 	"sort"
 	"time"
 
+	"github.com/cuigh/swirl/dao"
 	"github.com/cuigh/swirl/misc"
-	"github.com/cuigh/swirl/model"
 )
 
 const Event = "event"
 
-func (d *Dao) EventSearch(ctx context.Context, args *model.EventSearchArgs) (events []*model.Event, count int, err error) {
+func (d *Dao) EventSearch(ctx context.Context, args *dao.EventSearchArgs) (events []*dao.Event, count int, err error) {
 	err = d.each(Event, func(v []byte) error {
-		event := &model.Event{}
+		event := &dao.Event{}
 		err = decode(v, event)
 		if err != nil {
 			return err
@@ -43,6 +43,6 @@ func (d *Dao) EventSearch(ctx context.Context, args *model.EventSearchArgs) (eve
 	return
 }
 
-func (d *Dao) EventCreate(ctx context.Context, event *model.Event) (err error) {
+func (d *Dao) EventCreate(ctx context.Context, event *dao.Event) (err error) {
 	return d.replace(Event, event.ID.Hex(), event)
 }

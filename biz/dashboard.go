@@ -10,21 +10,20 @@ import (
 	"github.com/cuigh/auxo/log"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/dao"
-	"github.com/cuigh/swirl/model"
 	"github.com/jinzhu/copier"
 )
 
-var builtins = []*model.Chart{
-	model.NewChart("service", "$cpu", "CPU", "${name}", `rate(container_cpu_user_seconds_total{container_label_com_docker_swarm_service_name="${service}"}[5m]) * 100`, "percent:100", 60),
-	model.NewChart("service", "$memory", "Memory", "${name}", `container_memory_usage_bytes{container_label_com_docker_swarm_service_name="${service}"}`, "size:bytes", 60),
-	model.NewChart("service", "$network_in", "Network Receive", "${name}", `sum(irate(container_network_receive_bytes_total{container_label_com_docker_swarm_service_name="${service}"}[5m])) by(name)`, "size:bytes", 60),
-	model.NewChart("service", "$network_out", "Network Send", "${name}", `sum(irate(container_network_transmit_bytes_total{container_label_com_docker_swarm_service_name="${service}"}[5m])) by(name)`, "size:bytes", 60),
+var builtins = []*dao.Chart{
+	dao.NewChart("service", "$cpu", "CPU", "${name}", `rate(container_cpu_user_seconds_total{container_label_com_docker_swarm_service_name="${service}"}[5m]) * 100`, "percent:100", 60),
+	dao.NewChart("service", "$memory", "Memory", "${name}", `container_memory_usage_bytes{container_label_com_docker_swarm_service_name="${service}"}`, "size:bytes", 60),
+	dao.NewChart("service", "$network_in", "Network Receive", "${name}", `sum(irate(container_network_receive_bytes_total{container_label_com_docker_swarm_service_name="${service}"}[5m])) by(name)`, "size:bytes", 60),
+	dao.NewChart("service", "$network_out", "Network Send", "${name}", `sum(irate(container_network_transmit_bytes_total{container_label_com_docker_swarm_service_name="${service}"}[5m])) by(name)`, "size:bytes", 60),
 }
 
 type DashboardBiz interface {
 	FetchData(key string, ids []string, period time.Duration) (data.Map, error)
-	FindDashboard(name, key string) (dashboard *model.Dashboard, err error)
-	UpdateDashboard(dashboard *model.Dashboard, user web.User) (err error)
+	FindDashboard(name, key string) (dashboard *dao.Dashboard, err error)
+	UpdateDashboard(dashboard *dao.Dashboard, user web.User) (err error)
 }
 
 func NewDashboard(d dao.Interface, mb MetricBiz, eb EventBiz) DashboardBiz {
@@ -42,7 +41,7 @@ type dashboardBiz struct {
 	eb EventBiz
 }
 
-func (b *dashboardBiz) FindDashboard(name, key string) (dashboard *model.Dashboard, err error) {
+func (b *dashboardBiz) FindDashboard(name, key string) (dashboard *dao.Dashboard, err error) {
 	if dashboard, err = b.d.DashboardGet(context.TODO(), name, key); err != nil {
 		return
 	}
@@ -53,7 +52,7 @@ func (b *dashboardBiz) FindDashboard(name, key string) (dashboard *model.Dashboa
 	return
 }
 
-func (b *dashboardBiz) UpdateDashboard(dashboard *model.Dashboard, user web.User) (err error) {
+func (b *dashboardBiz) UpdateDashboard(dashboard *dao.Dashboard, user web.User) (err error) {
 	dashboard.UpdatedAt = now()
 	dashboard.UpdatedBy = newOperator(user)
 	return b.d.DashboardUpdate(context.TODO(), dashboard)
@@ -79,7 +78,7 @@ func (b *dashboardBiz) FetchData(key string, ids []string, period time.Duration)
 	end := time.Now()
 	start := end.Add(-period)
 	for _, chart := range charts {
-		go func(c *model.Chart) {
+		go func(c *dao.Chart) {
 			d := Data{id: c.ID}
 			switch c.Type {
 			case "line", "bar":
@@ -108,7 +107,7 @@ func (b *dashboardBiz) FetchData(key string, ids []string, period time.Duration)
 	return ds, nil
 }
 
-func (b *dashboardBiz) fetchMatrixData(chart *model.Chart, key string, start, end time.Time) (md *MatrixData, err error) {
+func (b *dashboardBiz) fetchMatrixData(chart *dao.Chart, key string, start, end time.Time) (md *MatrixData, err error) {
 	var (
 		q string
 		d *MatrixData
@@ -131,7 +130,7 @@ func (b *dashboardBiz) fetchMatrixData(chart *model.Chart, key string, start, en
 	return md, nil
 }
 
-func (b *dashboardBiz) fetchVectorData(chart *model.Chart, key string, end time.Time) (cvd *VectorData, err error) {
+func (b *dashboardBiz) fetchVectorData(chart *dao.Chart, key string, end time.Time) (cvd *VectorData, err error) {
 	var (
 		q string
 		d *VectorData
@@ -154,7 +153,7 @@ func (b *dashboardBiz) fetchVectorData(chart *model.Chart, key string, end time.
 	return cvd, nil
 }
 
-func (b *dashboardBiz) fetchScalarData(chart *model.Chart, key string, end time.Time) (*VectorValue, error) {
+func (b *dashboardBiz) fetchScalarData(chart *dao.Chart, key string, end time.Time) (*VectorValue, error) {
 	query, err := b.formatQuery(chart.Metrics[0].Query, chart.Dashboard, key)
 	if err != nil {
 		return nil, err
@@ -191,13 +190,13 @@ func (b *dashboardBiz) formatQuery(query, dashboard, key string) (string, error)
 	return "", errs[0]
 }
 
-func (b *dashboardBiz) getCharts(ids []string) (charts map[string]*model.Chart, err error) {
+func (b *dashboardBiz) getCharts(ids []string) (charts map[string]*dao.Chart, err error) {
 	var (
 		customIds    []string
-		customCharts []*model.Chart
+		customCharts []*dao.Chart
 	)
 
-	charts = make(map[string]*model.Chart)
+	charts = make(map[string]*dao.Chart)
 	for _, id := range ids {
 		if id[0] == '$' {
 			for _, c := range builtins {
@@ -220,13 +219,13 @@ func (b *dashboardBiz) getCharts(ids []string) (charts map[string]*model.Chart, 
 	return
 }
 
-func (b *dashboardBiz) fillCharts(d *model.Dashboard) (err error) {
+func (b *dashboardBiz) fillCharts(d *dao.Dashboard) (err error) {
 	if len(d.Charts) == 0 {
 		return
 	}
 
 	var (
-		m   map[string]*model.Chart
+		m   map[string]*dao.Chart
 		ids = make([]string, len(d.Charts))
 	)
 
@@ -247,15 +246,15 @@ func (b *dashboardBiz) fillCharts(d *model.Dashboard) (err error) {
 	return nil
 }
 
-func (b *dashboardBiz) defaultDashboard(name, key string) *model.Dashboard {
-	d := &model.Dashboard{
+func (b *dashboardBiz) defaultDashboard(name, key string) *dao.Dashboard {
+	d := &dao.Dashboard{
 		Name:     name,
 		Key:      key,
 		Period:   30,
 		Interval: 15,
 	}
 	if name == "service" {
-		d.Charts = []model.ChartInfo{
+		d.Charts = []dao.ChartInfo{
 			{ID: "$cpu"},
 			{ID: "$memory"},
 			{ID: "$network_in"},

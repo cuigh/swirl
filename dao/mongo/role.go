@@ -3,28 +3,28 @@ package mongo
 import (
 	"context"
 
-	"github.com/cuigh/swirl/model"
+	"github.com/cuigh/swirl/dao"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
 const Role = "role"
 
-func (d *Dao) RoleSearch(ctx context.Context, name string) (roles []*model.Role, err error) {
+func (d *Dao) RoleSearch(ctx context.Context, name string) (roles []*dao.Role, err error) {
 	filter := bson.M{}
 	if name != "" {
 		filter["name"] = name
 	}
-	roles = []*model.Role{}
+	roles = []*dao.Role{}
 	err = d.fetch(ctx, Role, filter, &roles)
 	return
 }
 
-func (d *Dao) RoleCreate(ctx context.Context, role *model.Role) (err error) {
+func (d *Dao) RoleCreate(ctx context.Context, role *dao.Role) (err error) {
 	return d.create(ctx, Role, role)
 }
 
-func (d *Dao) RoleGet(ctx context.Context, id string) (role *model.Role, err error) {
-	role = &model.Role{}
+func (d *Dao) RoleGet(ctx context.Context, id string) (role *dao.Role, err error) {
+	role = &dao.Role{}
 	found, err := d.find(ctx, Role, id, role)
 	if !found {
 		return nil, err
@@ -32,7 +32,7 @@ func (d *Dao) RoleGet(ctx context.Context, id string) (role *model.Role, err err
 	return
 }
 
-func (d *Dao) RoleUpdate(ctx context.Context, role *model.Role) (err error) {
+func (d *Dao) RoleUpdate(ctx context.Context, role *dao.Role) (err error) {
 	update := bson.M{
 		"$set": bson.M{
 			"name":       role.Name,

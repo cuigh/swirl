@@ -8,7 +8,6 @@ import (
 	"github.com/cuigh/auxo/security/passwd"
 	"github.com/cuigh/swirl/dao"
 	"github.com/cuigh/swirl/misc"
-	"github.com/cuigh/swirl/model"
 )
 
 const (
@@ -26,17 +25,17 @@ const (
 )
 
 type UserBiz interface {
-	Search(name, loginName, filter string, pageIndex, pageSize int) (users []*model.User, total int, err error)
-	Create(user *model.User, ctxUser web.User) (id string, err error)
-	Update(user *model.User, ctxUser web.User) (err error)
-	FindByID(id string) (user *model.User, err error)
-	FindByName(loginName string) (user *model.User, err error)
+	Search(name, loginName, filter string, pageIndex, pageSize int) (users []*dao.User, total int, err error)
+	Create(user *dao.User, ctxUser web.User) (id string, err error)
+	Update(user *dao.User, ctxUser web.User) (err error)
+	FindByID(id string) (user *dao.User, err error)
+	FindByName(loginName string) (user *dao.User, err error)
 	FindPrivacy(loginName string) (privacy *UserPrivacy, err error)
 	Count() (count int, err error)
 	Delete(id, name string, user web.User) (err error)
 	SetStatus(id string, status int32, user web.User) (err error)
 	ModifyPassword(oldPwd, newPwd string, user web.User) (err error)
-	ModifyProfile(user *model.User, ctxUser web.User) (err error)
+	ModifyProfile(user *dao.User, ctxUser web.User) (err error)
 }
 
 func NewUser(d dao.Interface, eb EventBiz) UserBiz {
@@ -48,8 +47,8 @@ type userBiz struct {
 	eb EventBiz
 }
 
-func (b *userBiz) Search(name, loginName, filter string, pageIndex, pageSize int) (users []*model.User, total int, err error) {
-	var args = &model.UserSearchArgs{
+func (b *userBiz) Search(name, loginName, filter string, pageIndex, pageSize int) (users []*dao.User, total int, err error) {
+	var args = &dao.UserSearchArgs{
 		Name:      name,
 		LoginName: loginName,
 		Status:    -1,
@@ -69,16 +68,16 @@ func (b *userBiz) Search(name, loginName, filter string, pageIndex, pageSize int
 	return b.d.UserSearch(context.TODO(), args)
 }
 
-func (b *userBiz) FindByID(id string) (user *model.User, err error) {
+func (b *userBiz) FindByID(id string) (user *dao.User, err error) {
 	return b.d.UserGet(context.TODO(), id)
 }
 
-func (b *userBiz) FindByName(loginName string) (user *model.User, err error) {
+func (b *userBiz) FindByName(loginName string) (user *dao.User, err error) {
 	return b.d.UserGetByName(context.TODO(), loginName)
 }
 
 func (b *userBiz) FindPrivacy(loginName string) (privacy *UserPrivacy, err error) {
-	var u *model.User
+	var u *dao.User
 	u, err = b.d.UserGetByName(context.TODO(), loginName)
 	if u != nil {
 		privacy = &UserPrivacy{
@@ -93,7 +92,7 @@ func (b *userBiz) FindPrivacy(loginName string) (privacy *UserPrivacy, err error
 	return
 }
 
-func (b *userBiz) Create(user *model.User, ctxUser web.User) (id string, err error) {
+func (b *userBiz) Create(user *dao.User, ctxUser web.User) (id string, err error) {
 	user.ID = createId()
 	user.Status = UserStatusActive
 	user.CreatedAt = now()
@@ -116,7 +115,7 @@ func (b *userBiz) Create(user *model.User, ctxUser web.User) (id string, err err
 	return
 }
 
-func (b *userBiz) Update(user *model.User, ctxUser web.User) (err error) {
+func (b *userBiz) Update(user *dao.User, ctxUser web.User) (err error) {
 	user.UpdatedAt = now()
 	user.UpdatedBy = newOperator(ctxUser)
 	if err = b.d.UserUpdate(context.TODO(), user); err == nil {
@@ -126,7 +125,7 @@ func (b *userBiz) Update(user *model.User, ctxUser web.User) (err error) {
 }
 
 func (b *userBiz) SetStatus(id string, status int32, user web.User) (err error) {
-	u := &model.User{
+	u := &dao.User{
 		ID:        id,
 		Status:    status,
 		UpdatedAt: now(),
@@ -144,7 +143,7 @@ func (b *userBiz) Delete(id, name string, user web.User) (err error) {
 }
 
 func (b *userBiz) ModifyPassword(oldPwd, newPwd string, user web.User) (err error) {
-	var u *model.User
+	var u *dao.User
 	u, err = b.d.UserGet(context.TODO(), user.ID())
 	if err != nil {
 		return err
@@ -165,7 +164,7 @@ func (b *userBiz) ModifyPassword(oldPwd, newPwd string, user web.User) (err erro
 	return b.d.UserUpdatePassword(context.TODO(), u)
 }
 
-func (b *userBiz) ModifyProfile(u *model.User, user web.User) (err error) {
+func (b *userBiz) ModifyProfile(u *dao.User, user web.User) (err error) {
 	u.ID = user.ID()
 	u.UpdatedAt = now()
 	u.UpdatedBy = newOperator(user)

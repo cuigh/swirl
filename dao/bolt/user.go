@@ -3,8 +3,8 @@ package bolt
 import (
 	"context"
 
+	"github.com/cuigh/swirl/dao"
 	"github.com/cuigh/swirl/misc"
-	"github.com/cuigh/swirl/model"
 )
 
 const User = "user"
@@ -13,12 +13,12 @@ func (d *Dao) UserCount(ctx context.Context) (count int, err error) {
 	return d.count(User)
 }
 
-func (d *Dao) UserCreate(ctx context.Context, user *model.User) (err error) {
+func (d *Dao) UserCreate(ctx context.Context, user *dao.User) (err error) {
 	return d.replace(User, user.ID, user)
 }
 
-func (d *Dao) UserUpdate(ctx context.Context, user *model.User) (err error) {
-	old := &model.User{}
+func (d *Dao) UserUpdate(ctx context.Context, user *dao.User) (err error) {
+	old := &dao.User{}
 	return d.update(User, user.ID, old, func() interface{} {
 		old.Name = user.Name
 		old.LoginName = user.LoginName
@@ -32,8 +32,8 @@ func (d *Dao) UserUpdate(ctx context.Context, user *model.User) (err error) {
 	})
 }
 
-func (d *Dao) UserUpdateStatus(ctx context.Context, user *model.User) (err error) {
-	old := &model.User{}
+func (d *Dao) UserUpdateStatus(ctx context.Context, user *dao.User) (err error) {
+	old := &dao.User{}
 	return d.update(User, user.ID, old, func() interface{} {
 		old.Status = user.Status
 		old.UpdatedAt = user.UpdatedAt
@@ -46,9 +46,9 @@ func (d *Dao) UserDelete(ctx context.Context, id string) (err error) {
 	return d.delete(User, id)
 }
 
-func (d *Dao) UserSearch(ctx context.Context, args *model.UserSearchArgs) (users []*model.User, count int, err error) {
+func (d *Dao) UserSearch(ctx context.Context, args *dao.UserSearchArgs) (users []*dao.User, count int, err error) {
 	err = d.each(User, func(v []byte) error {
-		user := &model.User{}
+		user := &dao.User{}
 		err = decode(v, user)
 		if err != nil {
 			return err
@@ -81,8 +81,8 @@ func (d *Dao) UserSearch(ctx context.Context, args *model.UserSearchArgs) (users
 	return
 }
 
-func (d *Dao) UserGet(ctx context.Context, id string) (user *model.User, err error) {
-	user = &model.User{}
+func (d *Dao) UserGet(ctx context.Context, id string) (user *dao.User, err error) {
+	user = &dao.User{}
 	err = d.get(User, id, user)
 	if err == ErrNoRecords {
 		return nil, nil
@@ -92,8 +92,8 @@ func (d *Dao) UserGet(ctx context.Context, id string) (user *model.User, err err
 	return
 }
 
-func (d *Dao) UserGetByName(ctx context.Context, loginName string) (user *model.User, err error) {
-	u := &model.User{}
+func (d *Dao) UserGetByName(ctx context.Context, loginName string) (user *dao.User, err error) {
+	u := &dao.User{}
 	found, err := d.find(User, u, func() bool { return u.LoginName == loginName })
 	if found {
 		return u, nil
@@ -101,8 +101,8 @@ func (d *Dao) UserGetByName(ctx context.Context, loginName string) (user *model.
 	return nil, err
 }
 
-func (d *Dao) UserUpdateProfile(ctx context.Context, user *model.User) (err error) {
-	old := &model.User{}
+func (d *Dao) UserUpdateProfile(ctx context.Context, user *dao.User) (err error) {
+	old := &dao.User{}
 	return d.update(User, user.ID, old, func() interface{} {
 		old.Name = user.Name
 		old.LoginName = user.LoginName
@@ -113,8 +113,8 @@ func (d *Dao) UserUpdateProfile(ctx context.Context, user *model.User) (err erro
 	})
 }
 
-func (d *Dao) UserUpdatePassword(ctx context.Context, user *model.User) (err error) {
-	old := &model.User{}
+func (d *Dao) UserUpdatePassword(ctx context.Context, user *dao.User) (err error) {
+	old := &dao.User{}
 	return d.update(User, user.ID, old, func() interface{} {
 		old.Password = user.Password
 		old.Salt = user.Salt

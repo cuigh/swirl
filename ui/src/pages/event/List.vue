@@ -61,6 +61,7 @@ import type { Event } from "@/api/event";
 import { useDataTable } from "@/utils/data-table";
 import { renderLink, renderTag, renderTime } from "@/utils/render";
 import { useI18n } from 'vue-i18n'
+import type { RouteLocationRaw } from "vue-router";
 
 const { t } = useI18n()
 const filter = reactive({
@@ -173,10 +174,7 @@ const columns = [
     key: "name",
     render(e: Event) {
       const u = url(e)
-      if (u === '') {
-        return e.name
-      }
-      return renderLink(u, e.name)
+      return u ? renderLink(u, e.name) : e.name
     },
   },
   {
@@ -192,34 +190,42 @@ const columns = [
 ];
 const { state, pagination, fetchData, changePageSize } = useDataTable(eventApi.search, filter)
 
-function url(e: Event): string {
+function url(e: Event): RouteLocationRaw | null {
+  if (e.type === 'Setting') {
+    return { name: 'setting' }
+  } else if (!e.code) {
+    return null
+  }
+
   switch (e.type) {
     case "User":
-      return `/system/users/${e.code}`
+      return { name: 'user_detail', params: { id: e.code } }
     case "Role":
-      return `/system/roles/${e.code}`
+      return { name: 'role_detail', params: { id: e.code } }
     case "Chart":
-      return `/system/charts/${e.code}`
-    case "Setting":
-      return '/system/settings'
+      return { name: 'chart_detail', params: { id: e.code } }
     case "Registry":
-      return `/swarm/registries/${e.code}`
+      return { name: 'registry_detail', params: { id: e.code } }
     case "Node":
-      return `/swarm/nodes/${e.code}`
+      return { name: 'node_detail', params: { id: e.code } }
     case "Network":
-      return `/swarm/networks/${e.code}`
+      return { name: 'network_detail', params: { name: e.code } }
     case "Service":
-      return `/swarm/services/${e.code}`
+      return { name: 'service_detail', params: { name: e.code } }
     case "Stack":
-      return `/swarm/stacks/${e.code}`
+      return { name: 'stack_detail', params: { name: e.code } }
     case "Config":
-      return `/swarm/configs/${e.code}`
+      return { name: 'config_detail', params: { id: e.code } }
     case "Secret":
-      return `/swarm/secrets/${e.code}`
+      return { name: 'secret_detail', params: { id: e.code } }
+    case "Image":
+      return { name: 'image_detail', params: { node: '-', id: e.code } }
+    case "Container":
+      return { name: 'container_detail', params: { node: '-', id: e.code } }
     case "Volume":
-      return `/local/volumes/${e.code}`
+      return { name: 'volume_detail', params: { node: '-', name: e.code } }
   }
-  return ''
+  return null
 }
 
 function prune() {

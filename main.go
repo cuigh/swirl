@@ -10,7 +10,6 @@ import (
 	"github.com/cuigh/auxo/app"
 	"github.com/cuigh/auxo/app/container"
 	"github.com/cuigh/auxo/app/flag"
-	_ "github.com/cuigh/auxo/cache/memory"
 	"github.com/cuigh/auxo/data"
 	"github.com/cuigh/auxo/data/valid"
 	"github.com/cuigh/auxo/errors"
@@ -20,6 +19,8 @@ import (
 	"github.com/cuigh/auxo/util/run"
 	_ "github.com/cuigh/swirl/api"
 	"github.com/cuigh/swirl/biz"
+	_ "github.com/cuigh/swirl/dao/bolt"
+	_ "github.com/cuigh/swirl/dao/mongo"
 	"github.com/cuigh/swirl/misc"
 	"github.com/cuigh/swirl/scaler"
 )
@@ -31,7 +32,7 @@ var (
 
 func main() {
 	app.Name = "Swirl"
-	app.Version = "1.0.0beta6"
+	app.Version = "1.0.0beta7"
 	app.Desc = "A web management UI for Docker, focused on swarm cluster"
 	app.Action = func(ctx *app.Context) error {
 		return run.Pipeline(misc.LoadOptions, initSystem, scaler.Start, startServer)

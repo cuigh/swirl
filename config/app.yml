@@ -22,11 +22,3 @@ log:
   - name: console
     type: console
     layout: '[{L}]{T}: {M}{N}'
-
-cache:
-- provider: memory
-  enabled: true
-  error: log
-  time: 10m
-  keys:
-#    auth_user: 3m

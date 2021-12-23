@@ -5,15 +5,14 @@ import (
 
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/dao"
-	"github.com/cuigh/swirl/model"
 )
 
 type RoleBiz interface {
-	Search(name string) ([]*model.Role, error)
-	Find(id string) (role *model.Role, err error)
-	Create(role *model.Role, user web.User) (err error)
+	Search(name string) ([]*dao.Role, error)
+	Find(id string) (role *dao.Role, err error)
+	Create(role *dao.Role, user web.User) (err error)
 	Delete(id, name string, user web.User) (err error)
-	Update(r *model.Role, user web.User) (err error)
+	Update(r *dao.Role, user web.User) (err error)
 	GetPerms(ids []string) ([]string, error)
 }
 
@@ -26,12 +25,12 @@ type roleBiz struct {
 	eb EventBiz
 }
 
-func (b *roleBiz) Search(name string) (roles []*model.Role, err error) {
+func (b *roleBiz) Search(name string) (roles []*dao.Role, err error) {
 	return b.d.RoleSearch(context.TODO(), name)
 }
 
-func (b *roleBiz) Create(role *model.Role, user web.User) (err error) {
-	r := &model.Role{
+func (b *roleBiz) Create(role *dao.Role, user web.User) (err error) {
+	r := &dao.Role{
 		ID:          createId(),
 		Name:        role.Name,
 		Description: role.Description,
@@ -56,12 +55,12 @@ func (b *roleBiz) Delete(id, name string, user web.User) (err error) {
 	return
 }
 
-func (b *roleBiz) Find(id string) (role *model.Role, err error) {
+func (b *roleBiz) Find(id string) (role *dao.Role, err error) {
 	return b.d.RoleGet(context.TODO(), id)
 }
 
-func (b *roleBiz) Update(role *model.Role, user web.User) (err error) {
-	r := &model.Role{
+func (b *roleBiz) Update(role *dao.Role, user web.User) (err error) {
+	r := &dao.Role{
 		ID:          role.ID,
 		Name:        role.Name,
 		Description: role.Description,

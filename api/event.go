@@ -5,7 +5,7 @@ import (
 	"github.com/cuigh/auxo/errors"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/biz"
-	"github.com/cuigh/swirl/model"
+	"github.com/cuigh/swirl/dao"
 )
 
 // EventHandler encapsulates event related handlers.
@@ -25,8 +25,8 @@ func NewEvent(b biz.EventBiz) *EventHandler {
 func eventSearch(b biz.EventBiz) web.HandlerFunc {
 	return func(ctx web.Context) (err error) {
 		var (
-			args   = &model.EventSearchArgs{}
-			events []*model.Event
+			args   = &dao.EventSearchArgs{}
+			events []*dao.Event
 			total  int
 		)
 

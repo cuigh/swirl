@@ -10,17 +10,16 @@ import (
 	"github.com/cuigh/swirl/docker"
 	"github.com/cuigh/swirl/docker/compose"
 	"github.com/cuigh/swirl/misc"
-	"github.com/cuigh/swirl/model"
 )
 
 type StackBiz interface {
-	Search(name, filter string) (stacks []*model.Stack, err error)
-	Find(name string) (stack *model.Stack, err error)
+	Search(name, filter string) (stacks []*dao.Stack, err error)
+	Find(name string) (stack *dao.Stack, err error)
 	Delete(name string, user web.User) (err error)
 	Shutdown(name string, user web.User) (err error)
 	Deploy(name string, user web.User) (err error)
-	Create(s *model.Stack, user web.User) (err error)
-	Update(s *model.Stack, user web.User) (err error)
+	Create(s *dao.Stack, user web.User) (err error)
+	Update(s *dao.Stack, user web.User) (err error)
 }
 
 func NewStack(d *docker.Docker, s dao.Interface, eb EventBiz) StackBiz {
@@ -33,10 +32,10 @@ type stackBiz struct {
 	eb EventBiz
 }
 
-func (b *stackBiz) Search(name, filter string) (stacks []*model.Stack, err error) {
+func (b *stackBiz) Search(name, filter string) (stacks []*dao.Stack, err error) {
 	var (
 		activeStacks   map[string][]string
-		internalStacks []*model.Stack
+		internalStacks []*dao.Stack
 	)
 
 	// load real stacks
@@ -63,7 +62,7 @@ func (b *stackBiz) Search(name, filter string) (stacks []*model.Stack, err error
 		}
 	}
 	for n, services := range activeStacks {
-		stack := &model.Stack{Name: n, Services: services}
+		stack := &dao.Stack{Name: n, Services: services}
 		if !b.filter(stack, name, filter) {
 			stacks = append(stacks, stack)
 		}
@@ -71,17 +70,17 @@ func (b *stackBiz) Search(name, filter string) (stacks []*model.Stack, err error
 	return
 }
 
-func (b *stackBiz) Find(name string) (s *model.Stack, err error) {
+func (b *stackBiz) Find(name string) (s *dao.Stack, err error) {
 	s, err = b.s.StackGet(context.TODO(), name)
 	if err != nil {
 		return nil, err
 	} else if s == nil {
-		s = &model.Stack{Name: name}
+		s = &dao.Stack{Name: name}
 	}
 	return
 }
 
-func (b *stackBiz) filter(stack *model.Stack, name, filter string) bool {
+func (b *stackBiz) filter(stack *dao.Stack, name, filter string) bool {
 	if name != "" {
 		if !strings.Contains(strings.ToLower(stack.Name), strings.ToLower(name)) {
 			return true
@@ -106,8 +105,8 @@ func (b *stackBiz) filter(stack *model.Stack, name, filter string) bool {
 	return false
 }
 
-func (b *stackBiz) Create(s *model.Stack, user web.User) (err error) {
-	stack := &model.Stack{
+func (b *stackBiz) Create(s *dao.Stack, user web.User) (err error) {
+	stack := &dao.Stack{
 		Name:      s.Name,
 		Content:   s.Content,
 		CreatedAt: now(),
@@ -122,8 +121,8 @@ func (b *stackBiz) Create(s *model.Stack, user web.User) (err error) {
 	return
 }
 
-func (b *stackBiz) Update(s *model.Stack, user web.User) (err error) {
-	stack := &model.Stack{
+func (b *stackBiz) Update(s *dao.Stack, user web.User) (err error) {
+	stack := &dao.Stack{
 		Name:      s.Name,
 		Content:   s.Content,
 		UpdatedAt: now(),

@@ -7,6 +7,7 @@ import (
 
 	"github.com/cuigh/auxo/app"
 	"github.com/cuigh/auxo/log"
+	"github.com/cuigh/swirl/dao"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -47,7 +48,7 @@ type Dao struct {
 	logger log.Logger
 }
 
-func New(addr string) (*Dao, error) {
+func New(addr string) (dao.Interface, error) {
 	db, err := open(addr)
 	if err != nil {
 		return nil, err
@@ -174,4 +175,8 @@ type searchOptions struct {
 	sorter    bson.M
 	pageIndex int
 	pageSize  int
+}
+
+func init() {
+	dao.Register("mongo", New)
 }

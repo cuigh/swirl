@@ -7,17 +7,16 @@ import (
 
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/dao"
-	"github.com/cuigh/swirl/model"
 	"github.com/docker/docker/api/types"
 )
 
 type RegistryBiz interface {
-	Search() ([]*model.Registry, error)
-	Find(id string) (*model.Registry, error)
+	Search() ([]*dao.Registry, error)
+	Find(id string) (*dao.Registry, error)
 	GetAuth(url string) (auth string, err error)
 	Delete(id, name string, user web.User) (err error)
-	Create(registry *model.Registry, user web.User) (err error)
-	Update(registry *model.Registry, user web.User) (err error)
+	Create(registry *dao.Registry, user web.User) (err error)
+	Update(registry *dao.Registry, user web.User) (err error)
 }
 
 func NewRegistry(d dao.Interface, eb EventBiz) RegistryBiz {
@@ -29,7 +28,7 @@ type registryBiz struct {
 	eb EventBiz
 }
 
-func (b *registryBiz) Create(r *model.Registry, user web.User) (err error) {
+func (b *registryBiz) Create(r *dao.Registry, user web.User) (err error) {
 	r.ID = createId()
 	r.CreatedAt = now()
 	r.UpdatedAt = r.CreatedAt
@@ -43,7 +42,7 @@ func (b *registryBiz) Create(r *model.Registry, user web.User) (err error) {
 	return
 }
 
-func (b *registryBiz) Update(r *model.Registry, user web.User) (err error) {
+func (b *registryBiz) Update(r *dao.Registry, user web.User) (err error) {
 	r.UpdatedAt = now()
 	r.UpdatedBy = newOperator(user)
 	err = b.d.RegistryUpdate(context.TODO(), r)
@@ -53,7 +52,7 @@ func (b *registryBiz) Update(r *model.Registry, user web.User) (err error) {
 	return
 }
 
-func (b *registryBiz) Search() (registries []*model.Registry, err error) {
+func (b *registryBiz) Search() (registries []*dao.Registry, err error) {
 	registries, err = b.d.RegistryGetAll(context.TODO())
 	if err == nil {
 		for _, r := range registries {
@@ -63,7 +62,7 @@ func (b *registryBiz) Search() (registries []*model.Registry, err error) {
 	return
 }
 
-func (b *registryBiz) Find(id string) (registry *model.Registry, err error) {
+func (b *registryBiz) Find(id string) (registry *dao.Registry, err error) {
 	registry, err = b.d.RegistryGet(context.TODO(), id)
 	if err == nil {
 		registry.Password = ""
@@ -73,7 +72,7 @@ func (b *registryBiz) Find(id string) (registry *model.Registry, err error) {
 
 func (b *registryBiz) GetAuth(url string) (auth string, err error) {
 	var (
-		r   *model.Registry
+		r   *dao.Registry
 		buf []byte
 	)
 	if r, err = b.d.RegistryGetByURL(context.TODO(), url); err == nil && r != nil {

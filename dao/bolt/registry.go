@@ -3,17 +3,17 @@ package bolt
 import (
 	"context"
 
-	"github.com/cuigh/swirl/model"
+	"github.com/cuigh/swirl/dao"
 )
 
 const Registry = "registry"
 
-func (d *Dao) RegistryCreate(ctx context.Context, registry *model.Registry) (err error) {
+func (d *Dao) RegistryCreate(ctx context.Context, registry *dao.Registry) (err error) {
 	return d.replace(Registry, registry.ID, registry)
 }
 
-func (d *Dao) RegistryUpdate(ctx context.Context, registry *model.Registry) (err error) {
-	old := &model.Registry{}
+func (d *Dao) RegistryUpdate(ctx context.Context, registry *dao.Registry) (err error) {
+	old := &dao.Registry{}
 	return d.update(Registry, registry.ID, old, func() interface{} {
 		registry.CreatedAt = old.CreatedAt
 		registry.CreatedBy = old.CreatedBy
@@ -24,9 +24,9 @@ func (d *Dao) RegistryUpdate(ctx context.Context, registry *model.Registry) (err
 	})
 }
 
-func (d *Dao) RegistryGetAll(ctx context.Context) (registries []*model.Registry, err error) {
+func (d *Dao) RegistryGetAll(ctx context.Context) (registries []*dao.Registry, err error) {
 	err = d.each(Registry, func(v []byte) error {
-		r := &model.Registry{}
+		r := &dao.Registry{}
 		err = decode(v, r)
 		if err != nil {
 			return err
@@ -37,8 +37,8 @@ func (d *Dao) RegistryGetAll(ctx context.Context) (registries []*model.Registry,
 	return
 }
 
-func (d *Dao) RegistryGet(ctx context.Context, id string) (registry *model.Registry, err error) {
-	registry = &model.Registry{}
+func (d *Dao) RegistryGet(ctx context.Context, id string) (registry *dao.Registry, err error) {
+	registry = &dao.Registry{}
 	err = d.get(Registry, id, registry)
 	if err == ErrNoRecords {
 		return nil, nil
@@ -48,8 +48,8 @@ func (d *Dao) RegistryGet(ctx context.Context, id string) (registry *model.Regis
 	return
 }
 
-func (d *Dao) RegistryGetByURL(ctx context.Context, url string) (registry *model.Registry, err error) {
-	r := &model.Registry{}
+func (d *Dao) RegistryGetByURL(ctx context.Context, url string) (registry *dao.Registry, err error) {
+	r := &dao.Registry{}
 	found, err := d.find(Registry, r, func() bool { return r.URL == url })
 	if found {
 		return r, nil

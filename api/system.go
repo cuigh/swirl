@@ -9,9 +9,9 @@ import (
 	"github.com/cuigh/auxo/errors"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/biz"
+	"github.com/cuigh/swirl/dao"
 	"github.com/cuigh/swirl/docker"
 	"github.com/cuigh/swirl/misc"
-	"github.com/cuigh/swirl/model"
 )
 
 // SystemHandler encapsulates system related handlers.
@@ -77,7 +77,7 @@ func systemSummarize(d *docker.Docker) web.HandlerFunc {
 
 func systemCreateAdmin(ub biz.UserBiz) web.HandlerFunc {
 	return func(c web.Context) (err error) {
-		user := &model.User{}
+		user := &dao.User{}
 		if err = c.Bind(user, true); err != nil {
 			return err
 		}

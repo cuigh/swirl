@@ -3,7 +3,7 @@ package mongo
 import (
 	"context"
 
-	"github.com/cuigh/swirl/model"
+	"github.com/cuigh/swirl/dao"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
@@ -12,7 +12,7 @@ const (
 	Dashboard = "dashboard"
 )
 
-func (d *Dao) ChartSearch(ctx context.Context, args *model.ChartSearchArgs) (charts []*model.Chart, count int, err error) {
+func (d *Dao) ChartSearch(ctx context.Context, args *dao.ChartSearchArgs) (charts []*dao.Chart, count int, err error) {
 	filter := bson.M{}
 	if args.Title != "" {
 		filter["title"] = args.Title
@@ -21,17 +21,17 @@ func (d *Dao) ChartSearch(ctx context.Context, args *model.ChartSearchArgs) (cha
 		filter["dashboard"] = bson.M{"$in": []string{"", args.Dashboard}}
 	}
 	opts := searchOptions{filter: filter, sorter: bson.M{"updated_at": -1}, pageIndex: args.PageIndex, pageSize: args.PageSize}
-	charts = []*model.Chart{}
+	charts = []*dao.Chart{}
 	count, err = d.search(ctx, Chart, opts, &charts)
 	return
 }
 
-func (d *Dao) ChartCreate(ctx context.Context, chart *model.Chart) (err error) {
+func (d *Dao) ChartCreate(ctx context.Context, chart *dao.Chart) (err error) {
 	return d.create(ctx, Chart, chart)
 }
 
-func (d *Dao) ChartGet(ctx context.Context, id string) (chart *model.Chart, err error) {
-	chart = &model.Chart{}
+func (d *Dao) ChartGet(ctx context.Context, id string) (chart *dao.Chart, err error) {
+	chart = &dao.Chart{}
 	found, err := d.find(ctx, Chart, id, chart)
 	if !found {
 		return nil, err
@@ -39,13 +39,13 @@ func (d *Dao) ChartGet(ctx context.Context, id string) (chart *model.Chart, err 
 	return
 }
 
-func (d *Dao) ChartGetBatch(ctx context.Context, names ...string) (charts []*model.Chart, err error) {
-	charts = []*model.Chart{}
+func (d *Dao) ChartGetBatch(ctx context.Context, names ...string) (charts []*dao.Chart, err error) {
+	charts = []*dao.Chart{}
 	err = d.fetch(ctx, Chart, bson.M{"_id": bson.M{"$in": names}}, &charts)
 	return
 }
 
-func (d *Dao) ChartUpdate(ctx context.Context, chart *model.Chart) (err error) {
+func (d *Dao) ChartUpdate(ctx context.Context, chart *dao.Chart) (err error) {
 	update := bson.M{
 		"$set": bson.M{
 			"title":      chart.Title,
@@ -68,8 +68,8 @@ func (d *Dao) ChartDelete(ctx context.Context, id string) (err error) {
 	return d.delete(ctx, Chart, id)
 }
 
-func (d *Dao) DashboardGet(ctx context.Context, name, key string) (dashboard *model.Dashboard, err error) {
-	dashboard = &model.Dashboard{
+func (d *Dao) DashboardGet(ctx context.Context, name, key string) (dashboard *dao.Dashboard, err error) {
+	dashboard = &dao.Dashboard{
 		Name: name,
 		Key:  key,
 	}
@@ -80,7 +80,7 @@ func (d *Dao) DashboardGet(ctx context.Context, name, key string) (dashboard *mo
 	return
 }
 
-func (d *Dao) DashboardUpdate(ctx context.Context, dashboard *model.Dashboard) (err error) {
+func (d *Dao) DashboardUpdate(ctx context.Context, dashboard *dao.Dashboard) (err error) {
 	update := bson.M{
 		"$set": dashboard,
 	}

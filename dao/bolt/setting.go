@@ -3,14 +3,14 @@ package bolt
 import (
 	"context"
 
-	"github.com/cuigh/swirl/model"
+	"github.com/cuigh/swirl/dao"
 )
 
 const Setting = "setting"
 
-func (d *Dao) SettingGetAll(ctx context.Context) (settings []*model.Setting, err error) {
+func (d *Dao) SettingGetAll(ctx context.Context) (settings []*dao.Setting, err error) {
 	err = d.each(Setting, func(v []byte) error {
-		s := &model.Setting{}
+		s := &dao.Setting{}
 		err = decode(v, s)
 		if err != nil {
 			return err
@@ -22,8 +22,8 @@ func (d *Dao) SettingGetAll(ctx context.Context) (settings []*model.Setting, err
 	return
 }
 
-func (d *Dao) SettingGet(ctx context.Context, id string) (setting *model.Setting, err error) {
-	setting = &model.Setting{}
+func (d *Dao) SettingGet(ctx context.Context, id string) (setting *dao.Setting, err error) {
+	setting = &dao.Setting{}
 	err = d.get(Setting, id, setting)
 	if err == ErrNoRecords {
 		return nil, nil
@@ -33,6 +33,6 @@ func (d *Dao) SettingGet(ctx context.Context, id string) (setting *model.Setting
 	return
 }
 
-func (d *Dao) SettingUpdate(ctx context.Context, setting *model.Setting) (err error) {
+func (d *Dao) SettingUpdate(ctx context.Context, setting *dao.Setting) (err error) {
 	return d.replace(Setting, setting.ID, setting)
 }

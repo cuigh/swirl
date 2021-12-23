@@ -9,7 +9,6 @@ import (
 	"github.com/cuigh/auxo/data"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/dao"
-	"github.com/cuigh/swirl/model"
 )
 
 type SettingBiz interface {
@@ -28,7 +27,7 @@ type settingBiz struct {
 }
 
 func (b *settingBiz) Find(id string) (options interface{}, err error) {
-	var setting *model.Setting
+	var setting *dao.Setting
 	setting, err = b.d.SettingGet(context.TODO(), id)
 	if err == nil && setting != nil {
 		return b.unmarshal(setting.Options)
@@ -38,7 +37,7 @@ func (b *settingBiz) Find(id string) (options interface{}, err error) {
 
 // Load returns settings of swirl. If not found, default settings will be returned.
 func (b *settingBiz) Load() (options data.Map, err error) {
-	var settings []*model.Setting
+	var settings []*dao.Setting
 	settings, err = b.d.SettingGetAll(context.TODO())
 	if err != nil {
 		return
@@ -56,12 +55,12 @@ func (b *settingBiz) Load() (options data.Map, err error) {
 }
 
 func (b *settingBiz) Save(id string, options interface{}, user web.User) (err error) {
-	setting := &model.Setting{
+	setting := &dao.Setting{
 		ID:        id,
 		UpdatedAt: time.Now(),
 	}
 	if user != nil {
-		setting.UpdatedBy = model.Operator{ID: user.ID(), Name: user.Name()}
+		setting.UpdatedBy = dao.Operator{ID: user.ID(), Name: user.Name()}
 	}
 
 	setting.Options, err = b.marshal(options)

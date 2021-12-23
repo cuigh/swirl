@@ -1,4 +1,4 @@
-package model
+package dao
 
 import (
 	"encoding/base64"
@@ -45,10 +45,6 @@ func (t *Time) UnmarshalJSON(data []byte) (err error) {
 
 func (t Time) String() string {
 	return time.Time(t).String()
-}
-
-func (t Time) Format(layout string) string {
-	return time.Time(t).Format(layout)
 }
 
 type Operator struct {

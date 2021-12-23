@@ -3,18 +3,18 @@ package mongo
 import (
 	"context"
 
-	"github.com/cuigh/swirl/model"
+	"github.com/cuigh/swirl/dao"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 const Registry = "registry"
 
-func (d *Dao) RegistryCreate(ctx context.Context, registry *model.Registry) (err error) {
+func (d *Dao) RegistryCreate(ctx context.Context, registry *dao.Registry) (err error) {
 	return d.create(ctx, Registry, registry)
 }
 
-func (d *Dao) RegistryUpdate(ctx context.Context, registry *model.Registry) (err error) {
+func (d *Dao) RegistryUpdate(ctx context.Context, registry *dao.Registry) (err error) {
 	update := bson.M{
 		"name":       registry.Name,
 		"url":        registry.URL,
@@ -28,14 +28,14 @@ func (d *Dao) RegistryUpdate(ctx context.Context, registry *model.Registry) (err
 	return d.update(ctx, Registry, registry.ID, bson.M{"$set": update})
 }
 
-func (d *Dao) RegistryGetAll(ctx context.Context) (registries []*model.Registry, err error) {
-	registries = []*model.Registry{}
+func (d *Dao) RegistryGetAll(ctx context.Context) (registries []*dao.Registry, err error) {
+	registries = []*dao.Registry{}
 	err = d.fetch(ctx, Registry, bson.M{}, &registries)
 	return
 }
 
-func (d *Dao) RegistryGet(ctx context.Context, id string) (registry *model.Registry, err error) {
-	registry = &model.Registry{}
+func (d *Dao) RegistryGet(ctx context.Context, id string) (registry *dao.Registry, err error) {
+	registry = &dao.Registry{}
 	found, err := d.find(ctx, Registry, id, registry)
 	if !found {
 		return nil, err
@@ -43,8 +43,8 @@ func (d *Dao) RegistryGet(ctx context.Context, id string) (registry *model.Regis
 	return
 }
 
-func (d *Dao) RegistryGetByURL(ctx context.Context, url string) (registry *model.Registry, err error) {
-	registry = &model.Registry{}
+func (d *Dao) RegistryGetByURL(ctx context.Context, url string) (registry *dao.Registry, err error) {
+	registry = &dao.Registry{}
 	err = d.db.Collection(Registry).FindOne(ctx, bson.M{"url": url}).Decode(registry)
 	if err == mongo.ErrNoDocuments {
 		return nil, nil
