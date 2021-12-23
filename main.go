@@ -2,6 +2,7 @@ package main
 
 import (
 	"embed"
+	"encoding/json"
 	"io/fs"
 	"net/http"
 	"strings"
@@ -10,7 +11,7 @@ import (
 	"github.com/cuigh/auxo/app/container"
 	"github.com/cuigh/auxo/app/flag"
 	_ "github.com/cuigh/auxo/cache/memory"
-	"github.com/cuigh/auxo/config"
+	"github.com/cuigh/auxo/data"
 	"github.com/cuigh/auxo/data/valid"
 	"github.com/cuigh/auxo/errors"
 	"github.com/cuigh/auxo/log"
@@ -102,13 +103,15 @@ func initSystem() error {
 
 func loadSetting(sb biz.SettingBiz) *misc.Setting {
 	var (
-		err error
-		s   = &misc.Setting{}
+		err  error
+		opts data.Map
+		b    []byte
+		s    = &misc.Setting{}
 	)
-
-	config.AddSource(sb)
-	if err = config.Load(); err == nil {
-		err = config.Unmarshal(s)
+	if opts, err = sb.Load(); err == nil {
+		if b, err = json.Marshal(opts); err == nil {
+			err = json.Unmarshal(b, s)
+		}
 	}
 	if err != nil {
 		log.Get("misc").Error("failed to load setting: ", err)

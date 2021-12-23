@@ -1,5 +1,5 @@
 <template>
-    <x-page-header>
+  <x-page-header>
     <template #action>
       <n-button secondary size="small" type="warning" @click="prune">
         <template #icon>
@@ -73,7 +73,16 @@ const columns = [
     fixed: "left" as const,
     render: (c: Container) => {
       const node = c.labels?.find(l => l.name === 'com.docker.swarm.node.id')
-      return renderLink({ name: 'container_detail', params: { id: c.id, node: node?.value || '-' } }, c.name)
+      const name = c.name.length > 32 ? c.name.substring(0, 32) + '...' : c.name
+      return renderLink({ name: 'container_detail', params: { id: c.id, node: node?.value || '-' } }, name)
+    },
+  },
+  {
+    title: t('objects.service'),
+    key: "service",
+    render: (c: Container) => {
+      const service = c.labels?.find(l => l.name === 'com.docker.swarm.service.name')?.value
+      return service ? renderLink({ name: 'service_detail', params: { name: service } }, service) : ''
     },
   },
   {

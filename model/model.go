@@ -58,16 +58,10 @@ type Operator struct {
 
 // Setting represents the options of swirl.
 type Setting struct {
-	ID        string           `json:"id" bson:"_id"`
-	Options   []*SettingOption `json:"options" bson:"options"`
-	UpdatedAt time.Time        `json:"updatedAt" bson:"updated_at"`
-	UpdatedBy Operator         `json:"updatedBy" bson:"updated_by"`
-}
-
-type SettingOption struct {
-	Name  string `json:"name" bson:"name"`
-	Value string `json:"value" bson:"value"`
-	Type  string `json:"type" bson:"type"`
+	ID        string    `json:"id" bson:"_id"`
+	Options   string    `json:"options" bson:"options"`
+	UpdatedAt time.Time `json:"updatedAt" bson:"updated_at"`
+	UpdatedBy Operator  `json:"updatedBy" bson:"updated_by"`
 }
 
 type Role struct {

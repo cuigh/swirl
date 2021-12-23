@@ -1,10 +1,8 @@
 package api
 
 import (
-	"bytes"
 	"encoding/json"
 
-	"github.com/cuigh/auxo/data"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/biz"
 )
@@ -18,7 +16,7 @@ type SettingHandler struct {
 // NewSetting creates an instance of SettingHandler
 func NewSetting(b biz.SettingBiz) *SettingHandler {
 	return &SettingHandler{
-		Load:   settingLoad(b),
+		Load: settingLoad(b),
 		Save: settingSave(b),
 	}
 }
@@ -42,15 +40,8 @@ func settingSave(b biz.SettingBiz) web.HandlerFunc {
 	return func(ctx web.Context) (err error) {
 		args := &Args{}
 		err = ctx.Bind(args)
-		if err != nil {
-			return
-		}
-
-		options := data.Map{}
-		d := json.NewDecoder(bytes.NewBuffer(args.Options))
-		d.UseNumber()
-		if err = d.Decode(&options); err == nil {
-			err = b.Save(args.ID, options, ctx.User())
+		if err == nil {
+			err = b.Save(args.ID, args.Options, ctx.User())
 		}
 		return ajax(ctx, err)
 	}

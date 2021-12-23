@@ -1,14 +1,17 @@
 import ajax, { Result } from './ajax'
 
 export interface Setting {
-    region: RegionSetting;
     ldap: LdapSetting;
     metric: MetricSetting;
+    deploy: DeployOptions;
 }
 
-export interface RegionSetting {
-    lang: string;
-    timezone: number;
+export interface DeployOptions {
+    keys: {
+        name: string;
+        token: string;
+        expiry: number;
+    }[];
 }
 
 export interface LdapSetting {

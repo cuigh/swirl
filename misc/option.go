@@ -49,28 +49,24 @@ func LoadOptions() (err error) {
 // Setting represents the settings of Swirl.
 type Setting struct {
 	System struct {
-		Version string
-	}
-	Region struct {
-		Language string `option:"lang"`
-		Timezone int32
-	}
+		Version string `json:"version"`
+	} `json:"system"`
 	LDAP struct {
-		Enabled        bool
-		Address        string
-		Security       int32  // 0, 1, 2
-		Authentication string `option:"auth"` // simple, bind
-		BindDN         string
-		BindPassword   string `option:"bind_pwd"` // Bind DN password
-		BaseDN         string // Base search path for users
-		UserDN         string // Template for the DN of the user for simple auth
-		UserFilter     string // Search filter for user
-		NameAttr       string
-		EmailAttr      string
-	}
+		Enabled        bool   `json:"enabled"`
+		Address        string `json:"address"`
+		Security       int32  `json:"security"` // 0, 1, 2
+		Authentication string `json:"auth"`     // simple, bind
+		BindDN         string `json:"bind_dn"`
+		BindPassword   string `json:"bind_pwd"`    // Bind DN password
+		BaseDN         string `json:"base_dn"`     // Base search path for users
+		UserDN         string `json:"user_dn"`     // Template for the DN of the user for simple auth
+		UserFilter     string `json:"user_filter"` // Search filter for user
+		NameAttr       string `json:"name_attr"`
+		EmailAttr      string `json:"email_attr"`
+	} `json:"ldap"`
 	Metric struct {
-		Prometheus string
-	}
+		Prometheus string `json:"prometheus"`
+	} `json:"metric"`
 }
 
 func init() {

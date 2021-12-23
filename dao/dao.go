@@ -79,7 +79,7 @@ func newInterface() (i Interface) {
 	case "bolt":
 		i, err = bolt.New(misc.Options.DBAddress)
 	default:
-		err = errors.New("Unknown database type: " + misc.Options.DBType)
+		err = errors.New("unknown database type: " + misc.Options.DBType)
 	}
 
 	if err != nil {
