@@ -56,26 +56,31 @@ func (b *serviceBiz) Find(name string, status bool) (service *Service, raw strin
 	}
 	if err == nil {
 		service = newService(&s)
-		//err = b.fillNetworks(service, &s)
+		err = b.fillNetworks(service)
 	}
 	return
 }
 
-func (b *serviceBiz) fillNetworks(service *Service, s *swarm.Service) error {
-	if len(s.Endpoint.VirtualIPs) == 0 {
+func (b *serviceBiz) fillNetworks(service *Service) error {
+	if len(service.Endpoint.VIPs) == 0 {
 		return nil
 	}
 
-	var ids = make([]string, len(s.Endpoint.VirtualIPs))
-	for i, vip := range s.Endpoint.VirtualIPs {
-		ids[i] = vip.NetworkID
+	var ids = make([]string, len(service.Endpoint.VIPs))
+	for i, vip := range service.Endpoint.VIPs {
+		ids[i] = vip.ID
 	}
+
 	names, err := b.d.NetworkNames(context.TODO(), ids...)
 	if err == nil {
-		for i, vip := range s.Endpoint.VirtualIPs {
-			ids[i] = names[vip.NetworkID] + ":" + vip.NetworkID
+		for i := range service.Endpoint.VIPs {
+			vip := &service.Endpoint.VIPs[i]
+			vip.Name = names[vip.ID]
+			// ingress network cannot be explicitly attached.
+			if vip.Name != "ingress" {
+				service.Networks = append(service.Networks, vip.Name)
+			}
 		}
-		service.Networks = ids
 	}
 	return err
 }
@@ -215,7 +220,7 @@ type Service struct {
 	Env             data.Options `json:"env,omitempty"`
 	Labels          data.Options `json:"labels,omitempty"`
 	ContainerLabels data.Options `json:"containerLabels,omitempty"`
-	Networks        []string     `json:"networks,omitempty"`
+	Networks        []string     `json:"networks,omitempty"` // only for edit
 	Mounts          []Mount      `json:"mounts,omitempty"`
 	Update          struct {
 		State   string `json:"state,omitempty"`
@@ -546,11 +551,6 @@ func newService(s *swarm.Service) *Service {
 	if s.UpdateStatus != nil {
 		service.Update.State = string(s.UpdateStatus.State)
 		service.Update.Message = s.UpdateStatus.Message
-	}
-
-	// Networks
-	for _, n := range s.Spec.TaskTemplate.Networks {
-		service.Networks = append(service.Networks, n.Target)
 	}
 
 	// Endpoint

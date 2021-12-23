@@ -37,6 +37,7 @@ type Interface interface {
 	SessionCreate(ctx context.Context, session *model.Session) error
 	SessionUpdate(ctx context.Context, session *model.Session) error
 	SessionUpdateExpiry(ctx context.Context, id string, expiry time.Time) (err error)
+	SessionUpdateDirty(ctx context.Context, userID string, roleID string) (err error)
 
 	RegistryGet(ctx context.Context, id string) (*model.Registry, error)
 	RegistryGetByURL(ctx context.Context, url string) (registry *model.Registry, err error)

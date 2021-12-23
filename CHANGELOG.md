@@ -5,6 +5,7 @@
 > As this version contains some incompatible modifications, it is recommended to redeploy instead of upgrading directly.
  
 * feat: Refactor UI with vue3.
+* feat: Add support to agent. Swirl can connect to any container even in swarm mode now.
 * feat: Switch to official MongoDB driver.
 * feat: Allow set chart margins.
 * fix: Some args are incorrect when generating service command line.

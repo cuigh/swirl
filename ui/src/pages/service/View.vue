@@ -462,7 +462,7 @@
                     round
                     size="small"
                     v-for="n in t.networks"
-                  >{{ n.name + ": " + n.ips.join(',') }}</n-tag>
+                  >{{ isEmpty(n.ips) ? n.name : (n.name + ": " + n.ips?.join(',')) }}</n-tag>
                 </n-space>
               </td>
               <td>{{ t.updatedAt }}</td>
@@ -508,7 +508,6 @@ import serviceApi from "@/api/service";
 import type { Service } from "@/api/service";
 import taskApi from "@/api/task";
 import type { Task } from "@/api/task";
-import networkApi from "@/api/network";
 import { useRoute } from "vue-router";
 import { router } from "@/router/router";
 import { isEmpty } from "@/utils";
@@ -703,17 +702,11 @@ async function fetchData() {
   let results = await Promise.all([
     serviceApi.find(name, true),
     taskApi.search({ service: name, pageIndex: 1, pageSize: 100 }),
-    networkApi.search(),
   ])
 
   service.value = results[0].data?.service as Service
   raw.value = results[0].data?.raw as string;
   tasks.value = results[1].data?.items as Task[];
-  if (service.value.endpoint.vips && service.value.endpoint.vips.length > 0) {
-    let networks = new Map<string, string>();
-    results[2].data?.forEach(n => networks.set(n.id, n.name))
-    service.value.endpoint.vips.forEach(vip => vip.name = networks.get(vip.id) as string)
-  }
   cli.value = generateCli(service.value)
 }
 

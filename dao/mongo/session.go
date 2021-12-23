@@ -36,3 +36,21 @@ func (d *Dao) SessionUpdateExpiry(ctx context.Context, id string, expiry time.Ti
 	}
 	return d.update(ctx, Session, id, update)
 }
+
+func (d *Dao) SessionUpdateDirty(ctx context.Context, userID string, roleID string) (err error) {
+	filter := bson.M{}
+	if userID != "" {
+		filter["userId"] = userID
+	} else if roleID != "" {
+		filter["roles"] = roleID
+	} else {
+		return nil
+	}
+
+	update := bson.M{
+		"dirty":      true,
+		"updated_by": time.Now(),
+	}
+	_, err = d.db.Collection(Session).UpdateMany(ctx, filter, update)
+	return
+}

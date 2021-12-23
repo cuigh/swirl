@@ -71,16 +71,32 @@ func (d *Docker) NetworkInspect(ctx context.Context, name string) (network types
 
 // NetworkNames return network names by id list.
 func (d *Docker) NetworkNames(ctx context.Context, ids ...string) (names map[string]string, err error) {
-	var c *client.Client
-	if c, err = d.client(); err == nil {
-		names = make(map[string]string)
-		for _, id := range ids {
-			var n types.NetworkResource
-			n, err = c.NetworkInspect(ctx, id, types.NetworkInspectOptions{})
-			if err != nil {
-				break
+	var (
+		c       *client.Client
+		network types.NetworkResource
+		lookup  = func(id string) (n types.NetworkResource, e error) {
+			if c == nil {
+				if c, e = d.client(); e != nil {
+					return
+				}
 			}
-			names[id] = n.Name
+			n, e = c.NetworkInspect(ctx, id, types.NetworkInspectOptions{})
+			return
+		}
+	)
+
+	names = make(map[string]string)
+	for _, id := range ids {
+		name, ok := d.networks.Load(id)
+		if ok {
+			names[id] = name.(string)
+		} else {
+			network, err = lookup(id)
+			if err != nil {
+				return nil, err
+			}
+			names[id] = network.Name
+			d.networks.Store(id, network.Name)
 		}
 	}
 	return

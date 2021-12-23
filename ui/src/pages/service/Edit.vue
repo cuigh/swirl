@@ -43,7 +43,7 @@
         <n-form-item-gi :label="t('objects.network', 2)" span="2" path="networks">
           <n-checkbox-group v-model:value="model.networks">
             <n-space item-style="display: flex;">
-              <n-checkbox :value="n.id" :label="n.name" v-for="n of networks" />
+              <n-checkbox :value="n.name" :label="n.name" v-for="n of networks" />
             </n-space>
           </n-checkbox-group>
         </n-form-item-gi>
@@ -653,22 +653,22 @@ function newFile() {
 }
 
 async function fetchData() {
-  const name = route.params.name as string || ''
-  if (name) {
-    let r = await serviceApi.find(name);
+  const name = route.params.name as string
+  
+  name && serviceApi.find(name, true).then(r => {
     model.value = r.data?.service as Service;
-  }
+  });
 
-  let nr = await networkApi.search();
-  networks.value = nr.data as Network[];
-
-  let cr = await configApi.search({ pageIndex: 1, pageSize: 1000 });
-  configFiles.value = cr.data?.items.map(c => {
+  let results = await Promise.all([
+    networkApi.search(),
+    configApi.search({ pageIndex: 1, pageSize: 1000 }),
+    secretApi.search({ pageIndex: 1, pageSize: 1000 }),
+  ])
+  networks.value = results[0].data?.filter(n => n.name != 'ingress') as Network[];
+  configFiles.value = results[1].data?.items.map(c => {
     return { label: c.name, value: `${c.id}:${c.name}` }
   })
-
-  let sr = await secretApi.search({ pageIndex: 1, pageSize: 1000 });
-  secretFiles.value = sr.data?.items.map(c => {
+  secretFiles.value = results[2].data?.items.map(c => {
     return { label: c.name, value: `${c.id}:${c.name}` }
   })
 }

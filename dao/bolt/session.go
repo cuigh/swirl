@@ -38,6 +38,40 @@ func (d *Dao) SessionUpdateExpiry(ctx context.Context, id string, expiry time.Ti
 	})
 }
 
+func (d *Dao) SessionUpdateDirty(ctx context.Context, userID string, roleID string) (err error) {
+	contains := func(arr []string, str string) bool {
+		for _, s := range arr {
+			if s == str {
+				return true
+			}
+		}
+		return false
+	}
+
+	var (
+		buf []byte
+		now = time.Now()
+	)
+	return d.db.Update(func(tx *bolt.Tx) (err error) {
+		b := tx.Bucket([]byte(Session))
+		return b.ForEach(func(k, v []byte) error {
+			session := &model.Session{}
+			if err = decode(v, session); err != nil {
+				return err
+			}
+
+			if (userID != "" && session.UserID == userID) || (roleID != "" && contains(session.Roles, roleID)) {
+				session.Dirty = true
+				session.UpdatedAt = now
+				if buf, err = encode(session); err == nil {
+					err = b.Put(k, buf)
+				}
+			}
+			return err
+		})
+	})
+}
+
 // SessionPrune cleans up expired logs.
 func (d *Dao) SessionPrune() {
 	err := d.db.Update(func(tx *bolt.Tx) (err error) {

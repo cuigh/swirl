@@ -4,8 +4,10 @@ import (
 	"context"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/cuigh/auxo/app/container"
+	"github.com/cuigh/auxo/cache"
 	"github.com/cuigh/auxo/errors"
 	"github.com/cuigh/auxo/log"
 	"github.com/cuigh/auxo/util/lazy"
@@ -21,16 +23,21 @@ func newVersion(v uint64) swarm.Version {
 }
 
 type Docker struct {
-	c      *client.Client
-	locker sync.Mutex
-	logger log.Logger
-	agents sync.Map
+	c        *client.Client
+	locker   sync.Mutex
+	logger   log.Logger
+	nodes    cache.Value
+	agents   sync.Map
+	networks sync.Map
 }
 
 func NewDocker() *Docker {
-	return &Docker{
+	d := &Docker{
 		logger: log.Get("docker"),
+		nodes:  cache.Value{TTL: 30 * time.Minute},
 	}
+	d.nodes.Load = d.loadCache
+	return d
 }
 
 func (d *Docker) call(fn func(c *client.Client) error) error {

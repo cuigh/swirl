@@ -1,5 +1,5 @@
 import * as echarts from "echarts";
-import { ChartInfo } from "@/api/chart";
+import { ChartInfo } from "@/api/dashboard";
 import { store } from "@/store";
 
 export abstract class Chart {

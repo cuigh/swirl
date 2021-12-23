@@ -27,32 +27,22 @@ import {
   NIcon,
   NButton,
 } from "naive-ui";
-import { ref, onMounted, PropType } from "vue";
+import { ref, onMounted } from "vue";
 import { CloseOutline, MenuOutline } from "@vicons/ionicons5";
 import { useResizeObserver } from '@vueuse/core'
-import { ChartInfo } from "@/api/chart";
+import { ChartInfo } from "@/api/dashboard";
 import { createChart } from "./chart";
 import type { Chart } from "./chart";
 
-// TS: 
-// interface Props {
-//   msg?: string
-//   labels?: string[]
-// }
-// const props = withDefaults(defineProps<Props>(), {
-//   msg: 'hello',
-//   labels: () => ['one', 'two']
-// })
+interface Props {
+  info: ChartInfo;
+  data?: any;
+}
 
-const props = defineProps({
-  info: {
-    type: Object as PropType<ChartInfo>,
-    required: true,
-  },
-  data: {
-    type: Object,
-  },
-})
+// const props = withDefaults(defineProps<Props>(), {
+//   data: () => null,
+// })
+const props = defineProps<Props>()
 const emits = defineEmits(['remove'])
 
 const container = ref()

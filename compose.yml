@@ -1,16 +1,16 @@
-version: '3'
+version: '3.8'
 
 services:
   swirl:
     image: cuigh/swirl
     environment:
-      DB_ADDRESS: mongodb://mongo:27017/swirl
+      DB_ADDRESS: mongodb://<database_address>
       DOCKER_ENDPOINT: tcp://swirl_manager_agent:2375
       AGENTS: swirl_manager_agent,swirl_worker_agent
-    ports:
-      - "8001:8001"
     networks:
       - net
+    ports:
+      - "8001:8001"
     deploy:
       replicas: 2
       placement:
@@ -18,10 +18,10 @@ services:
 
   manager_agent:
     image: cuigh/socat
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - net
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
     deploy:
       mode: global
       placement:
@@ -29,53 +29,63 @@ services:
 
   worker_agent:
     image: cuigh/socat
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - net
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
     deploy:
       mode: global
       placement:
         constraints: [ node.role == worker ]
 
-  #  prometheus:
-  #    image: prom/prometheus
-  #    volumes:
-  #      - prometheus:/prometheus
-  #    networks:
-  #      - net
-  #    deploy:
-  #      replicas: 1
-  #      placement:
-  #        constraints: [ node.labels.app.prometheus == true ]
-
-  #  cadvisor:
-  #    image: gcr.io/cadvisor/cadvisor
-  #    volumes:
-  #      - /:/rootfs:ro
-  #      - /sys:/sys:ro
-  #      - /var/lib/docker:/var/lib/docker:ro
-  #      - /var/run:/var/run:ro
-  #      - /var/run/docker.sock:/var/run/docker.sock:ro
-  #    networks:
-  #      - net
-  #    deploy:
-  #      mode: global
-
-  mongo:
-    image: mongo
-    volumes:
-      - mongo:/data/db
-    networks:
-      - net
-    deploy:
-      replicas: 1
+#  prometheus:
+#    image: prom/prometheus
+#    networks:
+#      - net
+#    volumes:
+#      - prometheus:/prometheus
+#    configs:
+#      - source: prometheus.yml
+#        target: /etc/prometheus/prometheus.yml
+#    deploy:
+#      replicas: 1
 #      placement:
-#        constraints: [ node.labels.app.mongo == true ]
+#        constraints: [ node.labels.app.prometheus == true ]
 
-volumes:
-  prometheus:
-  mongo:
+#  cadvisor:
+#    image: gcr.io/cadvisor/cadvisor
+#    networks:
+#      - net
+#    volumes:
+#      - /:/rootfs:ro
+#      - /dev/disk/:/dev/disk:ro
+#      - /sys:/sys:ro
+#      - /var/run:/var/run:ro
+#      - /var/lib/docker:/var/lib/docker:ro
+#    privileged: true
+#    deploy:
+#      mode: global
+#
+#  node:
+#    image: quay.io/prometheus/node-exporter
+#    command:
+#      - '--path.rootfs=/host'
+#    networks:
+#      - host
+#    pid: host
+#    volumes:
+#      - /:/host:ro,rslave
+#    deploy:
+#      mode: global
+
+#volumes:
+#  prometheus:
+
+#configs:
+#  prometheus.yml:
+#    external: true
 
 networks:
+#  host:
+#    external: true
   net:
