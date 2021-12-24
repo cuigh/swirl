@@ -17,7 +17,7 @@
       <tbody>
         <tr v-for="(r, index) of model" :key="r.id">
           <td>
-            <x-anchor :url="`/swarm/nodes/${r.id}`">{{ r.name || r.hostname }}</x-anchor>
+            <x-anchor :url="{ name: 'node_detail', params: { id: r.id } }">{{ r.name || r.hostname }}</x-anchor>
           </td>
           <td>
             <n-tag

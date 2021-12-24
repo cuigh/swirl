@@ -1,7 +1,7 @@
 <template>
   <x-page-header :subtitle="model.name">
     <template #action>
-      <n-button secondary size="small" @click="$router.push('/swarm/configs')">
+      <n-button secondary size="small" @click="$router.push({ name: 'config_list' })">
         <template #icon>
           <n-icon>
             <back-icon />
@@ -108,7 +108,7 @@ const rules: any = {
 const form = ref();
 const { submit, submiting } = useForm(form, () => configApi.save(model.value), () => {
   window.message.info(t('texts.action_success'));
-  router.push("/swarm/configs")
+  router.push({ name: 'config_list' })
 })
 
 function newPair() {

@@ -1,7 +1,7 @@
 <template>
   <x-page-header :subtitle="model.name || model.id">
     <template #action>
-      <n-button secondary size="small" @click="$router.push('/swarm/configs')">
+      <n-button secondary size="small" @click="$router.push({ name: 'config_list' })">
         <template #icon>
           <n-icon>
             <back-icon />
@@ -12,7 +12,7 @@
       <n-button
         secondary
         size="small"
-        @click="$router.push(`/swarm/configs/${model.id}/edit`)"
+        @click="$router.push({ name: 'config_edit', params: { id: model.id } })"
       >{{ t('buttons.edit') }}</n-button>
     </template>
   </x-page-header>

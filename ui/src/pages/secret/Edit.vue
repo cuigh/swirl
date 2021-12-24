@@ -1,7 +1,7 @@
 <template>
   <x-page-header :subtitle="model.name">
     <template #action>
-      <n-button secondary size="small" @click="$router.push('/swarm/secrets')">
+      <n-button secondary size="small" @click="$router.push({ name: 'secret_list' })">
         <template #icon>
           <n-icon>
             <back-icon />
@@ -129,7 +129,7 @@ const rules: any = {
 const form = ref();
 const { submit, submiting } = useForm(form, () => secretApi.save(model.value), () => {
   window.message.info(t('texts.action_success'));
-  router.push("/swarm/secrets")
+  router.push({ name: 'secret_list' })
 })
 
 function newPair() {

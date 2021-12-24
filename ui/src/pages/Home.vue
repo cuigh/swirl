@@ -6,7 +6,7 @@
           <template #icon>
             <server-outline />
           </template>
-          <x-anchor url="/swarm/nodes">{{ summary.nodeCount }}</x-anchor>
+          <x-anchor :url="{ name: 'node_list' }">{{ summary.nodeCount }}</x-anchor>
         </x-statistic>
       </n-gi>
       <n-gi>
@@ -14,7 +14,7 @@
           <template #icon>
             <globe-outline />
           </template>
-          <x-anchor url="/swarm/networks">{{ summary.networkCount }}</x-anchor>
+          <x-anchor :url="{ name: 'network_list' }">{{ summary.networkCount }}</x-anchor>
         </x-statistic>
       </n-gi>
       <n-gi>
@@ -22,7 +22,7 @@
           <template #icon>
             <image-outline />
           </template>
-          <x-anchor url="/swarm/services">{{ summary.serviceCount }}</x-anchor>
+          <x-anchor :url="{ name: 'service_list' }">{{ summary.serviceCount }}</x-anchor>
         </x-statistic>
       </n-gi>
       <n-gi>
@@ -30,7 +30,7 @@
           <template #icon>
             <albums-outline />
           </template>
-          <x-anchor url="/swarm/stacks">{{ summary.stackCount }}</x-anchor>
+          <x-anchor :url="{ name: 'stack_list' }">{{ summary.stackCount }}</x-anchor>
         </x-statistic>
       </n-gi>
       <!-- <n-gi>

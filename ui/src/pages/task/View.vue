@@ -1,7 +1,7 @@
 <template>
   <x-page-header :subtitle="model.name || model.id">
     <template #action>
-      <n-button secondary size="small" @click="$router.push('/swarm/tasks')">
+      <n-button secondary size="small" @click="$router.push({ name: 'task_list' })">
         <template #icon>
           <n-icon>
             <back-icon />

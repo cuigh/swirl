@@ -1,7 +1,7 @@
 <template>
   <x-page-header :subtitle="node.name ?? node.hostname">
     <template #action>
-      <n-button secondary size="small" @click="$router.push('/swarm/nodes')">
+      <n-button secondary size="small" @click="$router.push({ name: 'node_list' })">
         <template #icon>
           <n-icon>
             <back-icon />
@@ -12,7 +12,7 @@
       <n-button
         secondary
         size="small"
-        @click="$router.push(`/swarm/nodes/${node.id}/edit`)"
+        @click="$router.push({ name: 'node_edit', params: { id: node.id } })"
       >{{ t('buttons.edit') }}</n-button>
     </template>
   </x-page-header>
@@ -91,7 +91,7 @@
               <tbody>
                 <tr v-for="t in tasks">
                   <td>
-                    <x-anchor :url="`/swarm/tasks/${t.id}`">{{ t.id }}</x-anchor>
+                    <x-anchor :url="{ name: 'task_detail', params: { id: t.id } }">{{ t.id }}</x-anchor>
                   </td>
                   <td>
                     <n-tag

@@ -1,7 +1,7 @@
 <template>
   <x-page-header :subtitle="t('texts.records', { total: model.length }, model.length)">
     <template #action>
-      <n-button secondary size="small" @click="$router.push('/swarm/networks/new')">
+      <n-button secondary size="small" @click="$router.push({ name: 'network_new' })">
         <template #icon>
           <n-icon>
             <add-icon />
@@ -25,7 +25,7 @@
       <tbody>
         <tr v-for="(r, index) of model" :key="r.name">
           <td>
-            <x-anchor :url="`/swarm/networks/${r.name}`">{{ r.name }}</x-anchor>
+            <x-anchor :url="{ name: 'network_detail', params: { name: r.name } }">{{ r.name }}</x-anchor>
           </td>
           <td>{{ r.id }}</td>
           <td>

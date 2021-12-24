@@ -1,7 +1,7 @@
 <template>
   <x-page-header :subtitle="service.name">
     <template #action>
-      <n-button secondary size="small" @click="$router.push('/swarm/services')">
+      <n-button secondary size="small" @click="$router.push({ name: 'service_list' })">
         <template #icon>
           <n-icon>
             <back-icon />
@@ -21,7 +21,7 @@
       <n-button
         secondary
         size="small"
-        @click="$router.push(`/swarm/services/${service.name}/edit`)"
+        @click="$router.push({ name: 'service_edit', params: { name: service.name } })"
       >{{ t('buttons.edit') }}</n-button>
     </template>
   </x-page-header>
@@ -123,7 +123,7 @@
                 <tr v-for="label in service.endpoint?.vips">
                   <td>
                     <x-anchor
-                      :url="`/swarm/networks/${label.name || label.id}`"
+                      :url="{ name: 'network_detail', params: { name: label.name || label.id } }"
                     >{{ label.name || label.id }}</x-anchor>
                   </td>
                   <td>{{ label.ip }}</td>

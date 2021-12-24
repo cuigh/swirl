@@ -1,7 +1,7 @@
 <template>
   <x-page-header :subtitle="model.name">
     <template #action>
-      <n-button secondary size="small" @click="$router.push('/swarm/registries')">
+      <n-button secondary size="small" @click="$router.push({ name: 'registry_list' })">
         <template #icon>
           <n-icon>
             <back-icon />
@@ -81,7 +81,7 @@ const rules: any = {
 };
 const { submit, submiting } = useForm(form, () => registryApi.save(model.value), () => {
   window.message.info(t('texts.action_success'));
-  router.push("/swarm/registries")
+  router.push({ name: 'registry_list' })
 })
 
 async function fetchData() {

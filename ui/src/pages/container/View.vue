@@ -1,7 +1,7 @@
 <template>
   <x-page-header :subtitle="model.name">
     <template #action>
-      <n-button secondary size="small" @click="$router.push('/local/containers')">
+      <n-button secondary size="small" @click="$router.push({ name: 'container_list' })">
         <template #icon>
           <n-icon>
             <back-icon />
@@ -52,7 +52,12 @@
         <x-code :code="raw" language="json" />
       </n-tab-pane>
       <n-tab-pane name="logs" :tab="t('fields.logs')" display-directive="show:lazy">
-        <x-logs type="container" :node="node" :id="model.id" v-if="store.getters.allow('container.logs')"></x-logs>
+        <x-logs
+          type="container"
+          :node="node"
+          :id="model.id"
+          v-if="store.getters.allow('container.logs')"
+        ></x-logs>
         <n-alert type="info" v-else>{{ t('texts.403') }}</n-alert>
       </n-tab-pane>
       <n-tab-pane name="exec" :tab="t('fields.execute')" display-directive="show:lazy">

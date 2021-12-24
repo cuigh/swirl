@@ -1,7 +1,7 @@
 <template>
   <x-page-header>
     <template #action>
-      <n-button secondary size="small" @click="$router.push('/swarm/stacks/new')">
+      <n-button secondary size="small" @click="$router.push({ name: 'stack_new' })">
         <template #icon>
           <n-icon>
             <add-icon />
@@ -29,12 +29,14 @@
       <tbody>
         <tr v-for="(r, index) of model" :key="r.name">
           <td>
-            <x-anchor :url="`/swarm/stacks/${r.name}`">{{ r.name }}</x-anchor>
+            <x-anchor :url="{ name: 'stack_detail', params: { name: r.name } }">{{ r.name }}</x-anchor>
           </td>
           <td>
             <n-space :size="4" v-if="r.services && r.services.length">
               <n-tag size="small" type="primary" v-for="s in r.services">
-                <x-anchor :url="`/swarm/services/${s}`">{{ s.substring(r.name.length + 1) }}</x-anchor>
+                <x-anchor
+                  :url="{ name: 'service_detail', params: { name: s } }"
+                >{{ s.substring(r.name.length + 1) }}</x-anchor>
               </n-tag>
             </n-space>
           </td>

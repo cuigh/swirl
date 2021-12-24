@@ -1,7 +1,7 @@
 <template>
   <x-page-header :subtitle="model.name ?? model.hostname">
     <template #action>
-      <n-button secondary size="small" @click="$router.push('/swarm/nodes')">
+      <n-button secondary size="small" @click="$router.push({ name: 'node_list' })">
         <template #icon>
           <n-icon>
             <back-icon />
@@ -98,7 +98,7 @@ const model = ref({} as Node);
 const form = ref();
 const { submit, submiting } = useForm(form, () => nodeApi.save(model.value), () => {
   window.message.info(t('texts.action_success'));
-  router.push("/swarm/nodes")
+  router.push({ name: 'node_list' })
 })
 
 function newLabel() {

@@ -1,7 +1,7 @@
 <template>
   <x-page-header :subtitle="model.name">
     <template #action>
-      <n-button secondary size="small" @click="$router.push('/swarm/stacks')">
+      <n-button secondary size="small" @click="$router.push({ name: 'stack_list' })">
         <template #icon>
           <n-icon>
             <back-icon />
@@ -130,7 +130,7 @@ async function submit(e: Event) {
     try {
       await stackApi.save(model.value)
       window.message.info(t('texts.action_success'));
-      router.push("/swarm/stacks")
+      router.push({ name: 'stack_list' })
     } finally {
       submiting.value = false;
     }

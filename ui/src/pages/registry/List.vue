@@ -1,7 +1,7 @@
 <template>
   <x-page-header :subtitle="t('texts.records', { total: model.length }, model.length)">
     <template #action>
-      <n-button secondary size="small" @click="$router.push('/swarm/registries/new')">
+      <n-button secondary size="small" @click="$router.push({ name: 'registry_new' })">
         <template #icon>
           <n-icon>
             <add-icon />
@@ -26,7 +26,7 @@
       <tbody>
         <tr v-for="(r, index) of model" :key="r.id">
           <td>
-            <x-anchor :url="`/swarm/registries/${r.id}`">{{ r.name }}</x-anchor>
+            <x-anchor :url="{ name: 'registry_detail', params: { id: r.id } }">{{ r.name }}</x-anchor>
           </td>
           <td>{{ r.url }}</td>
           <td>{{ r.username }}</td>

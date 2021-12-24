@@ -1,12 +1,13 @@
 <template>
   <x-page-header>
     <template #action>
-      <n-button secondary size="small" @click="$router.push('/swarm/secrets/new')">
+      <n-button secondary size="small" @click="$router.push({ name: 'secret_new' })">
         <template #icon>
           <n-icon>
             <add-icon />
           </n-icon>
-        </template>{{ t('buttons.new') }}
+        </template>
+        {{ t('buttons.new') }}
       </n-button>
     </template>
   </x-page-header>
@@ -59,7 +60,7 @@ const columns = [
     title: t('fields.id'),
     key: "id",
     fixed: "left" as const,
-    render: (c: Secret) => renderLink(`/swarm/secrets/${c.id}`, c.id),
+    render: (c: Secret) => renderLink({ name: 'secret_detail', params: { id: c.id } }, c.id),
   },
   {
     title: t('fields.name'),
@@ -82,12 +83,12 @@ const columns = [
           type: 'error',
           text: t('buttons.delete'),
           action: () => deleteSecret(c.id, index),
-          prompt:  t('prompts.delete'),
+          prompt: t('prompts.delete'),
         },
         {
           type: 'warning',
           text: t('buttons.edit'),
-          action: () => router.push(`/swarm/secrets/${c.id}/edit`),
+          action: () => router.push({ name: 'secret_edit', params: { id: c.id } }),
         },
       ])
     },

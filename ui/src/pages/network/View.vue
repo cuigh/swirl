@@ -1,7 +1,7 @@
 <template>
   <x-page-header :subtitle="model.name">
     <template #action>
-      <n-button secondary size="small" @click="$router.push('/swarm/networks')">
+      <n-button secondary size="small" @click="$router.push({ name: 'network_list' })">
         <template #icon>
           <n-icon>
             <back-icon />
@@ -129,7 +129,9 @@
               <tbody>
                 <tr v-for="c in model.containers">
                   <td>
-                    <x-anchor :url="`/local/containers/${c.id}`">{{ c.name }}</x-anchor>
+                    <x-anchor
+                      :url="{ name: 'container_detail', params: { node: '-', id: c.id } }"
+                    >{{ c.name }}</x-anchor>
                   </td>
                   <td>{{ c.ipv4 }}</td>
                   <td>{{ c.ipv6 }}</td>

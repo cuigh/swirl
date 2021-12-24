@@ -1,7 +1,7 @@
 <template>
   <x-page-header>
     <template #action>
-      <n-button secondary size="small" @click="$router.push('/swarm/services/new')">
+      <n-button secondary size="small" @click="$router.push({ name: 'service_new' })">
         <template #icon>
           <n-icon>
             <add-icon />
@@ -75,7 +75,7 @@ const columns = [
     title: t('fields.name'),
     key: "name",
     fixed: "left" as const,
-    render: (s: Service) => renderLink(`/swarm/services/${s.name}`, s.name),
+    render: (s: Service) => renderLink({ name: 'service_detail', params: { name: s.name } }, s.name),
   },
   {
     title: t('objects.image'),
@@ -112,7 +112,7 @@ const columns = [
         {
           type: 'warning',
           text: t('buttons.edit'),
-          action: () => router.push(`/swarm/services/${s.name}/edit`),
+          action: () => router.push({ name: 'service_edit', params: { name: s.name } }),
         },
       ])
     },

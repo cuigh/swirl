@@ -1,7 +1,7 @@
 <template>
   <x-page-header :subtitle="model.name">
     <template #action>
-      <n-button size="small" @click="$router.push('/local/volumes')">
+      <n-button size="small" @click="$router.push({ name: 'volume_list' })">
         <template #icon>
           <n-icon>
             <back-icon />

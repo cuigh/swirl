@@ -1,7 +1,7 @@
 <template>
   <x-page-header :subtitle="model.id">
     <template #action>
-      <n-button secondary size="small" @click="$router.push('/local/images')">
+      <n-button secondary size="small" @click="$router.push({ name: 'image_list' })">
         <template #icon>
           <n-icon>
             <back-icon />
