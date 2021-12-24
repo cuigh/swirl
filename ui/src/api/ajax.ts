@@ -71,6 +71,9 @@ class Ajax {
                 case 403:
                     router.replace("/403");
                     return true
+                case 404:
+                    router.replace("/404");
+                    return true
                 case 500:
                     this.showError(error)
             }

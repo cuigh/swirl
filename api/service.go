@@ -1,9 +1,12 @@
 package api
 
 import (
+	"net/http"
+
 	"github.com/cuigh/auxo/data"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/biz"
+	"github.com/cuigh/swirl/docker"
 )
 
 // ServiceHandler encapsulates service related handlers.
@@ -70,6 +73,9 @@ func serviceFind(b biz.ServiceBiz) web.HandlerFunc {
 		status := ctx.Query("status") == "true"
 		service, raw, err := b.Find(name, status)
 		if err != nil {
+			if docker.IsErrNotFound(err) {
+				return web.NewError(http.StatusNotFound, err.Error())
+			}
 			return err
 		}
 		return success(ctx, data.Map{"service": service, "raw": raw})

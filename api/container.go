@@ -2,11 +2,13 @@ package api
 
 import (
 	"io"
+	"net/http"
 
 	"github.com/cuigh/auxo/data"
 	"github.com/cuigh/auxo/log"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/biz"
+	"github.com/cuigh/swirl/docker"
 	"github.com/gobwas/ws"
 	"github.com/gobwas/ws/wsutil"
 )
@@ -70,6 +72,9 @@ func containerFind(b biz.ContainerBiz) web.HandlerFunc {
 		id := ctx.Query("id")
 		container, raw, err := b.Find(node, id)
 		if err != nil {
+			if docker.IsErrNotFound(err) {
+				return web.NewError(http.StatusNotFound, err.Error())
+			}
 			return err
 		}
 		return success(ctx, data.Map{"container": container, "raw": raw})

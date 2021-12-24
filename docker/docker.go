@@ -40,6 +40,10 @@ func NewDocker() *Docker {
 	return d
 }
 
+func IsErrNotFound(err error) bool {
+	return client.IsErrNotFound(err)
+}
+
 func (d *Docker) call(fn func(c *client.Client) error) error {
 	c, err := d.client()
 	if err == nil {

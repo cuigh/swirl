@@ -1,9 +1,12 @@
 package api
 
 import (
+	"net/http"
+
 	"github.com/cuigh/auxo/data"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/biz"
+	"github.com/cuigh/swirl/docker"
 )
 
 // TaskHandler encapsulates node related handlers.
@@ -57,6 +60,9 @@ func taskFind(b biz.TaskBiz) web.HandlerFunc {
 		id := ctx.Query("id")
 		task, raw, err := b.Find(id)
 		if err != nil {
+			if docker.IsErrNotFound(err) {
+				return web.NewError(http.StatusNotFound, err.Error())
+			}
 			return err
 		}
 		return success(ctx, data.Map{"task": task, "raw": raw})
