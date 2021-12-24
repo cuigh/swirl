@@ -70,7 +70,7 @@
           <n-dynamic-input v-model:value="model.labels" #="{ index, value }" :on-create="newLabel">
             <n-input :placeholder="t('fields.name')" v-model:value="value.name" />
             <div style="height: 34px; line-height: 34px; margin: 0 8px">=</div>
-            <n-input :placeholder="t('fields.name')" v-model:value="value.value" />
+            <n-input :placeholder="t('fields.value')" v-model:value="value.value" />
           </n-dynamic-input>
         </n-form-item-gi>
       </n-grid>

@@ -1,7 +1,7 @@
 <template>
   <x-page-header>
     <template #action>
-      <n-button secondary size="small" @click="$router.push('/system/users/new')">
+      <n-button secondary size="small" @click="$router.push({ name: 'user_new' })">
         <template #icon>
           <n-icon>
             <add-icon />
@@ -13,19 +13,12 @@
   </x-page-header>
   <n-space class="page-body" vertical :size="12">
     <x-tab>
-      <x-tab-pane href="/system/users" :active="!$route.query.filter">{{ t('fields.all') }}</x-tab-pane>
+      <x-tab-pane :href="{ name: 'user_list' }" :active="!$route.query.filter">{{ t('fields.all') }}</x-tab-pane>
       <x-tab-pane
-        href="/system/users?filter=admins"
-        :active="$route.query.filter === 'admins'"
-      >{{ t('fields.admins') }}</x-tab-pane>
-      <x-tab-pane
-        href="/system/users?filter=active"
-        :active="$route.query.filter === 'active'"
-      >{{ t('fields.active') }}</x-tab-pane>
-      <x-tab-pane
-        href="/system/users?filter=blocked"
-        :active="$route.query.filter === 'blocked'"
-      >{{ t('fields.blocked') }}</x-tab-pane>
+        :href="{ name: 'user_list', query: { filter: tab } }"
+        :active="$route.query.filter === tab"
+        v-for="tab in ['admins', 'active', 'blocked']"
+      >{{ t('fields.' + tab) }}</x-tab-pane>
     </x-tab>
     <n-space :size="12">
       <n-input size="small" v-model:value="args.name" :placeholder="t('fields.name')" clearable />
@@ -84,7 +77,7 @@ const columns = [
   {
     title: t('fields.id'),
     key: "id",
-    render: (row: User) => renderLink(`/system/users/${row.id}`, row.id),
+    render: (row: User) => renderLink({ name: 'user_detail', params: { id: row.id } }, row.id),
   },
   {
     title: t('fields.name'),
@@ -124,7 +117,7 @@ const columns = [
         row.status ?
           { type: 'warning', text: t('buttons.block'), action: () => setStatus(row, 0), prompt: t('prompts.block'), } :
           { type: 'success', text: t('buttons.enable'), action: () => setStatus(row, 1) },
-        { type: 'warning', text: t('buttons.edit'), action: () => router.push(`/system/users/${row.id}/edit`) },
+        { type: 'warning', text: t('buttons.edit'), action: () => router.push({ name: 'user_edit', params: { id: row.id } }) },
         { type: 'error', text: t('buttons.delete'), action: () => remove(row, index), prompt: t('prompts.delete') },
       ])
     },

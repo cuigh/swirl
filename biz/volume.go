@@ -60,7 +60,7 @@ func (b *volumeBiz) Search(node, name string, pageIndex, pageSize int) (volumes 
 func (b *volumeBiz) Delete(node, name string, user web.User) (err error) {
 	err = b.d.VolumeRemove(context.TODO(), node, name)
 	if err == nil {
-		b.eb.CreateVolume(EventActionDelete, name, user)
+		b.eb.CreateVolume(EventActionDelete, node, name, user)
 	}
 	return
 }
@@ -79,8 +79,8 @@ func (b *volumeBiz) Create(vol *Volume, user web.User) (err error) {
 	}
 
 	err = b.d.VolumeCreate(context.TODO(), vol.Node, options)
-	if err != nil {
-		b.eb.CreateVolume(EventActionDelete, vol.Name, user)
+	if err == nil {
+		b.eb.CreateVolume(EventActionDelete, vol.Node, vol.Name, user)
 	}
 	return
 }
@@ -90,7 +90,7 @@ func (b *volumeBiz) Prune(node string, user web.User) (count int, size uint64, e
 	report, err = b.d.VolumePrune(context.TODO(), node)
 	if err == nil {
 		count, size = len(report.VolumesDeleted), report.SpaceReclaimed
-		b.eb.CreateVolume(EventActionPrune, "", user)
+		b.eb.CreateVolume(EventActionPrune, node, "", user)
 	}
 	return
 }

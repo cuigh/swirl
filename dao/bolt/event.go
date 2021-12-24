@@ -5,6 +5,7 @@ import (
 	"sort"
 	"time"
 
+	"github.com/cuigh/auxo/util/cast"
 	"github.com/cuigh/swirl/dao"
 	"github.com/cuigh/swirl/misc"
 )
@@ -21,7 +22,7 @@ func (d *Dao) EventSearch(ctx context.Context, args *dao.EventSearchArgs) (event
 
 		match := true
 		if args.Name != "" {
-			match = matchAny(args.Name, event.Name)
+			match = event.Args != nil && matchAny(args.Name, cast.ToString(event.Args["name"]))
 		}
 		if match && args.Type != "" {
 			match = event.Type == args.Type

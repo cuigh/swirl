@@ -33,7 +33,7 @@ var indexes = map[string][]mongo.IndexModel{
 	},
 	"event": {
 		mongo.IndexModel{Keys: bson.D{{"type", 1}}},
-		mongo.IndexModel{Keys: bson.D{{"name", 1}}},
+		mongo.IndexModel{Keys: bson.D{{"args.name", 1}}},
 	},
 	"session": {
 		mongo.IndexModel{

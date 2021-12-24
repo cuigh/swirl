@@ -65,7 +65,7 @@ func (b *imageBiz) Search(node, name string, pageIndex, pageSize int) (images []
 func (b *imageBiz) Delete(node, id string, user web.User) (err error) {
 	err = b.d.ImageRemove(context.TODO(), node, id)
 	if err == nil {
-		b.eb.CreateImage(EventActionDelete, id, user)
+		b.eb.CreateImage(EventActionDelete, node, id, user)
 	}
 	return
 }
@@ -74,7 +74,7 @@ func (b *imageBiz) Prune(node string, user web.User) (count int, size uint64, er
 	var report types.ImagesPruneReport
 	if report, err = b.d.ImagePrune(context.TODO(), node); err == nil {
 		count, size = len(report.ImagesDeleted), report.SpaceReclaimed
-		b.eb.CreateImage(EventActionPrune, "", user)
+		b.eb.CreateImage(EventActionPrune, node, "", user)
 	}
 	return
 }

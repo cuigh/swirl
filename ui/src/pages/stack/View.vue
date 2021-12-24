@@ -21,13 +21,19 @@
       <x-description :label-width="90">
         <x-description-item :label="t('fields.name')" :span="2">{{ model.name }}</x-description-item>
         <x-description-item :label="t('fields.created_by')">
-          <x-anchor :url="`/system/users/${model.createdBy?.id}`">{{ model.createdBy?.name }}</x-anchor>
+          <x-anchor
+            :url="{ name: 'user_detail', params: { id: model.createdBy?.id } }"
+            v-if="model.createdBy?.id"
+          >{{ model.createdBy?.name }}</x-anchor>
         </x-description-item>
         <x-description-item :label="t('fields.created_at')">
           <n-time :time="model.createdAt" format="y-MM-dd HH:mm:ss" />
         </x-description-item>
         <x-description-item :label="t('fields.updated_by')">
-          <x-anchor :url="`/system/users/${model.updatedBy?.id}`">{{ model.updatedBy?.name }}</x-anchor>
+          <x-anchor
+            :url="{ name: 'user_detail', params: { id: model.updatedBy?.id } }"
+            v-if="model.updatedBy?.id"
+          >{{ model.updatedBy?.name }}</x-anchor>
         </x-description-item>
         <x-description-item :label="t('fields.updated_at')">
           <n-time :time="model.updatedAt" format="y-MM-dd HH:mm:ss" />

@@ -1,7 +1,7 @@
 <template>
   <x-page-header :subtitle="model.user.name">
     <template #action>
-      <n-button secondary size="small" @click="$router.push('/system/users')">
+      <n-button secondary size="small" @click="$router.push({ name: 'user_list' })">
         <template #icon>
           <n-icon>
             <back-icon />
@@ -12,7 +12,7 @@
       <n-button
         secondary
         size="small"
-        @click="$router.push(`/system/users/${model.user.id}/edit`)"
+        @click="$router.push({ name: 'user_edit', params: { id: model.user.id } })"
       >{{ t('buttons.edit') }}</n-button>
     </template>
   </x-page-header>
@@ -45,7 +45,8 @@
       </x-description-item>
       <x-description-item :label="t('fields.created_by')">
         <x-anchor
-          :url="`/system/users/${model.user.createdBy?.id}`"
+          :url="{ name: 'user_detail', params: { id: model.user.createdBy?.id } }"
+          v-if="model.user.createdBy?.id"
         >{{ model.user.createdBy?.name }}</x-anchor>
       </x-description-item>
       <x-description-item :label="t('fields.created_at')">
@@ -53,7 +54,8 @@
       </x-description-item>
       <x-description-item :label="t('fields.updated_by')">
         <x-anchor
-          :url="`/system/users/${model.user.updatedBy?.id}`"
+          :url="{ name: 'user_detail', params: { id: model.user.updatedBy?.id } }"
+          v-if="model.user.updatedBy?.id"
         >{{ model.user.updatedBy?.name }}</x-anchor>
       </x-description-item>
       <x-description-item :label="t('fields.updated_at')">

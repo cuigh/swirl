@@ -63,7 +63,7 @@ func (b *containerBiz) Search(node, name, status string, pageIndex, pageSize int
 func (b *containerBiz) Delete(node, id, name string, user web.User) (err error) {
 	err = b.d.ContainerRemove(context.TODO(), node, id)
 	if err == nil {
-		b.eb.CreateContainer(EventActionDelete, id, name, user)
+		b.eb.CreateContainer(EventActionDelete, node, id, name, user)
 	}
 	return
 }
@@ -92,7 +92,7 @@ func (b *containerBiz) Prune(node string, user web.User) (count int, size uint64
 	var report types.ContainersPruneReport
 	if report, err = b.d.ContainerPrune(context.TODO(), node); err == nil {
 		count, size = len(report.ContainersDeleted), report.SpaceReclaimed
-		b.eb.CreateContainer(EventActionPrune, "", "", user)
+		b.eb.CreateContainer(EventActionPrune, node, "", "", user)
 	}
 	return
 }

@@ -9,18 +9,24 @@
         </template>
         {{ t('buttons.import') }}
       </n-button>
-      <n-button secondary size="small" @click="$router.push('/system/charts/new')">
+      <n-button secondary size="small" @click="$router.push({ name: 'chart_new' })">
         <template #icon>
           <n-icon>
             <add-icon />
           </n-icon>
-        </template>{{ t('buttons.new') }}
+        </template>
+        {{ t('buttons.new') }}
       </n-button>
     </template>
   </x-page-header>
   <n-space class="page-body" vertical :size="12">
     <n-space :size="12">
-      <n-input size="small" v-model:value="filter.title" :placeholder="t('fields.title')" clearable />
+      <n-input
+        size="small"
+        v-model:value="filter.title"
+        :placeholder="t('fields.title')"
+        clearable
+      />
       <n-select
         size="small"
         :placeholder="t('fields.dashboard')"
@@ -84,7 +90,7 @@ const columns = [
     title: t('fields.title'),
     key: "title",
     fixed: "left" as const,
-    render: (c: Chart) => renderLink(`/system/charts/${c.id}`, c.title),
+    render: (c: Chart) => renderLink({ name: 'chart_detail', params: { id: c.id } }, c.title),
   },
   {
     title: t('fields.type'),
@@ -136,7 +142,7 @@ const columns = [
         {
           type: 'warning',
           text: t('buttons.edit'),
-          action: () => router.push(`/system/charts/${c.id}/edit`),
+          action: () => router.push({ name: 'chart_edit', params: { id: c.id } }),
         },
         {
           type: 'info',

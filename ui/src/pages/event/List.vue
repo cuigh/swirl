@@ -153,7 +153,6 @@ const columns = [
     key: "id",
     width: 210,
     fixed: "left" as const,
-    // render: (e: Event) => renderLink(`/system/events/${e.id}`, e.id),
   },
   {
     title: t('fields.type'),
@@ -172,15 +171,12 @@ const columns = [
   {
     title: t('fields.object'),
     key: "name",
-    render(e: Event) {
-      const u = url(e)
-      return u ? renderLink(u, e.name) : e.name
-    },
+    render: renderObject,
   },
   {
     title: t('fields.operator'),
     key: "name",
-    render: (e: Event) => renderLink(`/system/users/${e.userId}`, e.username),
+    render: (e: Event) => e.userId ? renderLink({ name: 'user_detail', params: { id: e.userId } }, e.username) : null,
   },
   {
     title: t('fields.time'),
@@ -190,40 +186,40 @@ const columns = [
 ];
 const { state, pagination, fetchData, changePageSize } = useDataTable(eventApi.search, filter)
 
-function url(e: Event): RouteLocationRaw | null {
-  if (e.type === 'Setting') {
-    return { name: 'setting' }
-  } else if (!e.code) {
-    return null
-  }
-
+function renderObject(e: Event) {
   switch (e.type) {
     case "User":
-      return { name: 'user_detail', params: { id: e.code } }
     case "Role":
-      return { name: 'role_detail', params: { id: e.code } }
     case "Chart":
-      return { name: 'chart_detail', params: { id: e.code } }
     case "Registry":
-      return { name: 'registry_detail', params: { id: e.code } }
     case "Node":
-      return { name: 'node_detail', params: { id: e.code } }
-    case "Network":
-      return { name: 'network_detail', params: { name: e.code } }
-    case "Service":
-      return { name: 'service_detail', params: { name: e.code } }
-    case "Stack":
-      return { name: 'stack_detail', params: { name: e.code } }
     case "Config":
-      return { name: 'config_detail', params: { id: e.code } }
     case "Secret":
-      return { name: 'secret_detail', params: { id: e.code } }
+      return renderLink({ name: e.type.toLowerCase() + '_detail', params: { id: e.args.id } }, e.args.name)
+    case "Network":
+    case "Service":
+    case "Stack":
+      return renderLink({ name: e.type.toLowerCase() + '_detail', params: { name: e.args.name } }, e.args.name)
     case "Image":
-      return { name: 'image_detail', params: { node: '-', id: e.code } }
+      if (e.args.id) {
+        return renderLink({ name: 'image_detail', params: { node: e.args.node || '-', id: e.args.id } }, e.args.id)
+      } else {
+        return renderLink({ name: 'image_list' }, t('objects.image'))
+      }
     case "Container":
-      return { name: 'container_detail', params: { node: '-', id: e.code } }
+      if (e.args.id) {
+        return renderLink({ name: 'container_detail', params: { node: e.args.node || '-', id: e.args.id } }, e.args.name)
+      } else {
+        return renderLink({ name: 'container_list' }, t('objects.container'))
+      }
     case "Volume":
-      return { name: 'volume_detail', params: { node: '-', name: e.code } }
+      if (e.args.name) {
+        return renderLink({ name: 'volume_detail', params: { node: e.args.node || '-', name: e.args.name } }, e.args.name)
+      } else {
+        return renderLink({ name: 'volume_list' }, t('objects.volume'))
+      }
+    case "Setting":
+      return renderLink({ name: 'setting' }, t('objects.setting'))
   }
   return null
 }

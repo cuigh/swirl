@@ -1,7 +1,7 @@
 <template>
   <x-page-header>
     <template #action>
-      <n-button secondary size="small" @click="$router.push('/system/charts')">
+      <n-button secondary size="small" @click="$router.push({ name: 'chart_list' })">
         <template #icon>
           <n-icon>
             <back-icon />
@@ -219,7 +219,7 @@ const rules: any = {
 const form = ref();
 const { submit, submiting } = useForm(form, () => chartApi.save(model.value), () => {
   window.message.info(t('texts.action_success'));
-  router.push("/system/charts")
+  router.push({ name: 'chart_list' })
 })
 
 function newMetric() {

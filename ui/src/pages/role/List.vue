@@ -29,7 +29,7 @@
       <tbody>
         <tr v-for="(r, index) of model.roles" :key="r.id">
           <td>
-            <x-anchor :url="`/system/roles/${r.id}`">{{ r.id }}</x-anchor>
+            <x-anchor :url="{ name: 'role_detail', params: { id: r.id } }">{{ r.id }}</x-anchor>
           </td>
           <td>{{ r.name }}</td>
           <td>{{ r.desc }}</td>

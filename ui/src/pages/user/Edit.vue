@@ -1,7 +1,7 @@
 <template>
   <x-page-header :subtitle="user.id">
     <template #action>
-      <n-button secondary size="small" @click="$router.push('/system/users')">
+      <n-button secondary size="small" @click="$router.push({ name: 'user_list' })">
         <template #icon>
           <n-icon>
             <back-icon />
@@ -18,16 +18,28 @@
           <n-input :placeholder="t('fields.username')" v-model:value="user.name" />
         </n-form-item-gi>
         <n-form-item-gi :label="t('fields.login_name')" path="loginName">
-          <n-input :placeholder="t('fields.login_name')"  v-model:value="user.loginName" />
+          <n-input :placeholder="t('fields.login_name')" v-model:value="user.loginName" />
         </n-form-item-gi>
         <n-form-item-gi :label="t('fields.password')" path="password" v-if="!user.id">
-          <n-input type="password" :placeholder="t('fields.password')"  v-model:value="user.password" />
+          <n-input
+            type="password"
+            :placeholder="t('fields.password')"
+            v-model:value="user.password"
+          />
         </n-form-item-gi>
-        <n-form-item-gi :label="t('fields.password_confirm')" path="passwordConfirm" v-if="!user.id">
-          <n-input type="password" :placeholder="t('fields.password_confirm')"  v-model:value="user.passwordConfirm" />
+        <n-form-item-gi
+          :label="t('fields.password_confirm')"
+          path="passwordConfirm"
+          v-if="!user.id"
+        >
+          <n-input
+            type="password"
+            :placeholder="t('fields.password_confirm')"
+            v-model:value="user.passwordConfirm"
+          />
         </n-form-item-gi>
         <n-form-item-gi :label="t('fields.email')" path="email">
-          <n-input :placeholder="t('fields.email')"  v-model:value="user.email" />
+          <n-input :placeholder="t('fields.email')" v-model:value="user.email" />
         </n-form-item-gi>
         <n-form-item-gi :label="t('fields.admin')" path="admin">
           <n-switch v-model:value="user.admin">
@@ -47,7 +59,12 @@
             <n-radio key="ldap" value="ldap">LDAP</n-radio>
           </n-radio-group>
         </n-form-item-gi>
-        <n-form-item-gi :label="t('objects.role', 2)" span="2" path="roles" v-if="roles && roles.length">
+        <n-form-item-gi
+          :label="t('objects.role', 2)"
+          span="2"
+          path="roles"
+          v-if="roles && roles.length"
+        >
           <n-checkbox-group v-model:value="user.roles">
             <n-space item-style="display: flex;">
               <n-checkbox :value="r.id" :label="r.name" v-for="r of roles" />
@@ -119,7 +136,7 @@ const rules: any = {
 const form = ref();
 const { submit, submiting } = useForm(form, () => userApi.save(user.value), () => {
   window.message.info(t('texts.action_success'));
-  router.push("/system/users")
+  router.push({ name: 'user_list' })
 })
 
 async function fetchData() {

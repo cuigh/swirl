@@ -1,8 +1,8 @@
 <template>
-  <div class="tab-pane" :class="{active: active}" :style="{borderColor: themeVars.primaryColor}">
+  <div class="tab-pane" :class="{ active: active }" :style="{ borderColor: themeVars.primaryColor }">
     <router-link
       :to="href"
-      :style="{color: active ? themeVars.primaryColor : themeVars.textColorBase}"
+      :style="{ color: active ? themeVars.primaryColor : themeVars.textColorBase }"
     >
       <slot />
     </router-link>
@@ -11,16 +11,15 @@
 
 <script setup lang="ts">
 import { useThemeVars } from "naive-ui";
-import { RouterLink } from "vue-router";
+import { RouterLink, RouteLocationRaw } from "vue-router";
 
-const props = defineProps({
-  active: Boolean,
-  title: String,
-  href: {
-    type: String,
-    required: true,
-  },
-});
+interface Props {
+  active?: boolean;
+  title?: string;
+  href: RouteLocationRaw;
+}
+
+const props = defineProps<Props>()
 const themeVars = useThemeVars();
 </script>
 

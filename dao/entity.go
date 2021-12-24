@@ -140,8 +140,7 @@ type Event struct {
 	ID       primitive.ObjectID `json:"id" bson:"_id"`
 	Type     string             `json:"type" bson:"type"`
 	Action   string             `json:"action" bson:"action"`
-	Code     string             `json:"code" bson:"code"`
-	Name     string             `json:"name" bson:"name"`
+	Args     data.Map           `json:"args" bson:"args"`
 	UserID   string             `json:"userId" bson:"user_id"`
 	Username string             `json:"username" bson:"username"`
 	Time     Time               `json:"time" bson:"time"`

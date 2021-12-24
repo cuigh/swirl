@@ -15,7 +15,7 @@ func (d *Dao) EventSearch(ctx context.Context, args *dao.EventSearchArgs) (event
 		filter["type"] = args.Type
 	}
 	if args.Name != "" {
-		filter["name"] = args.Name
+		filter["args.name"] = args.Name
 	}
 	opts := searchOptions{filter: filter, sorter: bson.M{"_id": -1}, pageIndex: args.PageIndex, pageSize: args.PageSize}
 	events = []*dao.Event{}

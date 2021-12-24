@@ -22,24 +22,30 @@
       <x-description-item :label="t('fields.name')">{{ model.name }}</x-description-item>
       <x-description-item :span="2" :label="t('fields.desc')">{{ model.desc }}</x-description-item>
       <x-description-item :label="t('fields.created_by')">
-        <x-anchor :url="`/system/users/${model.createdBy?.id}`">{{ model.createdBy?.name }}</x-anchor>
+        <x-anchor
+          :url="{ name: 'user_detail', params: { id: model.createdBy?.id } }"
+          v-if="model.createdBy?.id"
+        >{{ model.createdBy?.name }}</x-anchor>
       </x-description-item>
       <x-description-item :label="t('fields.created_at')">
         <n-time :time="model.createdAt" format="y-MM-dd HH:mm:ss" />
       </x-description-item>
       <x-description-item :label="t('fields.updated_by')">
-        <x-anchor :url="`/system/users/${model.updatedBy?.id}`">{{ model.updatedBy?.name }}</x-anchor>
+        <x-anchor
+          :url="{ name: 'user_detail', params: { id: model.updatedBy?.id } }"
+          v-if="model.updatedBy?.id"
+        >{{ model.updatedBy?.name }}</x-anchor>
       </x-description-item>
       <x-description-item :label="t('fields.updated_at')">
         <n-time :time="model.updatedAt" format="y-MM-dd HH:mm:ss" />
       </x-description-item>
     </x-description>
     <x-panel :title="t('fields.perms')">
-        <n-grid cols="1 640:2 960:3 1440:4" x-gap="6" y-gap="6">
-          <n-gi span="1" v-for="g in ps">
-            <x-pair-tag type="warning" :label="g.group" :value="g.items" />
-          </n-gi>
-        </n-grid>
+      <n-grid cols="1 640:2 960:3 1440:4" x-gap="6" y-gap="6">
+        <n-gi span="1" v-for="g in ps">
+          <x-pair-tag type="warning" :label="g.group" :value="g.items" />
+        </n-gi>
+      </n-grid>
     </x-panel>
   </n-space>
 </template>

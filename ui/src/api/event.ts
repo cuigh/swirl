@@ -4,8 +4,9 @@ export interface Event {
     id: string;
     type: string;
     action: string;
-    code: number;
-    name: string;
+    args: {
+        [key: string]: string;
+    };
     userId: string;
     username: string;
     time: number;

@@ -1,7 +1,7 @@
 <template>
   <x-page-header :subtitle="model.title">
     <template #action>
-      <n-button secondary size="small" @click="$router.push('/system/charts')">
+      <n-button secondary size="small" @click="$router.push({ name: 'chart_list' })">
         <template #icon>
           <n-icon>
             <back-icon />
@@ -12,7 +12,7 @@
       <n-button
         secondary
         size="small"
-        @click="$router.push(`/system/charts/${model.id}/edit`)"
+        @click="$router.push({ name: 'chart_edit', params: { id: model.id } })"
       >{{ t('buttons.edit') }}</n-button>
     </template>
   </x-page-header>
@@ -55,13 +55,19 @@
       <x-description-item :label="t('fields.dashboard')">{{ model.dashboard }}</x-description-item>
       <x-description-item :label="t('fields.type')">{{ model.type }}</x-description-item>
       <x-description-item :label="t('fields.created_by')">
-        <x-anchor :url="`/system/users/${model.createdBy?.id}`">{{ model.createdBy?.name }}</x-anchor>
+        <x-anchor
+          :url="{ name: 'user_detail', params: { id: model.createdBy?.id } }"
+          v-if="model.createdBy?.id"
+        >{{ model.createdBy?.name }}</x-anchor>
       </x-description-item>
       <x-description-item :label="t('fields.created_at')">
         <n-time :time="model.createdAt" format="y-MM-dd HH:mm:ss" />
       </x-description-item>
       <x-description-item :label="t('fields.updated_by')">
-        <x-anchor :url="`/system/users/${model.updatedBy?.id}`">{{ model.updatedBy?.name }}</x-anchor>
+        <x-anchor
+          :url="{ name: 'user_detail', params: { id: model.updatedBy?.id } }"
+          v-if="model.updatedBy?.id"
+        >{{ model.updatedBy?.name }}</x-anchor>
       </x-description-item>
       <x-description-item :label="t('fields.updated_at')">
         <n-time :time="model.updatedAt" format="y-MM-dd HH:mm:ss" />

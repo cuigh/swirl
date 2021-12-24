@@ -111,7 +111,7 @@ const rules: any = {
 const form = ref();
 const { submit, submiting } = useForm(form, () => roleApi.save(model.value), () => {
   window.message.info(t('texts.action_success'));
-  router.push("/system/roles")
+  router.push({ name: 'role_list' })
 })
 
 function checkGroup(key: string, checked: boolean = true) {
