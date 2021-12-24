@@ -50,7 +50,7 @@ var Perms = map[string][]string{
 	"registry":  {"view", "edit", "delete"},
 	"node":      {"view", "edit", "delete"},
 	"network":   {"view", "edit", "delete", "disconnect"},
-	"service":   {"view", "edit", "delete", "restart", "rollback", "logs"},
+	"service":   {"view", "edit", "delete", "deploy", "restart", "rollback", "logs"},
 	"task":      {"view", "logs"},
 	"stack":     {"view", "edit", "delete", "deploy", "shutdown"},
 	"config":    {"view", "edit", "delete"},

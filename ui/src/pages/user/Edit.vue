@@ -71,6 +71,38 @@
             </n-space>
           </n-checkbox-group>
         </n-form-item-gi>
+        <n-form-item-gi :label="t('fields.tokens', 2)" span="2" path="tokens">
+          <n-dynamic-input
+            v-model:value="user.tokens"
+            #="{ index, value }"
+            :on-create="() => ({ name: '', value: guid() })"
+          >
+            <n-input
+              :placeholder="t('fields.name')"
+              v-model:value="value.name"
+              style="width: 300px"
+            />
+            <div style="height: 34px; line-height: 34px; margin: 0 8px">=</div>
+            <n-input-group>
+              <n-input :placeholder="t('fields.value')" v-model:value="value.value" readonly></n-input>
+              <n-tooltip trigger="hover">
+                <template #trigger>
+                  <n-button
+                    type="default"
+                    #icon
+                    @click="() => copy(value.value)"
+                    v-if="isSupported"
+                  >
+                    <n-icon>
+                      <copy-icon />
+                    </n-icon>
+                  </n-button>
+                </template>
+                {{ t(copied ? 'tips.copied' : 'buttons.copy') }}
+              </n-tooltip>
+            </n-input-group>
+          </n-dynamic-input>
+        </n-form-item-gi>
         <n-gi :span="2">
           <n-button
             :disabled="submiting"
@@ -97,6 +129,7 @@ import {
   NButton,
   NSpace,
   NInput,
+  NInputGroup,
   NIcon,
   NForm,
   NGrid,
@@ -107,10 +140,13 @@ import {
   NCheckbox,
   NRadioGroup,
   NRadio,
+  NDynamicInput,
+  NTooltip,
 } from "naive-ui";
 import {
   ArrowBackCircleOutline as BackIcon,
   SaveOutline as SaveIcon,
+  CopyOutline as CopyIcon,
 } from "@vicons/ionicons5";
 import XPageHeader from "@/components/PageHeader.vue";
 import { useRoute } from "vue-router";
@@ -119,8 +155,10 @@ import userApi from "@/api/user";
 import roleApi from "@/api/role";
 import type { User } from "@/api/user";
 import type { Role } from "@/api/role";
-import { useForm, emailRule, requiredRule } from "@/utils/form";
+import { useForm, emailRule, requiredRule, customRule } from "@/utils/form";
 import { useI18n } from 'vue-i18n'
+import { useClipboard } from '@vueuse/core'
+import { guid } from "@/utils";
 
 const { t } = useI18n()
 const route = useRoute();
@@ -132,12 +170,16 @@ const rules: any = {
   email: [requiredRule(), emailRule()],
   password: requiredRule(),
   passwordConfirm: requiredRule(),
+  tokens: customRule((rule: any, value: any[]) => {
+    return value?.every(v => v.name && v.value)
+  }, t('tips.required_rule')),
 };
 const form = ref();
 const { submit, submiting } = useForm(form, () => userApi.save(user.value), () => {
   window.message.info(t('texts.action_success'));
   router.push({ name: 'user_list' })
 })
+const { copy, copied, isSupported } = useClipboard()
 
 async function fetchData() {
   const id = route.params.id as string || ''

@@ -48,7 +48,7 @@ func (t Time) String() string {
 }
 
 type Operator struct {
-	ID   string `json:"id,omitempty" bson:"_id,omitempty"`
+	ID   string `json:"id,omitempty" bson:"id,omitempty"`
 	Name string `json:"name,omitempty" bson:"name,omitempty"`
 }
 
@@ -72,20 +72,21 @@ type Role struct {
 }
 
 type User struct {
-	ID        string   `json:"id,omitempty" bson:"_id"`
-	Name      string   `json:"name" bson:"name" valid:"required"`
-	LoginName string   `json:"loginName" bson:"login_name" valid:"required"`
-	Password  string   `json:"-" bson:"password"`
-	Salt      string   `json:"-" bson:"salt"`
-	Email     string   `json:"email" bson:"email" valid:"required"`
-	Admin     bool     `json:"admin" bson:"admin"`
-	Type      string   `json:"type" bson:"type"`
-	Status    int32    `json:"status" bson:"status"`
-	Roles     []string `json:"roles,omitempty" bson:"roles,omitempty"`
-	CreatedAt Time     `json:"createdAt" bson:"created_at"`
-	UpdatedAt Time     `json:"updatedAt" bson:"updated_at"`
-	CreatedBy Operator `json:"createdBy" bson:"created_by"`
-	UpdatedBy Operator `json:"updatedBy" bson:"updated_by"`
+	ID        string       `json:"id,omitempty" bson:"_id"`
+	Name      string       `json:"name" bson:"name" valid:"required"`
+	LoginName string       `json:"loginName" bson:"login_name" valid:"required"`
+	Password  string       `json:"-" bson:"password"`
+	Salt      string       `json:"-" bson:"salt"`
+	Email     string       `json:"email" bson:"email" valid:"required"`
+	Admin     bool         `json:"admin" bson:"admin"`
+	Type      string       `json:"type" bson:"type"`
+	Status    int32        `json:"status" bson:"status"`
+	Roles     []string     `json:"roles,omitempty" bson:"roles,omitempty"`
+	Tokens    data.Options `json:"tokens,omitempty" bson:"tokens,omitempty"`
+	CreatedAt Time         `json:"createdAt" bson:"created_at"`
+	UpdatedAt Time         `json:"updatedAt" bson:"updated_at"`
+	CreatedBy Operator     `json:"createdBy" bson:"created_by"`
+	UpdatedBy Operator     `json:"updatedBy" bson:"updated_by"`
 }
 
 type UserSearchArgs struct {

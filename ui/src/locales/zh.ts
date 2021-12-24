@@ -29,6 +29,7 @@ export default {
         "update": "更新",
         "submit": "提交",
         "home": "返回首页",
+        "copy": "复制",
     },
     "perms": {
         "view": "浏览",
@@ -182,6 +183,7 @@ export default {
         "admins": "@:fields.admin",
         "active": "正常",
         "blocked": "屏蔽",
+        "tokens": "凭证",
         "perms": "权限",
         "margin": "边距",
         "metrics": "指标",
@@ -372,6 +374,7 @@ export default {
         "profile": "用户个人资料",
         "password": "用户登录密码",
         "preference": "用户个性化设置",
+        "copied": "已复制",
         "required_rule": "不能为空",
         "email_rule": "电子邮箱格式不正确",
         "length_rule": "长度必须为 {min}-{max} 位",

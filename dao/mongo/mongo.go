@@ -24,6 +24,7 @@ var indexes = map[string][]mongo.IndexModel{
 			Options: options.Index().SetUnique(true),
 		},
 		mongo.IndexModel{Keys: bson.D{{"name", 1}}},
+		mongo.IndexModel{Keys: bson.D{{"tokens.value", 1}}},
 	},
 	"role": {
 		mongo.IndexModel{

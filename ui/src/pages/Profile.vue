@@ -28,6 +28,38 @@
             <n-form-item-gi :label="t('fields.email')" path="email">
               <n-input :placeholder="t('fields.email')" v-model:value="profile.email" />
             </n-form-item-gi>
+            <n-form-item-gi :label="t('fields.tokens')" path="tokens" span="2">
+              <n-dynamic-input
+                v-model:value="profile.tokens"
+                #="{ index, value }"
+                :on-create="() => ({ name: '', value: guid() })"
+              >
+                <n-input
+                  :placeholder="t('fields.name')"
+                  v-model:value="value.name"
+                  style="width: 300px"
+                />
+                <div style="height: 34px; line-height: 34px; margin: 0 8px">=</div>
+                <n-input-group>
+                  <n-input :placeholder="t('fields.value')" v-model:value="value.value" readonly></n-input>
+                  <n-tooltip trigger="hover">
+                    <template #trigger>
+                      <n-button
+                        type="default"
+                        #icon
+                        @click="() => copy(value.value)"
+                        v-if="isSupported"
+                      >
+                        <n-icon>
+                          <copy-icon />
+                        </n-icon>
+                      </n-button>
+                    </template>
+                    {{ t(copied ? 'tips.copied' : 'buttons.copy') }}
+                  </n-tooltip>
+                </n-input-group>
+              </n-dynamic-input>
+            </n-form-item-gi>
           </n-grid>
         </n-form>
         <n-button
@@ -153,6 +185,7 @@ import {
   NButton,
   NSpace,
   NInput,
+  NInputGroup,
   NIcon,
   NForm,
   NFormItem,
@@ -161,9 +194,12 @@ import {
   NRadioButton,
   NRadioGroup,
   NAlert,
+  NDynamicInput,
+  NTooltip,
 } from "naive-ui";
 import {
   SaveOutline as SaveIcon,
+  CopyOutline as CopyIcon,
 } from "@vicons/ionicons5";
 import XPageHeader from "@/components/PageHeader.vue";
 import XPanel from "@/components/Panel.vue";
@@ -173,6 +209,8 @@ import { useForm, emailRule, requiredRule, customRule, lengthRule } from "@/util
 import { Mutations } from "@/store/mutations";
 import { useStore } from "vuex";
 import { useI18n } from 'vue-i18n'
+import { useClipboard } from '@vueuse/core'
+import { guid } from "@/utils";
 
 const { t } = useI18n()
 const panel = ref('')
@@ -193,6 +231,7 @@ const profileRules: any = {
 };
 const profileForm = ref();
 const { submit: modifyProfile, submiting: profileSubmiting } = useForm(profileForm, () => userApi.modifyProfile(profile.value))
+const { copy, copied, isSupported } = useClipboard()
 
 // password
 const password = reactive({

@@ -1,39 +1,6 @@
 <template>
   <x-page-header />
   <n-space class="page-body" vertical :size="12">
-    <x-panel title="Deployment" divider="bottom" :collapsed="panel !== 'deploy'" v-if="false">
-      <template #action>
-        <n-button
-          secondary
-          strong
-          class="toggle"
-          size="small"
-          @click="togglePanel('deploy')"
-        >{{ panel === 'deploy' ? t('buttons.collapse') : t('buttons.expand') }}</n-button>
-      </template>
-      <div style="padding: 4px 0 0 12px">
-        <n-form :model="setting" ref="formDeploy" :show-feedback="false">
-          <n-form-item :label="t('fields.keys')" path="deploy.keys">
-            <n-dynamic-input
-              v-model:value="setting.deploy.keys"
-              #="{ index, value }"
-              :on-create="newKey"
-            >
-              <n-input-group>
-                <n-input :placeholder="t('fields.name')" v-model:value="value.name" />
-                <n-input :placeholder="t('fields.token')" v-model:value="value.token" />
-                <n-date-picker :placeholder="t('fields.expiry')" v-model:value="value.expiry" type="date" clearable style="min-width: 200px"/>
-              </n-input-group>
-            </n-dynamic-input>
-          </n-form-item>
-        </n-form>
-        <n-button
-          type="primary"
-          style="margin-top: 12px"
-          @click="() => save('deploy', setting.deploy)"
-        >{{ t('buttons.save') }}</n-button>
-      </div>
-    </x-panel>
     <x-panel title="LDAP" :subtitle="t('tips.ldap')" divider="bottom" :collapsed="panel !== 'ldap'">
       <template #action>
         <n-button
@@ -181,10 +148,8 @@ import {
   NFormItemGi,
   NRadioGroup,
   NRadio,
-  NDynamicInput,
   NSwitch,
   NAlert,
-  NDatePicker,
 } from "naive-ui";
 import XPageHeader from "@/components/PageHeader.vue";
 import XPanel from "@/components/Panel.vue";
@@ -209,10 +174,6 @@ function togglePanel(name: string) {
   } else {
     panel.value = name
   }
-}
-
-function newKey() {
-  return { name: '', token: '', expiry: undefined }
 }
 
 async function save(id: string, options: any) {

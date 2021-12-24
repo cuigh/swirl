@@ -28,6 +28,7 @@ func (d *Dao) UserUpdate(ctx context.Context, user *dao.User) (err error) {
 			"admin":      user.Admin,
 			"type":       user.Type,
 			"roles":      user.Roles,
+			"tokens":     user.Tokens,
 			"updated_at": user.UpdatedAt,
 			"updated_by": user.UpdatedBy,
 		},
@@ -90,12 +91,24 @@ func (d *Dao) UserGetByName(ctx context.Context, loginName string) (user *dao.Us
 	return
 }
 
+func (d *Dao) UserGetByToken(ctx context.Context, token string) (user *dao.User, err error) {
+	user = &dao.User{}
+	err = d.db.Collection(User).FindOne(ctx, bson.M{"tokens.value": token}).Decode(user)
+	if err == mongo.ErrNoDocuments {
+		return nil, nil
+	} else if err != nil {
+		return nil, err
+	}
+	return
+}
+
 func (d *Dao) UserUpdateProfile(ctx context.Context, user *dao.User) (err error) {
 	update := bson.M{
 		"$set": bson.M{
 			"name":       user.Name,
 			"login_name": user.LoginName,
 			"email":      user.Email,
+			"tokens":     user.Tokens,
 			"updated_at": user.UpdatedAt,
 			"updated_by": user.UpdatedBy,
 		},

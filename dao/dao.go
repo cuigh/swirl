@@ -30,6 +30,7 @@ type Interface interface {
 
 	UserGet(ctx context.Context, id string) (*User, error)
 	UserGetByName(ctx context.Context, loginName string) (*User, error)
+	UserGetByToken(ctx context.Context, token string) (user *User, err error)
 	UserSearch(ctx context.Context, args *UserSearchArgs) (users []*User, count int, err error)
 	UserCount(ctx context.Context) (int, error)
 	UserCreate(ctx context.Context, user *User) error

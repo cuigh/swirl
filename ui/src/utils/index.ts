@@ -47,3 +47,11 @@ export function isEmpty(...arrs: (any[] | undefined)[]): boolean {
 export function toTitle(s: string): string {
   return s ? s[0].toUpperCase() + s.substring(1) : s
 }
+
+export function guid() {
+  return s4() + s4() + s4() + s4() + s4() + s4() + s4() + s4()
+}
+
+function s4() {
+  return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+}

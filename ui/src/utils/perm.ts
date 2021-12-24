@@ -13,7 +13,7 @@ export const perms = [
     },
     {
         key: 'service',
-        actions: ['view', 'edit', 'delete', 'restart', 'rollback', 'logs'],
+        actions: ['view', 'edit', 'delete', 'deploy', 'restart', 'rollback', 'logs'],
     },
     {
         key: 'task',

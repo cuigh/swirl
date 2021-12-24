@@ -29,6 +29,7 @@ export default {
         "update": "Update",
         "submit": "Submit",
         "home": "Return to home",
+        "copy": "Copy",
     },
     "perms": {
         "view": "View",
@@ -182,6 +183,7 @@ export default {
         "admins": "Admins",
         "active": "Active",
         "blocked": "Blocked",
+        "tokens": "Tokens",
         "perms": "Permissions",
         "margin": "Margin",
         "metrics": "Metrics",
@@ -372,6 +374,7 @@ export default {
         "profile": "User personal information",
         "password": "User login password",
         "preference": "User personalization",
+        "copied": "Copied",
         "required_rule": "Cannot be empty",
         "email_rule": "Incorrect email format",
         "length_rule": "The length must be {min}-{max} bits",

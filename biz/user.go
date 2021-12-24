@@ -3,6 +3,7 @@ package biz
 import (
 	"context"
 
+	"github.com/cuigh/auxo/data"
 	"github.com/cuigh/auxo/errors"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/auxo/security/passwd"
@@ -30,6 +31,7 @@ type UserBiz interface {
 	Update(user *dao.User, ctxUser web.User) (err error)
 	FindByID(id string) (user *dao.User, err error)
 	FindByName(loginName string) (user *dao.User, err error)
+	FindByToken(token string) (user *dao.User, err error)
 	FindPrivacy(loginName string) (privacy *UserPrivacy, err error)
 	Count() (count int, err error)
 	Delete(id, name string, user web.User) (err error)
@@ -76,6 +78,10 @@ func (b *userBiz) FindByName(loginName string) (user *dao.User, err error) {
 	return b.d.UserGetByName(context.TODO(), loginName)
 }
 
+func (b *userBiz) FindByToken(token string) (user *dao.User, err error) {
+	return b.d.UserGetByToken(context.TODO(), token)
+}
+
 func (b *userBiz) FindPrivacy(loginName string) (privacy *UserPrivacy, err error) {
 	var u *dao.User
 	u, err = b.d.UserGetByName(context.TODO(), loginName)
@@ -93,6 +99,7 @@ func (b *userBiz) FindPrivacy(loginName string) (privacy *UserPrivacy, err error
 }
 
 func (b *userBiz) Create(user *dao.User, ctxUser web.User) (id string, err error) {
+	user.Tokens = data.Options{data.Option{Name: "test", Value: "abc123"}}
 	user.ID = createId()
 	user.Status = UserStatusActive
 	user.CreatedAt = now()

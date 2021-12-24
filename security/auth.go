@@ -42,7 +42,12 @@ func (c *Identifier) Apply(next web.HandlerFunc) web.HandlerFunc {
 	return func(ctx web.Context) error {
 		token := c.extractToken(ctx)
 		if token != "" {
-			user := c.identifyUser(token)
+			var user web.User
+			if len(token) == 24 {
+				user = c.identifyBySession(token)
+			} else {
+				user = c.identifyByToken(token)
+			}
 			ctx.SetUser(user)
 		}
 		return next(ctx)
@@ -105,7 +110,7 @@ func (c *Identifier) extractToken(ctx web.Context) (token string) {
 	return
 }
 
-func (c *Identifier) identifyUser(token string) web.User {
+func (c *Identifier) identifyBySession(token string) web.User {
 	session, err := c.sb.Find(token)
 	if err != nil {
 		c.logger.Error("failed to find session: ", err)
@@ -124,6 +129,30 @@ func (c *Identifier) identifyUser(token string) web.User {
 	}
 
 	return c.createUser(session)
+}
+
+func (c *Identifier) identifyByToken(token string) web.User {
+	u, err := c.ub.FindByToken(token)
+	if err != nil {
+		c.logger.Errorf("failed to find user by token '%s': %s", token, err)
+		return nil
+	} else if u == nil {
+		return nil
+	}
+
+	perms, err := c.rb.GetPerms(u.Roles)
+	if err != nil {
+		c.logger.Error("failed to load perms: ", err)
+		return nil
+	}
+
+	return &User{
+		token: token,
+		id:    u.ID,
+		name:  u.Name,
+		admin: u.Admin,
+		perm:  NewPermMap(perms),
+	}
 }
 
 func (c *Identifier) createUser(s *dao.Session) web.User {

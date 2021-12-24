@@ -17,6 +17,10 @@ export interface User {
     status: number;
     email: string;
     roles: string[];
+    tokens: {
+        name: string;
+        value: string;
+    }[];
     createdAt: number;
     updatedAt: number;
     createdBy: {

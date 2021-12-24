@@ -26,6 +26,7 @@ func (d *Dao) UserUpdate(ctx context.Context, user *dao.User) (err error) {
 		old.Admin = user.Admin
 		old.Type = user.Type
 		old.Roles = user.Roles
+		old.Tokens = user.Tokens
 		old.UpdatedAt = user.UpdatedAt
 		old.UpdatedBy = user.UpdatedBy
 		return old
@@ -101,12 +102,29 @@ func (d *Dao) UserGetByName(ctx context.Context, loginName string) (user *dao.Us
 	return nil, err
 }
 
+func (d *Dao) UserGetByToken(ctx context.Context, token string) (user *dao.User, err error) {
+	u := &dao.User{}
+	found, err := d.find(User, u, func() bool {
+		for _, t := range u.Tokens {
+			if t.Value == token {
+				return true
+			}
+		}
+		return false
+	})
+	if found {
+		return u, nil
+	}
+	return nil, err
+}
+
 func (d *Dao) UserUpdateProfile(ctx context.Context, user *dao.User) (err error) {
 	old := &dao.User{}
 	return d.update(User, user.ID, old, func() interface{} {
 		old.Name = user.Name
 		old.LoginName = user.LoginName
 		old.Email = user.Email
+		old.Tokens = user.Tokens
 		old.UpdatedAt = user.UpdatedAt
 		old.UpdatedBy = user.UpdatedBy
 		return old
