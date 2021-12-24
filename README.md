@@ -60,7 +60,6 @@ web:
 swirl:
   db_type: mongo
   db_address: mongodb://localhost:27017/swirl
-#  token_key: 80fe9a6d5c6d5dd39f27cd37a77faf8a
 #  token_expiry: 30m
 #  docker_api_version: '1.41'
 #  docker_endpoint: tcp://docker-proxy:2375

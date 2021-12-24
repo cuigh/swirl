@@ -50,7 +50,15 @@ func (b *serviceBiz) Find(name string, status bool) (service *Service, raw strin
 		s swarm.Service
 		r []byte
 	)
+
 	s, r, err = b.d.ServiceInspect(context.TODO(), name, status)
+	if err != nil {
+		if docker.IsErrNotFound(err) {
+			err = nil
+		}
+		return
+	}
+
 	if err == nil {
 		raw, err = indentJSON(r)
 	}

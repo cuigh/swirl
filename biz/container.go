@@ -37,11 +37,15 @@ func (b *containerBiz) Find(node, id string) (c *Container, raw string, err erro
 		r  []byte
 	)
 
-	if cj, r, err = b.d.ContainerInspect(context.TODO(), node, id); err == nil {
-		raw, err = indentJSON(r)
+	cj, r, err = b.d.ContainerInspect(context.TODO(), node, id)
+	if err != nil {
+		if docker.IsErrNotFound(err) {
+			err = nil
+		}
+		return
 	}
 
-	if err == nil {
+	if raw, err = indentJSON(r); err == nil {
 		c = newContainerDetail(&cj)
 	}
 	return

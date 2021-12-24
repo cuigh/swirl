@@ -30,10 +30,14 @@ func (b *taskBiz) Find(id string) (task *Task, raw string, err error) {
 	)
 
 	t, r, err = b.d.TaskInspect(context.TODO(), id)
-	if err == nil {
-		raw, err = indentJSON(r)
+	if err != nil {
+		if docker.IsErrNotFound(err) {
+			err = nil
+		}
+		return
 	}
 
+	raw, err = indentJSON(r)
 	if err == nil {
 		m, _ := b.d.NodeMap()
 		task = newTask(&t, m)

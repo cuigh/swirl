@@ -8,7 +8,6 @@ import (
 	"github.com/cuigh/auxo/log"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/biz"
-	"github.com/cuigh/swirl/docker"
 	"github.com/gobwas/ws"
 	"github.com/gobwas/ws/wsutil"
 )
@@ -72,10 +71,9 @@ func containerFind(b biz.ContainerBiz) web.HandlerFunc {
 		id := ctx.Query("id")
 		container, raw, err := b.Find(node, id)
 		if err != nil {
-			if docker.IsErrNotFound(err) {
-				return web.NewError(http.StatusNotFound, err.Error())
-			}
 			return err
+		} else if container == nil {
+			return web.NewError(http.StatusNotFound)
 		}
 		return success(ctx, data.Map{"container": container, "raw": raw})
 	}
@@ -127,9 +125,11 @@ func containerConnect(b biz.ContainerBiz) web.HandlerFunc {
 			cmd  = ctx.Query("cmd")
 		)
 
-		_, _, err := b.Find(node, id)
+		container, _, err := b.Find(node, id)
 		if err != nil {
 			return err
+		} else if container == nil {
+			return web.NewError(http.StatusNotFound)
 		}
 
 		conn, _, _, err := ws.UpgradeHTTP(ctx.Request(), ctx.Response())

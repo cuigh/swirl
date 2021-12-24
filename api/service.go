@@ -6,7 +6,6 @@ import (
 	"github.com/cuigh/auxo/data"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/biz"
-	"github.com/cuigh/swirl/docker"
 )
 
 // ServiceHandler encapsulates service related handlers.
@@ -73,10 +72,9 @@ func serviceFind(b biz.ServiceBiz) web.HandlerFunc {
 		status := ctx.Query("status") == "true"
 		service, raw, err := b.Find(name, status)
 		if err != nil {
-			if docker.IsErrNotFound(err) {
-				return web.NewError(http.StatusNotFound, err.Error())
-			}
 			return err
+		} else if service == nil {
+			return web.NewError(http.StatusNotFound)
 		}
 		return success(ctx, data.Map{"service": service, "raw": raw})
 	}
@@ -153,6 +151,7 @@ func serviceSave(b biz.ServiceBiz) web.HandlerFunc {
 
 func serviceDeploy(b biz.ServiceBiz) web.HandlerFunc {
 	return func(ctx web.Context) error {
+		//mode := ctx.Query("mode") // update/replace
 		service := &biz.Service{}
 		err := ctx.Bind(service, true)
 		if err != nil {
