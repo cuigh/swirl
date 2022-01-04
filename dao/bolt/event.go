@@ -5,6 +5,7 @@ import (
 	"sort"
 	"time"
 
+	"github.com/boltdb/bolt"
 	"github.com/cuigh/auxo/util/cast"
 	"github.com/cuigh/swirl/dao"
 	"github.com/cuigh/swirl/misc"
@@ -46,4 +47,17 @@ func (d *Dao) EventSearch(ctx context.Context, args *dao.EventSearchArgs) (event
 
 func (d *Dao) EventCreate(ctx context.Context, event *dao.Event) (err error) {
 	return d.replace(Event, event.ID.Hex(), event)
+}
+
+func (d *Dao) EventPrune(ctx context.Context, end time.Time) (err error) {
+	return d.db.Update(func(tx *bolt.Tx) (err error) {
+		b := tx.Bucket([]byte(Event))
+		return b.ForEach(func(k, v []byte) error {
+			event := &dao.Event{}
+			if err = decode(v, event); err == nil && time.Time(event.Time).Before(end) {
+				err = b.Delete(k)
+			}
+			return err
+		})
+	})
 }

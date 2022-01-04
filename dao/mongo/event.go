@@ -2,6 +2,7 @@ package mongo
 
 import (
 	"context"
+	"time"
 
 	"github.com/cuigh/swirl/dao"
 	"go.mongodb.org/mongo-driver/bson"
@@ -25,4 +26,10 @@ func (d *Dao) EventSearch(ctx context.Context, args *dao.EventSearchArgs) (event
 
 func (d *Dao) EventCreate(ctx context.Context, event *dao.Event) (err error) {
 	return d.create(ctx, Event, event)
+}
+
+func (d *Dao) EventPrune(ctx context.Context, end time.Time) (err error) {
+	filter := bson.M{"time": bson.M{"$lt": end}}
+	_, err = d.db.Collection(Event).DeleteMany(ctx, filter)
+	return
 }

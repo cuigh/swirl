@@ -28,6 +28,10 @@ export class EventApi {
     search(args: SearchArgs) {
         return ajax.get<SearchResult>('/event/search', args)
     }
+
+    prune(days: number) {
+        return ajax.post<Result<Object>>('/event/prune', { days })
+    }
 }
 
 export default new EventApi

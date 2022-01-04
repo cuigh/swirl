@@ -45,7 +45,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from "vue";
+import { h, reactive, ref } from "vue";
 import {
   NSpace,
   NButton,
@@ -53,6 +53,8 @@ import {
   NSelect,
   NInput,
   NIcon,
+  NFormItem,
+  NInputNumber,
 } from "naive-ui";
 import { CloseOutline as CloseIcon } from "@vicons/ionicons5";
 import XPageHeader from "@/components/PageHeader.vue";
@@ -61,7 +63,6 @@ import type { Event } from "@/api/event";
 import { useDataTable } from "@/utils/data-table";
 import { renderLink, renderTag, renderTime } from "@/utils/render";
 import { useI18n } from 'vue-i18n'
-import type { RouteLocationRaw } from "vue-router";
 
 const { t } = useI18n()
 const filter = reactive({
@@ -225,6 +226,21 @@ function renderObject(e: Event) {
 }
 
 function prune() {
-  window.message.info("TODO...")
+  const days = ref(7) as any
+  window.dialog.warning({
+    title: t('dialogs.prune_event.title'),
+    content: () => h(
+      NFormItem,
+      { label: t('dialogs.prune_event.label'), labelPlacement: 'top', showFeedback: false },
+      { default: () => h(NInputNumber, { min: 0, defaultValue: days, style: 'width: 100%' }) }
+    ),
+    positiveText: t('buttons.confirm'),
+    negativeText: t('buttons.cancel'),
+    onPositiveClick: async () => {
+      eventApi.prune(days.value);
+      window.message.success(t('texts.action_success'))
+      fetchData()
+    }
+  })
 }
 </script>

@@ -247,6 +247,10 @@ export default {
             "title": "Prune volume",
             "body": "Are you sure you want to clean up unused data volumes?",
         },
+        "prune_event": {
+            "title": "Prune event",
+            "label": "Retention days",
+        },
     },
     "objects": {
         "registry": "Registry | Registries",

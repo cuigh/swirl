@@ -2,8 +2,10 @@ package biz
 
 import (
 	"context"
+	"time"
 
 	"github.com/cuigh/auxo/data"
+	"github.com/cuigh/auxo/ext/times"
 	"github.com/cuigh/auxo/log"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/dao"
@@ -47,6 +49,7 @@ const (
 
 type EventBiz interface {
 	Search(args *dao.EventSearchArgs) (events []*dao.Event, total int, err error)
+	Prune(days int32) (err error)
 	CreateRegistry(action EventAction, id, name string, user web.User)
 	CreateNode(action EventAction, id, name string, user web.User)
 	CreateNetwork(action EventAction, id, name string, user web.User)
@@ -73,6 +76,10 @@ type eventBiz struct {
 
 func (b *eventBiz) Search(args *dao.EventSearchArgs) (events []*dao.Event, total int, err error) {
 	return b.d.EventSearch(context.TODO(), args)
+}
+
+func (b *eventBiz) Prune(days int32) (err error) {
+	return b.d.EventPrune(context.TODO(), time.Now().Add(-times.Days(days)))
 }
 
 func (b *eventBiz) create(et EventType, ea EventAction, args data.Map, user web.User) {

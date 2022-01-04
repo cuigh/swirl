@@ -2,7 +2,6 @@ package api
 
 import (
 	"github.com/cuigh/auxo/data"
-	"github.com/cuigh/auxo/errors"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/biz"
 	"github.com/cuigh/swirl/dao"
@@ -47,15 +46,13 @@ func eventSearch(b biz.EventBiz) web.HandlerFunc {
 
 func eventPrune(b biz.EventBiz) web.HandlerFunc {
 	type Args struct {
-		Date string `json:"date"`
+		Days int32 `json:"days"`
 	}
 
 	return func(ctx web.Context) (err error) {
 		var args = &Args{}
 		if err = ctx.Bind(args); err == nil {
-			// TODO
-			//err = b.Prune(args.Date)
-			err = errors.NotImplemented
+			err = b.Prune(args.Days)
 		}
 		return ajax(ctx, err)
 	}

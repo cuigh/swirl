@@ -61,6 +61,7 @@ type Interface interface {
 
 	EventSearch(ctx context.Context, args *EventSearchArgs) (events []*Event, count int, err error)
 	EventCreate(ctx context.Context, event *Event) error
+	EventPrune(ctx context.Context, end time.Time) (err error)
 
 	SettingGet(ctx context.Context, id string) (*Setting, error)
 	SettingGetAll(ctx context.Context) (settings []*Setting, err error)

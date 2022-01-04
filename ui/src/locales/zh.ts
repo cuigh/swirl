@@ -247,6 +247,10 @@ export default {
             "title": "清理数据卷",
             "body": "是否确实要清理未使用的数据卷？",
         },
+        "prune_event": {
+            "title": "清理事件",
+            "label": "保留天数",
+        },
     },
     "objects": {
         "registry": "镜像仓库",
