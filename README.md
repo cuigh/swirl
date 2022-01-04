@@ -82,7 +82,6 @@ Only these options can be set by environment variables for now.
 |--------------------|----------------------------------|
 | DB_TYPE            | mongo(default),bolt              |
 | DB_ADDRESS         | mongodb://localhost:27017/swirl  |
-| TOKEN_KEY          | 80fe9a6d5c6d5dd39f27cd37a77faf8a |
 | TOKEN_EXPIRY       | 30m                              |
 | DOCKER_ENDPOINT    | tcp://docker-proxy:2375          |
 | DOCKER_API_VERSION | 1.41                             |

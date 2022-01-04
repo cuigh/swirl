@@ -1,5 +1,5 @@
 <template>
-  <x-page-header :subtitle="model.id">
+  <x-page-header :subtitle="image.id">
     <template #action>
       <n-button secondary size="small" @click="$router.push({ name: 'image_list' })">
         <template #icon>
@@ -16,44 +16,44 @@
       <n-tab-pane name="detail" :tab="t('fields.detail')">
         <n-space vertical :size="16">
           <x-description label-placement="left" label-align="right" :label-width="110">
-            <x-description-item :label="t('fields.id')" :span="2">{{ model.id }}</x-description-item>
+            <x-description-item :label="t('fields.id')" :span="2">{{ image.id }}</x-description-item>
             <x-description-item
               :label="t('fields.tags')"
               :span="2"
-              v-if="model.tags && model.tags.length"
+              v-if="image.tags && image.tags.length"
             >
               <n-space :size="4">
-                <n-tag round size="small" type="default" v-for="tag in model.tags">{{ tag }}</n-tag>
+                <n-tag round size="small" type="default" v-for="tag in image.tags">{{ tag }}</n-tag>
               </n-space>
             </x-description-item>
-            <x-description-item :label="t('fields.created_at')" :span="2">{{ model.created }}</x-description-item>
-            <x-description-item :label="t('fields.size')">{{ formatSize(model.size) }}</x-description-item>
-            <x-description-item :label="t('fields.platform')">{{ model.os + "/" + model.arch }}</x-description-item>
+            <x-description-item :label="t('fields.created_at')" :span="2">{{ image.created }}</x-description-item>
+            <x-description-item :label="t('fields.size')">{{ formatSize(image.size) }}</x-description-item>
+            <x-description-item :label="t('fields.platform')">{{ image.os + "/" + image.arch }}</x-description-item>
             <x-description-item
               :label="t('fields.docker_version')"
-              v-if="model.dockerVersion"
+              v-if="image.dockerVersion"
               :span="2"
-            >{{ model.dockerVersion }}</x-description-item>
+            >{{ image.dockerVersion }}</x-description-item>
             <x-description-item
               :label="t('fields.graph_driver')"
-              v-if="model.graphDriver?.name"
-            >{{ model.graphDriver?.name }}</x-description-item>
+              v-if="image.graphDriver?.name"
+            >{{ image.graphDriver?.name }}</x-description-item>
             <x-description-item
               :label="t('fields.root_fs')"
-              v-if="model.rootFS?.type"
-            >{{ model.rootFS?.type }}</x-description-item>
+              v-if="image.rootFS?.type"
+            >{{ image.rootFS?.type }}</x-description-item>
             <x-description-item
               :label="t('fields.comment')"
-              v-if="model.comment"
+              v-if="image.comment"
               :span="2"
-            >{{ model.comment }}</x-description-item>
+            >{{ image.comment }}</x-description-item>
           </x-description>
-          <x-panel :title="t('fields.layers')" v-if="model.histories && model.histories.length">
+          <x-panel :title="t('fields.layers')" v-if="image.histories && image.histories.length">
             <n-data-table
               remote
               size="small"
               :columns="columns"
-              :data="model.histories"
+              :data="image.histories"
               scroll-x="max-content"
             />
           </x-panel>
@@ -90,7 +90,7 @@ import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 const route = useRoute();
-const model = ref({} as Image);
+const image = ref({} as Image);
 const raw = ref('');
 const node = route.params.node as string || '';
 const columns = [
@@ -139,8 +139,9 @@ const columns = [
 async function fetchData() {
   const id = route.params.id as string;
   let r = await imageApi.find(node, id);
-  model.value = r.data?.image as Image;
   raw.value = r.data?.raw as string;
+  image.value = r.data?.image as Image;
+  image.value.histories && image.value.histories.reverse();
 }
 
 onMounted(fetchData);

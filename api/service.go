@@ -166,7 +166,9 @@ func serviceDeploy(b biz.ServiceBiz) web.HandlerFunc {
 		if s == nil {
 			err = b.Create(service, ctx.User())
 		} else {
-			err = b.Update(service, ctx.User())
+			// Only the image field is allowed to be changed when updating.
+			s.Image = service.Image
+			err = b.Update(s, ctx.User())
 		}
 		return ajax(ctx, err)
 	}
