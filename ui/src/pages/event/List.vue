@@ -203,7 +203,7 @@ function renderObject(e: Event) {
       return renderLink({ name: e.type.toLowerCase() + '_detail', params: { name: e.args.name } }, e.args.name)
     case "Image":
       if (e.args.id) {
-        return renderLink({ name: 'image_detail', params: { node: e.args.node || '-', id: e.args.id } }, e.args.id)
+        return renderLink({ name: 'image_detail', params: { node: e.args.node || '-', id: e.args.id } }, e.args.id.substring(7, 19))
       } else {
         return renderLink({ name: 'image_list' }, t('objects.image'))
       }

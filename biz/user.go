@@ -126,7 +126,10 @@ func (b *userBiz) Update(user *dao.User, ctxUser web.User) (err error) {
 	user.UpdatedAt = now()
 	user.UpdatedBy = newOperator(ctxUser)
 	if err = b.d.UserUpdate(context.TODO(), user); err == nil {
-		b.eb.CreateUser(EventActionUpdate, user.LoginName, user.Name, ctxUser)
+		go func() {
+			_ = b.d.SessionUpdateDirty(context.TODO(), user.ID, "")
+			b.eb.CreateUser(EventActionUpdate, user.LoginName, user.Name, ctxUser)
+		}()
 	}
 	return
 }

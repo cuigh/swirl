@@ -50,7 +50,10 @@ func (b *roleBiz) Create(role *dao.Role, user web.User) (err error) {
 func (b *roleBiz) Delete(id, name string, user web.User) (err error) {
 	err = b.d.RoleDelete(context.TODO(), id)
 	if err == nil {
-		b.eb.CreateRole(EventActionDelete, id, name, user)
+		go func() {
+			_ = b.d.SessionUpdateDirty(context.TODO(), "", id)
+			b.eb.CreateRole(EventActionDelete, id, name, user)
+		}()
 	}
 	return
 }
@@ -70,7 +73,10 @@ func (b *roleBiz) Update(role *dao.Role, user web.User) (err error) {
 	}
 	err = b.d.RoleUpdate(context.TODO(), r)
 	if err == nil {
-		b.eb.CreateRole(EventActionUpdate, role.ID, role.Name, user)
+		go func() {
+			_ = b.d.SessionUpdateDirty(context.TODO(), "", role.ID)
+			b.eb.CreateRole(EventActionUpdate, role.ID, role.Name, user)
+		}()
 	}
 	return
 }
