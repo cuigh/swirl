@@ -20,7 +20,7 @@ func Register(name string, builder Builder) {
 
 // Interface is the interface that wraps all dao methods.
 type Interface interface {
-	Init() error
+	Init(ctx context.Context) error
 
 	RoleGet(ctx context.Context, id string) (*Role, error)
 	RoleSearch(ctx context.Context, name string) (roles []*Role, err error)

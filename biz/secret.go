@@ -10,11 +10,11 @@ import (
 )
 
 type SecretBiz interface {
-	Search(name string, pageIndex, pageSize int) (secrets []*Secret, total int, err error)
-	Find(id string) (secret *Secret, raw string, err error)
-	Delete(id, name string, user web.User) (err error)
-	Create(c *Secret, user web.User) (err error)
-	Update(c *Secret, user web.User) (err error)
+	Search(ctx context.Context, name string, pageIndex, pageSize int) (secrets []*Secret, total int, err error)
+	Find(ctx context.Context, id string) (secret *Secret, raw string, err error)
+	Delete(ctx context.Context, id, name string, user web.User) (err error)
+	Create(ctx context.Context, secret *Secret, user web.User) (err error)
+	Update(ctx context.Context, secret *Secret, user web.User) (err error)
 }
 
 func NewSecret(d *docker.Docker, eb EventBiz) SecretBiz {
@@ -26,12 +26,12 @@ type secretBiz struct {
 	eb EventBiz
 }
 
-func (b *secretBiz) Find(id string) (secret *Secret, raw string, err error) {
+func (b *secretBiz) Find(ctx context.Context, id string) (secret *Secret, raw string, err error) {
 	var (
 		c swarm.Secret
 		r []byte
 	)
-	c, r, err = b.d.SecretInspect(context.TODO(), id)
+	c, r, err = b.d.SecretInspect(ctx, id)
 	if err == nil {
 		raw, err = indentJSON(r)
 	}
@@ -41,8 +41,8 @@ func (b *secretBiz) Find(id string) (secret *Secret, raw string, err error) {
 	return
 }
 
-func (b *secretBiz) Search(name string, pageIndex, pageSize int) ([]*Secret, int, error) {
-	list, total, err := b.d.SecretList(context.TODO(), name, pageIndex, pageSize)
+func (b *secretBiz) Search(ctx context.Context, name string, pageIndex, pageSize int) ([]*Secret, int, error) {
+	list, total, err := b.d.SecretList(ctx, name, pageIndex, pageSize)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -54,15 +54,15 @@ func (b *secretBiz) Search(name string, pageIndex, pageSize int) ([]*Secret, int
 	return secrets, total, nil
 }
 
-func (b *secretBiz) Delete(id, name string, user web.User) (err error) {
-	err = b.d.SecretRemove(context.TODO(), id)
+func (b *secretBiz) Delete(ctx context.Context, id, name string, user web.User) (err error) {
+	err = b.d.SecretRemove(ctx, id)
 	if err == nil {
 		b.eb.CreateSecret(EventActionDelete, id, name, user)
 	}
 	return
 }
 
-func (b *secretBiz) Create(c *Secret, user web.User) (err error) {
+func (b *secretBiz) Create(ctx context.Context, c *Secret, user web.User) (err error) {
 	spec := swarm.SecretSpec{
 		Data: []byte(c.Data),
 	}
@@ -82,14 +82,14 @@ func (b *secretBiz) Create(c *Secret, user web.User) (err error) {
 	}
 
 	var id string
-	id, err = b.d.SecretCreate(context.TODO(), &spec)
+	id, err = b.d.SecretCreate(ctx, &spec)
 	if err != nil {
 		b.eb.CreateSecret(EventActionCreate, id, c.Name, user)
 	}
 	return
 }
 
-func (b *secretBiz) Update(c *Secret, user web.User) (err error) {
+func (b *secretBiz) Update(ctx context.Context, c *Secret, user web.User) (err error) {
 	spec := &swarm.SecretSpec{
 		Data: []byte(c.Data),
 	}
@@ -107,7 +107,7 @@ func (b *secretBiz) Update(c *Secret, user web.User) (err error) {
 			Options: toMap(c.Templating.Options),
 		}
 	}
-	err = b.d.SecretUpdate(context.TODO(), c.ID, c.Version, spec)
+	err = b.d.SecretUpdate(ctx, c.ID, c.Version, spec)
 	if err == nil {
 		b.eb.CreateSecret(EventActionUpdate, c.ID, c.Name, user)
 	}

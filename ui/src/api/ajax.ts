@@ -19,7 +19,7 @@ class Ajax {
     constructor() {
         this.ajax = axios.create({
             baseURL: import.meta.env.MODE === 'development' ? '/api' : '/api',
-            timeout: 10000,
+            timeout: 30000,
             // withCredentials: true,            
         })
 

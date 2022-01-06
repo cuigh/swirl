@@ -8,10 +8,10 @@ import (
 )
 
 type SessionBiz interface {
-	Find(token string) (session *dao.Session, err error)
-	Create(session *dao.Session) (err error)
-	Update(session *dao.Session) (err error)
-	UpdateExpiry(id string, expiry time.Time) (err error)
+	Find(ctx context.Context, token string) (session *dao.Session, err error)
+	Create(ctx context.Context, session *dao.Session) (err error)
+	Update(ctx context.Context, session *dao.Session) (err error)
+	UpdateExpiry(ctx context.Context, id string, expiry time.Time) (err error)
 }
 
 func NewSession(d dao.Interface, rb RoleBiz) SessionBiz {
@@ -23,22 +23,22 @@ type sessionBiz struct {
 	rb RoleBiz
 }
 
-func (b *sessionBiz) Find(token string) (session *dao.Session, err error) {
-	return b.d.SessionGet(context.TODO(), token)
+func (b *sessionBiz) Find(ctx context.Context, token string) (session *dao.Session, err error) {
+	return b.d.SessionGet(ctx, token)
 }
 
-func (b *sessionBiz) Create(session *dao.Session) (err error) {
+func (b *sessionBiz) Create(ctx context.Context, session *dao.Session) (err error) {
 	session.CreatedAt = time.Now()
 	session.UpdatedAt = session.CreatedAt
-	return b.d.SessionCreate(context.TODO(), session)
+	return b.d.SessionCreate(ctx, session)
 }
 
-func (b *sessionBiz) Update(session *dao.Session) (err error) {
+func (b *sessionBiz) Update(ctx context.Context, session *dao.Session) (err error) {
 	session.Dirty = false
 	session.UpdatedAt = time.Now()
-	return b.d.SessionUpdate(context.TODO(), session)
+	return b.d.SessionUpdate(ctx, session)
 }
 
-func (b *sessionBiz) UpdateExpiry(id string, expiry time.Time) (err error) {
-	return b.d.SessionUpdateExpiry(context.TODO(), id, expiry)
+func (b *sessionBiz) UpdateExpiry(ctx context.Context, id string, expiry time.Time) (err error) {
+	return b.d.SessionUpdateExpiry(ctx, id, expiry)
 }

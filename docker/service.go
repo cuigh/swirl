@@ -134,7 +134,7 @@ func (d *Docker) ServiceRollback(ctx context.Context, name string) error {
 		options := types.ServiceUpdateOptions{
 			Rollback: "previous",
 		}
-		resp, err := c.ServiceUpdate(context.Background(), name, service.Version, service.Spec, options)
+		resp, err := c.ServiceUpdate(ctx, name, service.Version, service.Spec, options)
 		if err == nil && len(resp.Warnings) > 0 {
 			d.logger.Warnf("service '%s' was rollbacked but got warnings: %v", name, resp.Warnings)
 		}
@@ -151,7 +151,7 @@ func (d *Docker) ServiceRestart(ctx context.Context, name string) error {
 		}
 
 		service.Spec.TaskTemplate.ForceUpdate++
-		resp, err := c.ServiceUpdate(context.Background(), name, service.Version, service.Spec, types.ServiceUpdateOptions{})
+		resp, err := c.ServiceUpdate(ctx, name, service.Version, service.Spec, types.ServiceUpdateOptions{})
 		if err == nil && len(resp.Warnings) > 0 {
 			d.logger.Warnf("service '%s' was restarted but got warnings: %v", name, resp.Warnings)
 		}
@@ -180,7 +180,7 @@ func (d *Docker) ServiceScale(ctx context.Context, name string, count, version u
 		if version > 0 {
 			ver = swarm.Version{Index: version}
 		}
-		resp, err := c.ServiceUpdate(context.Background(), name, ver, spec, types.ServiceUpdateOptions{})
+		resp, err := c.ServiceUpdate(ctx, name, ver, spec, types.ServiceUpdateOptions{})
 		if err == nil && len(resp.Warnings) > 0 {
 			d.logger.Warnf("service %s was scaled but got warnings: %v", name, resp.Warnings)
 		}

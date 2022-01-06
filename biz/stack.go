@@ -13,13 +13,13 @@ import (
 )
 
 type StackBiz interface {
-	Search(name, filter string) (stacks []*dao.Stack, err error)
-	Find(name string) (stack *dao.Stack, err error)
-	Delete(name string, user web.User) (err error)
-	Shutdown(name string, user web.User) (err error)
-	Deploy(name string, user web.User) (err error)
-	Create(s *dao.Stack, user web.User) (err error)
-	Update(s *dao.Stack, user web.User) (err error)
+	Search(ctx context.Context, name, filter string) (stacks []*dao.Stack, err error)
+	Find(ctx context.Context, name string) (stack *dao.Stack, err error)
+	Delete(ctx context.Context, name string, user web.User) (err error)
+	Shutdown(ctx context.Context, name string, user web.User) (err error)
+	Deploy(ctx context.Context, name string, user web.User) (err error)
+	Create(ctx context.Context, s *dao.Stack, user web.User) (err error)
+	Update(ctx context.Context, s *dao.Stack, user web.User) (err error)
 }
 
 func NewStack(d *docker.Docker, s dao.Interface, eb EventBiz) StackBiz {
@@ -32,20 +32,20 @@ type stackBiz struct {
 	eb EventBiz
 }
 
-func (b *stackBiz) Search(name, filter string) (stacks []*dao.Stack, err error) {
+func (b *stackBiz) Search(ctx context.Context, name, filter string) (stacks []*dao.Stack, err error) {
 	var (
 		activeStacks   map[string][]string
 		internalStacks []*dao.Stack
 	)
 
 	// load real stacks
-	activeStacks, err = b.d.StackList(context.TODO())
+	activeStacks, err = b.d.StackList(ctx)
 	if err != nil {
 		return
 	}
 
 	// load stack definitions
-	internalStacks, err = b.s.StackGetAll(context.TODO())
+	internalStacks, err = b.s.StackGetAll(ctx)
 	if err != nil {
 		return
 	}
@@ -70,8 +70,8 @@ func (b *stackBiz) Search(name, filter string) (stacks []*dao.Stack, err error) 
 	return
 }
 
-func (b *stackBiz) Find(name string) (s *dao.Stack, err error) {
-	s, err = b.s.StackGet(context.TODO(), name)
+func (b *stackBiz) Find(ctx context.Context, name string) (s *dao.Stack, err error) {
+	s, err = b.s.StackGet(ctx, name)
 	if err != nil {
 		return nil, err
 	} else if s == nil {
@@ -105,7 +105,7 @@ func (b *stackBiz) filter(stack *dao.Stack, name, filter string) bool {
 	return false
 }
 
-func (b *stackBiz) Create(s *dao.Stack, user web.User) (err error) {
+func (b *stackBiz) Create(ctx context.Context, s *dao.Stack, user web.User) (err error) {
 	stack := &dao.Stack{
 		Name:      s.Name,
 		Content:   s.Content,
@@ -114,31 +114,31 @@ func (b *stackBiz) Create(s *dao.Stack, user web.User) (err error) {
 	}
 	stack.UpdatedAt = stack.CreatedAt
 	stack.UpdatedBy = stack.CreatedBy
-	err = b.s.StackCreate(context.TODO(), stack)
+	err = b.s.StackCreate(ctx, stack)
 	if err == nil {
 		b.eb.CreateStack(EventActionCreate, stack.Name, user)
 	}
 	return
 }
 
-func (b *stackBiz) Update(s *dao.Stack, user web.User) (err error) {
+func (b *stackBiz) Update(ctx context.Context, s *dao.Stack, user web.User) (err error) {
 	stack := &dao.Stack{
 		Name:      s.Name,
 		Content:   s.Content,
 		UpdatedAt: now(),
 		UpdatedBy: newOperator(user),
 	}
-	err = b.s.StackUpdate(context.TODO(), stack)
+	err = b.s.StackUpdate(ctx, stack)
 	if err == nil {
 		b.eb.CreateStack(EventActionUpdate, stack.Name, user)
 	}
 	return
 }
 
-func (b *stackBiz) Delete(name string, user web.User) (err error) {
-	err = b.d.StackRemove(context.TODO(), name)
+func (b *stackBiz) Delete(ctx context.Context, name string, user web.User) (err error) {
+	err = b.d.StackRemove(ctx, name)
 	if err == nil {
-		err = b.s.StackDelete(context.TODO(), name)
+		err = b.s.StackDelete(ctx, name)
 	}
 	if err == nil {
 		b.eb.CreateStack(EventActionDelete, name, user)
@@ -146,16 +146,16 @@ func (b *stackBiz) Delete(name string, user web.User) (err error) {
 	return
 }
 
-func (b *stackBiz) Shutdown(name string, user web.User) (err error) {
-	err = b.d.StackRemove(context.TODO(), name)
+func (b *stackBiz) Shutdown(ctx context.Context, name string, user web.User) (err error) {
+	err = b.d.StackRemove(ctx, name)
 	if err == nil {
 		b.eb.CreateStack(EventActionShutdown, name, user)
 	}
 	return
 }
 
-func (b *stackBiz) Deploy(name string, user web.User) (err error) {
-	stack, err := b.s.StackGet(context.TODO(), name)
+func (b *stackBiz) Deploy(ctx context.Context, name string, user web.User) (err error) {
+	stack, err := b.s.StackGet(ctx, name)
 	if err != nil {
 		return err
 	} else if stack == nil {
@@ -167,7 +167,7 @@ func (b *stackBiz) Deploy(name string, user web.User) (err error) {
 		return err
 	}
 
-	registries, err := b.s.RegistryGetAll(context.TODO())
+	registries, err := b.s.RegistryGetAll(ctx)
 	if err != nil {
 		return err
 	}
@@ -184,7 +184,7 @@ func (b *stackBiz) Deploy(name string, user web.User) (err error) {
 		}
 	}
 
-	err = b.d.StackDeploy(context.TODO(), cfg, authes)
+	err = b.d.StackDeploy(ctx, cfg, authes)
 	if err == nil {
 		b.eb.CreateStack(EventActionDeploy, name, user)
 	}

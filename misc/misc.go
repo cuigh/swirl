@@ -1,6 +1,11 @@
 package misc
 
-import "github.com/cuigh/auxo/errors"
+import (
+	"context"
+	"time"
+
+	"github.com/cuigh/auxo/errors"
+)
 
 const (
 	ErrInvalidToken         = 1001
@@ -23,4 +28,8 @@ func Page(count, pageIndex, pageSize int) (start, end int) {
 		end = count
 	}
 	return
+}
+
+func Context(timeout time.Duration) (context.Context, context.CancelFunc) {
+	return context.WithTimeout(context.Background(), timeout)
 }

@@ -12,9 +12,9 @@ import (
 )
 
 type SettingBiz interface {
-	Find(id string) (options interface{}, err error)
-	Load() (options data.Map, err error)
-	Save(id string, options interface{}, user web.User) (err error)
+	Find(ctx context.Context, id string) (options interface{}, err error)
+	Load(ctx context.Context) (options data.Map, err error)
+	Save(ctx context.Context, id string, options interface{}, user web.User) (err error)
 }
 
 func NewSetting(d dao.Interface, eb EventBiz) SettingBiz {
@@ -26,9 +26,9 @@ type settingBiz struct {
 	eb EventBiz
 }
 
-func (b *settingBiz) Find(id string) (options interface{}, err error) {
+func (b *settingBiz) Find(ctx context.Context, id string) (options interface{}, err error) {
 	var setting *dao.Setting
-	setting, err = b.d.SettingGet(context.TODO(), id)
+	setting, err = b.d.SettingGet(ctx, id)
 	if err == nil && setting != nil {
 		return b.unmarshal(setting.Options)
 	}
@@ -36,9 +36,9 @@ func (b *settingBiz) Find(id string) (options interface{}, err error) {
 }
 
 // Load returns settings of swirl. If not found, default settings will be returned.
-func (b *settingBiz) Load() (options data.Map, err error) {
+func (b *settingBiz) Load(ctx context.Context) (options data.Map, err error) {
 	var settings []*dao.Setting
-	settings, err = b.d.SettingGetAll(context.TODO())
+	settings, err = b.d.SettingGetAll(ctx)
 	if err != nil {
 		return
 	}
@@ -54,7 +54,7 @@ func (b *settingBiz) Load() (options data.Map, err error) {
 	return
 }
 
-func (b *settingBiz) Save(id string, options interface{}, user web.User) (err error) {
+func (b *settingBiz) Save(ctx context.Context, id string, options interface{}, user web.User) (err error) {
 	setting := &dao.Setting{
 		ID:        id,
 		UpdatedAt: time.Now(),
@@ -65,7 +65,7 @@ func (b *settingBiz) Save(id string, options interface{}, user web.User) (err er
 
 	setting.Options, err = b.marshal(options)
 	if err == nil {
-		err = b.d.SettingUpdate(context.TODO(), setting)
+		err = b.d.SettingUpdate(ctx, setting)
 	}
 	if err == nil && user != nil {
 		b.eb.CreateSetting(EventActionUpdate, user)

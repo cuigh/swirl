@@ -4,6 +4,7 @@ import (
 	"github.com/cuigh/auxo/data"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/biz"
+	"github.com/cuigh/swirl/misc"
 )
 
 // SecretHandler encapsulates secret related handlers.
@@ -31,22 +32,25 @@ func secretSearch(b biz.SecretBiz) web.HandlerFunc {
 		PageSize  int    `json:"pageSize" bind:"pageSize"`
 	}
 
-	return func(ctx web.Context) (err error) {
+	return func(c web.Context) (err error) {
 		var (
 			args    = &Args{}
 			secrets []*biz.Secret
 			total   int
 		)
 
-		if err = ctx.Bind(args); err == nil {
-			secrets, total, err = b.Search(args.Name, args.PageIndex, args.PageSize)
+		if err = c.Bind(args); err == nil {
+			ctx, cancel := misc.Context(defaultTimeout)
+			defer cancel()
+
+			secrets, total, err = b.Search(ctx, args.Name, args.PageIndex, args.PageSize)
 		}
 
 		if err != nil {
 			return
 		}
 
-		return success(ctx, data.Map{
+		return success(c, data.Map{
 			"items": secrets,
 			"total": total,
 		})
@@ -54,13 +58,16 @@ func secretSearch(b biz.SecretBiz) web.HandlerFunc {
 }
 
 func secretFind(b biz.SecretBiz) web.HandlerFunc {
-	return func(ctx web.Context) error {
-		id := ctx.Query("id")
-		secret, raw, err := b.Find(id)
+	return func(c web.Context) error {
+		ctx, cancel := misc.Context(defaultTimeout)
+		defer cancel()
+
+		id := c.Query("id")
+		secret, raw, err := b.Find(ctx, id)
 		if err != nil {
 			return err
 		}
-		return success(ctx, data.Map{"secret": secret, "raw": raw})
+		return success(c, data.Map{"secret": secret, "raw": raw})
 	}
 }
 
@@ -69,26 +76,32 @@ func secretDelete(b biz.SecretBiz) web.HandlerFunc {
 		ID   string `json:"id"`
 		Name string `json:"name"`
 	}
-	return func(ctx web.Context) (err error) {
+	return func(c web.Context) (err error) {
 		args := &Args{}
-		if err = ctx.Bind(args); err == nil {
-			err = b.Delete(args.ID, args.Name, ctx.User())
+		if err = c.Bind(args); err == nil {
+			ctx, cancel := misc.Context(defaultTimeout)
+			defer cancel()
+
+			err = b.Delete(ctx, args.ID, args.Name, c.User())
 		}
-		return ajax(ctx, err)
+		return ajax(c, err)
 	}
 }
 
 func secretSave(b biz.SecretBiz) web.HandlerFunc {
-	return func(ctx web.Context) error {
-		c := &biz.Secret{}
-		err := ctx.Bind(c, true)
+	return func(c web.Context) error {
+		secret := &biz.Secret{}
+		err := c.Bind(secret, true)
 		if err == nil {
-			if c.ID == "" {
-				err = b.Create(c, ctx.User())
+			ctx, cancel := misc.Context(defaultTimeout)
+			defer cancel()
+
+			if secret.ID == "" {
+				err = b.Create(ctx, secret, c.User())
 			} else {
-				err = b.Update(c, ctx.User())
+				err = b.Update(ctx, secret, c.User())
 			}
 		}
-		return ajax(ctx, err)
+		return ajax(c, err)
 	}
 }

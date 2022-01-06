@@ -5,6 +5,7 @@ import (
 
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/biz"
+	"github.com/cuigh/swirl/misc"
 )
 
 // SettingHandler encapsulates setting related handlers.
@@ -22,12 +23,15 @@ func NewSetting(b biz.SettingBiz) *SettingHandler {
 }
 
 func settingLoad(b biz.SettingBiz) web.HandlerFunc {
-	return func(ctx web.Context) error {
-		options, err := b.Load()
+	return func(c web.Context) error {
+		ctx, cancel := misc.Context(defaultTimeout)
+		defer cancel()
+
+		options, err := b.Load(ctx)
 		if err != nil {
 			return err
 		}
-		return success(ctx, options)
+		return success(c, options)
 	}
 }
 
@@ -37,12 +41,15 @@ func settingSave(b biz.SettingBiz) web.HandlerFunc {
 		Options json.RawMessage `json:"options"`
 	}
 
-	return func(ctx web.Context) (err error) {
+	return func(c web.Context) (err error) {
 		args := &Args{}
-		err = ctx.Bind(args)
+		err = c.Bind(args)
 		if err == nil {
-			err = b.Save(args.ID, args.Options, ctx.User())
+			ctx, cancel := misc.Context(defaultTimeout)
+			defer cancel()
+
+			err = b.Save(ctx, args.ID, args.Options, c.User())
 		}
-		return ajax(ctx, err)
+		return ajax(c, err)
 	}
 }

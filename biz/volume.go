@@ -12,11 +12,11 @@ import (
 )
 
 type VolumeBiz interface {
-	Search(node, name string, pageIndex, pageSize int) ([]*Volume, int, error)
-	Find(node, name string) (volume *Volume, raw string, err error)
-	Delete(node, name string, user web.User) (err error)
-	Create(volume *Volume, user web.User) (err error)
-	Prune(node string, user web.User) (count int, size uint64, err error)
+	Search(ctx context.Context, node, name string, pageIndex, pageSize int) ([]*Volume, int, error)
+	Find(ctx context.Context, node, name string) (volume *Volume, raw string, err error)
+	Delete(ctx context.Context, node, name string, user web.User) (err error)
+	Create(ctx context.Context, volume *Volume, user web.User) (err error)
+	Prune(ctx context.Context, node string, user web.User) (count int, size uint64, err error)
 }
 
 func NewVolume(d *docker.Docker, eb EventBiz) VolumeBiz {
@@ -28,13 +28,13 @@ type volumeBiz struct {
 	eb EventBiz
 }
 
-func (b *volumeBiz) Find(node, name string) (volume *Volume, raw string, err error) {
+func (b *volumeBiz) Find(ctx context.Context, node, name string) (volume *Volume, raw string, err error) {
 	var (
 		v types.Volume
 		r []byte
 	)
 
-	if v, r, err = b.d.VolumeInspect(context.TODO(), node, name); err == nil {
+	if v, r, err = b.d.VolumeInspect(ctx, node, name); err == nil {
 		raw, err = indentJSON(r)
 	}
 
@@ -44,8 +44,8 @@ func (b *volumeBiz) Find(node, name string) (volume *Volume, raw string, err err
 	return
 }
 
-func (b *volumeBiz) Search(node, name string, pageIndex, pageSize int) (volumes []*Volume, total int, err error) {
-	list, total, err := b.d.VolumeList(context.TODO(), node, name, pageIndex, pageSize)
+func (b *volumeBiz) Search(ctx context.Context, node, name string, pageIndex, pageSize int) (volumes []*Volume, total int, err error) {
+	list, total, err := b.d.VolumeList(ctx, node, name, pageIndex, pageSize)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -57,15 +57,15 @@ func (b *volumeBiz) Search(node, name string, pageIndex, pageSize int) (volumes 
 	return volumes, total, nil
 }
 
-func (b *volumeBiz) Delete(node, name string, user web.User) (err error) {
-	err = b.d.VolumeRemove(context.TODO(), node, name)
+func (b *volumeBiz) Delete(ctx context.Context, node, name string, user web.User) (err error) {
+	err = b.d.VolumeRemove(ctx, node, name)
 	if err == nil {
 		b.eb.CreateVolume(EventActionDelete, node, name, user)
 	}
 	return
 }
 
-func (b *volumeBiz) Create(vol *Volume, user web.User) (err error) {
+func (b *volumeBiz) Create(ctx context.Context, vol *Volume, user web.User) (err error) {
 	options := &volume.VolumeCreateBody{
 		Name:       vol.Name,
 		Driver:     vol.Driver,
@@ -78,16 +78,16 @@ func (b *volumeBiz) Create(vol *Volume, user web.User) (err error) {
 		options.Driver = vol.Driver
 	}
 
-	err = b.d.VolumeCreate(context.TODO(), vol.Node, options)
+	err = b.d.VolumeCreate(ctx, vol.Node, options)
 	if err == nil {
 		b.eb.CreateVolume(EventActionDelete, vol.Node, vol.Name, user)
 	}
 	return
 }
 
-func (b *volumeBiz) Prune(node string, user web.User) (count int, size uint64, err error) {
+func (b *volumeBiz) Prune(ctx context.Context, node string, user web.User) (count int, size uint64, err error) {
 	var report types.VolumesPruneReport
-	report, err = b.d.VolumePrune(context.TODO(), node)
+	report, err = b.d.VolumePrune(ctx, node)
 	if err == nil {
 		count, size = len(report.VolumesDeleted), report.SpaceReclaimed
 		b.eb.CreateVolume(EventActionPrune, node, "", user)

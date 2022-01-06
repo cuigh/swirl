@@ -12,10 +12,10 @@ import (
 )
 
 type ImageBiz interface {
-	Search(node, name string, pageIndex, pageSize int) ([]*Image, int, error)
-	Find(node, name string) (image *Image, raw string, err error)
-	Delete(node, id string, user web.User) (err error)
-	Prune(node string, user web.User) (count int, size uint64, err error)
+	Search(ctx context.Context, node, name string, pageIndex, pageSize int) ([]*Image, int, error)
+	Find(ctx context.Context, node, name string) (image *Image, raw string, err error)
+	Delete(ctx context.Context, node, id string, user web.User) (err error)
+	Prune(ctx context.Context, node string, user web.User) (count int, size uint64, err error)
 }
 
 func NewImage(d *docker.Docker, eb EventBiz) ImageBiz {
@@ -27,12 +27,11 @@ type imageBiz struct {
 	eb EventBiz
 }
 
-func (b *imageBiz) Find(node, id string) (img *Image, raw string, err error) {
+func (b *imageBiz) Find(ctx context.Context, node, id string) (img *Image, raw string, err error) {
 	var (
 		i         types.ImageInspect
 		r         []byte
 		histories []image.HistoryResponseItem
-		ctx       = context.TODO()
 	)
 
 	if i, r, err = b.d.ImageInspect(ctx, node, id); err == nil {
@@ -49,8 +48,8 @@ func (b *imageBiz) Find(node, id string) (img *Image, raw string, err error) {
 	return
 }
 
-func (b *imageBiz) Search(node, name string, pageIndex, pageSize int) (images []*Image, total int, err error) {
-	list, total, err := b.d.ImageList(context.TODO(), node, name, pageIndex, pageSize)
+func (b *imageBiz) Search(ctx context.Context, node, name string, pageIndex, pageSize int) (images []*Image, total int, err error) {
+	list, total, err := b.d.ImageList(ctx, node, name, pageIndex, pageSize)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -62,17 +61,17 @@ func (b *imageBiz) Search(node, name string, pageIndex, pageSize int) (images []
 	return images, total, nil
 }
 
-func (b *imageBiz) Delete(node, id string, user web.User) (err error) {
-	err = b.d.ImageRemove(context.TODO(), node, id)
+func (b *imageBiz) Delete(ctx context.Context, node, id string, user web.User) (err error) {
+	err = b.d.ImageRemove(ctx, node, id)
 	if err == nil {
 		b.eb.CreateImage(EventActionDelete, node, id, user)
 	}
 	return
 }
 
-func (b *imageBiz) Prune(node string, user web.User) (count int, size uint64, err error) {
+func (b *imageBiz) Prune(ctx context.Context, node string, user web.User) (count int, size uint64, err error) {
 	var report types.ImagesPruneReport
-	if report, err = b.d.ImagePrune(context.TODO(), node); err == nil {
+	if report, err = b.d.ImagePrune(ctx, node); err == nil {
 		count, size = len(report.ImagesDeleted), report.SpaceReclaimed
 		b.eb.CreateImage(EventActionPrune, node, "", user)
 	}

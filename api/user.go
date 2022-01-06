@@ -5,6 +5,7 @@ import (
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/biz"
 	"github.com/cuigh/swirl/dao"
+	"github.com/cuigh/swirl/misc"
 	"github.com/cuigh/swirl/security"
 )
 
@@ -40,23 +41,26 @@ func userSignIn(auth *security.Identifier, eb biz.EventBiz) web.HandlerFunc {
 		Password string `json:"password"`
 	}
 
-	return func(ctx web.Context) (err error) {
+	return func(c web.Context) (err error) {
 		var (
 			args = &SignInArgs{}
 			user security.Identity
 		)
 
-		if err = ctx.Bind(args); err != nil {
+		if err = c.Bind(args); err != nil {
 			return err
 		}
 
-		if user, err = auth.Identify(args.Name, args.Password); err != nil {
+		ctx, cancel := misc.Context(defaultTimeout)
+		defer cancel()
+
+		if user, err = auth.Identify(ctx, args.Name, args.Password); err != nil {
 			return err
 		}
 
 		eb.CreateUser(biz.EventActionLogin, user.ID(), user.Name(), user)
 
-		return success(ctx, data.Map{
+		return success(c, data.Map{
 			"name":  user.Name(),
 			"token": user.Token(),
 			"perms": user.Perms(),
@@ -65,17 +69,20 @@ func userSignIn(auth *security.Identifier, eb biz.EventBiz) web.HandlerFunc {
 }
 
 func userSave(b biz.UserBiz) web.HandlerFunc {
-	return func(ctx web.Context) error {
+	return func(c web.Context) error {
 		user := &dao.User{}
-		err := ctx.Bind(user, true)
+		err := c.Bind(user, true)
 		if err == nil {
+			ctx, cancel := misc.Context(defaultTimeout)
+			defer cancel()
+
 			if user.ID == "" {
-				_, err = b.Create(user, ctx.User())
+				_, err = b.Create(ctx, user, c.User())
 			} else {
-				err = b.Update(user, ctx.User())
+				err = b.Update(ctx, user, c.User())
 			}
 		}
-		return ajax(ctx, err)
+		return ajax(c, err)
 	}
 }
 
@@ -88,32 +95,38 @@ func userSearch(b biz.UserBiz) web.HandlerFunc {
 		PageSize  int    `bind:"pageSize"`
 	}
 
-	return func(ctx web.Context) error {
+	return func(c web.Context) error {
 		args := &Args{}
-		err := ctx.Bind(args)
+		err := c.Bind(args)
 		if err != nil {
 			return err
 		}
 
-		users, total, err := b.Search(args.Name, args.LoginName, args.Filter, args.PageIndex, args.PageSize)
+		ctx, cancel := misc.Context(defaultTimeout)
+		defer cancel()
+
+		users, total, err := b.Search(ctx, args.Name, args.LoginName, args.Filter, args.PageIndex, args.PageSize)
 		if err != nil {
 			return err
 		}
-		return success(ctx, data.Map{"items": users, "total": total})
+		return success(c, data.Map{"items": users, "total": total})
 	}
 }
 
 func userFind(b biz.UserBiz) web.HandlerFunc {
-	return func(ctx web.Context) error {
-		id := ctx.Query("id")
+	return func(c web.Context) error {
+		ctx, cancel := misc.Context(defaultTimeout)
+		defer cancel()
+
+		id := c.Query("id")
 		if id == "" {
-			id = ctx.User().ID()
+			id = c.User().ID()
 		}
-		user, err := b.FindByID(id)
+		user, err := b.FindByID(ctx, id)
 		if err != nil {
 			return err
 		}
-		return success(ctx, user)
+		return success(c, user)
 	}
 }
 
@@ -123,13 +136,16 @@ func userDelete(b biz.UserBiz) web.HandlerFunc {
 		Name string `json:"name"`
 	}
 
-	return func(ctx web.Context) error {
+	return func(c web.Context) error {
 		args := &Args{}
-		err := ctx.Bind(args)
+		err := c.Bind(args)
 		if err == nil {
-			err = b.Delete(args.ID, args.Name, ctx.User())
+			ctx, cancel := misc.Context(defaultTimeout)
+			defer cancel()
+
+			err = b.Delete(ctx, args.ID, args.Name, c.User())
 		}
-		return ajax(ctx, err)
+		return ajax(c, err)
 	}
 }
 
@@ -139,13 +155,16 @@ func userSetStatus(b biz.UserBiz) web.HandlerFunc {
 		Status int32  `json:"status"`
 	}
 
-	return func(ctx web.Context) error {
+	return func(c web.Context) error {
 		args := &Args{}
-		err := ctx.Bind(args)
+		err := c.Bind(args)
 		if err == nil {
-			err = b.SetStatus(args.ID, args.Status, ctx.User())
+			ctx, cancel := misc.Context(defaultTimeout)
+			defer cancel()
+
+			err = b.SetStatus(ctx, args.ID, args.Status, c.User())
 		}
-		return ajax(ctx, err)
+		return ajax(c, err)
 	}
 }
 
@@ -155,23 +174,29 @@ func userModifyPassword(b biz.UserBiz) web.HandlerFunc {
 		NewPassword string `json:"newPwd"`
 	}
 
-	return func(ctx web.Context) error {
+	return func(c web.Context) error {
 		args := &Args{}
-		err := ctx.Bind(args)
+		err := c.Bind(args)
 		if err == nil {
-			err = b.ModifyPassword(args.OldPassword, args.NewPassword, ctx.User())
+			ctx, cancel := misc.Context(defaultTimeout)
+			defer cancel()
+
+			err = b.ModifyPassword(ctx, args.OldPassword, args.NewPassword, c.User())
 		}
-		return ajax(ctx, err)
+		return ajax(c, err)
 	}
 }
 
 func userModifyProfile(b biz.UserBiz) web.HandlerFunc {
-	return func(ctx web.Context) error {
+	return func(c web.Context) error {
 		u := &dao.User{}
-		err := ctx.Bind(u, true)
+		err := c.Bind(u, true)
 		if err == nil {
-			err = b.ModifyProfile(u, ctx.User())
+			ctx, cancel := misc.Context(defaultTimeout)
+			defer cancel()
+
+			err = b.ModifyProfile(ctx, u, c.User())
 		}
-		return ajax(ctx, err)
+		return ajax(c, err)
 	}
 }

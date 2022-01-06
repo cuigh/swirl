@@ -1,6 +1,7 @@
 package bolt
 
 import (
+	"context"
 	"path/filepath"
 	"strings"
 	"time"
@@ -50,7 +51,7 @@ func New(addr string) (dao.Interface, error) {
 	return d, nil
 }
 
-func (d *Dao) Init() error {
+func (d *Dao) Init(ctx context.Context) error {
 	buckets := []string{"chart", "dashboard", "event", "registry", "role", "setting", "stack", "user" /*"perm","session","template"*/}
 	return d.db.Update(func(tx *bolt.Tx) error {
 		for _, bucket := range buckets {

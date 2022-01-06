@@ -12,10 +12,10 @@ import (
 
 type NodeBiz interface {
 	List(agent bool) ([]*docker.Node, error)
-	Search() ([]*Node, error)
-	Find(id string) (node *Node, raw string, err error)
-	Delete(id, name string, user web.User) (err error)
-	Update(n *Node, user web.User) (err error)
+	Search(ctx context.Context) ([]*Node, error)
+	Find(ctx context.Context, id string) (node *Node, raw string, err error)
+	Delete(ctx context.Context, id, name string, user web.User) (err error)
+	Update(ctx context.Context, n *Node, user web.User) (err error)
 }
 
 func NewNode(d *docker.Docker, eb EventBiz) NodeBiz {
@@ -27,12 +27,12 @@ type nodeBiz struct {
 	eb EventBiz
 }
 
-func (b *nodeBiz) Find(id string) (node *Node, raw string, err error) {
+func (b *nodeBiz) Find(ctx context.Context, id string) (node *Node, raw string, err error) {
 	var (
 		sn swarm.Node
 		r  []byte
 	)
-	sn, r, err = b.d.NodeInspect(context.TODO(), id)
+	sn, r, err = b.d.NodeInspect(ctx, id)
 	if err == nil {
 		raw, err = indentJSON(r)
 	}
@@ -60,8 +60,8 @@ func (b *nodeBiz) List(agent bool) ([]*docker.Node, error) {
 	return nodes, nil
 }
 
-func (b *nodeBiz) Search() ([]*Node, error) {
-	list, err := b.d.NodeList(context.TODO())
+func (b *nodeBiz) Search(ctx context.Context) ([]*Node, error) {
+	list, err := b.d.NodeList(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -73,22 +73,22 @@ func (b *nodeBiz) Search() ([]*Node, error) {
 	return networks, nil
 }
 
-func (b *nodeBiz) Delete(id, name string, user web.User) (err error) {
-	err = b.d.NodeRemove(context.TODO(), id)
+func (b *nodeBiz) Delete(ctx context.Context, id, name string, user web.User) (err error) {
+	err = b.d.NodeRemove(ctx, id)
 	if err == nil {
 		b.eb.CreateNode(EventActionDelete, id, name, user)
 	}
 	return
 }
 
-func (b *nodeBiz) Update(n *Node, user web.User) (err error) {
+func (b *nodeBiz) Update(ctx context.Context, n *Node, user web.User) (err error) {
 	spec := &swarm.NodeSpec{
 		Role:         n.Role,
 		Availability: n.Availability,
 	}
 	spec.Name = n.Name
 	spec.Labels = toMap(n.Labels)
-	err = b.d.NodeUpdate(context.TODO(), n.ID, n.Version, spec)
+	err = b.d.NodeUpdate(ctx, n.ID, n.Version, spec)
 	if err == nil {
 		b.eb.CreateNode(EventActionUpdate, n.ID, n.Hostname, user)
 	}

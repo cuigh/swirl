@@ -24,15 +24,15 @@ const (
 )
 
 type ServiceBiz interface {
-	Search(name, mode string, pageIndex, pageSize int) (services []*ServiceBase, total int, err error)
-	Find(name string, status bool) (service *Service, raw string, err error)
-	Delete(name string, user web.User) (err error)
-	Rollback(name string, user web.User) (err error)
-	Restart(name string, user web.User) (err error)
-	Scale(name string, count, version uint64, user web.User) (err error)
-	Create(s *Service, user web.User) (err error)
-	Update(s *Service, user web.User) (err error)
-	FetchLogs(name string, lines int, timestamps bool) (stdout, stderr string, err error)
+	Search(ctx context.Context, name, mode string, pageIndex, pageSize int) (services []*ServiceBase, total int, err error)
+	Find(ctx context.Context, name string, status bool) (service *Service, raw string, err error)
+	Delete(ctx context.Context, name string, user web.User) (err error)
+	Rollback(ctx context.Context, name string, user web.User) (err error)
+	Restart(ctx context.Context, name string, user web.User) (err error)
+	Scale(ctx context.Context, name string, count, version uint64, user web.User) (err error)
+	Create(ctx context.Context, s *Service, user web.User) (err error)
+	Update(ctx context.Context, s *Service, user web.User) (err error)
+	FetchLogs(ctx context.Context, name string, lines int, timestamps bool) (stdout, stderr string, err error)
 }
 
 func NewService(d *docker.Docker, rb RegistryBiz, eb EventBiz) ServiceBiz {
@@ -45,13 +45,13 @@ type serviceBiz struct {
 	eb EventBiz
 }
 
-func (b *serviceBiz) Find(name string, status bool) (service *Service, raw string, err error) {
+func (b *serviceBiz) Find(ctx context.Context, name string, status bool) (service *Service, raw string, err error) {
 	var (
 		s swarm.Service
 		r []byte
 	)
 
-	s, r, err = b.d.ServiceInspect(context.TODO(), name, status)
+	s, r, err = b.d.ServiceInspect(ctx, name, status)
 	if err != nil {
 		if docker.IsErrNotFound(err) {
 			err = nil
@@ -64,12 +64,12 @@ func (b *serviceBiz) Find(name string, status bool) (service *Service, raw strin
 	}
 	if err == nil {
 		service = newService(&s)
-		err = b.fillNetworks(service)
+		err = b.fillNetworks(ctx, service)
 	}
 	return
 }
 
-func (b *serviceBiz) fillNetworks(service *Service) error {
+func (b *serviceBiz) fillNetworks(ctx context.Context, service *Service) error {
 	if len(service.Endpoint.VIPs) == 0 {
 		return nil
 	}
@@ -79,7 +79,7 @@ func (b *serviceBiz) fillNetworks(service *Service) error {
 		ids[i] = vip.ID
 	}
 
-	names, err := b.d.NetworkNames(context.TODO(), ids...)
+	names, err := b.d.NetworkNames(ctx, ids...)
 	if err == nil {
 		for i := range service.Endpoint.VIPs {
 			vip := &service.Endpoint.VIPs[i]
@@ -93,9 +93,9 @@ func (b *serviceBiz) fillNetworks(service *Service) error {
 	return err
 }
 
-func (b *serviceBiz) Search(name, mode string, pageIndex, pageSize int) (services []*ServiceBase, total int, err error) {
+func (b *serviceBiz) Search(ctx context.Context, name, mode string, pageIndex, pageSize int) (services []*ServiceBase, total int, err error) {
 	var list []swarm.Service
-	list, total, err = b.d.ServiceList(context.TODO(), name, mode, pageIndex, pageSize)
+	list, total, err = b.d.ServiceList(ctx, name, mode, pageIndex, pageSize)
 	if err != nil {
 		return
 	}
@@ -107,39 +107,39 @@ func (b *serviceBiz) Search(name, mode string, pageIndex, pageSize int) (service
 	return
 }
 
-func (b *serviceBiz) Delete(name string, user web.User) (err error) {
-	err = b.d.ServiceRemove(context.TODO(), name)
+func (b *serviceBiz) Delete(ctx context.Context, name string, user web.User) (err error) {
+	err = b.d.ServiceRemove(ctx, name)
 	if err == nil {
 		b.eb.CreateService(EventActionDelete, name, user)
 	}
 	return
 }
 
-func (b *serviceBiz) Rollback(name string, user web.User) (err error) {
-	err = b.d.ServiceRollback(context.TODO(), name)
+func (b *serviceBiz) Rollback(ctx context.Context, name string, user web.User) (err error) {
+	err = b.d.ServiceRollback(ctx, name)
 	if err == nil {
 		b.eb.CreateService(EventActionRollback, name, user)
 	}
 	return
 }
 
-func (b *serviceBiz) Restart(name string, user web.User) (err error) {
-	err = b.d.ServiceRestart(context.TODO(), name)
+func (b *serviceBiz) Restart(ctx context.Context, name string, user web.User) (err error) {
+	err = b.d.ServiceRestart(ctx, name)
 	if err == nil {
 		b.eb.CreateService(EventActionRestart, name, user)
 	}
 	return
 }
 
-func (b *serviceBiz) Scale(name string, count, version uint64, user web.User) (err error) {
-	err = b.d.ServiceScale(context.TODO(), name, count, version)
+func (b *serviceBiz) Scale(ctx context.Context, name string, count, version uint64, user web.User) (err error) {
+	err = b.d.ServiceScale(ctx, name, count, version)
 	if err == nil {
 		b.eb.CreateService(EventActionScale, name, user)
 	}
 	return
 }
 
-func (b *serviceBiz) Create(s *Service, user web.User) (err error) {
+func (b *serviceBiz) Create(ctx context.Context, s *Service, user web.User) (err error) {
 	spec := &swarm.ServiceSpec{TaskTemplate: swarm.TaskSpec{ContainerSpec: &swarm.ContainerSpec{}}}
 	err = s.MergeTo(spec)
 	if err != nil {
@@ -159,21 +159,21 @@ func (b *serviceBiz) Create(s *Service, user web.User) (err error) {
 	auth := ""
 	if i := strings.Index(s.Image, "/"); i > 0 {
 		if host := s.Image[:i]; strings.Contains(host, ".") {
-			auth, err = b.rb.GetAuth(host)
+			auth, err = b.rb.GetAuth(ctx, host)
 			if err != nil {
 				return err
 			}
 		}
 	}
 
-	if err = b.d.ServiceCreate(context.TODO(), spec, auth); err == nil {
+	if err = b.d.ServiceCreate(ctx, spec, auth); err == nil {
 		b.eb.CreateService(EventActionCreate, s.Name, user)
 	}
 	return
 }
 
-func (b *serviceBiz) Update(s *Service, user web.User) (err error) {
-	service, _, err := b.d.ServiceInspect(context.TODO(), s.Name, false)
+func (b *serviceBiz) Update(ctx context.Context, s *Service, user web.User) (err error) {
+	service, _, err := b.d.ServiceInspect(ctx, s.Name, false)
 	if err != nil {
 		return err
 	}
@@ -190,14 +190,14 @@ func (b *serviceBiz) Update(s *Service, user web.User) (err error) {
 		spec.Mode.ReplicatedJob.TotalCompletions = &s.Replicas
 	}
 
-	if err = b.d.ServiceUpdate(context.TODO(), spec, s.Version); err == nil {
+	if err = b.d.ServiceUpdate(ctx, spec, s.Version); err == nil {
 		b.eb.CreateService(EventActionUpdate, s.Name, user)
 	}
 	return
 }
 
-func (b *serviceBiz) FetchLogs(name string, lines int, timestamps bool) (string, string, error) {
-	stdout, stderr, err := b.d.ServiceLogs(context.TODO(), name, lines, timestamps)
+func (b *serviceBiz) FetchLogs(ctx context.Context, name string, lines int, timestamps bool) (string, string, error) {
+	stdout, stderr, err := b.d.ServiceLogs(ctx, name, lines, timestamps)
 	if err != nil {
 		return "", "", err
 	}

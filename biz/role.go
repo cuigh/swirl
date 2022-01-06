@@ -8,12 +8,12 @@ import (
 )
 
 type RoleBiz interface {
-	Search(name string) ([]*dao.Role, error)
-	Find(id string) (role *dao.Role, err error)
-	Create(role *dao.Role, user web.User) (err error)
-	Delete(id, name string, user web.User) (err error)
-	Update(r *dao.Role, user web.User) (err error)
-	GetPerms(ids []string) ([]string, error)
+	Search(ctx context.Context, name string) ([]*dao.Role, error)
+	Find(ctx context.Context, id string) (role *dao.Role, err error)
+	Create(ctx context.Context, role *dao.Role, user web.User) (err error)
+	Delete(ctx context.Context, id, name string, user web.User) (err error)
+	Update(ctx context.Context, r *dao.Role, user web.User) (err error)
+	GetPerms(ctx context.Context, ids []string) ([]string, error)
 }
 
 func NewRole(d dao.Interface, eb EventBiz) RoleBiz {
@@ -25,11 +25,11 @@ type roleBiz struct {
 	eb EventBiz
 }
 
-func (b *roleBiz) Search(name string) (roles []*dao.Role, err error) {
-	return b.d.RoleSearch(context.TODO(), name)
+func (b *roleBiz) Search(ctx context.Context, name string) (roles []*dao.Role, err error) {
+	return b.d.RoleSearch(ctx, name)
 }
 
-func (b *roleBiz) Create(role *dao.Role, user web.User) (err error) {
+func (b *roleBiz) Create(ctx context.Context, role *dao.Role, user web.User) (err error) {
 	r := &dao.Role{
 		ID:          createId(),
 		Name:        role.Name,
@@ -40,29 +40,29 @@ func (b *roleBiz) Create(role *dao.Role, user web.User) (err error) {
 	}
 	r.UpdatedAt = r.CreatedAt
 	r.UpdatedBy = r.CreatedBy
-	err = b.d.RoleCreate(context.TODO(), r)
+	err = b.d.RoleCreate(ctx, r)
 	if err == nil {
 		b.eb.CreateRole(EventActionCreate, r.ID, role.Name, user)
 	}
 	return
 }
 
-func (b *roleBiz) Delete(id, name string, user web.User) (err error) {
-	err = b.d.RoleDelete(context.TODO(), id)
+func (b *roleBiz) Delete(ctx context.Context, id, name string, user web.User) (err error) {
+	err = b.d.RoleDelete(ctx, id)
 	if err == nil {
 		go func() {
-			_ = b.d.SessionUpdateDirty(context.TODO(), "", id)
+			_ = b.d.SessionUpdateDirty(ctx, "", id)
 			b.eb.CreateRole(EventActionDelete, id, name, user)
 		}()
 	}
 	return
 }
 
-func (b *roleBiz) Find(id string) (role *dao.Role, err error) {
-	return b.d.RoleGet(context.TODO(), id)
+func (b *roleBiz) Find(ctx context.Context, id string) (role *dao.Role, err error) {
+	return b.d.RoleGet(ctx, id)
 }
 
-func (b *roleBiz) Update(role *dao.Role, user web.User) (err error) {
+func (b *roleBiz) Update(ctx context.Context, role *dao.Role, user web.User) (err error) {
 	r := &dao.Role{
 		ID:          role.ID,
 		Name:        role.Name,
@@ -71,21 +71,21 @@ func (b *roleBiz) Update(role *dao.Role, user web.User) (err error) {
 		UpdatedAt:   now(),
 		UpdatedBy:   newOperator(user),
 	}
-	err = b.d.RoleUpdate(context.TODO(), r)
+	err = b.d.RoleUpdate(ctx, r)
 	if err == nil {
 		go func() {
-			_ = b.d.SessionUpdateDirty(context.TODO(), "", role.ID)
+			_ = b.d.SessionUpdateDirty(ctx, "", role.ID)
 			b.eb.CreateRole(EventActionUpdate, role.ID, role.Name, user)
 		}()
 	}
 	return
 }
 
-func (b *roleBiz) GetPerms(ids []string) ([]string, error) {
+func (b *roleBiz) GetPerms(ctx context.Context, ids []string) ([]string, error) {
 	m := make(map[string]struct{})
 
 	for _, id := range ids {
-		r, err := b.d.RoleGet(context.TODO(), id)
+		r, err := b.d.RoleGet(ctx, id)
 		if err != nil {
 			return nil, err
 		}

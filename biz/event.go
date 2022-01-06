@@ -48,8 +48,8 @@ const (
 )
 
 type EventBiz interface {
-	Search(args *dao.EventSearchArgs) (events []*dao.Event, total int, err error)
-	Prune(days int32) (err error)
+	Search(ctx context.Context, args *dao.EventSearchArgs) (events []*dao.Event, total int, err error)
+	Prune(ctx context.Context, days int32) (err error)
 	CreateRegistry(action EventAction, id, name string, user web.User)
 	CreateNode(action EventAction, id, name string, user web.User)
 	CreateNetwork(action EventAction, id, name string, user web.User)
@@ -74,12 +74,12 @@ type eventBiz struct {
 	d dao.Interface
 }
 
-func (b *eventBiz) Search(args *dao.EventSearchArgs) (events []*dao.Event, total int, err error) {
-	return b.d.EventSearch(context.TODO(), args)
+func (b *eventBiz) Search(ctx context.Context, args *dao.EventSearchArgs) (events []*dao.Event, total int, err error) {
+	return b.d.EventSearch(ctx, args)
 }
 
-func (b *eventBiz) Prune(days int32) (err error) {
-	return b.d.EventPrune(context.TODO(), time.Now().Add(-times.Days(days)))
+func (b *eventBiz) Prune(ctx context.Context, days int32) (err error) {
+	return b.d.EventPrune(ctx, time.Now().Add(-times.Days(days)))
 }
 
 func (b *eventBiz) create(et EventType, ea EventAction, args data.Map, user web.User) {

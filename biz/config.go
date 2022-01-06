@@ -10,11 +10,11 @@ import (
 )
 
 type ConfigBiz interface {
-	Search(name string, pageIndex, pageSize int) (configs []*Config, total int, err error)
-	Find(id string) (config *Config, raw string, err error)
-	Delete(id, name string, user web.User) (err error)
-	Create(c *Config, user web.User) (err error)
-	Update(c *Config, user web.User) (err error)
+	Search(ctx context.Context, name string, pageIndex, pageSize int) (configs []*Config, total int, err error)
+	Find(ctx context.Context, id string) (config *Config, raw string, err error)
+	Delete(ctx context.Context, id, name string, user web.User) (err error)
+	Create(ctx context.Context, c *Config, user web.User) (err error)
+	Update(ctx context.Context, c *Config, user web.User) (err error)
 }
 
 func NewConfig(d *docker.Docker, eb EventBiz) ConfigBiz {
@@ -26,12 +26,12 @@ type configBiz struct {
 	eb EventBiz
 }
 
-func (b *configBiz) Find(id string) (config *Config, raw string, err error) {
+func (b *configBiz) Find(ctx context.Context, id string) (config *Config, raw string, err error) {
 	var (
 		c swarm.Config
 		r []byte
 	)
-	c, r, err = b.d.ConfigInspect(context.TODO(), id)
+	c, r, err = b.d.ConfigInspect(ctx, id)
 	if err == nil {
 		raw, err = indentJSON(r)
 	}
@@ -41,8 +41,8 @@ func (b *configBiz) Find(id string) (config *Config, raw string, err error) {
 	return
 }
 
-func (b *configBiz) Search(name string, pageIndex, pageSize int) ([]*Config, int, error) {
-	list, total, err := b.d.ConfigList(context.TODO(), name, pageIndex, pageSize)
+func (b *configBiz) Search(ctx context.Context, name string, pageIndex, pageSize int) ([]*Config, int, error) {
+	list, total, err := b.d.ConfigList(ctx, name, pageIndex, pageSize)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -54,15 +54,15 @@ func (b *configBiz) Search(name string, pageIndex, pageSize int) ([]*Config, int
 	return configs, total, nil
 }
 
-func (b *configBiz) Delete(id, name string, user web.User) (err error) {
-	err = b.d.ConfigRemove(context.TODO(), id)
+func (b *configBiz) Delete(ctx context.Context, id, name string, user web.User) (err error) {
+	err = b.d.ConfigRemove(ctx, id)
 	if err == nil {
 		b.eb.CreateConfig(EventActionDelete, id, name, user)
 	}
 	return
 }
 
-func (b *configBiz) Create(c *Config, user web.User) (err error) {
+func (b *configBiz) Create(ctx context.Context, c *Config, user web.User) (err error) {
 	spec := swarm.ConfigSpec{
 		Data: []byte(c.Data),
 	}
@@ -76,14 +76,14 @@ func (b *configBiz) Create(c *Config, user web.User) (err error) {
 	}
 
 	var id string
-	id, err = b.d.ConfigCreate(context.TODO(), &spec)
+	id, err = b.d.ConfigCreate(ctx, &spec)
 	if err == nil {
 		b.eb.CreateConfig(EventActionCreate, id, c.Name, user)
 	}
 	return
 }
 
-func (b *configBiz) Update(c *Config, user web.User) (err error) {
+func (b *configBiz) Update(ctx context.Context, c *Config, user web.User) (err error) {
 	spec := &swarm.ConfigSpec{
 		Data: []byte(c.Data),
 	}
@@ -95,7 +95,7 @@ func (b *configBiz) Update(c *Config, user web.User) (err error) {
 			Options: toMap(c.Templating.Options),
 		}
 	}
-	err = b.d.ConfigUpdate(context.TODO(), c.ID, c.Version, spec)
+	err = b.d.ConfigUpdate(ctx, c.ID, c.Version, spec)
 	if err == nil {
 		b.eb.CreateConfig(EventActionUpdate, c.ID, c.Name, user)
 	}

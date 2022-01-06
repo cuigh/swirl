@@ -18,9 +18,9 @@ import (
 
 type MetricBiz interface {
 	Enabled() bool
-	GetMatrix(query, legend string, start, end time.Time) (data *MatrixData, err error)
-	GetScalar(query string, t time.Time) (data float64, err error)
-	GetVector(query, label string, t time.Time) (data *VectorData, err error)
+	GetMatrix(ctx context.Context, query, legend string, start, end time.Time) (data *MatrixData, err error)
+	GetScalar(ctx context.Context, query string, t time.Time) (data float64, err error)
+	GetVector(ctx context.Context, query, label string, t time.Time) (data *VectorData, err error)
 }
 
 func NewMetric(setting *misc.Setting) MetricBiz {
@@ -50,7 +50,7 @@ func (b *metricBiz) Enabled() bool {
 	return b.prometheus != ""
 }
 
-func (b *metricBiz) GetMatrix(query, legend string, start, end time.Time) (data *MatrixData, err error) {
+func (b *metricBiz) GetMatrix(ctx context.Context, query, legend string, start, end time.Time) (data *MatrixData, err error) {
 	if !b.Enabled() {
 		return
 	}
@@ -61,7 +61,7 @@ func (b *metricBiz) GetMatrix(query, legend string, start, end time.Time) (data 
 	}
 
 	period := end.Sub(start)
-	value, _, err := api.QueryRange(context.Background(), query, papi.Range{
+	value, _, err := api.QueryRange(ctx, query, papi.Range{
 		Start: start,
 		End:   end,
 		Step:  b.calcStep(period),
@@ -87,7 +87,7 @@ func (b *metricBiz) GetMatrix(query, legend string, start, end time.Time) (data 
 	return
 }
 
-func (b *metricBiz) GetScalar(query string, t time.Time) (v float64, err error) {
+func (b *metricBiz) GetScalar(ctx context.Context, query string, t time.Time) (v float64, err error) {
 	if !b.Enabled() {
 		return
 	}
@@ -97,7 +97,7 @@ func (b *metricBiz) GetScalar(query string, t time.Time) (v float64, err error) 
 		return 0, err
 	}
 
-	value, _, err := api.Query(context.Background(), query, t)
+	value, _, err := api.Query(ctx, query, t)
 	if err != nil {
 		return 0, err
 	}
@@ -111,7 +111,7 @@ func (b *metricBiz) GetScalar(query string, t time.Time) (v float64, err error) 
 	return 0, nil
 }
 
-func (b *metricBiz) GetVector(query, label string, t time.Time) (data *VectorData, err error) {
+func (b *metricBiz) GetVector(ctx context.Context, query, label string, t time.Time) (data *VectorData, err error) {
 	if !b.Enabled() {
 		return
 	}
@@ -123,7 +123,7 @@ func (b *metricBiz) GetVector(query, label string, t time.Time) (data *VectorDat
 	}
 
 	var value model.Value
-	value, _, err = api.Query(context.Background(), query, t)
+	value, _, err = api.Query(ctx, query, t)
 	if err != nil {
 		return
 	}

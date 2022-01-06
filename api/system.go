@@ -1,7 +1,6 @@
 package api
 
 import (
-	"context"
 	"runtime"
 
 	"github.com/cuigh/auxo/app"
@@ -34,7 +33,10 @@ func NewSystem(d *docker.Docker, b biz.SystemBiz, ub biz.UserBiz) *SystemHandler
 
 func systemCheckState(b biz.SystemBiz) web.HandlerFunc {
 	return func(c web.Context) (err error) {
-		state, err := b.CheckState()
+		ctx, cancel := misc.Context(defaultTimeout)
+		defer cancel()
+
+		state, err := b.CheckState(ctx)
 		if err != nil {
 			return err
 		}
@@ -58,16 +60,19 @@ func systemSummarize(d *docker.Docker) web.HandlerFunc {
 			StackCount   int `json:"stackCount"`
 		}{}
 
-		if summary.NodeCount, err = d.NodeCount(context.TODO()); err != nil {
+		ctx, cancel := misc.Context(defaultTimeout)
+		defer cancel()
+
+		if summary.NodeCount, err = d.NodeCount(ctx); err != nil {
 			return
 		}
-		if summary.NetworkCount, err = d.NetworkCount(context.TODO()); err != nil {
+		if summary.NetworkCount, err = d.NetworkCount(ctx); err != nil {
 			return
 		}
-		if summary.ServiceCount, err = d.ServiceCount(context.TODO()); err != nil {
+		if summary.ServiceCount, err = d.ServiceCount(ctx); err != nil {
 			return
 		}
-		if summary.StackCount, err = d.StackCount(context.TODO()); err != nil {
+		if summary.StackCount, err = d.StackCount(ctx); err != nil {
 			return
 		}
 
@@ -82,14 +87,17 @@ func systemCreateAdmin(ub biz.UserBiz) web.HandlerFunc {
 			return err
 		}
 
+		ctx, cancel := misc.Context(defaultTimeout)
+		defer cancel()
+
 		var count int
-		if count, err = ub.Count(); err == nil && count > 0 {
+		if count, err = ub.Count(ctx); err == nil && count > 0 {
 			return errors.Coded(misc.ErrSystemInitialized, "system was already initialized")
 		}
 
 		user.Admin = true
 		user.Type = biz.UserTypeInternal
-		_, err = ub.Create(user, nil)
+		_, err = ub.Create(ctx, user, nil)
 		return ajax(c, err)
 	}
 }

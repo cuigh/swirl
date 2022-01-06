@@ -4,6 +4,7 @@ import (
 	"github.com/cuigh/auxo/data"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/biz"
+	"github.com/cuigh/swirl/misc"
 )
 
 // ImageHandler encapsulates image related handlers.
@@ -32,22 +33,25 @@ func imageSearch(b biz.ImageBiz) web.HandlerFunc {
 		PageSize  int    `json:"pageSize" bind:"pageSize"`
 	}
 
-	return func(ctx web.Context) (err error) {
+	return func(c web.Context) (err error) {
 		var (
 			args   = &Args{}
 			images []*biz.Image
 			total  int
 		)
 
-		if err = ctx.Bind(args); err == nil {
-			images, total, err = b.Search(args.Node, args.Name, args.PageIndex, args.PageSize)
+		if err = c.Bind(args); err == nil {
+			ctx, cancel := misc.Context(defaultTimeout)
+			defer cancel()
+
+			images, total, err = b.Search(ctx, args.Node, args.Name, args.PageIndex, args.PageSize)
 		}
 
 		if err != nil {
 			return
 		}
 
-		return success(ctx, data.Map{
+		return success(c, data.Map{
 			"items": images,
 			"total": total,
 		})
@@ -55,14 +59,17 @@ func imageSearch(b biz.ImageBiz) web.HandlerFunc {
 }
 
 func imageFind(b biz.ImageBiz) web.HandlerFunc {
-	return func(ctx web.Context) error {
-		node := ctx.Query("node")
-		id := ctx.Query("id")
-		image, raw, err := b.Find(node, id)
+	return func(c web.Context) error {
+		ctx, cancel := misc.Context(defaultTimeout)
+		defer cancel()
+
+		node := c.Query("node")
+		id := c.Query("id")
+		image, raw, err := b.Find(ctx, node, id)
 		if err != nil {
 			return err
 		}
-		return success(ctx, data.Map{"image": image, "raw": raw})
+		return success(c, data.Map{"image": image, "raw": raw})
 	}
 }
 
@@ -71,12 +78,16 @@ func imageDelete(b biz.ImageBiz) web.HandlerFunc {
 		Node string `json:"node"`
 		ID   string `json:"id"`
 	}
-	return func(ctx web.Context) (err error) {
+
+	return func(c web.Context) (err error) {
 		args := &Args{}
-		if err = ctx.Bind(args); err == nil {
-			err = b.Delete(args.Node, args.ID, ctx.User())
+		if err = c.Bind(args); err == nil {
+			ctx, cancel := misc.Context(defaultTimeout)
+			defer cancel()
+
+			err = b.Delete(ctx, args.Node, args.ID, c.User())
 		}
-		return ajax(ctx, err)
+		return ajax(c, err)
 	}
 }
 
@@ -84,18 +95,22 @@ func imagePrune(b biz.ImageBiz) web.HandlerFunc {
 	type Args struct {
 		Node string `json:"node"`
 	}
-	return func(ctx web.Context) (err error) {
+
+	return func(c web.Context) (err error) {
 		args := &Args{}
-		if err = ctx.Bind(args); err != nil {
+		if err = c.Bind(args); err != nil {
 			return err
 		}
 
-		count, size, err := b.Prune(args.Node, ctx.User())
+		ctx, cancel := misc.Context(defaultTimeout)
+		defer cancel()
+
+		count, size, err := b.Prune(ctx, args.Node, c.User())
 		if err != nil {
 			return err
 		}
 
-		return success(ctx, data.Map{
+		return success(c, data.Map{
 			"count": count,
 			"size":  size,
 		})

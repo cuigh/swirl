@@ -12,14 +12,14 @@ import (
 )
 
 type ContainerBiz interface {
-	Search(node, name, status string, pageIndex, pageSize int) ([]*Container, int, error)
-	Find(node, id string) (container *Container, raw string, err error)
-	Delete(node, id, name string, user web.User) (err error)
-	FetchLogs(node, id string, lines int, timestamps bool) (stdout, stderr string, err error)
-	ExecCreate(node, id string, cmd string) (resp types.IDResponse, err error)
-	ExecAttach(node, id string) (resp types.HijackedResponse, err error)
-	ExecStart(node, id string) error
-	Prune(node string, user web.User) (count int, size uint64, err error)
+	Search(ctx context.Context, node, name, status string, pageIndex, pageSize int) ([]*Container, int, error)
+	Find(ctx context.Context, node, id string) (container *Container, raw string, err error)
+	Delete(ctx context.Context, node, id, name string, user web.User) (err error)
+	FetchLogs(ctx context.Context, node, id string, lines int, timestamps bool) (stdout, stderr string, err error)
+	ExecCreate(ctx context.Context, node, id string, cmd string) (resp types.IDResponse, err error)
+	ExecAttach(ctx context.Context, node, id string) (resp types.HijackedResponse, err error)
+	ExecStart(ctx context.Context, node, id string) error
+	Prune(ctx context.Context, node string, user web.User) (count int, size uint64, err error)
 }
 
 func NewContainer(d *docker.Docker, eb EventBiz) ContainerBiz {
@@ -31,13 +31,13 @@ type containerBiz struct {
 	eb EventBiz
 }
 
-func (b *containerBiz) Find(node, id string) (c *Container, raw string, err error) {
+func (b *containerBiz) Find(ctx context.Context, node, id string) (c *Container, raw string, err error) {
 	var (
 		cj types.ContainerJSON
 		r  []byte
 	)
 
-	cj, r, err = b.d.ContainerInspect(context.TODO(), node, id)
+	cj, r, err = b.d.ContainerInspect(ctx, node, id)
 	if err != nil {
 		if docker.IsErrNotFound(err) {
 			err = nil
@@ -51,8 +51,8 @@ func (b *containerBiz) Find(node, id string) (c *Container, raw string, err erro
 	return
 }
 
-func (b *containerBiz) Search(node, name, status string, pageIndex, pageSize int) (containers []*Container, total int, err error) {
-	list, total, err := b.d.ContainerList(context.TODO(), node, name, status, pageIndex, pageSize)
+func (b *containerBiz) Search(ctx context.Context, node, name, status string, pageIndex, pageSize int) (containers []*Container, total int, err error) {
+	list, total, err := b.d.ContainerList(ctx, node, name, status, pageIndex, pageSize)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -64,37 +64,37 @@ func (b *containerBiz) Search(node, name, status string, pageIndex, pageSize int
 	return containers, total, nil
 }
 
-func (b *containerBiz) Delete(node, id, name string, user web.User) (err error) {
-	err = b.d.ContainerRemove(context.TODO(), node, id)
+func (b *containerBiz) Delete(ctx context.Context, node, id, name string, user web.User) (err error) {
+	err = b.d.ContainerRemove(ctx, node, id)
 	if err == nil {
 		b.eb.CreateContainer(EventActionDelete, node, id, name, user)
 	}
 	return
 }
 
-func (b *containerBiz) ExecCreate(node, id, cmd string) (resp types.IDResponse, err error) {
-	return b.d.ContainerExecCreate(context.TODO(), node, id, cmd)
+func (b *containerBiz) ExecCreate(ctx context.Context, node, id, cmd string) (resp types.IDResponse, err error) {
+	return b.d.ContainerExecCreate(ctx, node, id, cmd)
 }
 
-func (b *containerBiz) ExecAttach(node, id string) (resp types.HijackedResponse, err error) {
-	return b.d.ContainerExecAttach(context.TODO(), node, id)
+func (b *containerBiz) ExecAttach(ctx context.Context, node, id string) (resp types.HijackedResponse, err error) {
+	return b.d.ContainerExecAttach(ctx, node, id)
 }
 
-func (b *containerBiz) ExecStart(node, id string) error {
-	return b.d.ContainerExecStart(context.TODO(), node, id)
+func (b *containerBiz) ExecStart(ctx context.Context, node, id string) error {
+	return b.d.ContainerExecStart(ctx, node, id)
 }
 
-func (b *containerBiz) FetchLogs(node, id string, lines int, timestamps bool) (string, string, error) {
-	stdout, stderr, err := b.d.ContainerLogs(context.TODO(), node, id, lines, timestamps)
+func (b *containerBiz) FetchLogs(ctx context.Context, node, id string, lines int, timestamps bool) (string, string, error) {
+	stdout, stderr, err := b.d.ContainerLogs(ctx, node, id, lines, timestamps)
 	if err != nil {
 		return "", "", err
 	}
 	return stdout.String(), stderr.String(), nil
 }
 
-func (b *containerBiz) Prune(node string, user web.User) (count int, size uint64, err error) {
+func (b *containerBiz) Prune(ctx context.Context, node string, user web.User) (count int, size uint64, err error) {
 	var report types.ContainersPruneReport
-	if report, err = b.d.ContainerPrune(context.TODO(), node); err == nil {
+	if report, err = b.d.ContainerPrune(ctx, node); err == nil {
 		count, size = len(report.ContainersDeleted), report.SpaceReclaimed
 		b.eb.CreateContainer(EventActionPrune, node, "", "", user)
 	}

@@ -1,9 +1,13 @@
 package api
 
 import (
+	"time"
+
 	"github.com/cuigh/auxo/app/container"
 	"github.com/cuigh/auxo/net/web"
 )
+
+const defaultTimeout = 30 * time.Second
 
 func ajax(ctx web.Context, err error) error {
 	if err != nil {

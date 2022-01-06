@@ -1,6 +1,8 @@
 package biz
 
 import (
+	"context"
+
 	"github.com/cuigh/auxo/app"
 	"github.com/cuigh/auxo/data"
 	"github.com/cuigh/swirl/dao"
@@ -9,8 +11,8 @@ import (
 )
 
 type SystemBiz interface {
-	Init() (err error)
-	CheckState() (state *SystemState, err error)
+	Init(ctx context.Context) (err error)
+	CheckState(ctx context.Context) (state *SystemState, err error)
 }
 
 func NewSystem(d dao.Interface, ub UserBiz, sb SettingBiz, s *misc.Setting) SystemBiz {
@@ -29,20 +31,20 @@ type systemBiz struct {
 	sb SettingBiz
 }
 
-func (b *systemBiz) Init() (err error) {
+func (b *systemBiz) Init(ctx context.Context) (err error) {
 	if versions.LessThan(b.s.System.Version, app.Version) {
 		// initialize database
-		err = b.d.Init()
+		err = b.d.Init(ctx)
 		if err == nil {
-			err = b.sb.Save("system", data.Map{"version": app.Version}, nil)
+			err = b.sb.Save(ctx, "system", data.Map{"version": app.Version}, nil)
 		}
 	}
 	return
 }
 
-func (b *systemBiz) CheckState() (state *SystemState, err error) {
+func (b *systemBiz) CheckState(ctx context.Context) (state *SystemState, err error) {
 	var count int
-	count, err = b.ub.Count()
+	count, err = b.ub.Count(ctx)
 	if err == nil {
 		state = &SystemState{Fresh: count == 0}
 	}

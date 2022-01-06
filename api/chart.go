@@ -5,6 +5,7 @@ import (
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/biz"
 	"github.com/cuigh/swirl/dao"
+	"github.com/cuigh/swirl/misc"
 )
 
 // ChartHandler encapsulates chart related handlers.
@@ -26,22 +27,25 @@ func NewChart(b biz.ChartBiz) *ChartHandler {
 }
 
 func chartSearch(b biz.ChartBiz) web.HandlerFunc {
-	return func(ctx web.Context) (err error) {
+	return func(c web.Context) (err error) {
 		var (
 			args   = &dao.ChartSearchArgs{}
 			charts []*dao.Chart
 			total  int
 		)
 
-		if err = ctx.Bind(args); err == nil {
-			charts, total, err = b.Search(args)
+		if err = c.Bind(args); err == nil {
+			ctx, cancel := misc.Context(defaultTimeout)
+			defer cancel()
+
+			charts, total, err = b.Search(ctx, args)
 		}
 
 		if err != nil {
 			return
 		}
 
-		return success(ctx, data.Map{
+		return success(c, data.Map{
 			"items": charts,
 			"total": total,
 		})
@@ -49,13 +53,16 @@ func chartSearch(b biz.ChartBiz) web.HandlerFunc {
 }
 
 func chartFind(b biz.ChartBiz) web.HandlerFunc {
-	return func(ctx web.Context) error {
-		id := ctx.Query("id")
-		chart, err := b.Find(id)
+	return func(c web.Context) error {
+		ctx, cancel := misc.Context(defaultTimeout)
+		defer cancel()
+
+		id := c.Query("id")
+		chart, err := b.Find(ctx, id)
 		if err != nil {
 			return err
 		}
-		return success(ctx, chart)
+		return success(c, chart)
 	}
 }
 
@@ -64,26 +71,32 @@ func chartDelete(b biz.ChartBiz) web.HandlerFunc {
 		ID    string `json:"id"`
 		Title string `json:"title"`
 	}
-	return func(ctx web.Context) (err error) {
+	return func(c web.Context) (err error) {
 		args := &Args{}
-		if err = ctx.Bind(args); err == nil {
-			err = b.Delete(args.ID, args.Title, ctx.User())
+		if err = c.Bind(args); err == nil {
+			ctx, cancel := misc.Context(defaultTimeout)
+			defer cancel()
+
+			err = b.Delete(ctx, args.ID, args.Title, c.User())
 		}
-		return ajax(ctx, err)
+		return ajax(c, err)
 	}
 }
 
 func chartSave(b biz.ChartBiz) web.HandlerFunc {
-	return func(ctx web.Context) error {
+	return func(c web.Context) error {
 		r := &dao.Chart{}
-		err := ctx.Bind(r, true)
+		err := c.Bind(r, true)
 		if err == nil {
+			ctx, cancel := misc.Context(defaultTimeout)
+			defer cancel()
+
 			if r.ID == "" {
-				err = b.Create(r, ctx.User())
+				err = b.Create(ctx, r, c.User())
 			} else {
-				err = b.Update(r, ctx.User())
+				err = b.Update(ctx, r, c.User())
 			}
 		}
-		return ajax(ctx, err)
+		return ajax(c, err)
 	}
 }

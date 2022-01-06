@@ -5,6 +5,7 @@ import (
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/auxo/util/cast"
 	"github.com/cuigh/swirl/biz"
+	"github.com/cuigh/swirl/misc"
 )
 
 // NodeHandler encapsulates node related handlers.
@@ -28,35 +29,41 @@ func NewNode(nb biz.NodeBiz) *NodeHandler {
 }
 
 func nodeList(nb biz.NodeBiz) web.HandlerFunc {
-	return func(ctx web.Context) error {
-		agent := cast.ToBool(ctx.Query("agent"))
+	return func(c web.Context) error {
+		agent := cast.ToBool(c.Query("agent"))
 		nodes, err := nb.List(agent)
 		if err != nil {
 			return err
 		}
-		return success(ctx, nodes)
+		return success(c, nodes)
 	}
 }
 
 func nodeSearch(nb biz.NodeBiz) web.HandlerFunc {
-	return func(ctx web.Context) error {
-		nodes, err := nb.Search()
+	return func(c web.Context) error {
+		ctx, cancel := misc.Context(defaultTimeout)
+		defer cancel()
+
+		nodes, err := nb.Search(ctx)
 		if err != nil {
 			return err
 		}
 
-		return success(ctx, nodes)
+		return success(c, nodes)
 	}
 }
 
 func nodeFind(nb biz.NodeBiz) web.HandlerFunc {
-	return func(ctx web.Context) error {
-		id := ctx.Query("id")
-		node, raw, err := nb.Find(id)
+	return func(c web.Context) error {
+		ctx, cancel := misc.Context(defaultTimeout)
+		defer cancel()
+
+		id := c.Query("id")
+		node, raw, err := nb.Find(ctx, id)
 		if err != nil {
 			return err
 		}
-		return success(ctx, data.Map{"node": node, "raw": raw})
+		return success(c, data.Map{"node": node, "raw": raw})
 	}
 }
 
@@ -65,22 +72,28 @@ func nodeDelete(nb biz.NodeBiz) web.HandlerFunc {
 		ID   string `json:"id"`
 		Name string `json:"name"`
 	}
-	return func(ctx web.Context) (err error) {
+	return func(c web.Context) (err error) {
 		args := &Args{}
-		if err = ctx.Bind(args); err == nil {
-			err = nb.Delete(args.ID, args.Name, ctx.User())
+		if err = c.Bind(args); err == nil {
+			ctx, cancel := misc.Context(defaultTimeout)
+			defer cancel()
+
+			err = nb.Delete(ctx, args.ID, args.Name, c.User())
 		}
-		return ajax(ctx, err)
+		return ajax(c, err)
 	}
 }
 
 func nodeSave(nb biz.NodeBiz) web.HandlerFunc {
-	return func(ctx web.Context) error {
+	return func(c web.Context) error {
 		n := &biz.Node{}
-		err := ctx.Bind(n, true)
+		err := c.Bind(n, true)
 		if err == nil {
-			err = nb.Update(n, ctx.User())
+			ctx, cancel := misc.Context(defaultTimeout)
+			defer cancel()
+
+			err = nb.Update(ctx, n, c.User())
 		}
-		return ajax(ctx, err)
+		return ajax(c, err)
 	}
 }

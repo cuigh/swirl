@@ -6,6 +6,7 @@ import (
 	"io/fs"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/cuigh/auxo/app"
 	"github.com/cuigh/auxo/app/container"
@@ -98,7 +99,10 @@ func findFilters(names ...string) []web.Filter {
 
 func initSystem() error {
 	return container.Call(func(b biz.SystemBiz) error {
-		return b.Init()
+		ctx, cancel := misc.Context(time.Minute)
+		defer cancel()
+
+		return b.Init(ctx)
 	})
 }
 
@@ -109,7 +113,11 @@ func loadSetting(sb biz.SettingBiz) *misc.Setting {
 		b    []byte
 		s    = &misc.Setting{}
 	)
-	if opts, err = sb.Load(); err == nil {
+
+	ctx, cancel := misc.Context(30 * time.Second)
+	defer cancel()
+
+	if opts, err = sb.Load(ctx); err == nil {
 		if b, err = json.Marshal(opts); err == nil {
 			err = json.Unmarshal(b, s)
 		}

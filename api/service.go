@@ -6,6 +6,7 @@ import (
 	"github.com/cuigh/auxo/data"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/biz"
+	"github.com/cuigh/swirl/misc"
 )
 
 // ServiceHandler encapsulates service related handlers.
@@ -44,22 +45,25 @@ func serviceSearch(b biz.ServiceBiz) web.HandlerFunc {
 		PageSize  int    `json:"pageSize" bind:"pageSize"`
 	}
 
-	return func(ctx web.Context) (err error) {
+	return func(c web.Context) (err error) {
 		var (
 			args     = &Args{}
 			services []*biz.ServiceBase
 			total    int
 		)
 
-		if err = ctx.Bind(args); err == nil {
-			services, total, err = b.Search(args.Name, args.Mode, args.PageIndex, args.PageSize)
+		if err = c.Bind(args); err == nil {
+			ctx, cancel := misc.Context(defaultTimeout)
+			defer cancel()
+
+			services, total, err = b.Search(ctx, args.Name, args.Mode, args.PageIndex, args.PageSize)
 		}
 
 		if err != nil {
 			return
 		}
 
-		return success(ctx, data.Map{
+		return success(c, data.Map{
 			"items": services,
 			"total": total,
 		})
@@ -67,16 +71,19 @@ func serviceSearch(b biz.ServiceBiz) web.HandlerFunc {
 }
 
 func serviceFind(b biz.ServiceBiz) web.HandlerFunc {
-	return func(ctx web.Context) error {
-		name := ctx.Query("name")
-		status := ctx.Query("status") == "true"
-		service, raw, err := b.Find(name, status)
+	return func(c web.Context) error {
+		ctx, cancel := misc.Context(defaultTimeout)
+		defer cancel()
+
+		name := c.Query("name")
+		status := c.Query("status") == "true"
+		service, raw, err := b.Find(ctx, name, status)
 		if err != nil {
 			return err
 		} else if service == nil {
 			return web.NewError(http.StatusNotFound)
 		}
-		return success(ctx, data.Map{"service": service, "raw": raw})
+		return success(c, data.Map{"service": service, "raw": raw})
 	}
 }
 
@@ -84,12 +91,15 @@ func serviceDelete(b biz.ServiceBiz) web.HandlerFunc {
 	type Args struct {
 		Name string `json:"name"`
 	}
-	return func(ctx web.Context) (err error) {
+	return func(c web.Context) (err error) {
 		args := &Args{}
-		if err = ctx.Bind(args); err == nil {
-			err = b.Delete(args.Name, ctx.User())
+		if err = c.Bind(args); err == nil {
+			ctx, cancel := misc.Context(defaultTimeout)
+			defer cancel()
+
+			err = b.Delete(ctx, args.Name, c.User())
 		}
-		return ajax(ctx, err)
+		return ajax(c, err)
 	}
 }
 
@@ -97,12 +107,15 @@ func serviceRestart(b biz.ServiceBiz) web.HandlerFunc {
 	type Args struct {
 		Name string `json:"name"`
 	}
-	return func(ctx web.Context) (err error) {
+	return func(c web.Context) (err error) {
 		args := &Args{}
-		if err = ctx.Bind(args); err == nil {
-			err = b.Restart(args.Name, ctx.User())
+		if err = c.Bind(args); err == nil {
+			ctx, cancel := misc.Context(defaultTimeout)
+			defer cancel()
+
+			err = b.Restart(ctx, args.Name, c.User())
 		}
-		return ajax(ctx, err)
+		return ajax(c, err)
 	}
 }
 
@@ -110,12 +123,15 @@ func serviceRollback(b biz.ServiceBiz) web.HandlerFunc {
 	type Args struct {
 		Name string `json:"name"`
 	}
-	return func(ctx web.Context) (err error) {
+	return func(c web.Context) (err error) {
 		args := &Args{}
-		if err = ctx.Bind(args); err == nil {
-			err = b.Rollback(args.Name, ctx.User())
+		if err = c.Bind(args); err == nil {
+			ctx, cancel := misc.Context(defaultTimeout)
+			defer cancel()
+
+			err = b.Rollback(ctx, args.Name, c.User())
 		}
-		return ajax(ctx, err)
+		return ajax(c, err)
 	}
 }
 
@@ -125,52 +141,61 @@ func serviceScale(b biz.ServiceBiz) web.HandlerFunc {
 		Count   uint64 `json:"count"`
 		Version uint64 `json:"version"`
 	}
-	return func(ctx web.Context) (err error) {
+	return func(c web.Context) (err error) {
 		args := &Args{}
-		if err = ctx.Bind(args); err == nil {
-			err = b.Scale(args.Name, args.Count, args.Version, ctx.User())
+		if err = c.Bind(args); err == nil {
+			ctx, cancel := misc.Context(defaultTimeout)
+			defer cancel()
+
+			err = b.Scale(ctx, args.Name, args.Count, args.Version, c.User())
 		}
-		return ajax(ctx, err)
+		return ajax(c, err)
 	}
 }
 
 func serviceSave(b biz.ServiceBiz) web.HandlerFunc {
-	return func(ctx web.Context) error {
+	return func(c web.Context) error {
 		s := &biz.Service{}
-		err := ctx.Bind(s, true)
+		err := c.Bind(s, true)
 		if err == nil {
+			ctx, cancel := misc.Context(defaultTimeout)
+			defer cancel()
+
 			if s.ID == "" {
-				err = b.Create(s, ctx.User())
+				err = b.Create(ctx, s, c.User())
 			} else {
-				err = b.Update(s, ctx.User())
+				err = b.Update(ctx, s, c.User())
 			}
 		}
-		return ajax(ctx, err)
+		return ajax(c, err)
 	}
 }
 
 func serviceDeploy(b biz.ServiceBiz) web.HandlerFunc {
-	return func(ctx web.Context) error {
-		//mode := ctx.Query("mode") // update/replace
+	return func(c web.Context) error {
+		//mode := c.Query("mode") // update/replace
 		service := &biz.Service{}
-		err := ctx.Bind(service, true)
+		err := c.Bind(service, true)
 		if err != nil {
 			return err
 		}
 
+		ctx, cancel := misc.Context(defaultTimeout)
+		defer cancel()
+
 		var s *biz.Service
-		if s, _, err = b.Find(service.Name, false); err != nil {
+		if s, _, err = b.Find(ctx, service.Name, false); err != nil {
 			return err
 		}
 
 		if s == nil {
-			err = b.Create(service, ctx.User())
+			err = b.Create(ctx, service, c.User())
 		} else {
 			// Only the image field is allowed to be changed when updating.
 			s.Image = service.Image
-			err = b.Update(s, ctx.User())
+			err = b.Update(ctx, s, c.User())
 		}
-		return ajax(ctx, err)
+		return ajax(c, err)
 	}
 }
 
@@ -181,17 +206,20 @@ func serviceFetchLogs(b biz.ServiceBiz) web.HandlerFunc {
 		Timestamps bool   `json:"timestamps" bind:"timestamps"`
 	}
 
-	return func(ctx web.Context) (err error) {
+	return func(c web.Context) (err error) {
 		var (
 			args           = &Args{}
 			stdout, stderr string
 		)
-		if err = ctx.Bind(args); err == nil {
-			stdout, stderr, err = b.FetchLogs(args.ID, args.Lines, args.Timestamps)
+		if err = c.Bind(args); err == nil {
+			ctx, cancel := misc.Context(defaultTimeout)
+			defer cancel()
+
+			stdout, stderr, err = b.FetchLogs(ctx, args.ID, args.Lines, args.Timestamps)
 		}
 		if err != nil {
 			return err
 		}
-		return success(ctx, data.Map{"stdout": stdout, "stderr": stderr})
+		return success(c, data.Map{"stdout": stdout, "stderr": stderr})
 	}
 }

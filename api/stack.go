@@ -7,6 +7,7 @@ import (
 	"github.com/cuigh/swirl/biz"
 	"github.com/cuigh/swirl/dao"
 	"github.com/cuigh/swirl/docker/compose"
+	"github.com/cuigh/swirl/misc"
 )
 
 // StackHandler encapsulates stack related handlers.
@@ -33,8 +34,8 @@ func NewStack(b biz.StackBiz) *StackHandler {
 	}
 }
 
-func stackUpload(ctx web.Context) (err error) {
-	file, _, err := ctx.File("content")
+func stackUpload(c web.Context) (err error) {
+	file, _, err := c.File("content")
 	if err != nil {
 		return err
 	}
@@ -42,7 +43,7 @@ func stackUpload(ctx web.Context) (err error) {
 	if err != nil {
 		return err
 	}
-	return ctx.Data(b)
+	return c.Data(b)
 }
 
 func stackSearch(b biz.StackBiz) web.HandlerFunc {
@@ -51,32 +52,38 @@ func stackSearch(b biz.StackBiz) web.HandlerFunc {
 		Filter string `json:"filter" bind:"filter"`
 	}
 
-	return func(ctx web.Context) (err error) {
+	return func(c web.Context) (err error) {
 		var (
 			args   = &Args{}
 			stacks []*dao.Stack
 		)
 
-		if err = ctx.Bind(args); err == nil {
-			stacks, err = b.Search(args.Name, args.Filter)
+		if err = c.Bind(args); err == nil {
+			ctx, cancel := misc.Context(defaultTimeout)
+			defer cancel()
+
+			stacks, err = b.Search(ctx, args.Name, args.Filter)
 		}
 
 		if err != nil {
 			return
 		}
 
-		return success(ctx, stacks)
+		return success(c, stacks)
 	}
 }
 
 func stackFind(b biz.StackBiz) web.HandlerFunc {
-	return func(ctx web.Context) error {
-		name := ctx.Query("name")
-		stack, err := b.Find(name)
+	return func(c web.Context) error {
+		ctx, cancel := misc.Context(defaultTimeout)
+		defer cancel()
+
+		name := c.Query("name")
+		stack, err := b.Find(ctx, name)
 		if err != nil {
 			return err
 		}
-		return success(ctx, stack)
+		return success(c, stack)
 	}
 }
 
@@ -84,12 +91,15 @@ func stackDelete(b biz.StackBiz) web.HandlerFunc {
 	type Args struct {
 		Name string `json:"name"`
 	}
-	return func(ctx web.Context) (err error) {
+	return func(c web.Context) (err error) {
 		args := &Args{}
-		if err = ctx.Bind(args); err == nil {
-			err = b.Delete(args.Name, ctx.User())
+		if err = c.Bind(args); err == nil {
+			ctx, cancel := misc.Context(defaultTimeout)
+			defer cancel()
+
+			err = b.Delete(ctx, args.Name, c.User())
 		}
-		return ajax(ctx, err)
+		return ajax(c, err)
 	}
 }
 
@@ -97,12 +107,15 @@ func stackShutdown(b biz.StackBiz) web.HandlerFunc {
 	type Args struct {
 		Name string `json:"name"`
 	}
-	return func(ctx web.Context) (err error) {
+	return func(c web.Context) (err error) {
 		args := &Args{}
-		if err = ctx.Bind(args); err == nil {
-			err = b.Shutdown(args.Name, ctx.User())
+		if err = c.Bind(args); err == nil {
+			ctx, cancel := misc.Context(defaultTimeout)
+			defer cancel()
+
+			err = b.Shutdown(ctx, args.Name, c.User())
 		}
-		return ajax(ctx, err)
+		return ajax(c, err)
 	}
 }
 
@@ -110,12 +123,15 @@ func stackDeploy(b biz.StackBiz) web.HandlerFunc {
 	type Args struct {
 		Name string `json:"name"`
 	}
-	return func(ctx web.Context) (err error) {
+	return func(c web.Context) (err error) {
 		args := &Args{}
-		if err = ctx.Bind(args); err == nil {
-			err = b.Deploy(args.Name, ctx.User())
+		if err = c.Bind(args); err == nil {
+			ctx, cancel := misc.Context(defaultTimeout)
+			defer cancel()
+
+			err = b.Deploy(ctx, args.Name, c.User())
 		}
-		return ajax(ctx, err)
+		return ajax(c, err)
 	}
 }
 
@@ -125,9 +141,9 @@ func stackSave(b biz.StackBiz) web.HandlerFunc {
 		dao.Stack
 	}
 
-	return func(ctx web.Context) error {
+	return func(c web.Context) error {
 		stack := &Args{}
-		err := ctx.Bind(stack, true)
+		err := c.Bind(stack, true)
 		if err != nil {
 			return err
 		}
@@ -138,11 +154,14 @@ func stackSave(b biz.StackBiz) web.HandlerFunc {
 			return err
 		}
 
+		ctx, cancel := misc.Context(defaultTimeout)
+		defer cancel()
+
 		if stack.ID == "" {
-			err = b.Create(&stack.Stack, ctx.User())
+			err = b.Create(ctx, &stack.Stack, c.User())
 		} else {
-			err = b.Update(&stack.Stack, ctx.User())
+			err = b.Update(ctx, &stack.Stack, c.User())
 		}
-		return ajax(ctx, err)
+		return ajax(c, err)
 	}
 }

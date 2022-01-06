@@ -4,6 +4,7 @@ import (
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/biz"
 	"github.com/cuigh/swirl/dao"
+	"github.com/cuigh/swirl/misc"
 )
 
 // RegistryHandler encapsulates registry related handlers.
@@ -25,23 +26,29 @@ func NewRegistry(b biz.RegistryBiz) *RegistryHandler {
 }
 
 func registrySearch(b biz.RegistryBiz) web.HandlerFunc {
-	return func(ctx web.Context) error {
-		registries, err := b.Search()
+	return func(c web.Context) error {
+		ctx, cancel := misc.Context(defaultTimeout)
+		defer cancel()
+
+		registries, err := b.Search(ctx)
 		if err != nil {
 			return err
 		}
-		return success(ctx, registries)
+		return success(c, registries)
 	}
 }
 
 func registryFind(b biz.RegistryBiz) web.HandlerFunc {
-	return func(ctx web.Context) error {
-		id := ctx.Query("id")
-		node, err := b.Find(id)
+	return func(c web.Context) error {
+		ctx, cancel := misc.Context(defaultTimeout)
+		defer cancel()
+
+		id := c.Query("id")
+		node, err := b.Find(ctx, id)
 		if err != nil {
 			return err
 		}
-		return success(ctx, node)
+		return success(c, node)
 	}
 }
 
@@ -50,26 +57,32 @@ func registryDelete(b biz.RegistryBiz) web.HandlerFunc {
 		ID   string `json:"id"`
 		Name string `json:"name"`
 	}
-	return func(ctx web.Context) (err error) {
+	return func(c web.Context) (err error) {
 		args := &Args{}
-		if err = ctx.Bind(args); err == nil {
-			err = b.Delete(args.ID, args.Name, ctx.User())
+		if err = c.Bind(args); err == nil {
+			ctx, cancel := misc.Context(defaultTimeout)
+			defer cancel()
+
+			err = b.Delete(ctx, args.ID, args.Name, c.User())
 		}
-		return ajax(ctx, err)
+		return ajax(c, err)
 	}
 }
 
 func registrySave(b biz.RegistryBiz) web.HandlerFunc {
-	return func(ctx web.Context) error {
+	return func(c web.Context) error {
 		r := &dao.Registry{}
-		err := ctx.Bind(r, true)
+		err := c.Bind(r, true)
 		if err == nil {
+			ctx, cancel := misc.Context(defaultTimeout)
+			defer cancel()
+
 			if r.ID == "" {
-				err = b.Create(r, ctx.User())
+				err = b.Create(ctx, r, c.User())
 			} else {
-				err = b.Update(r, ctx.User())
+				err = b.Update(ctx, r, c.User())
 			}
 		}
-		return ajax(ctx, err)
+		return ajax(c, err)
 	}
 }

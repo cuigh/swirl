@@ -9,6 +9,7 @@ import (
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/biz"
 	"github.com/cuigh/swirl/dao"
+	"github.com/cuigh/swirl/misc"
 )
 
 // DashboardHandler encapsulates dashboard related handlers.
@@ -28,35 +29,42 @@ func NewDashboard(b biz.DashboardBiz) *DashboardHandler {
 }
 
 func dashboardFind(b biz.DashboardBiz) web.HandlerFunc {
-	return func(ctx web.Context) (err error) {
+	return func(c web.Context) (err error) {
 		var (
 			d    *dao.Dashboard
-			name = ctx.Query("name")
-			key  = ctx.Query("key")
+			name = c.Query("name")
+			key  = c.Query("key")
 		)
-		d, err = b.FindDashboard(name, key)
+
+		ctx, cancel := misc.Context(defaultTimeout)
+		defer cancel()
+
+		d, err = b.FindDashboard(ctx, name, key)
 		if err != nil {
 			return err
 		}
-		return success(ctx, d)
+		return success(c, d)
 	}
 }
 
 func dashboardSave(b biz.DashboardBiz) web.HandlerFunc {
-	return func(ctx web.Context) error {
+	return func(c web.Context) error {
 		dashboard := &dao.Dashboard{}
-		err := ctx.Bind(dashboard)
+		err := c.Bind(dashboard)
 		if err != nil {
 			return err
 		}
 
 		switch dashboard.Name {
 		case "home", "service":
-			err = b.UpdateDashboard(dashboard, ctx.User())
+			ctx, cancel := misc.Context(defaultTimeout)
+			defer cancel()
+
+			err = b.UpdateDashboard(ctx, dashboard, c.User())
 		default:
 			err = errors.New("unknown dashboard: " + dashboard.Name)
 		}
-		return ajax(ctx, err)
+		return ajax(c, err)
 	}
 }
 
@@ -66,17 +74,19 @@ func dashboardFetchData(b biz.DashboardBiz) web.HandlerFunc {
 		Dashboards string `json:"charts" bind:"charts"`
 		Period     int32  `json:"period" bind:"period"`
 	}
-	return func(ctx web.Context) (err error) {
+	return func(c web.Context) (err error) {
 		var (
 			args = &Args{}
 			d    data.Map
 		)
-		if err = ctx.Bind(args); err == nil {
-			d, err = b.FetchData(args.Key, strings.Split(args.Dashboards, ","), times.Minutes(args.Period))
+		if err = c.Bind(args); err == nil {
+			ctx, cancel := misc.Context(defaultTimeout)
+			defer cancel()
+			d, err = b.FetchData(ctx, args.Key, strings.Split(args.Dashboards, ","), times.Minutes(args.Period))
 		}
 		if err != nil {
 			return err
 		}
-		return success(ctx, d)
+		return success(c, d)
 	}
 }

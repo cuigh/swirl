@@ -1,7 +1,6 @@
 package scaler
 
 import (
-	"context"
 	"fmt"
 	"strings"
 	"time"
@@ -14,6 +13,7 @@ import (
 	"github.com/cuigh/auxo/util/run"
 	"github.com/cuigh/swirl/biz"
 	"github.com/cuigh/swirl/docker"
+	"github.com/cuigh/swirl/misc"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/swarm"
 )
@@ -60,10 +60,13 @@ func (s *Scaler) Start() {
 	}
 
 	run.Schedule(time.Minute, func() {
+		ctx, cancel := misc.Context(time.Minute)
+		defer cancel()
+
 		args := filters.NewArgs()
 		args.Add("mode", "replicated")
 		args.Add("label", labelScale)
-		services, err := s.d.ServiceSearch(context.TODO(), args)
+		services, err := s.d.ServiceSearch(ctx, args)
 		if err != nil {
 			log.Get("scaler").Error("scaler > Failed to search service: ", err)
 			return
@@ -91,8 +94,8 @@ func (s *Scaler) tryScale(service *swarm.Service, opts data.Options) {
 		window        = 3 * time.Minute
 		policy        = policyAny
 		args   data.Options
-		ctx    = context.TODO()
 	)
+
 	for _, opt := range opts {
 		switch opt.Name {
 		case "min":
@@ -119,6 +122,9 @@ func (s *Scaler) tryScale(service *swarm.Service, opts data.Options) {
 	if result.Type == scaleNone {
 		return
 	}
+
+	ctx, cancel := misc.Context(time.Minute)
+	defer cancel()
 
 	logger := log.Get("scaler")
 	replicas := *service.Spec.Mode.Replicated.Replicas
@@ -203,8 +209,11 @@ type cpuChecker struct {
 }
 
 func (c *cpuChecker) Check(service string, low, high float64) (scaleType, float64) {
+	ctx, cancel := misc.Context(time.Minute)
+	defer cancel()
+
 	query := fmt.Sprintf(`avg(rate(container_cpu_user_seconds_total{container_label_com_docker_swarm_service_name="%s"}[1m]) * 100)`, service)
-	vector, err := c.mb.GetVector(query, "", time.Now())
+	vector, err := c.mb.GetVector(ctx, query, "", time.Now())
 	if err != nil {
 		log.Get("scaler").Error("scaler > Failed to query metrics: ", err)
 		return scaleNone, 0

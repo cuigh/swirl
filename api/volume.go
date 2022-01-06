@@ -4,6 +4,7 @@ import (
 	"github.com/cuigh/auxo/data"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/biz"
+	"github.com/cuigh/swirl/misc"
 )
 
 // VolumeHandler encapsulates volume related handlers.
@@ -34,22 +35,25 @@ func volumeSearch(b biz.VolumeBiz) web.HandlerFunc {
 		PageSize  int    `json:"pageSize" bind:"pageSize"`
 	}
 
-	return func(ctx web.Context) (err error) {
+	return func(c web.Context) (err error) {
 		var (
 			args    = &Args{}
 			volumes []*biz.Volume
 			total   int
 		)
 
-		if err = ctx.Bind(args); err == nil {
-			volumes, total, err = b.Search(args.Node, args.Name, args.PageIndex, args.PageSize)
+		if err = c.Bind(args); err == nil {
+			ctx, cancel := misc.Context(defaultTimeout)
+			defer cancel()
+
+			volumes, total, err = b.Search(ctx, args.Node, args.Name, args.PageIndex, args.PageSize)
 		}
 
 		if err != nil {
 			return
 		}
 
-		return success(ctx, data.Map{
+		return success(c, data.Map{
 			"items": volumes,
 			"total": total,
 		})
@@ -57,14 +61,17 @@ func volumeSearch(b biz.VolumeBiz) web.HandlerFunc {
 }
 
 func volumeFind(b biz.VolumeBiz) web.HandlerFunc {
-	return func(ctx web.Context) error {
-		node := ctx.Query("node")
-		name := ctx.Query("name")
-		volume, raw, err := b.Find(node, name)
+	return func(c web.Context) error {
+		ctx, cancel := misc.Context(defaultTimeout)
+		defer cancel()
+
+		node := c.Query("node")
+		name := c.Query("name")
+		volume, raw, err := b.Find(ctx, node, name)
 		if err != nil {
 			return err
 		}
-		return success(ctx, data.Map{"volume": volume, "raw": raw})
+		return success(c, data.Map{"volume": volume, "raw": raw})
 	}
 }
 
@@ -73,23 +80,29 @@ func volumeDelete(b biz.VolumeBiz) web.HandlerFunc {
 		Node string `json:"node"`
 		Name string `json:"name"`
 	}
-	return func(ctx web.Context) (err error) {
+	return func(c web.Context) (err error) {
 		args := &Args{}
-		if err = ctx.Bind(args); err == nil {
-			err = b.Delete(args.Node, args.Name, ctx.User())
+		if err = c.Bind(args); err == nil {
+			ctx, cancel := misc.Context(defaultTimeout)
+			defer cancel()
+
+			err = b.Delete(ctx, args.Node, args.Name, c.User())
 		}
-		return ajax(ctx, err)
+		return ajax(c, err)
 	}
 }
 
 func volumeSave(b biz.VolumeBiz) web.HandlerFunc {
-	return func(ctx web.Context) error {
+	return func(c web.Context) error {
 		v := &biz.Volume{}
-		err := ctx.Bind(v, true)
+		err := c.Bind(v, true)
 		if err == nil {
-			err = b.Create(v, ctx.User())
+			ctx, cancel := misc.Context(defaultTimeout)
+			defer cancel()
+
+			err = b.Create(ctx, v, c.User())
 		}
-		return ajax(ctx, err)
+		return ajax(c, err)
 	}
 }
 
@@ -97,18 +110,21 @@ func volumePrune(b biz.VolumeBiz) web.HandlerFunc {
 	type Args struct {
 		Node string `json:"node"`
 	}
-	return func(ctx web.Context) (err error) {
+	return func(c web.Context) (err error) {
 		args := &Args{}
-		if err = ctx.Bind(args); err != nil {
+		if err = c.Bind(args); err != nil {
 			return err
 		}
 
-		count, size, err := b.Prune(args.Node, ctx.User())
+		ctx, cancel := misc.Context(defaultTimeout)
+		defer cancel()
+
+		count, size, err := b.Prune(ctx, args.Node, c.User())
 		if err != nil {
 			return err
 		}
 
-		return success(ctx, data.Map{
+		return success(c, data.Map{
 			"count": count,
 			"size":  size,
 		})

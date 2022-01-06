@@ -4,6 +4,7 @@ import (
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/biz"
 	"github.com/cuigh/swirl/dao"
+	"github.com/cuigh/swirl/misc"
 )
 
 // RoleHandler encapsulates role related handlers.
@@ -25,24 +26,30 @@ func NewRole(b biz.RoleBiz) *RoleHandler {
 }
 
 func roleSearch(b biz.RoleBiz) web.HandlerFunc {
-	return func(ctx web.Context) error {
-		name := ctx.Query("name")
-		roles, err := b.Search(name)
+	return func(c web.Context) error {
+		ctx, cancel := misc.Context(defaultTimeout)
+		defer cancel()
+
+		name := c.Query("name")
+		roles, err := b.Search(ctx, name)
 		if err != nil {
 			return err
 		}
-		return success(ctx, roles)
+		return success(c, roles)
 	}
 }
 
 func roleFind(b biz.RoleBiz) web.HandlerFunc {
-	return func(ctx web.Context) error {
-		id := ctx.Query("id")
-		role, err := b.Find(id)
+	return func(c web.Context) error {
+		ctx, cancel := misc.Context(defaultTimeout)
+		defer cancel()
+
+		id := c.Query("id")
+		role, err := b.Find(ctx, id)
 		if err != nil {
 			return err
 		}
-		return success(ctx, role)
+		return success(c, role)
 	}
 }
 
@@ -51,26 +58,32 @@ func roleDelete(b biz.RoleBiz) web.HandlerFunc {
 		ID   string `json:"id"`
 		Name string `json:"name"`
 	}
-	return func(ctx web.Context) (err error) {
+	return func(c web.Context) (err error) {
 		args := &Args{}
-		if err = ctx.Bind(args); err == nil {
-			err = b.Delete(args.ID, args.Name, ctx.User())
+		if err = c.Bind(args); err == nil {
+			ctx, cancel := misc.Context(defaultTimeout)
+			defer cancel()
+
+			err = b.Delete(ctx, args.ID, args.Name, c.User())
 		}
-		return ajax(ctx, err)
+		return ajax(c, err)
 	}
 }
 
 func roleSave(b biz.RoleBiz) web.HandlerFunc {
-	return func(ctx web.Context) error {
+	return func(c web.Context) error {
 		r := &dao.Role{}
-		err := ctx.Bind(r, true)
+		err := c.Bind(r, true)
 		if err == nil {
+			ctx, cancel := misc.Context(defaultTimeout)
+			defer cancel()
+
 			if r.ID == "" {
-				err = b.Create(r, ctx.User())
+				err = b.Create(ctx, r, c.User())
 			} else {
-				err = b.Update(r, ctx.User())
+				err = b.Update(ctx, r, c.User())
 			}
 		}
-		return ajax(ctx, err)
+		return ajax(c, err)
 	}
 }

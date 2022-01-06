@@ -8,6 +8,7 @@ import (
 	"github.com/cuigh/auxo/app"
 	"github.com/cuigh/auxo/log"
 	"github.com/cuigh/swirl/dao"
+	"github.com/cuigh/swirl/misc"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -79,7 +80,7 @@ func open(addr string) (*mongo.Database, error) {
 	opts := &options.ClientOptions{}
 	opts.ApplyURI(addr)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := misc.Context(10 * time.Second)
 	defer cancel()
 
 	client, err := mongo.Connect(ctx, opts.SetAppName(app.Name))
@@ -89,10 +90,10 @@ func open(addr string) (*mongo.Database, error) {
 	return client.Database(db), nil
 }
 
-func (d *Dao) Init() (err error) {
+func (d *Dao) Init(ctx context.Context) (err error) {
 	for name, models := range indexes {
 		c := d.db.Collection(name)
-		_, err = c.Indexes().CreateMany(context.TODO(), models)
+		_, err = c.Indexes().CreateMany(ctx, models)
 		if err != nil {
 			return
 		}
@@ -138,7 +139,7 @@ func (d *Dao) search(ctx context.Context, coll string, opts searchOptions, recor
 	if opts.sorter != nil {
 		findOpts.SetSort(opts.sorter)
 	}
-	cur, err = c.Find(context.TODO(), opts.filter, findOpts)
+	cur, err = c.Find(ctx, opts.filter, findOpts)
 	if err != nil {
 		return 0, err
 	}

@@ -9,9 +9,9 @@ import (
 )
 
 type TaskBiz interface {
-	Search(node, service, mode string, pageIndex, pageSize int) (tasks []*Task, total int, err error)
-	Find(id string) (task *Task, raw string, err error)
-	FetchLogs(id string, lines int, timestamps bool) (stdout, stderr string, err error)
+	Search(ctx context.Context, node, service, mode string, pageIndex, pageSize int) (tasks []*Task, total int, err error)
+	Find(ctx context.Context, id string) (task *Task, raw string, err error)
+	FetchLogs(ctx context.Context, id string, lines int, timestamps bool) (stdout, stderr string, err error)
 }
 
 func NewTask(d *docker.Docker) TaskBiz {
@@ -22,14 +22,14 @@ type taskBiz struct {
 	d *docker.Docker
 }
 
-func (b *taskBiz) Find(id string) (task *Task, raw string, err error) {
+func (b *taskBiz) Find(ctx context.Context, id string) (task *Task, raw string, err error) {
 	var (
 		t swarm.Task
 		s swarm.Service
 		r []byte
 	)
 
-	t, r, err = b.d.TaskInspect(context.TODO(), id)
+	t, r, err = b.d.TaskInspect(ctx, id)
 	if err != nil {
 		if docker.IsErrNotFound(err) {
 			err = nil
@@ -43,7 +43,7 @@ func (b *taskBiz) Find(id string) (task *Task, raw string, err error) {
 		task = newTask(&t, m)
 
 		// Fill service name
-		if s, _, _ = b.d.ServiceInspect(context.TODO(), t.ServiceID, false); s.Spec.Name == "" {
+		if s, _, _ = b.d.ServiceInspect(ctx, t.ServiceID, false); s.Spec.Name == "" {
 			task.ServiceName = task.ServiceID
 		} else {
 			task.ServiceName = s.Spec.Name
@@ -52,9 +52,9 @@ func (b *taskBiz) Find(id string) (task *Task, raw string, err error) {
 	return
 }
 
-func (b *taskBiz) Search(node, service, state string, pageIndex, pageSize int) (tasks []*Task, total int, err error) {
+func (b *taskBiz) Search(ctx context.Context, node, service, state string, pageIndex, pageSize int) (tasks []*Task, total int, err error) {
 	var list []swarm.Task
-	list, total, err = b.d.TaskList(context.TODO(), node, service, state, pageIndex, pageSize)
+	list, total, err = b.d.TaskList(ctx, node, service, state, pageIndex, pageSize)
 	if err != nil {
 		return
 	}
@@ -72,8 +72,8 @@ func (b *taskBiz) Search(node, service, state string, pageIndex, pageSize int) (
 	return
 }
 
-func (b *taskBiz) FetchLogs(id string, lines int, timestamps bool) (string, string, error) {
-	stdout, stderr, err := b.d.TaskLogs(context.TODO(), id, lines, timestamps)
+func (b *taskBiz) FetchLogs(ctx context.Context, id string, lines int, timestamps bool) (string, string, error) {
+	stdout, stderr, err := b.d.TaskLogs(ctx, id, lines, timestamps)
 	if err != nil {
 		return "", "", err
 	}

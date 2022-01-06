@@ -121,12 +121,15 @@ func (d *Docker) loadCache() (interface{}, error) {
 		return nil, err
 	}
 
-	agents, err := d.loadAgents(context.TODO(), c)
+	ctx, cancel := misc.Context(time.Minute)
+	defer cancel()
+
+	agents, err := d.loadAgents(ctx, c)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to load agents")
 	}
 
-	nodes, err := d.loadNodes(context.TODO(), c)
+	nodes, err := d.loadNodes(ctx, c)
 	if err != nil {
 		return nil, err
 	}

@@ -5,6 +5,7 @@ import (
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/swirl/biz"
 	"github.com/cuigh/swirl/dao"
+	"github.com/cuigh/swirl/misc"
 )
 
 // EventHandler encapsulates event related handlers.
@@ -22,22 +23,25 @@ func NewEvent(b biz.EventBiz) *EventHandler {
 }
 
 func eventSearch(b biz.EventBiz) web.HandlerFunc {
-	return func(ctx web.Context) (err error) {
+	return func(c web.Context) (err error) {
 		var (
 			args   = &dao.EventSearchArgs{}
 			events []*dao.Event
 			total  int
 		)
 
-		if err = ctx.Bind(args); err == nil {
-			events, total, err = b.Search(args)
+		if err = c.Bind(args); err == nil {
+			ctx, cancel := misc.Context(defaultTimeout)
+			defer cancel()
+
+			events, total, err = b.Search(ctx, args)
 		}
 
 		if err != nil {
 			return
 		}
 
-		return success(ctx, data.Map{
+		return success(c, data.Map{
 			"items": events,
 			"total": total,
 		})
@@ -49,11 +53,14 @@ func eventPrune(b biz.EventBiz) web.HandlerFunc {
 		Days int32 `json:"days"`
 	}
 
-	return func(ctx web.Context) (err error) {
+	return func(c web.Context) (err error) {
 		var args = &Args{}
-		if err = ctx.Bind(args); err == nil {
-			err = b.Prune(args.Days)
+		if err = c.Bind(args); err == nil {
+			ctx, cancel := misc.Context(defaultTimeout)
+			defer cancel()
+
+			err = b.Prune(ctx, args.Days)
 		}
-		return ajax(ctx, err)
+		return ajax(c, err)
 	}
 }

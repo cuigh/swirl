@@ -21,9 +21,9 @@ var builtins = []*dao.Chart{
 }
 
 type DashboardBiz interface {
-	FetchData(key string, ids []string, period time.Duration) (data.Map, error)
-	FindDashboard(name, key string) (dashboard *dao.Dashboard, err error)
-	UpdateDashboard(dashboard *dao.Dashboard, user web.User) (err error)
+	FetchData(ctx context.Context, key string, ids []string, period time.Duration) (data.Map, error)
+	FindDashboard(ctx context.Context, name, key string) (dashboard *dao.Dashboard, err error)
+	UpdateDashboard(ctx context.Context, dashboard *dao.Dashboard, user web.User) (err error)
 }
 
 func NewDashboard(d dao.Interface, mb MetricBiz, eb EventBiz) DashboardBiz {
@@ -41,29 +41,29 @@ type dashboardBiz struct {
 	eb EventBiz
 }
 
-func (b *dashboardBiz) FindDashboard(name, key string) (dashboard *dao.Dashboard, err error) {
-	if dashboard, err = b.d.DashboardGet(context.TODO(), name, key); err != nil {
+func (b *dashboardBiz) FindDashboard(ctx context.Context, name, key string) (dashboard *dao.Dashboard, err error) {
+	if dashboard, err = b.d.DashboardGet(ctx, name, key); err != nil {
 		return
 	}
 	if dashboard == nil {
 		dashboard = b.defaultDashboard(name, key)
 	}
-	err = b.fillCharts(dashboard)
+	err = b.fillCharts(ctx, dashboard)
 	return
 }
 
-func (b *dashboardBiz) UpdateDashboard(dashboard *dao.Dashboard, user web.User) (err error) {
+func (b *dashboardBiz) UpdateDashboard(ctx context.Context, dashboard *dao.Dashboard, user web.User) (err error) {
 	dashboard.UpdatedAt = now()
 	dashboard.UpdatedBy = newOperator(user)
-	return b.d.DashboardUpdate(context.TODO(), dashboard)
+	return b.d.DashboardUpdate(ctx, dashboard)
 }
 
-func (b *dashboardBiz) FetchData(key string, ids []string, period time.Duration) (data.Map, error) {
+func (b *dashboardBiz) FetchData(ctx context.Context, key string, ids []string, period time.Duration) (data.Map, error) {
 	if !b.mb.Enabled() {
 		return data.Map{}, nil
 	}
 
-	charts, err := b.getCharts(ids)
+	charts, err := b.getCharts(ctx, ids)
 	if err != nil {
 		return nil, err
 	}
@@ -82,11 +82,11 @@ func (b *dashboardBiz) FetchData(key string, ids []string, period time.Duration)
 			d := Data{id: c.ID}
 			switch c.Type {
 			case "line", "bar":
-				d.data, d.err = b.fetchMatrixData(c, key, start, end)
+				d.data, d.err = b.fetchMatrixData(ctx, c, key, start, end)
 			case "pie":
-				d.data, d.err = b.fetchVectorData(c, key, end)
+				d.data, d.err = b.fetchVectorData(ctx, c, key, end)
 			case "gauge":
-				d.data, d.err = b.fetchScalarData(c, key, end)
+				d.data, d.err = b.fetchScalarData(ctx, c, key, end)
 			default:
 				d.err = errors.New("invalid chart type: " + c.Type)
 			}
@@ -107,7 +107,7 @@ func (b *dashboardBiz) FetchData(key string, ids []string, period time.Duration)
 	return ds, nil
 }
 
-func (b *dashboardBiz) fetchMatrixData(chart *dao.Chart, key string, start, end time.Time) (md *MatrixData, err error) {
+func (b *dashboardBiz) fetchMatrixData(ctx context.Context, chart *dao.Chart, key string, start, end time.Time) (md *MatrixData, err error) {
 	var (
 		q string
 		d *MatrixData
@@ -118,7 +118,7 @@ func (b *dashboardBiz) fetchMatrixData(chart *dao.Chart, key string, start, end 
 			return nil, err
 		}
 
-		if d, err = b.mb.GetMatrix(q, m.Legend, start, end); err != nil {
+		if d, err = b.mb.GetMatrix(ctx, q, m.Legend, start, end); err != nil {
 			log.Get("metric").Error(err)
 		} else if i == 0 {
 			md = d
@@ -130,7 +130,7 @@ func (b *dashboardBiz) fetchMatrixData(chart *dao.Chart, key string, start, end 
 	return md, nil
 }
 
-func (b *dashboardBiz) fetchVectorData(chart *dao.Chart, key string, end time.Time) (cvd *VectorData, err error) {
+func (b *dashboardBiz) fetchVectorData(ctx context.Context, chart *dao.Chart, key string, end time.Time) (cvd *VectorData, err error) {
 	var (
 		q string
 		d *VectorData
@@ -141,7 +141,7 @@ func (b *dashboardBiz) fetchVectorData(chart *dao.Chart, key string, end time.Ti
 			return nil, err
 		}
 
-		if d, err = b.mb.GetVector(q, m.Legend, end); err != nil {
+		if d, err = b.mb.GetVector(ctx, q, m.Legend, end); err != nil {
 			log.Get("metric").Error(err)
 		} else if i == 0 {
 			cvd = d
@@ -153,13 +153,13 @@ func (b *dashboardBiz) fetchVectorData(chart *dao.Chart, key string, end time.Ti
 	return cvd, nil
 }
 
-func (b *dashboardBiz) fetchScalarData(chart *dao.Chart, key string, end time.Time) (*VectorValue, error) {
+func (b *dashboardBiz) fetchScalarData(ctx context.Context, chart *dao.Chart, key string, end time.Time) (*VectorValue, error) {
 	query, err := b.formatQuery(chart.Metrics[0].Query, chart.Dashboard, key)
 	if err != nil {
 		return nil, err
 	}
 
-	v, err := b.mb.GetScalar(query, end)
+	v, err := b.mb.GetScalar(ctx, query, end)
 	if err != nil {
 		return nil, err
 	}
@@ -190,7 +190,7 @@ func (b *dashboardBiz) formatQuery(query, dashboard, key string) (string, error)
 	return "", errs[0]
 }
 
-func (b *dashboardBiz) getCharts(ids []string) (charts map[string]*dao.Chart, err error) {
+func (b *dashboardBiz) getCharts(ctx context.Context, ids []string) (charts map[string]*dao.Chart, err error) {
 	var (
 		customIds    []string
 		customCharts []*dao.Chart
@@ -210,7 +210,7 @@ func (b *dashboardBiz) getCharts(ids []string) (charts map[string]*dao.Chart, er
 	}
 
 	if len(customIds) > 0 {
-		if customCharts, err = b.d.ChartGetBatch(context.TODO(), customIds...); err == nil {
+		if customCharts, err = b.d.ChartGetBatch(ctx, customIds...); err == nil {
 			for _, chart := range customCharts {
 				charts[chart.ID] = chart
 			}
@@ -219,7 +219,7 @@ func (b *dashboardBiz) getCharts(ids []string) (charts map[string]*dao.Chart, er
 	return
 }
 
-func (b *dashboardBiz) fillCharts(d *dao.Dashboard) (err error) {
+func (b *dashboardBiz) fillCharts(ctx context.Context, d *dao.Dashboard) (err error) {
 	if len(d.Charts) == 0 {
 		return
 	}
@@ -233,7 +233,7 @@ func (b *dashboardBiz) fillCharts(d *dao.Dashboard) (err error) {
 		ids[i] = c.ID
 	}
 
-	m, err = b.getCharts(ids)
+	m, err = b.getCharts(ctx, ids)
 	if err != nil {
 		return err
 	}

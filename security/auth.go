@@ -1,6 +1,7 @@
 package security
 
 import (
+	"context"
 	"strings"
 	"time"
 
@@ -54,18 +55,18 @@ func (c *Identifier) Apply(next web.HandlerFunc) web.HandlerFunc {
 	}
 }
 
-func (c *Identifier) Identify(loginName, password string) (identify Identity, err error) {
+func (c *Identifier) Identify(ctx context.Context, loginName, password string) (identify Identity, err error) {
 	var (
 		u security.User
 		s *dao.Session
 	)
 
-	u, err = c.signIn(loginName, password)
+	u, err = c.signIn(ctx, loginName, password)
 	if err != nil {
 		return
 	}
 
-	s, err = c.createSession(u)
+	s, err = c.createSession(ctx, u)
 	if err != nil {
 		return nil, err
 	}
@@ -78,8 +79,8 @@ func (c *Identifier) Identify(loginName, password string) (identify Identity, er
 	}, nil
 }
 
-func (c *Identifier) signIn(loginName, password string) (user security.User, err error) {
-	privacy, err := c.ub.FindPrivacy(loginName)
+func (c *Identifier) signIn(ctx context.Context, loginName, password string) (user security.User, err error) {
+	privacy, err := c.ub.FindPrivacy(ctx, loginName)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +90,7 @@ func (c *Identifier) signIn(loginName, password string) (user security.User, err
 	}
 
 	for _, login := range c.realms {
-		user, err = login(privacy, loginName, password)
+		user, err = login(ctx, privacy, loginName, password)
 		if user != nil && err == nil {
 			return
 		}
@@ -111,7 +112,10 @@ func (c *Identifier) extractToken(ctx web.Context) (token string) {
 }
 
 func (c *Identifier) identifyBySession(token string) web.User {
-	session, err := c.sb.Find(token)
+	ctx, cancel := misc.Context(30 * time.Second)
+	defer cancel()
+
+	session, err := c.sb.Find(ctx, token)
 	if err != nil {
 		c.logger.Error("failed to find session: ", err)
 		return nil
@@ -120,19 +124,22 @@ func (c *Identifier) identifyBySession(token string) web.User {
 	}
 
 	if session.Dirty {
-		if err = c.updateSession(session); err != nil {
+		if err = c.updateSession(ctx, session); err != nil {
 			c.logger.Error("failed to refresh session: ", err)
 			return nil
 		}
 	} else if time.Now().Add(time.Minute * 5).After(session.Expiry) {
-		c.renewSession(session)
+		c.renewSession(ctx, session)
 	}
 
 	return c.createUser(session)
 }
 
 func (c *Identifier) identifyByToken(token string) web.User {
-	u, err := c.ub.FindByToken(token)
+	ctx, cancel := misc.Context(30 * time.Second)
+	defer cancel()
+
+	u, err := c.ub.FindByToken(ctx, token)
 	if err != nil {
 		c.logger.Errorf("failed to find user by token '%s': %s", token, err)
 		return nil
@@ -140,7 +147,7 @@ func (c *Identifier) identifyByToken(token string) web.User {
 		return nil
 	}
 
-	perms, err := c.rb.GetPerms(u.Roles)
+	perms, err := c.rb.GetPerms(ctx, u.Roles)
 	if err != nil {
 		c.logger.Error("failed to load perms: ", err)
 		return nil
@@ -165,7 +172,7 @@ func (c *Identifier) createUser(s *dao.Session) web.User {
 	}
 }
 
-func (c *Identifier) createSession(user security.User) (s *dao.Session, err error) {
+func (c *Identifier) createSession(ctx context.Context, user security.User) (s *dao.Session, err error) {
 	s = &dao.Session{
 		ID:       primitive.NewObjectID().Hex(),
 		UserID:   user.ID(),
@@ -173,21 +180,21 @@ func (c *Identifier) createSession(user security.User) (s *dao.Session, err erro
 		Expiry:   time.Now().Add(misc.Options.TokenExpiry),
 	}
 	s.MaxExpiry = s.Expiry.Add(24 * time.Hour)
-	if err = c.fillSession(s); err == nil {
-		err = c.sb.Create(s)
+	if err = c.fillSession(ctx, s); err == nil {
+		err = c.sb.Create(ctx, s)
 	}
 	return
 }
 
-func (c *Identifier) updateSession(s *dao.Session) (err error) {
-	if err = c.fillSession(s); err == nil {
-		err = c.sb.Update(s)
+func (c *Identifier) updateSession(ctx context.Context, s *dao.Session) (err error) {
+	if err = c.fillSession(ctx, s); err == nil {
+		err = c.sb.Update(ctx, s)
 	}
 	return
 }
 
-func (c *Identifier) fillSession(s *dao.Session) (err error) {
-	u, err := c.ub.FindByID(s.UserID)
+func (c *Identifier) fillSession(ctx context.Context, s *dao.Session) (err error) {
+	u, err := c.ub.FindByID(ctx, s.UserID)
 	if err != nil {
 		return err
 	} else if u == nil {
@@ -197,7 +204,7 @@ func (c *Identifier) fillSession(s *dao.Session) (err error) {
 	if u.Admin {
 		s.Perms = []string{"*"}
 	} else {
-		s.Perms, err = c.rb.GetPerms(u.Roles)
+		s.Perms, err = c.rb.GetPerms(ctx, u.Roles)
 		if err != nil {
 			return err
 		}
@@ -210,12 +217,12 @@ func (c *Identifier) fillSession(s *dao.Session) (err error) {
 	return nil
 }
 
-func (c *Identifier) renewSession(s *dao.Session) {
+func (c *Identifier) renewSession(ctx context.Context, s *dao.Session) {
 	expiry := time.Now().Add(misc.Options.TokenExpiry)
 	if expiry.After(s.MaxExpiry) {
 		expiry = s.MaxExpiry
 	}
-	err := c.sb.UpdateExpiry(s.ID, expiry)
+	err := c.sb.UpdateExpiry(ctx, s.ID, expiry)
 	if err != nil {
 		c.logger.Errorf("failed to renew token '%s': %s", s.ID, err)
 	}
@@ -235,10 +242,10 @@ func queryExtractor(ctx web.Context) (token string) {
 	return ctx.Query("token")
 }
 
-type RealmFunc func(u *biz.UserPrivacy, loginName, password string) (security.User, error)
+type RealmFunc func(ctx context.Context, u *biz.UserPrivacy, loginName, password string) (security.User, error)
 
 func internalRealm() RealmFunc {
-	return func(u *biz.UserPrivacy, loginName, password string) (security.User, error) {
+	return func(ctx context.Context, u *biz.UserPrivacy, loginName, password string) (security.User, error) {
 		if u == nil || u.Type != biz.UserTypeInternal {
 			return nil, nil
 		}
@@ -267,7 +274,7 @@ func ldapRealm(s *misc.Setting, ub biz.UserBiz) RealmFunc {
 		r = ldap.New(s.LDAP.Address, s.LDAP.BaseDN, s.LDAP.UserDN, opts...)
 	}
 
-	return func(u *biz.UserPrivacy, loginName, password string) (security.User, error) {
+	return func(ctx context.Context, u *biz.UserPrivacy, loginName, password string) (security.User, error) {
 		if r == nil || (u != nil && u.Type != biz.UserTypeLDAP) {
 			return nil, nil
 		}
@@ -282,7 +289,7 @@ func ldapRealm(s *misc.Setting, ub biz.UserBiz) RealmFunc {
 			lu = user.(*ldap.User)
 		)
 		if u == nil {
-			id, err = ub.Create(&dao.User{
+			id, err = ub.Create(ctx, &dao.User{
 				Type:      biz.UserTypeLDAP,
 				LoginName: loginName,
 				Name:      lu.Name(),
