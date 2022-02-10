@@ -82,8 +82,11 @@ func systemSummarize(d *docker.Docker) web.HandlerFunc {
 
 func systemCreateAdmin(ub biz.UserBiz) web.HandlerFunc {
 	return func(c web.Context) (err error) {
-		user := &dao.User{}
-		if err = c.Bind(user, true); err != nil {
+		args := &struct {
+			Password string `json:"password"`
+			*dao.User
+		}{}
+		if err = c.Bind(args, true); err != nil {
 			return err
 		}
 
@@ -95,6 +98,8 @@ func systemCreateAdmin(ub biz.UserBiz) web.HandlerFunc {
 			return errors.Coded(misc.ErrSystemInitialized, "system was already initialized")
 		}
 
+		user := args.User
+		user.Password = args.Password
 		user.Admin = true
 		user.Type = biz.UserTypeInternal
 		_, err = ub.Create(ctx, user, nil)

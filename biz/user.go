@@ -3,7 +3,6 @@ package biz
 import (
 	"context"
 
-	"github.com/cuigh/auxo/data"
 	"github.com/cuigh/auxo/errors"
 	"github.com/cuigh/auxo/net/web"
 	"github.com/cuigh/auxo/security/passwd"
@@ -99,7 +98,6 @@ func (b *userBiz) FindPrivacy(ctx context.Context, loginName string) (privacy *U
 }
 
 func (b *userBiz) Create(ctx context.Context, user *dao.User, ctxUser web.User) (id string, err error) {
-	user.Tokens = data.Options{data.Option{Name: "test", Value: "abc123"}}
 	user.ID = createId()
 	user.Status = UserStatusActive
 	user.CreatedAt = now()

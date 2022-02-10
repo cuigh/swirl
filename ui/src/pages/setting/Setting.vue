@@ -16,7 +16,7 @@
         ref="formLdap"
         label-placement="left"
         style="padding: 4px 0 0 12px"
-        label-width="100"
+        label-width="auto"
       >
         <n-form-item :label="t('fields.enabled')" path="ldap.enabled" label-align="right">
           <n-switch v-model:value="setting.ldap.enabled" />
@@ -48,6 +48,7 @@
         <n-form-item
           :label="t('fields.bind_dn')"
           label-align="right"
+          label-width="auto"
           :show-feedback="false"
           v-show="setting.ldap.auth === 'bind'"
         >

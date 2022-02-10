@@ -33,7 +33,7 @@ var (
 
 func main() {
 	app.Name = "Swirl"
-	app.Version = "1.0.0rc1"
+	app.Version = "1.0.0rc2"
 	app.Desc = "A web management UI for Docker, focused on swarm cluster"
 	app.Action = func(ctx *app.Context) error {
 		return run.Pipeline(misc.LoadOptions, initSystem, scaler.Start, startServer)

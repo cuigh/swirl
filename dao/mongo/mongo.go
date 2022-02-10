@@ -90,7 +90,7 @@ func open(addr string) (*mongo.Database, error) {
 	return client.Database(db), nil
 }
 
-func (d *Dao) Init(ctx context.Context) (err error) {
+func (d *Dao) Upgrade(ctx context.Context) (err error) {
 	for name, models := range indexes {
 		c := d.db.Collection(name)
 		_, err = c.Indexes().CreateMany(ctx, models)

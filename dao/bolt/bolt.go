@@ -45,14 +45,19 @@ func New(addr string) (dao.Interface, error) {
 		logger: log.Get("bolt"),
 		db:     db,
 	}
+
+	if err = d.init(); err != nil {
+		return nil, err
+	}
+
 	run.Schedule(time.Hour, d.SessionPrune, func(err interface{}) {
 		d.logger.Error("failed to clean up expired sessions: ", err)
 	})
 	return d, nil
 }
 
-func (d *Dao) Init(ctx context.Context) error {
-	buckets := []string{"chart", "dashboard", "event", "registry", "role", "setting", "stack", "user" /*"perm","session","template"*/}
+func (d *Dao) init() error {
+	buckets := []string{"chart", "dashboard", "event", "registry", "role", "setting", "stack", "user", "session" /*"perm","template"*/}
 	return d.db.Update(func(tx *bolt.Tx) error {
 		for _, bucket := range buckets {
 			if _, err := tx.CreateBucketIfNotExists([]byte(bucket)); err != nil {
@@ -61,6 +66,10 @@ func (d *Dao) Init(ctx context.Context) error {
 		}
 		return nil
 	})
+}
+
+func (d *Dao) Upgrade(ctx context.Context) error {
+	return nil
 }
 
 func (d *Dao) replace(bucket, key string, value interface{}) error {

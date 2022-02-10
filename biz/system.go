@@ -33,8 +33,8 @@ type systemBiz struct {
 
 func (b *systemBiz) Init(ctx context.Context) (err error) {
 	if versions.LessThan(b.s.System.Version, app.Version) {
-		// initialize database
-		err = b.d.Init(ctx)
+		// upgrade database
+		err = b.d.Upgrade(ctx)
 		if err == nil {
 			err = b.sb.Save(ctx, "system", data.Map{"version": app.Version}, nil)
 		}

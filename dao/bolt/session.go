@@ -11,12 +11,12 @@ import (
 const Session = "session"
 
 func (d *Dao) SessionGet(ctx context.Context, id string) (session *dao.Session, err error) {
-	s := &dao.Session{}
-	err = d.get(Session, id, s)
+	session = &dao.Session{}
+	err = d.get(Session, id, session)
 	if err == ErrNoRecords {
 		return nil, nil
 	} else if err != nil {
-		s = nil
+		session = nil
 	}
 	return
 }
