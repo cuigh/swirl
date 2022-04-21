@@ -106,11 +106,13 @@ func (d *Docker) fillStatus(ctx context.Context, c *client.Client, services []sw
 	// count tasks
 	for _, task := range tasks {
 		s := m[task.ServiceID]
-		if s.Spec.Mode.Global != nil && task.DesiredState != swarm.TaskStateShutdown {
-			s.ServiceStatus.DesiredTasks++
-		}
-		if n, ok := nodes[task.NodeID]; ok && n.State != swarm.NodeStateDown && task.Status.State == swarm.TaskStateRunning {
-			s.ServiceStatus.RunningTasks++
+		if s != nil {
+			if s.Spec.Mode.Global != nil && task.DesiredState != swarm.TaskStateShutdown {
+				s.ServiceStatus.DesiredTasks++
+			}
+			if n, ok := nodes[task.NodeID]; ok && n.State != swarm.NodeStateDown && task.Status.State == swarm.TaskStateRunning {
+				s.ServiceStatus.RunningTasks++
+			}
 		}
 	}
 	return
