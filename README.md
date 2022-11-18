@@ -165,9 +165,9 @@ docker stack deploy -c compose.yml swirl
 
 **Swirl** use service labels to support some features, the labels in the table below are currently supported.
 
-| Name        | Description          | Examples                            |
-|-------------|----------------------|-------------------------------------|
-| swirl.scale | Service auto scaling | `swirl.scale=min=1,max=5,cpu=30:50` |
+| Name        | Description          | Examples                |
+|-------------|----------------------|-------------------------|
+| swirl.scale | Service auto scaling | `min=1,max=5,cpu=30:50` |
 
 ## Build
 
