@@ -22,8 +22,7 @@ require (
 	github.com/prometheus/client_golang v1.11.0
 	github.com/prometheus/common v0.30.0
 	go.mongodb.org/mongo-driver v1.8.2
-	golang.org/x/net v0.0.0-20220420153159-1850ba15e1be // indirect
-	golang.org/x/sys v0.0.0-20220412211240-33da011f77ad // indirect
+	golang.org/x/net v0.7.0 // indirect
 	google.golang.org/genproto v0.0.0-20220420195807-44278fea765b // indirect
 	gopkg.in/yaml.v2 v2.4.0
 )
