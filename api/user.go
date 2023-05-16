@@ -70,13 +70,18 @@ func userSignIn(auth *security.Identifier, eb biz.EventBiz) web.HandlerFunc {
 
 func userSave(b biz.UserBiz) web.HandlerFunc {
 	return func(c web.Context) error {
-		user := &dao.User{}
-		err := c.Bind(user, true)
+		args := &struct {
+			Password string `json:"password"`
+			*dao.User
+		}{}
+		err := c.Bind(args, true)
 		if err == nil {
 			ctx, cancel := misc.Context(defaultTimeout)
 			defer cancel()
 
+			user := args.User
 			if user.ID == "" {
+				user.Password = args.Password
 				_, err = b.Create(ctx, user, c.User())
 			} else {
 				err = b.Update(ctx, user, c.User())
