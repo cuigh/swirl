@@ -19,7 +19,7 @@ require (
 	github.com/mitchellh/mapstructure v1.4.3
 	github.com/opencontainers/image-spec v1.0.2 // indirect
 	github.com/pkg/errors v0.9.1
-	github.com/prometheus/client_golang v1.11.0
+	github.com/prometheus/client_golang v1.11.1
 	github.com/prometheus/common v0.30.0
 	go.mongodb.org/mongo-driver v1.8.2
 	golang.org/x/net v0.0.0-20220420153159-1850ba15e1be // indirect
